@@ -129,58 +129,9 @@ namespace Json
             return Decode(token, Encoding.UTF8.GetBytes(key), parseJson);
         }
 
-        /// <summary>
-        /// Given a JWT, decode it and return the JSON payload. This overload used with plaintext JWT.
-        /// </summary>
-        /// <param name="token">The JWT.</param>
-        /// <param name="parseJson">Whether to parse json payload (default is false).</param>
-        /// <returns>A string containing the JSON payload or IDictionary<string, object> depending on parse option</returns>
-        /// <exception cref="SignatureVerificationException">Thrown if the verify parameter was true and the signature was NOT valid or if the JWT was signed with an unsupported algorithm.</exception>
         public static object Decode(string token, bool parseJson = false)
         {
             return Decode(token, (object)null, parseJson);
-        }
-
-        public static string Encode(object payload, JwsAlgorithm algorithm)
-        {
-            return Encode(payload, (object) null, algorithm);
-        }
-
-
-        /// <summary>
-        /// Creates a JWT given a payload, the signing key, and the algorithm to use.
-        /// </summary>
-        /// <param name="payload">An arbitrary payload (must be serializable to JSON via <see cref="System.Web.Script.Serialization.JavaScriptSerializer"/>).</param>
-        /// <param name="key">The private key to sign token.</param>
-        /// <param name="algorithm">The assymetric hash algorithm to use (RS-* family).</param>
-        /// <returns>The generated JWT.</returns>
-        public static string Encode(object payload, AsymmetricAlgorithm key, JwsAlgorithm algorithm)
-        {
-            return Encode(payload, (object)key, algorithm);
-        }
-
-        /// <summary>
-        /// Creates a JWT given a payload, the signing key, and the algorithm to use.
-        /// </summary>
-        /// <param name="payload">An arbitrary payload (must be serializable to JSON via <see cref="System.Web.Script.Serialization.JavaScriptSerializer"/>).</param>
-        /// <param name="key">The key bytes used to sign the token.</param>
-        /// <param name="algorithm">The hash algorithm to use.</param>
-        /// <returns>The generated JWT.</returns>
-        public static string Encode(object payload, byte[] key, JwsAlgorithm algorithm)
-        {
-            return Encode(payload, (object)key, algorithm);
-        }
-
-        /// <summary>
-        /// Creates a JWT given a payload, the signing key, and the algorithm to use.
-        /// </summary>
-        /// <param name="payload">An arbitrary payload (must be serializable to JSON via <see cref="System.Web.Script.Serialization.JavaScriptSerializer"/>).</param>
-        /// <param name="key">The key used to sign the token.</param>
-        /// <param name="algorithm">The hash algorithm to use.</param>
-        /// <returns>The generated JWT.</returns>
-        public static string Encode(object payload, string key, JwsAlgorithm algorithm)
-        {
-            return Encode(payload, Encoding.UTF8.GetBytes(key), algorithm);
         }
 
         public static string Encode(object payload, object key, JweAlgorithm alg, JweEncryption enc)
@@ -207,13 +158,29 @@ namespace Json
             return Compact.Serialize(header, encryptedCek, encParts[0], encParts[1], encParts[2]);
         }
 
+        /// <summary>
+        /// Given a JWT, decode it and return the JSON payload. This overload used with plaintext JWT.
+        /// </summary>
+        /// <param name="token">The JWT.</param>
+        /// <param name="parseJson">Whether to parse json payload (default is false).</param>
+        /// <returns>A string containing the JSON payload or IDictionary<string, object> depending on parse option</returns>
+        /// <exception cref="SignatureVerificationException">Thrown if the verify parameter was true and the signature was NOT valid or if the JWT was signed with an unsupported algorithm.</exception>
+        public static string Encode(object payload, JwsAlgorithm algorithm)
+        {
+            return Encode(payload, null, algorithm);
+        }
 
-        private static string Encode(object payload, object key, JwsAlgorithm algorithm)
+        public static string Encode(object payload, object key, JwsAlgorithm algorithm)
+        {
+            return Encode(js.Serialize(payload), key, algorithm);
+        }
+
+        public static string Encode(string payload, object key, JwsAlgorithm algorithm)
         {
             var header = new { typ = "JWT", alg = algorithm.ToString() };
 
             byte[] headerBytes = Encoding.UTF8.GetBytes(js.Serialize(header));
-            byte[] payloadBytes = Encoding.UTF8.GetBytes(js.Serialize(payload));
+            byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);
 
             var bytesToSign = Encoding.UTF8.GetBytes(Compact.Serialize(headerBytes, payloadBytes));
 

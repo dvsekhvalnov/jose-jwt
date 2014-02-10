@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using Json;
 using NUnit.Framework;
 namespace UnitTests
@@ -142,12 +143,12 @@ namespace UnitTests
             string token = @"{""hello"": ""world""}";
 
             //when
-            string hashed=Json.JWT.Encode(token, key, JwsAlgorithm.HS256);
+            string hashed=Json.JWT.Encode(token, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256);
 
             //then
             Console.Out.WriteLine("hashed = {0}", hashed);
 
-            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.IntcImhlbGxvXCI6IFwid29ybGRcIn0i.hUqBEt3MRgc89LbU_qDCRQbhrSMSZ2QwbG5-5PU8tiI"));
+            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.KmLWPfxC3JGopWImDgYg9IUpgAi8gwimviUfr6eJyFI"));
         }
 
         [Test]
@@ -157,12 +158,12 @@ namespace UnitTests
             string token = @"{""hello"": ""world""}";
 
             //when
-            string hashed=Json.JWT.Encode(token, key, JwsAlgorithm.HS384);
+            string hashed = Json.JWT.Encode(token, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS384);
 
             //then
             Console.Out.WriteLine("hashed = {0}", hashed);
 
-            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzM4NCJ9.IntcImhlbGxvXCI6IFwid29ybGRcIn0i.dGhs1ESDC2lpoRy1K-z3n0yQsUlm4Vws7aVp6LXTVhJ_9C0xQwc6ztxNc3Ja-P8q"));
+            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzM4NCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.Be1KYCRGFbv0uQwelaRj0a5SYDdbk_sYsXkfrbRI6TmYpuWBga_RsiU2TyyyjoXR"));
         }
 
         [Test]
@@ -172,12 +173,12 @@ namespace UnitTests
             string token = @"{""hello"": ""world""}";
 
             //when
-            string hashed=Json.JWT.Encode(token, key, JwsAlgorithm.HS512);
+            string hashed = Json.JWT.Encode(token, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS512);
 
             //then
             Console.Out.WriteLine("hashed = {0}", hashed);
 
-            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.IntcImhlbGxvXCI6IFwid29ybGRcIn0i.bm3KkSKH5eswhvP9FB7h13_WiJ-N4gCRvX5jxuGAFS6O03jO8rQ_mNfqJ2AQ1UOikoZPbjMb1AlJtht2ffvR6A"));
+            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9._1m5AmI1xbSfVpykAm9PMXYuQLIdqWuRN8Lz6hFMDq0beqLAaH4Dh2VQNlXzoBG7Nk4vHx2gZgVuhF62cnXcKQ"));
         }
 
         [Test]
@@ -192,7 +193,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("hashed = {0}", hashed);
 
-            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.IntcImhlbGxvXCI6IFwid29ybGRcIn0i.pTyJsvJNvGbsAZxms9RRGfkemW6r44uesjf-V4uT9H_EDCErnIifcdRUIpCCRjwGFp8n019-oRZttY6f4edxMiXu7Giq1mON5pBKfKENRFmFeFm6klS83h1m33zp_cfXAQk4pWt6LRQUnpuRrAV_nJ88ra5TnBzPq6Cfs5QJn6B9UuE86cXOrirBaiLnx9AWphPtL19sodqHF_bXDCS0qeJ_RaEDiQieWo2ZsIOh0elYSoC3Jgxxp3fqW6eBaBgglTxskh-GarMWvTPG_WHdfw_OKHrMgan8XYl7Vv-_NE4Uz97sXed1GZ247VdRULUIlLYSYfznrgK5J3NdJzwjNQ"));
+            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.M3uJ9g4_e_lCyd0LtSJuSPMHe_s0Bj6LDA2kqf041SA3Les8aUmRQGlkG3ng63Thw6q06hF6r5bXX8tamku8AOyc45TIfPY9caNKKcVJ6RtXBxRWSY3r3Uh9o5zg3EOElfMWuekz0jfVfOaRgMO358ARsKW5BY6jfgmKsVyG1n3uYm8ESpzPlWWLcgUEjUSq3_m5t-COKySXa_zPPtFnA__159kSKCQRm4OcbYWzJD3-xl2i2GRQFLP7npLAuGPv42t5zf8snJvBWbROsdvvs7qzZ5v6bJy8wuBe9mGXmnbRsMFCzooZQ4H8LFrSnT3DakPVdLcDWE5HxZ-Ikr9l0A"));
         }
 
         [Test]
@@ -207,7 +208,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("hashed = {0}", hashed);
 
-            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzM4NCJ9.IntcImhlbGxvXCI6IFwid29ybGRcIn0i.SgD2wzM67mXVNdJvRO3SGOY0ffzMFHrUURKNk2CCMd5Me_tQCAXYKGqMzsdkFhY0resqKTv423EXJ9Hzxg5_4P91BI0Qb7j-ei3xR9gtpbTNpwhF_ttwVgKdvKejo5m1sTawsA3SLBPRpqdArpnpqKAVniATWu6LC2_zDmtYQKVvEYN4-6d620PUWhSuUNskWHRLqSdea-e6K2dK6d39sNzvH-qglBAcCmoNO7zy2tlwMkMhNn_baHHMk1kJTk79W3p4fveaLrWmP42s3Ds_Rr4ZQF8T0svYZsFy7vpwZC1ITJRMOPHllqThSJoAtTtVGgi2Exw8uUOJdohxfuaseg"));
+            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzM4NCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.Tsq02ZIAOOK8ck0NS7VJ2NOmL6VpATGTb5hVUQC9_DJqiyrp2Vs8KGw9ahRjvIQMElkcFuWRPg-MGgHd7XUPVbhm7jK3cBvQ4y9hal6VNFfsL_DWhijLYgFpBj2nEw_qqZbChrPNRn-B1BrMKuRHOqu-7D3PPPMv9hvSg80WOLlkOUgIhp3a64saPJ8rDEibowdNNXw0k0H2i1D6WLK59Ew-6v6qO8OI9bkVc7SDV9qZSx3n0hm_JfyZbkCb-KKacJnkfVcnlNIRXRbk7cdlp90uYJ1aJDZrcIVTUOOAHQCQ4uaGwxhmH_NNHiY-sjWybP7xQCSq-Ip0yNVstWfUTQ"));
         }
 
         [Test]
@@ -222,7 +223,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("hashed = {0}", hashed);
 
-            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.IntcImhlbGxvXCI6IFwid29ybGRcIn0i.e9yrjhZ6KFbtiUGH5Kz2oJXUFedqr1ou1WvO50VQ3oQYH2HsTRDp7JJEoXGEBp1l8QTEplm-RxBBGE_OnE2kWYCS1IJy40NHrcjxECHhO4xDZT9WGbAkrmbzuZDeKHmcHVXLGl_AGVROu6IFh_Jka6i6yqMH34N3a4j1-sHs01DO_99Sunx8Cywx-rAT7khu3zgH-aH5GpAge2LyNUxxcJkwwgDOT2-n6pLYg1RaH3S1rgjg5nx0ouD8auwQq5z7sCnYVozsfEG3EQNFcR2VxOF0zqPcQ8FfTV73qeXNPiZZjgmtYiNJOf8Owkt_SE3oKE5XvexiWtWGYCWjxmM0XQ"));
+            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.YJ_5bDkZUgZj1ZoyTbSeYerUnahjt4Llbj6IwUQUY-zH_mMpywJHs2IT8wteUyX32lCCGr4NfNKpkC-zMMq7aDsklSKIg8sdGYDMheGsEw9YD0QRBF1Ovt4yuSZjWsgmdGSapXKc8CBqSzPCr9S1Rns8YhVHAYMfzHrahXuroYK35gVPQKKLbYQGcwnhpgvxMx0EfGyFbSc6r6XYK-fJ5lSqBh4wSxVMBy_5CkTVWpmnDjRuycE_j4c-yuTYUEAsj5o0sW2ahPf8aomBUC5I1ZG2yTAz8BX7dud6s2VPJQRRsUKlMNrUcMGEooJMoL_vmek9z3t_z9KFyyVHuY5XUA"));
         }
 
         [Test]
