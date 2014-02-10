@@ -36,7 +36,7 @@ namespace UnitTests
                                 hello="world"
                               };
             //when
-            string hashed = Json.JWT.Encode(payload, JwsAlgorithm.none);
+            string hashed = Json.JWT.Encode(payload, null, JwsAlgorithm.none);
 
             Console.Out.WriteLine(hashed);
 

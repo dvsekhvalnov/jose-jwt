@@ -158,18 +158,6 @@ namespace Json
             return Compact.Serialize(header, encryptedCek, encParts[0], encParts[1], encParts[2]);
         }
 
-        /// <summary>
-        /// Given a JWT, decode it and return the JSON payload. This overload used with plaintext JWT.
-        /// </summary>
-        /// <param name="token">The JWT.</param>
-        /// <param name="parseJson">Whether to parse json payload (default is false).</param>
-        /// <returns>A string containing the JSON payload or IDictionary<string, object> depending on parse option</returns>
-        /// <exception cref="SignatureVerificationException">Thrown if the verify parameter was true and the signature was NOT valid or if the JWT was signed with an unsupported algorithm.</exception>
-        public static string Encode(object payload, JwsAlgorithm algorithm)
-        {
-            return Encode(payload, null, algorithm);
-        }
-
         public static string Encode(object payload, object key, JwsAlgorithm algorithm)
         {
             return Encode(js.Serialize(payload), key, algorithm);
