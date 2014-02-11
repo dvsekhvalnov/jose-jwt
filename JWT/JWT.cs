@@ -68,9 +68,9 @@ namespace Json
                 { JweEncryption.A128CBC_HS256, new AesCbcHmac(HashAlgorithms[JwsAlgorithm.HS256], 256) },
                 { JweEncryption.A192CBC_HS384, new AesCbcHmac(HashAlgorithms[JwsAlgorithm.HS384], 384) },
                 { JweEncryption.A256CBC_HS512, new AesCbcHmac(HashAlgorithms[JwsAlgorithm.HS512], 512) },
-                { JweEncryption.A128GCM, new AesGcm() },
-                { JweEncryption.A192GCM, new AesGcm() },
-                { JweEncryption.A256GCM, new AesGcm() }
+                { JweEncryption.A128GCM, new AesGcm(128) },
+                { JweEncryption.A192GCM, new AesGcm(192) },
+                { JweEncryption.A256GCM, new AesGcm(256) }
             };
                                 
             KeyAlgorithms = new Dictionary<JweAlgorithm, IKeyManagement>

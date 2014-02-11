@@ -327,7 +327,7 @@ namespace UnitTests
             string token = Json.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A128CBC_HS256);
 
             //then
-            Console.Out.WriteLine("token = {0}", token);
+            Console.Out.WriteLine("RSA_OAEP_A128CBC_HS256 = {0}", token);
 
             string[] parts = token.Split('.');
 
@@ -337,6 +337,8 @@ namespace UnitTests
             Assert.That(parts[2].Length, Is.EqualTo(22),"IV size");
             Assert.That(parts[3].Length, Is.EqualTo(278),"cipher text size");
             Assert.That(parts[4].Length, Is.EqualTo(22),"auth tag size");
+
+            Assert.That(Json.JWT.Decode(token, PrivKey()), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
         }
 
         [Test]
@@ -357,7 +359,7 @@ namespace UnitTests
             string token = Json.JWT.Encode(payload, PubKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A192CBC_HS384);
 
             //then
-            Console.Out.WriteLine("token = {0}", token);
+            Console.Out.WriteLine("RSA_OAEP_A192CBC_HS384 = {0}", token);
 
             string[] parts = token.Split('.');
 
@@ -388,8 +390,8 @@ namespace UnitTests
             string token = Json.JWT.Encode(payload, PubKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A256CBC_HS512);
 
             //then
-            
-            Console.Out.WriteLine("token = {0}", token);
+
+            Console.Out.WriteLine("RSA_OAEP_A256CBC_HS512 = {0}", token);
 
             string[] parts = token.Split('.');
 
@@ -412,7 +414,7 @@ namespace UnitTests
             string token = Json.JWT.Encode(json, PubKey(), JweAlgorithm.RSA1_5, JweEncryption.A128CBC_HS256);
 
             //then
-            Console.Out.WriteLine("token = {0}", token);
+            Console.Out.WriteLine("RSA1_5_A128CBC_HS256 = {0}", token);
 
             string[] parts = token.Split('.');
 
@@ -422,6 +424,8 @@ namespace UnitTests
             Assert.That(parts[2].Length, Is.EqualTo(22), "IV size");
             Assert.That(parts[3].Length, Is.EqualTo(278), "cipher text size");
             Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
+
+            Assert.That(Json.JWT.Decode(token, PrivKey()), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
         }
 
         [Test]
@@ -443,7 +447,7 @@ namespace UnitTests
             string token = Json.JWT.Encode(payload, PubKey(), JweAlgorithm.RSA1_5, JweEncryption.A192CBC_HS384);
 
             //then
-            Console.Out.WriteLine("token = {0}", token);
+            Console.Out.WriteLine("RSA1_5_A192CBC_HS384 = {0}", token);
 
             string[] parts = token.Split('.');
 
@@ -466,7 +470,7 @@ namespace UnitTests
             string token = Json.JWT.Encode(json, PubKey(), JweAlgorithm.RSA1_5, JweEncryption.A256CBC_HS512);
 
             //then
-            Console.Out.WriteLine("token = {0}", token);
+            Console.Out.WriteLine("RSA1_5_A256CBC_HS512 = {0}", token);
 
             string[] parts = token.Split('.');
 
@@ -476,6 +480,8 @@ namespace UnitTests
             Assert.That(parts[2].Length, Is.EqualTo(22), "IV size");
             Assert.That(parts[3].Length, Is.EqualTo(278), "cipher text size");
             Assert.That(parts[4].Length, Is.EqualTo(43), "auth tag size");
+
+            Assert.That(Json.JWT.Decode(token, PrivKey()), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
         }
 
         [Test]
@@ -568,6 +574,160 @@ namespace UnitTests
             Assert.That(json, Is.EqualTo(@"{""exp"":1391711482,""sub"":""alice"",""nbf"":1391710882,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""77a31aed-f546-4b1d-ba77-9455a2e0a3d5"",""iat"":1391710882}"));
         }
 
+        [Test]
+        public void Encrypt_RSA_OAEP_A128GCM()
+        {
+            //given
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Json.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A128GCM);
+
+            //then
+            Console.Out.WriteLine("RSA-OAEP_A128GCM = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5), "Make sure 5 parts");
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhHQ00ifQ"), "Header is non-encrypted and static text");
+            Assert.That(parts[1].Length, Is.EqualTo(342), "CEK size");
+            Assert.That(parts[2].Length, Is.EqualTo(16), "IV size, 96 bits");
+            Assert.That(parts[3].Length, Is.EqualTo(262), "cipher text size");
+            Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
+
+            Assert.That(Json.JWT.Decode(token, PrivKey()),Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+        }
+
+        [Test]
+        public void Encrypt_RSA_OAEP_A192GCM()
+        {
+            //given
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Json.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A192GCM);
+
+            //then
+            Console.Out.WriteLine("RSA-OAEP_A192GCM = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5), "Make sure 5 parts");
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExOTJHQ00ifQ"), "Header is non-encrypted and static text");
+            Assert.That(parts[1].Length, Is.EqualTo(342), "CEK size");
+            Assert.That(parts[2].Length, Is.EqualTo(16), "IV size, 96 bits");
+            Assert.That(parts[3].Length, Is.EqualTo(262), "cipher text size");
+            Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
+
+            Assert.That(Json.JWT.Decode(token, PrivKey()),Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+        }
+
+        [Test]
+        public void Encrypt_RSA_OAEP_A256GCM()
+        {
+            //given
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Json.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM);
+
+            //then
+            Console.Out.WriteLine("RSA-OAEP_A256GCM = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5), "Make sure 5 parts");
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ"), "Header is non-encrypted and static text");
+            Assert.That(parts[1].Length, Is.EqualTo(342), "CEK size");
+            Assert.That(parts[2].Length, Is.EqualTo(16), "IV size, 96 bits");
+            Assert.That(parts[3].Length, Is.EqualTo(262), "cipher text size");
+            Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
+
+            Assert.That(Json.JWT.Decode(token, PrivKey()),Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+        }
+
+        [Test]
+        public void Encrypt_RSA1_5_A128GCM()
+        {
+            //given
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Json.JWT.Encode(json, PubKey(), JweAlgorithm.RSA1_5, JweEncryption.A128GCM);
+
+            //then
+            Console.Out.WriteLine("RSA1_5_A128GCM = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5), "Make sure 5 parts");
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4R0NNIn0"), "Header is non-encrypted and static text");
+            Assert.That(parts[1].Length, Is.EqualTo(342), "CEK size");
+            Assert.That(parts[2].Length, Is.EqualTo(16), "IV size, 96 bits");
+            Assert.That(parts[3].Length, Is.EqualTo(262), "cipher text size");
+            Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
+
+            Assert.That(Json.JWT.Decode(token, PrivKey()),Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+        }
+
+
+        [Test]
+        public void Encrypt_RSA1_5_A192GCM()
+        {
+            //given
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Json.JWT.Encode(json, PubKey(), JweAlgorithm.RSA1_5, JweEncryption.A192GCM);
+
+            //then
+            Console.Out.WriteLine("RSA1_5_A192GCM = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5), "Make sure 5 parts");
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTkyR0NNIn0"), "Header is non-encrypted and static text");
+            Assert.That(parts[1].Length, Is.EqualTo(342), "CEK size");
+            Assert.That(parts[2].Length, Is.EqualTo(16), "IV size, 96 bits");
+            Assert.That(parts[3].Length, Is.EqualTo(262), "cipher text size");
+            Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
+
+            Assert.That(Json.JWT.Decode(token, PrivKey()),Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+        }
+
+        [Test]
+        public void Encrypt_RSA1_5_A256GCM()
+        {
+            //given
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Json.JWT.Encode(json, PubKey(), JweAlgorithm.RSA1_5, JweEncryption.A256GCM);
+
+            //then
+            Console.Out.WriteLine("RSA1_5_A256GCM = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5), "Make sure 5 parts");
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMjU2R0NNIn0"), "Header is non-encrypted and static text");
+            Assert.That(parts[1].Length, Is.EqualTo(342), "CEK size");
+            Assert.That(parts[2].Length, Is.EqualTo(16), "IV size, 96 bits");
+            Assert.That(parts[3].Length, Is.EqualTo(262), "cipher text size");
+            Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
+
+            Assert.That(Json.JWT.Decode(token, PrivKey()),Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+        }
+
+
+        #region test utils
+
         private RSACryptoServiceProvider PrivKey()
         {
             var key = (RSACryptoServiceProvider)X509().PrivateKey;
@@ -587,6 +747,8 @@ namespace UnitTests
         {
             return new X509Certificate2("jwt-2048.p12", "1", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
         }
+
+        #endregion
     }
 
 }

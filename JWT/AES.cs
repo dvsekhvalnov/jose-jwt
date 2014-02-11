@@ -77,6 +77,8 @@ namespace Json
             aes.GenerateIV();
 
             return aes.IV;
+
+            //can switched to RNGCryptoServiceProvider, see Rijndel code
         }
     }
 }

@@ -13,6 +13,9 @@ namespace Json
 
         public byte[] NewKey(int keyLength)
         {
+            if (keyLength < 256)
+                return AES.GenerateKey(keyLength);
+
             byte[] hmacKey = AES.GenerateKey(keyLength/2);
             byte[] aesKey = AES.GenerateKey(keyLength/2);
 

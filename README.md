@@ -14,12 +14,12 @@ Moved to separate project in February 2014.
 - NONE (unprotected) plain text algorithm without integrity protection
 
 **Encryption**
-- RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512
-- RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512
+- RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 
 
 ## Installation
-The easiest way to install is via NuGet.  See [here](https://nuget.org/packages/JWT).  Else, you can download and compile it yourself.
+NuGet is coming. 
 
 ## Usage
 ### Creating Plaintext (unprotected) Tokens
@@ -43,11 +43,6 @@ The easiest way to install is via NuGet.  See [here](https://nuget.org/packages/
     string token = JWT.JsonWebToken.Encode(payload, secretKey, JwtHashAlgorithm.HS256);
     Console.Out.WriteLine(token);
 
-Output will be:
-
-    eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjbGFpbTEiOjAsImNsYWltMiI6ImNsYWltMi12YWx1ZSJ9.8pwBI_HtXqI3UgQHQ_rDRnSQRxFL1SR8fbQoS-5kM5s
-
-
 
 ### Creating encrypted Tokens
 
@@ -68,15 +63,5 @@ TODO
         Console.Out.WriteLine("Invalid token!");
     }
 
-Output will be:
-
-    {"claim1":0,"claim2":"claim2-value"}
-
-You can also deserialize the JSON payload directly to a .Net object with DecodeToObject:
-
-    var payload = JWT.JsonWebToken.DecodeToObject(token, secretKey) as IDictionary<string, object>;
-    Console.Out.WriteLine(payload["claim2"]);
-
-which will output:
-    
-    claim2-value
+### Contribute (wish-list)
+1. Managed AES-GCM implementation (no external libraries)
