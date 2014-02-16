@@ -16,12 +16,7 @@ namespace Json
 
         public byte[][] Encrypt(byte[] aad, byte[] plainText, byte[] cek)
         {
-            byte[] iv = new byte[12]; //AES.GenerateIV(12) //96 bits
-
-            using (RNGCng rng = new RNGCng())
-            {
-                rng.GetBytes(iv);
-            }
+            byte[] iv = Arrays.Random(96);
 
             byte[] authTag;
             byte[] cipherText;
@@ -53,8 +48,6 @@ namespace Json
             return new[] { iv, cipherText, authTag };
         }
 
-        //iv - 96 bit
-        //authtag 128bit
         public byte[] Decrypt(byte[] aad, byte[] cek, byte[] iv, byte[] cipherText, byte[] authTag)
         {
             using (AuthenticatedAesCng aes = new AuthenticatedAesCng())
@@ -64,6 +57,7 @@ namespace Json
                 aes.IV = iv;
                 aes.AuthenticatedData = aad;
                 aes.Tag = authTag;
+
                 using (MemoryStream ms = new MemoryStream())
                 {
                     using (CryptoStream cs = new CryptoStream(ms, aes.CreateDecryptor(), CryptoStreamMode.Write))

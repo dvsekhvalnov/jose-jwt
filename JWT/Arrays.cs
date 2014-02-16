@@ -1,13 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Security.Cryptography;
 
 namespace Json
 {
     public class Arrays
     {
         public readonly static byte[] Empty=new byte[0];
+
+        private static RNGCryptoServiceProvider rng;
 
         public static byte[] SixtyFourBitLength(byte[] aad)
         {
@@ -17,7 +18,7 @@ namespace Json
             byte[] bytes = BitConverter.GetBytes((long)bitLength);
 
             if (BitConverter.IsLittleEndian)
-                System.Array.Reverse(bytes);
+                Array.Reverse(bytes);
 
             return bytes;
         }
@@ -28,7 +29,7 @@ namespace Json
 
             byte[] result = new byte[halfIndex];
 
-            System.Buffer.BlockCopy(arr, 0, result, 0, halfIndex);
+            Buffer.BlockCopy(arr, 0, result, 0, halfIndex);
 
             return result;
         }
@@ -39,7 +40,7 @@ namespace Json
 
             byte[] result = new byte[halfIndex];
 
-            System.Buffer.BlockCopy(arr, halfIndex, result, 0, halfIndex);
+            Buffer.BlockCopy(arr, halfIndex, result, 0, halfIndex);
 
             return result;
         }
@@ -51,7 +52,7 @@ namespace Json
 
             foreach (byte[] array in arrays)
             {
-                System.Buffer.BlockCopy(array, 0, result, offset, array.Length);
+                Buffer.BlockCopy(array, 0, result, offset, array.Length);
                 offset += array.Length;
             }
             return result;
@@ -87,6 +88,20 @@ namespace Json
             }
 
             Console.Out.Write("]\n");
+        }        
+
+        public static byte[] Random(int sizeBits=128)
+        {
+            byte[] data = new byte[sizeBits / 8];
+
+            RNG.GetBytes(data);
+
+            return data;      
+        }
+
+        internal static RNGCryptoServiceProvider RNG
+        {
+            get { return rng ?? (rng = new RNGCryptoServiceProvider()); }
         }
     }
 }

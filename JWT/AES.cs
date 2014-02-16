@@ -15,17 +15,17 @@ namespace Json
                 aes.Key = key;
                 aes.IV = iv;
 
-                ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
-
                 using (MemoryStream ms = new MemoryStream())
                 {
-                    using (CryptoStream encrypt = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                    using (ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV))
                     {
-                        
-                            encrypt.Write(plainText,0,plainText.Length);
+                        using (CryptoStream encrypt = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                        {
+                            encrypt.Write(plainText, 0, plainText.Length);
                             encrypt.FlushFinalBlock();
 
                             cipherText = ms.ToArray();
+                        }
                     }
                 }
 
@@ -38,47 +38,27 @@ namespace Json
         {
             string plaintext;
 
-            using (Aes rijAlg = new AesManaged())
+            using (Aes aes = new AesManaged())
             {
-                rijAlg.Key = key;
-                rijAlg.IV = iv;
-
-                ICryptoTransform decryptor = rijAlg.CreateDecryptor(rijAlg.Key, rijAlg.IV);
+                aes.Key = key;
+                aes.IV = iv;                
 
                 using (MemoryStream msDecrypt = new MemoryStream(cipherText))
                 {
-                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    using (ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV))
                     {
-                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
                         {
-                            plaintext = srDecrypt.ReadToEnd();
+                            using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                            {
+                                plaintext = srDecrypt.ReadToEnd();
+                            }
                         }
                     }
                 }
-
             }
 
             return Encoding.UTF8.GetBytes(plaintext);
-        }
-
-        public static byte[] GenerateKey(int keySizeBits)
-        {
-            var aes = new AesManaged {KeySize = keySizeBits};
-
-            aes.GenerateKey();
-
-            return aes.Key;
-        }
-
-        public static byte[] GenerateIV()
-        {
-            var aes = new AesManaged();            
-
-            aes.GenerateIV();
-
-            return aes.IV;
-
-            //can switched to RNGCryptoServiceProvider, see Rijndel code
         }
     }
 }

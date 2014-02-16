@@ -21,7 +21,7 @@ namespace Json
             byte[] hmacKey = Arrays.FirstHalf(cek);
             byte[] aesKey = Arrays.SecondHalf(cek);
 
-            byte[] iv = AES.GenerateIV();                        
+            byte[] iv = Arrays.Random();                        
 
             byte[] cipherText = AES.Encrypt(plainText, aesKey, iv);
 
