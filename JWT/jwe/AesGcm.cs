@@ -16,6 +16,8 @@ namespace Json
 
         public byte[][] Encrypt(byte[] aad, byte[] plainText, byte[] cek)
         {
+            Ensure.BitSize(cek, keyLength, string.Format("AES-GCM algorithm expected key of size {0} bits, but was given {1} bits",keyLength, cek.Length * 8));
+
             byte[] iv = Arrays.Random(96);
 
             byte[] authTag;
@@ -50,6 +52,8 @@ namespace Json
 
         public byte[] Decrypt(byte[] aad, byte[] cek, byte[] iv, byte[] cipherText, byte[] authTag)
         {
+            Ensure.BitSize(cek, keyLength, string.Format("AES-GCM algorithm expected key of size {0} bits, but was given {1} bits",keyLength, cek.Length * 8));
+
             using (AuthenticatedAesCng aes = new AuthenticatedAesCng())
             {
                 aes.CngMode = CngChainingMode.Gcm;

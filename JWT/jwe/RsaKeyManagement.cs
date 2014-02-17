@@ -11,8 +11,8 @@ namespace Json
             this.useRsaOaepPadding = useRsaOaepPadding;
         }
 
-        public byte[] NewKey(int keyLength)
-        {
+        public byte[] NewKey(int keyLength, object key)
+        {            
             return Arrays.Random(keyLength);
         }
 

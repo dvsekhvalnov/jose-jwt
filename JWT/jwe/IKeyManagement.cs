@@ -6,8 +6,9 @@ namespace Json
         /// Generates new Content Encryption Key (CEK)
         /// </summary>
         /// <param name="keyLength">Length of key to generate (bits).</param>
+        /// <param name="key">management key</param>
         /// <returns></returns>
-        byte[] NewKey(int keyLength);
+        byte[] NewKey(int keyLength, object key);
 
         /// <summary>
         /// Wraps CEK for transmission, usually encryps in some form.

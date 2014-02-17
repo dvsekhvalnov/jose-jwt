@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Cryptography;
+using System.Text;
 
 namespace Json
 {
@@ -80,14 +81,19 @@ namespace Json
 
         public static void Dump(byte[] arr, string label = "")
         {
-            Console.Out.Write("\n{0}({1} bytes): [",label+" ", arr.Length);
+            var builder=new StringBuilder();
+            builder.Append(string.Format("{0}({1} bytes): [", label+" ", arr.Length).Trim());
 
             foreach (var b in arr)
             {
-                Console.Out.Write(b+",");
+                builder.Append(b);
+                builder.Append(",");
             }
 
-            Console.Out.Write("]\n");
+            builder.Remove(builder.Length - 1, 1);
+            builder.Append("]\n");
+
+            Console.Out.WriteLine(builder.ToString());
         }        
 
         public static byte[] Random(int sizeBits=128)

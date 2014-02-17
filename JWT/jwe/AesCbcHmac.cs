@@ -18,6 +18,8 @@ namespace Json
 
         public byte[][] Encrypt(byte[] aad, byte[] plainText, byte[] cek)
         {
+            Ensure.BitSize(cek, keyLength, string.Format("AES-CBC with HMAC algorithm expected key of size {0} bits, but was given {1} bits", keyLength, cek.Length * 8));
+
             byte[] hmacKey = Arrays.FirstHalf(cek);
             byte[] aesKey = Arrays.SecondHalf(cek);
 
@@ -32,6 +34,8 @@ namespace Json
 
         public byte[] Decrypt(byte[] aad, byte[] cek, byte[] iv, byte[] cipherText, byte[] authTag)
         {
+            Ensure.BitSize(cek, keyLength, string.Format("AES-CBC with HMAC algorithm expected key of size {0} bits, but was given {1} bits", keyLength, cek.Length * 8));
+
             byte[] hmacKey = Arrays.FirstHalf(cek);
             byte[] aesKey = Arrays.SecondHalf(cek);
 

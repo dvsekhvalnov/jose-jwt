@@ -47,6 +47,7 @@
     <Compile Include="Ensure.cs" />
     <Compile Include="jwe\AesCbcHmac.cs" />
     <Compile Include="jwe\AesGcm.cs" />
+    <Compile Include="jwe\DirectKeyManagement.cs" />
     <Compile Include="jwe\IJweAlgorithm.cs" />
     <Compile Include="jwe\IKeyManagement.cs" />
     <Compile Include="jwe\RsaKeyManagement.cs" />

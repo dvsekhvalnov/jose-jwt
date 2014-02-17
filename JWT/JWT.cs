@@ -22,7 +22,8 @@ namespace Json
     public enum JweAlgorithm
     {
         RSA1_5, //RSAES with PKCS #1 v1.5 padding, RFC 3447
-        RSA_OAEP //RSAES using Optimal Assymetric Encryption Padding, RFC 3447
+        RSA_OAEP, //RSAES using Optimal Assymetric Encryption Padding, RFC 3447
+        DIR //Direct use of pre-shared symmetric key
     }
 
     public enum JweEncryption
@@ -76,11 +77,13 @@ namespace Json
             KeyAlgorithms = new Dictionary<JweAlgorithm, IKeyManagement>
             {
                 { JweAlgorithm.RSA_OAEP, new RsaKeyManagement(true) },
-                { JweAlgorithm.RSA1_5, new RsaKeyManagement(false) }
+                { JweAlgorithm.RSA1_5, new RsaKeyManagement(false) },
+                { JweAlgorithm.DIR, new DirectKeyManagement() }
             };
 
             JweAlgorithms[JweAlgorithm.RSA1_5] = "RSA1_5";
             JweAlgorithms[JweAlgorithm.RSA_OAEP] = "RSA-OAEP";
+            JweAlgorithms[JweAlgorithm.DIR] = "dir";
 
             JweEncryptionMethods[JweEncryption.A128CBC_HS256] = "A128CBC-HS256";
             JweEncryptionMethods[JweEncryption.A192CBC_HS384] = "A192CBC-HS384";
@@ -144,7 +147,7 @@ namespace Json
             IKeyManagement keys = KeyAlgorithms[alg];
             IJweAlgorithm _enc = EncAlgorithms[enc];
 
-            byte[] cek = keys.NewKey(_enc.KeySize);
+            byte[] cek = keys.NewKey(_enc.KeySize,key);
             byte[] encryptedCek = keys.Wrap(cek, key);
 
             var jwtHeader = new { alg = JweAlgorithms[alg], enc = JweEncryptionMethods[enc] };
