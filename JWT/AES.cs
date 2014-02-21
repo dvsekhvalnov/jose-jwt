@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace Json
 {
@@ -28,7 +27,6 @@ namespace Json
                         }
                     }
                 }
-
             }
 
             return cipherText;
@@ -36,29 +34,26 @@ namespace Json
 
         public static byte[] Decrypt(byte[] cipherText, byte[] key, byte[] iv)
         {
-            string plaintext;
-
             using (Aes aes = new AesManaged())
             {
                 aes.Key = key;
                 aes.IV = iv;                
 
-                using (MemoryStream msDecrypt = new MemoryStream(cipherText))
+                using (MemoryStream ms = new MemoryStream())
                 {
                     using (ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV))
                     {
-                        using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
-                        {
-                            using (StreamReader srDecrypt = new StreamReader(csDecrypt))
-                            {
-                                plaintext = srDecrypt.ReadToEnd();
-                            }
+                        using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Write))
+                        {                                                        
+                            cs.Write(cipherText, 0, cipherText.Length);
+
+                            cs.FlushFinalBlock();
+
+                            return ms.ToArray();
                         }
-                    }
+                    }                    
                 }
             }
-
-            return Encoding.UTF8.GetBytes(plaintext);
         }
     }
 }

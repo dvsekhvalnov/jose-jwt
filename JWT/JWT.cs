@@ -36,6 +36,11 @@ namespace Json
         A256GCM
     }
 
+    public enum JweCompression
+    {
+        DEF //Deflate compression
+    }
+
     /// <summary>
     /// Provides methods for encoding and decoding JSON Web Tokens.
     /// </summary>
@@ -44,9 +49,11 @@ namespace Json
         private static Dictionary<JwsAlgorithm, IJwsAlgorithm> HashAlgorithms;
         private static Dictionary<JweEncryption, IJweAlgorithm> EncAlgorithms;
         private static Dictionary<JweAlgorithm, IKeyManagement> KeyAlgorithms;
+        private static Dictionary<JweCompression, ICompression> CompressionAlgorithms;
 
         private static Dictionary<JweAlgorithm, string> JweAlgorithms = new Dictionary<JweAlgorithm, string>();
-        private static Dictionary<JweEncryption, string> JweEncryptionMethods = new Dictionary<JweEncryption, string>();         
+        private static Dictionary<JweEncryption, string> JweEncryptionMethods = new Dictionary<JweEncryption, string>();
+        private static Dictionary<JweCompression, string> JweCompressionMethods = new Dictionary<JweCompression, string>();         
 
         private static JavaScriptSerializer js = new JavaScriptSerializer();
 
@@ -81,6 +88,12 @@ namespace Json
                 { JweAlgorithm.DIR, new DirectKeyManagement() }
             };
 
+            CompressionAlgorithms = new Dictionary<JweCompression, ICompression>
+            {
+                {JweCompression.DEF, new DeflateCompression()}                        
+            };
+
+
             JweAlgorithms[JweAlgorithm.RSA1_5] = "RSA1_5";
             JweAlgorithms[JweAlgorithm.RSA_OAEP] = "RSA-OAEP";
             JweAlgorithms[JweAlgorithm.DIR] = "dir";
@@ -91,6 +104,8 @@ namespace Json
             JweEncryptionMethods[JweEncryption.A128GCM] = "A128GCM";
             JweEncryptionMethods[JweEncryption.A192GCM] = "A192GCM";
             JweEncryptionMethods[JweEncryption.A256GCM] = "A256GCM";
+
+            JweCompressionMethods[JweCompression.DEF] = "DEF";
         }
 
         /// <summary>
@@ -137,12 +152,12 @@ namespace Json
             return Decode(token, (object)null, parseJson);
         }
 
-        public static string Encode(object payload, object key, JweAlgorithm alg, JweEncryption enc)
+        public static string Encode(object payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null)
         {
             return Encode(js.Serialize(payload), key, alg, enc);
         }
 
-        public static string Encode(string payload, object key, JweAlgorithm alg, JweEncryption enc)
+        public static string Encode(string payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression=null)
         {
             IKeyManagement keys = KeyAlgorithms[alg];
             IJweAlgorithm _enc = EncAlgorithms[enc];
@@ -150,12 +165,18 @@ namespace Json
             byte[] cek = keys.NewKey(_enc.KeySize,key);
             byte[] encryptedCek = keys.Wrap(cek, key);
 
-            var jwtHeader = new { alg = JweAlgorithms[alg], enc = JweEncryptionMethods[enc] };
+            var jwtHeader = new Dictionary<string,object>{ { "alg" , JweAlgorithms[alg]}, { "enc", JweEncryptionMethods[enc]} };
+            
+            byte[] plainText = Encoding.UTF8.GetBytes(payload);            
+
+            if (compression.HasValue)
+            {
+                jwtHeader["zip"] = JweCompressionMethods[compression.Value];
+                plainText = CompressionAlgorithms[compression.Value].Compress(plainText);
+            }
 
             byte[] header = Encoding.UTF8.GetBytes(js.Serialize(jwtHeader));
-            byte[] plainText = Encoding.UTF8.GetBytes(payload);
             byte[] aad = Encoding.UTF8.GetBytes(Compact.Serialize(header));
-
             byte[][] encParts = _enc.Encrypt(aad, plainText, cek);
 
             return Compact.Serialize(header, encryptedCek, encParts[0], encParts[1], encParts[2]);
@@ -228,8 +249,13 @@ namespace Json
             byte[] aad = Encoding.UTF8.GetBytes(Compact.Serialize(header));
 
             byte[] plainText=enc.Decrypt(aad, cek, iv, cipherText, authTag);
-            
-            return Encoding.UTF8.GetString(plainText); //todo: apply de-compression if needed & parse
+
+            if (jwtHeader.ContainsKey("zip"))
+            {
+                plainText = CompressionAlgorithms[GetJweCompression(jwtHeader["zip"])].Decompress(plainText);
+            }
+
+            return Encoding.UTF8.GetString(plainText); 
         }
         
         private static JwsAlgorithm GetHashAlgorithm(string algorithm)
@@ -255,7 +281,7 @@ namespace Json
                 if (pair.Value.Equals(algorithm)) return pair.Key;
             }
 
-            throw new SignatureVerificationException("Algorithm is not supported.");
+            throw new SignatureVerificationException(string.Format("Algorithm is not supported:{0}.", algorithm));
         }
 
         private static JweEncryption GetJweEncryption(string algorithm)
@@ -265,7 +291,17 @@ namespace Json
                 if (pair.Value.Equals(algorithm)) return pair.Key;
             }
 
-            throw new SignatureVerificationException("Encryption is not supported.");
+            throw new SignatureVerificationException(string.Format("Encryption is not supported:{0}.", algorithm));
+        }
+
+        private static JweCompression GetJweCompression(string algorithm)
+        {
+            foreach (var pair in JweCompressionMethods)
+            {
+                if (pair.Value.Equals(algorithm)) return pair.Key;
+            }
+
+            throw new SignatureVerificationException(string.Format("Compression is not supported:{0}.",algorithm));
         }
 
     }

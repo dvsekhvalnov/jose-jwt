@@ -248,6 +248,23 @@ namespace UnitTests
         }
 
         [Test]
+        public void Decrypt_RSA_OAEP_A128CBC_HS256_Compressed()
+        {
+            //given
+            string token = "eyJhbGciOiJSU0EtT0FFUCIsInppcCI6IkRFRiIsImVuYyI6IkExMjhDQkMtSFMyNTYifQ.nXSS9jDwE0dXkcGI7UquZBhn2nsB2P8u-YSWEuTAgEeuV54qNU4SlE76bToI1z4LUuABHmZOv9S24xkF45b7Mrap_Fu4JXH8euXrQgKQb9o_HL5FvE8m4zk5Ow13MKGPvHvWKOaNEBFriwYIfPi6QBYrpuqn0BaANc_aMyInV0Fn7e8EAgVmvoagmy7Hxic2sPUeLEIlRCDSGa82mpiGusjo7VMJxymkhnMdKufpGPh4wod7pvgb-jDWasUHpsUkHqSKZxlrDQxcy1-Pu1G37TAnImlWPa9NU7500IXc-W07IJccXhR3qhA5QaIyBbmHY0j1Dn3808oSFOYSF85A9w.uwbZhK-8iNzcjvKRb1a2Ig.jxj1GfH9Ndu1y0b7NRz_yfmjrvX2rXQczyK9ZJGWTWfeNPGR_PZdJmddiam15Qtz7R-pzIeyR4_qQoMzOISkq6fDEvEWVZdHnnTUHQzCoGX1dZoG9jXEwfAk2G1vXYT2vynEQZ72xk0V_OBtKhpIAUEFsXwCUeLAAgjFNY4OGWZl_Kmv9RTGhnePZfVbrbwg.WuV64jlV03OZm99qHMP9wQ";
+
+            //when
+            string json = (string) Json.JWT.Decode(token,PrivKey());
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.That(json, Is.EqualTo(@"{""exp"":1392963710,""sub"":""alice"",""nbf"":1392963110,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""9fa7a38a-28fd-421c-825c-8fab3bbf3fb4"",""iat"":1392963110}"));
+        }
+
+
+
+        [Test]
         public void Decrypt_RSA_OAEP_A256CBC_HS512()
         {
             //given
@@ -581,6 +598,21 @@ namespace UnitTests
         }
 
         [Test]
+        public void Decrypt_RSA1_5_A256GCM_DEFLATE()
+        {
+            //given
+            string token = "eyJhbGciOiJSU0ExXzUiLCJ6aXAiOiJERUYiLCJlbmMiOiJBMjU2R0NNIn0.imMUAOkYe54TzNknmrUkWOtjgGlbSivDyFRbvebC1rT9ixxQOTN-bCGiLwyEoPLdkroEvvR1cf_abR_afZIfWsk6Om09aar9JQkA7KMNoTRBQnn7X7BX_agpZuhRzPo_gQDXA0fll10j9OdUTcXd7oSw6FVb4non2qyO2ZvwT1UANY3SbQchlQrXnQpjQluR1tkxWXo-5p3o9MQEIqyypOQyGKIIXJlBtcUkWz0PHHsqJ3OdZus7dbwajv5GpHmLfT8Q2aPZN5QX1zv4h2y8vD6RYn6evLCc7e7Gp1z7C5WOZXDA6hyYQiL3Y92zzxVVD5E7nt94WSktxjM-y65TQw.g3FCuDmLISjam69Q.PrMnFDnuYNkLvmR8QmmEu6NB9N6ecJy6gMSR1fYEkZLz2jMtxN-OTaudX901_SWCX_dDFgpmOPziQRJ1IYOiySZ3N0FFyWxemJgHjVOZaPpu5ZSTH7JYoH5CLBpD1H9VMX5vC5SUH7hWgLZ_NCgVs0eZt_3_AyUObVAInNNTH_pNjhdjV8xuCCE.rDEvIPtM1fNjpDvD62x2PA";
+
+            //when
+            string json = (string)Json.JWT.Decode(token, PrivKey());
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.That(json, Is.EqualTo(@"{""exp"":1392994388,""sub"":""alice"",""nbf"":1392993788,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""81b338eb-346e-4b04-a618-d3cbb2d64ec6"",""iat"":1392993788}"));
+        }
+
+        [Test]
         public void Encrypt_RSA_OAEP_A128GCM()
         {
             //given
@@ -650,6 +682,31 @@ namespace UnitTests
             Assert.That(parts[1].Length, Is.EqualTo(342), "CEK size");
             Assert.That(parts[2].Length, Is.EqualTo(16), "IV size, 96 bits");
             Assert.That(parts[3].Length, Is.EqualTo(262), "cipher text size");
+            Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
+
+            Assert.That(Json.JWT.Decode(token, PrivKey()),Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+        }
+
+        [Test]
+        public void Encrypt_RSA_OAEP_A256GCM_DEFLATE()
+        {
+            //given
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Json.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM, JweCompression.DEF);
+
+            //then
+            Console.Out.WriteLine("RSA-OAEP_A256GCM-DEFLATE = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5), "Make sure 5 parts");
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00iLCJ6aXAiOiJERUYifQ"), "Header is non-encrypted and static text");
+            Assert.That(parts[1].Length, Is.EqualTo(342), "CEK size");
+            Assert.That(parts[2].Length, Is.EqualTo(16), "IV size, 96 bits");
+            Assert.That(parts[3].Length, Is.EqualTo(334), "cipher text size");
             Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
 
             Assert.That(Json.JWT.Decode(token, PrivKey()),Is.EqualTo(json), "Make sure we are consistent with ourselfs");
@@ -972,7 +1029,30 @@ namespace UnitTests
             Assert.That(Json.JWT.Decode(token, aes512Key), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
         }
 
+        [Test]
+        public void Encrypt_DIR_A256CBC_HS512_DEFLATE()
+        {
+            //given
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
 
+            //when
+            string token = Json.JWT.Encode(json, aes512Key, JweAlgorithm.DIR, JweEncryption.A256CBC_HS512, JweCompression.DEF);
+
+            //then
+            Console.Out.WriteLine("DIR_A256CBC_HS512-DEFLATE = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5), "Make sure 5 parts");
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiemlwIjoiREVGIn0"), "Header is non-encrypted and static text");
+            Assert.That(parts[1].Length, Is.EqualTo(0), "CEK size");
+            Assert.That(parts[2].Length, Is.EqualTo(22), "IV size");
+            Assert.That(parts[3].Length, Is.EqualTo(342), "cipher text size");
+            Assert.That(parts[4].Length, Is.EqualTo(43), "auth tag size");
+
+            Assert.That(Json.JWT.Decode(token, aes512Key), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+        }
 
         #region test utils
 

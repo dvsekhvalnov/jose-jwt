@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>JWT</RootNamespace>
     <AssemblyName>JWT</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
@@ -47,7 +47,9 @@
     <Compile Include="Ensure.cs" />
     <Compile Include="jwe\AesCbcHmac.cs" />
     <Compile Include="jwe\AesGcm.cs" />
+    <Compile Include="jwe\DeflateCompression.cs" />
     <Compile Include="jwe\DirectKeyManagement.cs" />
+    <Compile Include="jwe\ICompression.cs" />
     <Compile Include="jwe\IJweAlgorithm.cs" />
     <Compile Include="jwe\IKeyManagement.cs" />
     <Compile Include="jwe\RsaKeyManagement.cs" />
