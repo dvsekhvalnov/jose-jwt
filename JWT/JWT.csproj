@@ -44,6 +44,8 @@
     <Compile Include="Arrays.cs" />
     <Compile Include="Compact.cs" />
     <Compile Include="Ensure.cs" />
+    <Compile Include="json\IJsonMapper.cs" />
+    <Compile Include="json\JSSerializerMapper.cs" />
     <Compile Include="jwe\AesCbcHmac.cs" />
     <Compile Include="jwe\AesGcm.cs" />
     <Compile Include="jwe\DeflateCompression.cs" />

@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web.Script.Serialization;
@@ -55,10 +53,17 @@ namespace Json
         private static Dictionary<JweEncryption, string> JweEncryptionMethods = new Dictionary<JweEncryption, string>();
         private static Dictionary<JweCompression, string> JweCompressionMethods = new Dictionary<JweCompression, string>();         
 
-        private static JavaScriptSerializer js = new JavaScriptSerializer();
+        private static IJsonMapper jsMapper;
+
+        public static IJsonMapper JsonMapper
+        {
+            set { jsMapper = value; }
+        }
 
         static JWT()
         {
+            JsonMapper = new JSSerializerMapper();
+
             HashAlgorithms = new Dictionary<JwsAlgorithm, IJwsAlgorithm>
             {
                 { JwsAlgorithm.none, new Plaintext()},
@@ -108,53 +113,9 @@ namespace Json
             JweCompressionMethods[JweCompression.DEF] = "DEF";
         }
 
-        /// <summary>
-        /// Given a JWT, decode it, verify signature via HS* and return the JSON payload.
-        /// </summary>
-        /// <param name="token">The JWT.</param>
-        /// <param name="key">The key bytes that were used to sign the JWT.</param>
-        /// <param name="verify">Whether to verify the signature (default is true).</param>
-        /// <returns>A string containing the JSON payload.</returns>
-        /// <exception cref="IntegrityException">Thrown if the verify parameter was true and the signature was NOT valid or if the JWT was signed with an unsupported algorithm.</exception>
-        public static object Decode(string token, byte[] key, bool parseJson = false)
-        {
-            return Decode(token, (object)key, parseJson);
-        }
-
-        /// <summary>
-        /// Given a JWT, decode it, verify signature and return the JSON payload (optionally parse it).
-        /// </summary>
-        /// <param name="token">The JWT token in compact serialization form</param>
-        /// <param name="key">The public part of key that was used to sign the JWT. (Used with RS-* family)</param>
-        /// <param name="parseJson">Whether to parse payload and returd Dictionary or return unparsed json as string (default is true).</param>
-        /// <returns>A string containing the JSON payload or IDictionary<string,object> depending on parseJson values.</returns>
-        /// <exception cref="IntegrityException">Thrown if the the signature was NOT valid or if the JWT was signed with an unsupported algorithm.</exception>
-        public static object Decode(string token, AsymmetricAlgorithm key, bool parseJson = false)
-        {
-            return Decode(token, (object)key, parseJson);
-        }
-
-        /// <summary>
-        /// Given a JWT, decode it and return the JSON payload.
-        /// </summary>
-        /// <param name="token">The JWT.</param>
-        /// <param name="key">The key that was used to sign the JWT.</param>
-        /// <param name="parseJson">Whether to parse json payload (default is false).</param>
-        /// <returns>A string containing the JSON payload or IDictionary<string,object> depending on parse option</returns>
-        /// <exception cref="IntegrityException">Thrown if the verify parameter was true and the signature was NOT valid or if the JWT was signed with an unsupported algorithm.</exception>
-        public static object Decode(string token, string key, bool parseJson = false)
-        {
-            return Decode(token, Encoding.UTF8.GetBytes(key), parseJson);
-        }
-
-        public static object Decode(string token, bool parseJson = false)
-        {
-            return Decode(token, (object)null, parseJson);
-        }
-
         public static string Encode(object payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null)
         {
-            return Encode(js.Serialize(payload), key, alg, enc);
+            return Encode(jsMapper.Serialize(payload), key, alg, enc);
         }
 
         public static string Encode(string payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression=null)
@@ -175,7 +136,7 @@ namespace Json
                 plainText = CompressionAlgorithms[compression.Value].Compress(plainText);
             }
 
-            byte[] header = Encoding.UTF8.GetBytes(js.Serialize(jwtHeader));
+            byte[] header = Encoding.UTF8.GetBytes(jsMapper.Serialize(jwtHeader));
             byte[] aad = Encoding.UTF8.GetBytes(Compact.Serialize(header));
             byte[][] encParts = _enc.Encrypt(aad, plainText, cek);
 
@@ -184,14 +145,14 @@ namespace Json
 
         public static string Encode(object payload, object key, JwsAlgorithm algorithm)
         {
-            return Encode(js.Serialize(payload), key, algorithm);
+            return Encode(jsMapper.Serialize(payload), key, algorithm);
         }
 
         public static string Encode(string payload, object key, JwsAlgorithm algorithm)
         {
-            var header = new { typ = "JWT", alg = algorithm.ToString() };
+            var jwtHeader = new Dictionary<string,object> { {"typ", "JWT"}, { "alg", algorithm.ToString()} };
 
-            byte[] headerBytes = Encoding.UTF8.GetBytes(js.Serialize(header));
+            byte[] headerBytes = Encoding.UTF8.GetBytes(jsMapper.Serialize(jwtHeader));
             byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);
 
             var bytesToSign = Encoding.UTF8.GetBytes(Compact.Serialize(headerBytes, payloadBytes));
@@ -201,7 +162,7 @@ namespace Json
             return Compact.Serialize(headerBytes, payloadBytes, signature);
         }
 
-        private static object Decode(string token, object key, bool parseJson = false)
+        public static string Decode(string token, object key=null)
         {
             byte[][] parts = Compact.Parse(token);
 
@@ -220,7 +181,7 @@ namespace Json
 
                 byte[] securedInput = Encoding.UTF8.GetBytes(Compact.Serialize(header, payload));
 
-                var headerData = js.Deserialize<Dictionary<string, object>>(Encoding.UTF8.GetString(header));
+                var headerData = jsMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(header));
                 var algorithm = (string)headerData["alg"];
 
                 if (!HashAlgorithms[GetHashAlgorithm(algorithm)].Verify(signature, securedInput, key))
@@ -229,7 +190,12 @@ namespace Json
                 json = Encoding.UTF8.GetString(payload);
             }
 
-            return parseJson ? (object) js.Deserialize<Dictionary<string,object>>(json) : json;
+            return json;
+        }
+
+        public static T Decode<T>(string token, object key=null)
+        {
+            return jsMapper.Parse<T>(Decode(token, key));
         }
 
         private static string Decrypt(byte[][] parts, object key)
@@ -240,7 +206,7 @@ namespace Json
             byte[] cipherText = parts[3];
             byte[] authTag = parts[4];
 
-            var jwtHeader = js.Deserialize<Dictionary<string, string>>(Encoding.UTF8.GetString(header));
+            var jwtHeader = jsMapper.Parse<Dictionary<string, string>>(Encoding.UTF8.GetString(header));
 
             IKeyManagement keys = KeyAlgorithms[GetJweAlgorithm(jwtHeader["alg"])];
             IJweAlgorithm enc = EncAlgorithms[GetJweEncryption(jwtHeader["enc"])];

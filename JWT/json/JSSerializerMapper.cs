@@ -1,0 +1,25 @@
+using System;
+using System.Web.Script.Serialization;
+
+namespace Json
+{
+    public class JSSerializerMapper:IJsonMapper
+    {
+        private static JavaScriptSerializer js;
+
+        private JavaScriptSerializer JS
+        {
+            get { return js ?? (js = new JavaScriptSerializer()); }
+        }
+
+        public string Serialize(object obj)
+        {
+            return JS.Serialize(obj);
+        }
+
+        public T Parse<T>(string json)
+        {
+            return JS.Deserialize<T>(json);
+        }
+    }
+}
