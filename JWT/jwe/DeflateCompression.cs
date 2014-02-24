@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.IO.Compression;
 
-namespace Json
+namespace Jose
 {
     public class DeflateCompression : ICompression
     {

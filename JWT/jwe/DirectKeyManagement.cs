@@ -1,6 +1,6 @@
 using System;
 
-namespace Json
+namespace Jose
 {
     public class DirectKeyManagement : IKeyManagement
     {

@@ -1,4 +1,4 @@
-namespace Json
+namespace Jose
 {
     public interface IJsonMapper
     {

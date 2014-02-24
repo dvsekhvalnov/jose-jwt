@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using System.Text;
-using System.Web.Script.Serialization;
 
-namespace Json
+namespace Jose
 {
     public enum JwsAlgorithm
     {

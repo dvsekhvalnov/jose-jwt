@@ -3,7 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using Security.Cryptography;
 
-namespace Json
+namespace Jose
 {
     public class AesGcm : IJweAlgorithm
     {

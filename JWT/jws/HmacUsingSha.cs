@@ -1,7 +1,7 @@
 using System;
 using System.Security.Cryptography;
 
-namespace Json
+namespace Jose
 {
     public class HmacUsingSha : IJwsAlgorithm
     {

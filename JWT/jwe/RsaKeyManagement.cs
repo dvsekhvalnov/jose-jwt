@@ -1,6 +1,6 @@
 using System.Security.Cryptography;
 
-namespace Json
+namespace Jose
 {
     public class RsaKeyManagement:IKeyManagement
     {        
