@@ -23,64 +23,72 @@ namespace Json
             byte[] authTag;
             byte[] cipherText;
 
-            using (AuthenticatedAesCng aes = new AuthenticatedAesCng())
+            try
             {
-                aes.CngMode = CngChainingMode.Gcm;
-                aes.Key = cek;
-                aes.IV = iv;
-                aes.AuthenticatedData = aad;
-
-                using (MemoryStream ms = new MemoryStream())
+                using (AuthenticatedAesCng aes = new AuthenticatedAesCng())
                 {
-                    using (IAuthenticatedCryptoTransform encryptor = aes.CreateAuthenticatedEncryptor())
-                    {
-                        using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
-                        {
-                            cs.Write(plainText, 0, plainText.Length);
+                    aes.CngMode = CngChainingMode.Gcm;
+                    aes.Key = cek;
+                    aes.IV = iv;
+                    aes.AuthenticatedData = aad;
 
-                            // Finish the encryption and get the output authentication tag and ciphertext
-                            cs.FlushFinalBlock();
-                            authTag = encryptor.GetTag();
-                            cipherText = ms.ToArray();
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        using (IAuthenticatedCryptoTransform encryptor = aes.CreateAuthenticatedEncryptor())
+                        {
+                            using (CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                            {
+                                cs.Write(plainText, 0, plainText.Length);
+
+                                cs.FlushFinalBlock();
+                                authTag = encryptor.GetTag();
+                                cipherText = ms.ToArray();
+
+                                return new[] { iv, cipherText, authTag };
+                            }
                         }
                     }
                 }
             }
-
-            return new[] { iv, cipherText, authTag };
+            catch (CryptographicException e)
+            {
+                throw new EncryptionException("Unable to encrypt content.",e);    
+            }            
         }
 
         public byte[] Decrypt(byte[] aad, byte[] cek, byte[] iv, byte[] cipherText, byte[] authTag)
         {
             Ensure.BitSize(cek, keyLength, string.Format("AES-GCM algorithm expected key of size {0} bits, but was given {1} bits",keyLength, cek.Length * 8));
 
-            using (AuthenticatedAesCng aes = new AuthenticatedAesCng())
+            try
             {
-                aes.CngMode = CngChainingMode.Gcm;
-                aes.Key = cek;
-                aes.IV = iv;
-                aes.AuthenticatedData = aad;
-                aes.Tag = authTag;
-
-                using (MemoryStream ms = new MemoryStream())
+                using (AuthenticatedAesCng aes = new AuthenticatedAesCng())
                 {
-                    using (ICryptoTransform decryptor = aes.CreateDecryptor())
+                    aes.CngMode = CngChainingMode.Gcm;
+                    aes.Key = cek;
+                    aes.IV = iv;
+                    aes.AuthenticatedData = aad;
+                    aes.Tag = authTag;
+
+                    using (MemoryStream ms = new MemoryStream())
                     {
-                        using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Write))
+                        using (ICryptoTransform decryptor = aes.CreateDecryptor())
                         {
-                            cs.Write(cipherText, 0, cipherText.Length);
+                            using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Write))
+                            {
+                                cs.Write(cipherText, 0, cipherText.Length);
 
-                            // If the authentication tag does not match, we'll fail here with a
-                            // CryptographicException, and the ciphertext will not be decrypted.
-                            //TODO: should we catch it?
-                            cs.FlushFinalBlock();
+                                cs.FlushFinalBlock();
 
-                            byte[] plaintext = ms.ToArray();
-
-                            return plaintext;
+                                return ms.ToArray();
+                            }
                         }
                     }
                 }
+            }
+            catch (CryptographicException e)
+            {
+                throw new EncryptionException("Unable to decrypt content or authentication tag do not match.", e);
             }
         }
 

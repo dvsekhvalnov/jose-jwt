@@ -115,7 +115,7 @@ namespace Json
         /// <param name="key">The key bytes that were used to sign the JWT.</param>
         /// <param name="verify">Whether to verify the signature (default is true).</param>
         /// <returns>A string containing the JSON payload.</returns>
-        /// <exception cref="SignatureVerificationException">Thrown if the verify parameter was true and the signature was NOT valid or if the JWT was signed with an unsupported algorithm.</exception>
+        /// <exception cref="IntegrityException">Thrown if the verify parameter was true and the signature was NOT valid or if the JWT was signed with an unsupported algorithm.</exception>
         public static object Decode(string token, byte[] key, bool parseJson = false)
         {
             return Decode(token, (object)key, parseJson);
@@ -128,7 +128,7 @@ namespace Json
         /// <param name="key">The public part of key that was used to sign the JWT. (Used with RS-* family)</param>
         /// <param name="parseJson">Whether to parse payload and returd Dictionary or return unparsed json as string (default is true).</param>
         /// <returns>A string containing the JSON payload or IDictionary<string,object> depending on parseJson values.</returns>
-        /// <exception cref="SignatureVerificationException">Thrown if the the signature was NOT valid or if the JWT was signed with an unsupported algorithm.</exception>
+        /// <exception cref="IntegrityException">Thrown if the the signature was NOT valid or if the JWT was signed with an unsupported algorithm.</exception>
         public static object Decode(string token, AsymmetricAlgorithm key, bool parseJson = false)
         {
             return Decode(token, (object)key, parseJson);
@@ -141,7 +141,7 @@ namespace Json
         /// <param name="key">The key that was used to sign the JWT.</param>
         /// <param name="parseJson">Whether to parse json payload (default is false).</param>
         /// <returns>A string containing the JSON payload or IDictionary<string,object> depending on parse option</returns>
-        /// <exception cref="SignatureVerificationException">Thrown if the verify parameter was true and the signature was NOT valid or if the JWT was signed with an unsupported algorithm.</exception>
+        /// <exception cref="IntegrityException">Thrown if the verify parameter was true and the signature was NOT valid or if the JWT was signed with an unsupported algorithm.</exception>
         public static object Decode(string token, string key, bool parseJson = false)
         {
             return Decode(token, Encoding.UTF8.GetBytes(key), parseJson);
@@ -224,7 +224,7 @@ namespace Json
                 var algorithm = (string)headerData["alg"];
 
                 if (!HashAlgorithms[GetHashAlgorithm(algorithm)].Verify(signature, securedInput, key))
-                    throw new SignatureVerificationException("Invalid signature.");
+                    throw new IntegrityException("Invalid signature.");
 
                 json = Encoding.UTF8.GetString(payload);
             }
@@ -270,7 +270,7 @@ namespace Json
                 case "RS384": return JwsAlgorithm.RS384;
                 case "RS512": return JwsAlgorithm.RS512;
 
-                default: throw new SignatureVerificationException("Signing algorithm is not supported.");
+                default: throw new InvalidAlgorithmException("Signing algorithm is not supported:{0}");
             }
         }
 
@@ -281,7 +281,7 @@ namespace Json
                 if (pair.Value.Equals(algorithm)) return pair.Key;
             }
 
-            throw new SignatureVerificationException(string.Format("Algorithm is not supported:{0}.", algorithm));
+            throw new InvalidAlgorithmException(string.Format("Algorithm is not supported:{0}.", algorithm));
         }
 
         private static JweEncryption GetJweEncryption(string algorithm)
@@ -291,7 +291,7 @@ namespace Json
                 if (pair.Value.Equals(algorithm)) return pair.Key;
             }
 
-            throw new SignatureVerificationException(string.Format("Encryption is not supported:{0}.", algorithm));
+            throw new InvalidAlgorithmException(string.Format("Encryption algorithm is not supported:{0}.", algorithm));
         }
 
         private static JweCompression GetJweCompression(string algorithm)
@@ -301,18 +301,31 @@ namespace Json
                 if (pair.Value.Equals(algorithm)) return pair.Key;
             }
 
-            throw new SignatureVerificationException(string.Format("Compression is not supported:{0}.",algorithm));
+            throw new InvalidAlgorithmException(string.Format("Compression algorithm is not supported:{0}.", algorithm));
         }
-
     }
 
-    public class SignatureVerificationException : Exception
+    public class JoseException : Exception
     {
-        public SignatureVerificationException(string message) : base(message) {}
+        public JoseException(string message) : base(message) {}
+        public JoseException(string message, Exception innerException) : base(message, innerException){}
     }
 
-    public class DecryptionException : Exception
+    public class IntegrityException : JoseException
     {
-        public DecryptionException(string message) : base(message) {}
+        public IntegrityException(string message) : base(message) {}
+        public IntegrityException(string message, Exception innerException) : base(message, innerException) { }
+    }
+
+    public class EncryptionException : JoseException
+    {
+        public EncryptionException(string message) : base(message) {}
+        public EncryptionException(string message, Exception innerException) : base(message, innerException) { }
+    }
+
+    public class InvalidAlgorithmException : JoseException
+    {
+        public InvalidAlgorithmException(string message) : base(message) { }
+        public InvalidAlgorithmException(string message, Exception innerException) : base(message, innerException) { }
     }
 }

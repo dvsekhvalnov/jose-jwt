@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -23,9 +24,36 @@ namespace Json
             byte[] hmacKey = Arrays.FirstHalf(cek);
             byte[] aesKey = Arrays.SecondHalf(cek);
 
-            byte[] iv = Arrays.Random();                        
+            byte[] iv = Arrays.Random();
 
-            byte[] cipherText = AES.Encrypt(plainText, aesKey, iv);
+            byte[] cipherText;
+
+            try
+            {
+                using (Aes aes = new AesManaged())
+                {
+                    aes.Key = aesKey;
+                    aes.IV = iv;
+
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        using (ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV))
+                        {
+                            using (CryptoStream encrypt = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                            {
+                                encrypt.Write(plainText, 0, plainText.Length);
+                                encrypt.FlushFinalBlock();
+
+                                cipherText = ms.ToArray();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (CryptographicException e)
+            {
+                throw new EncryptionException("Unable to encrypt content.", e);    
+            }
 
             byte[] authTag = ComputeAuthTag(aad, iv, cipherText, hmacKey);
 
@@ -44,10 +72,35 @@ namespace Json
 
             if (!Arrays.ConstantTimeEquals(expectedAuthTag, authTag))
             {
-                throw new SignatureVerificationException(string.Format("Invalid signature."));
+                throw new IntegrityException("Authentication tag do not match.");
             }
 
-            return AES.Decrypt(cipherText, aesKey, iv);
+            try
+            {
+                using (Aes aes = new AesManaged())
+                {
+                    aes.Key = aesKey;
+                    aes.IV = iv;                
+
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        using (ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV))
+                        {
+                            using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Write))
+                            {                                                        
+                                cs.Write(cipherText, 0, cipherText.Length);
+                                cs.FlushFinalBlock();
+
+                                return ms.ToArray();
+                            }
+                        }                    
+                    }
+                }
+            }
+            catch (CryptographicException e)
+            {
+                throw new EncryptionException("Unable to decrypt content", e);
+            }
         }
 
         public int KeySize

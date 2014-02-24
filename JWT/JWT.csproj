@@ -41,7 +41,6 @@
     <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AES.cs" />
     <Compile Include="Arrays.cs" />
     <Compile Include="Compact.cs" />
     <Compile Include="Ensure.cs" />
