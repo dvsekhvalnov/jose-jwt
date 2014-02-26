@@ -11,6 +11,7 @@ Moved to separate project in February 2014.
 **Signing**
 - HMAC signatures with HS256, HS384 and HS512.
 - RSASSA-PKCS1-V1_5 signatures with RS256, RS384 and RS512.
+- RSASSA-PSS signatures (probabilistic signature scheme with appendix) with PS256, PS384 and PS512.
 - NONE (unprotected) plain text algorithm without integrity protection
 
 **Encryption**

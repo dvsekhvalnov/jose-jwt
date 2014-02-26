@@ -143,93 +143,216 @@ namespace UnitTests
         }
 
         [Test]
+        public void DecodePS256()
+        {
+            //given
+            string token = "eyJhbGciOiJQUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.S9xuR-IGfXEj5qsHcMtK-jcj1lezvVstw1AISp8dEQVRNgwOMZhUQnSCx9i1CA-pMucxR-lv4e7zd6h3cYCfMnyv7iuxraxNiNAgREhOT-bkBCZMNgb5t15xEtDSJ3MuBlK3YBtXyVcDDIdKH_Bwj-u363y6LuvZ8FEOGmIK5WSFi18Xjg-ihhvH1C6UzH1G82wrRbX6DyJKqrUnHAg8yzUJVP1AdgjWRt5BKpuYbXSib-MKZZkaE4q_hCb-j25xCzn8Ez8a7PO7p0fDGvZuOk_yzSfvXSavg7iE0GLuUTNv3nQ_xW-rfbrpYeyXNtstoK3JPFpdtORTyH1iIh7VVA";
+
+            //when
+            string json = Jose.JWT.Decode(token, PubKey());
+
+            Console.Out.WriteLine("token = {0}", json);
+
+            //then
+            Assert.That(json, Is.EqualTo(@"{""hello"": ""world""}"));
+        }
+
+        [Test]
+        public void DecodePS384()
+        {
+            //given
+            string token = "eyJhbGciOiJQUzM4NCIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.EKqVLw6nLGNt1h7KNFZbzkKhf788VBYCfnigYc0dBZBa64MrfbIFHtJuFgIGkCVSDYH-qs-i4w9ke6mD8mxTZFniMgzFXXaCFIrv6QZeMbKh6VYtSEPp7l0B1zMZiQw6egZbZ6a8VBkCRipuZggSlUTg5tHMMTj_jNVxxlY4uUwXlz7vakpbqgXe19pCDJrzEoXE0cNKV13eRCNA1tXOHx0dFL7Jm9NUq7blvhJ8iTw1jMFzK8bV6g6L7GclHBMoJ3MIvRp71m6idir-QeW1KCUfVtBs3HRn3a822LW02vGqopSkaGdRzQZOI28136AMeW4679UXE852srA2v3mWHQ";
+
+            //when
+            string json = Jose.JWT.Decode(token, PubKey());
+
+            Console.Out.WriteLine("token = {0}", json);
+
+            //then
+            Assert.That(json, Is.EqualTo(@"{""hello"": ""world""}"));
+        }
+
+        [Test]
+        public void DecodePS512()
+        {
+            //given
+            string token = "eyJhbGciOiJQUzUxMiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.IvbnmxhKvM70C0n0grkF807wOQLyPOBwJOee-p7JHCQcSstNeml3Owdyw9C3HGHzOdK9db51yAkjJ2TCojxqHW4OR5Apna8tvafYgD2femn1V3GdkGj6ZvYdV3q4ldnmahVeO36vHYy5P0zFcEGU1_j3S3DwGmhw2ktZ4p5fLZ2up2qwhzlOjbtsQpWywHj7cLdeA32MLId9MTAPVGUHIZHw_W0xwjJRS6TgxD9vPQQnP70MY-q_2pVAhfRCM_pauPYO1XH5ldizrTvVr27q_-Uqtw-wV-UDUnyWYQUDDiMTpLBoX1EEXmsbvUGx0OH3yWEaNINoCsepgZvTKbiEQQ";
+
+            //when
+            string json = Jose.JWT.Decode(token, PubKey());
+
+            Console.Out.WriteLine("token = {0}", json);
+
+            //then
+            Assert.That(json, Is.EqualTo(@"{""hello"": ""world""}"));
+        }
+
+        [Test]
+        public void EncodePS256()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, PrivKey(), JwsAlgorithm.PS256);
+
+            Console.Out.WriteLine("PS256 = {0}", token);
+
+            //then            
+            //can't assert whole signature, because PSS padding is non deterministic
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(3), "Make sure 3 parts");
+            Assert.That(parts[0], Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJQUzI1NiJ9"), "Header is non-encrypted and static text");
+            Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
+            Assert.That(parts[2].Length, Is.EqualTo(342), "signature size");
+
+            Assert.That(Jose.JWT.Decode(token,PubKey()),Is.EqualTo(json),"Make sure we are consistent with ourselves");
+        }
+
+        [Test]
+        public void EncodePS384()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, PrivKey(), JwsAlgorithm.PS384);
+
+            Console.Out.WriteLine("PS384 = {0}", token);
+
+            //then            
+            //can't assert whole signature, because PSS padding is non deterministic
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(3), "Make sure 3 parts");
+            Assert.That(parts[0], Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJQUzM4NCJ9"), "Header is non-encrypted and static text");
+            Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
+            Assert.That(parts[2].Length, Is.EqualTo(342), "signature size");
+
+            Assert.That(Jose.JWT.Decode(token,PubKey()),Is.EqualTo(json),"Make sure we are consistent with ourselves");
+        }
+
+        [Test]
+        public void EncodePS512()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, PrivKey(), JwsAlgorithm.PS512);
+
+            Console.Out.WriteLine("PS512 = {0}", token);
+
+            //then            
+            //can't assert whole signature, because PSS padding is non deterministic
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(3), "Make sure 3 parts");
+            Assert.That(parts[0], Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJQUzUxMiJ9"), "Header is non-encrypted and static text");
+            Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
+            Assert.That(parts[2].Length, Is.EqualTo(342), "signature size");
+
+            Assert.That(Jose.JWT.Decode(token,PubKey()),Is.EqualTo(json),"Make sure we are consistent with ourselves");
+        }
+
+        [Test]
         public void EncodeHS256()
         {
             //given
-            string token = @"{""hello"": ""world""}";
+            string json = @"{""hello"": ""world""}";
 
             //when
-            string hashed=Jose.JWT.Encode(token, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256);
+            string token=Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256);
 
             //then
-            Console.Out.WriteLine("hashed = {0}", hashed);
+            Console.Out.WriteLine("hashed = {0}", token);
 
-            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.KmLWPfxC3JGopWImDgYg9IUpgAi8gwimviUfr6eJyFI"));
+            Assert.That(token, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.KmLWPfxC3JGopWImDgYg9IUpgAi8gwimviUfr6eJyFI"));
+            Assert.That(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), Is.EqualTo(json), "Make sure we are consistent with ourselves");
         }
 
         [Test]
         public void EncodeHS384()
         {
             //given
-            string token = @"{""hello"": ""world""}";
+            string json = @"{""hello"": ""world""}";
 
             //when
-            string hashed = Jose.JWT.Encode(token, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS384);
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS384);
 
             //then
-            Console.Out.WriteLine("hashed = {0}", hashed);
+            Console.Out.WriteLine("HS384 = {0}", token);
 
-            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzM4NCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.Be1KYCRGFbv0uQwelaRj0a5SYDdbk_sYsXkfrbRI6TmYpuWBga_RsiU2TyyyjoXR"));
+            Assert.That(token, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzM4NCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.Be1KYCRGFbv0uQwelaRj0a5SYDdbk_sYsXkfrbRI6TmYpuWBga_RsiU2TyyyjoXR"));
+            Assert.That(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), Is.EqualTo(json), "Make sure we are consistent with ourselves");
         }
 
         [Test]
         public void EncodeHS512()
         {
             //given
-            string token = @"{""hello"": ""world""}";
+            string json = @"{""hello"": ""world""}";
 
             //when
-            string hashed = Jose.JWT.Encode(token, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS512);
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS512);
 
             //then
-            Console.Out.WriteLine("hashed = {0}", hashed);
+            Console.Out.WriteLine("HS512 = {0}", token);
 
-            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9._1m5AmI1xbSfVpykAm9PMXYuQLIdqWuRN8Lz6hFMDq0beqLAaH4Dh2VQNlXzoBG7Nk4vHx2gZgVuhF62cnXcKQ"));
+            Assert.That(token, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9._1m5AmI1xbSfVpykAm9PMXYuQLIdqWuRN8Lz6hFMDq0beqLAaH4Dh2VQNlXzoBG7Nk4vHx2gZgVuhF62cnXcKQ"));
+            Assert.That(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), Is.EqualTo(json), "Make sure we are consistent with ourselves");
         }
 
         [Test]
         public void EncodeRS256()
         {
             //given
-            string token = @"{""hello"": ""world""}";
+            string json = @"{""hello"": ""world""}";
 
             //when
-            string hashed=Jose.JWT.Encode(token, PrivKey(), JwsAlgorithm.RS256);
+            string test=Jose.JWT.Encode(json, PrivKey(), JwsAlgorithm.RS256);
 
             //then
-            Console.Out.WriteLine("hashed = {0}", hashed);
+            Console.Out.WriteLine("RS256 = {0}", test);
 
-            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.M3uJ9g4_e_lCyd0LtSJuSPMHe_s0Bj6LDA2kqf041SA3Les8aUmRQGlkG3ng63Thw6q06hF6r5bXX8tamku8AOyc45TIfPY9caNKKcVJ6RtXBxRWSY3r3Uh9o5zg3EOElfMWuekz0jfVfOaRgMO358ARsKW5BY6jfgmKsVyG1n3uYm8ESpzPlWWLcgUEjUSq3_m5t-COKySXa_zPPtFnA__159kSKCQRm4OcbYWzJD3-xl2i2GRQFLP7npLAuGPv42t5zf8snJvBWbROsdvvs7qzZ5v6bJy8wuBe9mGXmnbRsMFCzooZQ4H8LFrSnT3DakPVdLcDWE5HxZ-Ikr9l0A"));
+            Assert.That(test, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.M3uJ9g4_e_lCyd0LtSJuSPMHe_s0Bj6LDA2kqf041SA3Les8aUmRQGlkG3ng63Thw6q06hF6r5bXX8tamku8AOyc45TIfPY9caNKKcVJ6RtXBxRWSY3r3Uh9o5zg3EOElfMWuekz0jfVfOaRgMO358ARsKW5BY6jfgmKsVyG1n3uYm8ESpzPlWWLcgUEjUSq3_m5t-COKySXa_zPPtFnA__159kSKCQRm4OcbYWzJD3-xl2i2GRQFLP7npLAuGPv42t5zf8snJvBWbROsdvvs7qzZ5v6bJy8wuBe9mGXmnbRsMFCzooZQ4H8LFrSnT3DakPVdLcDWE5HxZ-Ikr9l0A"));
+            Assert.That(Jose.JWT.Decode(test,PubKey()),Is.EqualTo(json),"Make sure we are consistent with outselfs.");
         }
 
         [Test]
         public void EncodeRS384()
         {
             //given
-            string token = @"{""hello"": ""world""}";
+            string json = @"{""hello"": ""world""}";
 
             //when
-            string hashed=Jose.JWT.Encode(token, PrivKey(), JwsAlgorithm.RS384);
+            string token=Jose.JWT.Encode(json, PrivKey(), JwsAlgorithm.RS384);
 
             //then
-            Console.Out.WriteLine("hashed = {0}", hashed);
+            Console.Out.WriteLine("RS384 = {0}", token);
 
-            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzM4NCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.Tsq02ZIAOOK8ck0NS7VJ2NOmL6VpATGTb5hVUQC9_DJqiyrp2Vs8KGw9ahRjvIQMElkcFuWRPg-MGgHd7XUPVbhm7jK3cBvQ4y9hal6VNFfsL_DWhijLYgFpBj2nEw_qqZbChrPNRn-B1BrMKuRHOqu-7D3PPPMv9hvSg80WOLlkOUgIhp3a64saPJ8rDEibowdNNXw0k0H2i1D6WLK59Ew-6v6qO8OI9bkVc7SDV9qZSx3n0hm_JfyZbkCb-KKacJnkfVcnlNIRXRbk7cdlp90uYJ1aJDZrcIVTUOOAHQCQ4uaGwxhmH_NNHiY-sjWybP7xQCSq-Ip0yNVstWfUTQ"));
+            Assert.That(token, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzM4NCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.Tsq02ZIAOOK8ck0NS7VJ2NOmL6VpATGTb5hVUQC9_DJqiyrp2Vs8KGw9ahRjvIQMElkcFuWRPg-MGgHd7XUPVbhm7jK3cBvQ4y9hal6VNFfsL_DWhijLYgFpBj2nEw_qqZbChrPNRn-B1BrMKuRHOqu-7D3PPPMv9hvSg80WOLlkOUgIhp3a64saPJ8rDEibowdNNXw0k0H2i1D6WLK59Ew-6v6qO8OI9bkVc7SDV9qZSx3n0hm_JfyZbkCb-KKacJnkfVcnlNIRXRbk7cdlp90uYJ1aJDZrcIVTUOOAHQCQ4uaGwxhmH_NNHiY-sjWybP7xQCSq-Ip0yNVstWfUTQ"));
+            Assert.That(Jose.JWT.Decode(token, PubKey()), Is.EqualTo(json), "Make sure we are consistent with ourselves");
         }
 
         [Test]
         public void EncodeRS512()
         {
             //given
-            string token = @"{""hello"": ""world""}";
+            string json = @"{""hello"": ""world""}";
 
             //when
-            string hashed=Jose.JWT.Encode(token, PrivKey(), JwsAlgorithm.RS512);
+            string token=Jose.JWT.Encode(json, PrivKey(), JwsAlgorithm.RS512);
 
             //then
-            Console.Out.WriteLine("hashed = {0}", hashed);
+            Console.Out.WriteLine("RS512 = {0}", token);
 
-            Assert.That(hashed, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.YJ_5bDkZUgZj1ZoyTbSeYerUnahjt4Llbj6IwUQUY-zH_mMpywJHs2IT8wteUyX32lCCGr4NfNKpkC-zMMq7aDsklSKIg8sdGYDMheGsEw9YD0QRBF1Ovt4yuSZjWsgmdGSapXKc8CBqSzPCr9S1Rns8YhVHAYMfzHrahXuroYK35gVPQKKLbYQGcwnhpgvxMx0EfGyFbSc6r6XYK-fJ5lSqBh4wSxVMBy_5CkTVWpmnDjRuycE_j4c-yuTYUEAsj5o0sW2ahPf8aomBUC5I1ZG2yTAz8BX7dud6s2VPJQRRsUKlMNrUcMGEooJMoL_vmek9z3t_z9KFyyVHuY5XUA"));
+            Assert.That(token, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.YJ_5bDkZUgZj1ZoyTbSeYerUnahjt4Llbj6IwUQUY-zH_mMpywJHs2IT8wteUyX32lCCGr4NfNKpkC-zMMq7aDsklSKIg8sdGYDMheGsEw9YD0QRBF1Ovt4yuSZjWsgmdGSapXKc8CBqSzPCr9S1Rns8YhVHAYMfzHrahXuroYK35gVPQKKLbYQGcwnhpgvxMx0EfGyFbSc6r6XYK-fJ5lSqBh4wSxVMBy_5CkTVWpmnDjRuycE_j4c-yuTYUEAsj5o0sW2ahPf8aomBUC5I1ZG2yTAz8BX7dud6s2VPJQRRsUKlMNrUcMGEooJMoL_vmek9z3t_z9KFyyVHuY5XUA"));
+            Assert.That(Jose.JWT.Decode(token, PubKey()), Is.EqualTo(json), "Make sure we are consistent with ourselves");
         }
 
         [Test]

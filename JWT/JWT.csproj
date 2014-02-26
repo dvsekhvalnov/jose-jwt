@@ -57,6 +57,7 @@
     <Compile Include="jws\HmacUsingSha.cs" />
     <Compile Include="jws\IJwsAlgorithm.cs" />
     <Compile Include="jws\Plaintext.cs" />
+    <Compile Include="jws\RsaPssUsingSha.cs" />
     <Compile Include="jws\RsaUsingSha.cs" />
     <Compile Include="JWT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

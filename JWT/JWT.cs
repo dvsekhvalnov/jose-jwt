@@ -12,7 +12,10 @@ namespace Jose
         HS512,
         RS256,
         RS384,
-        RS512
+        RS512,
+        PS256,
+        PS384,
+        PS512
     }
 
     public enum JweAlgorithm
@@ -64,14 +67,17 @@ namespace Jose
 
             HashAlgorithms = new Dictionary<JwsAlgorithm, IJwsAlgorithm>
             {
-                { JwsAlgorithm.none, new Plaintext()},
-                { JwsAlgorithm.HS256, new HmacUsingSha("SHA256") },   
-                { JwsAlgorithm.HS384, new HmacUsingSha("SHA384") },   
-                { JwsAlgorithm.HS512, new HmacUsingSha("SHA512") },   
+                {JwsAlgorithm.none, new Plaintext()},
+                {JwsAlgorithm.HS256, new HmacUsingSha("SHA256")},
+                {JwsAlgorithm.HS384, new HmacUsingSha("SHA384")},
+                {JwsAlgorithm.HS512, new HmacUsingSha("SHA512")},
 
-                { JwsAlgorithm.RS256, new RsaUsingSha("SHA256") },
-                { JwsAlgorithm.RS384, new RsaUsingSha("SHA384") },
-                { JwsAlgorithm.RS512, new RsaUsingSha("SHA512") }
+                {JwsAlgorithm.RS256, new RsaUsingSha("SHA256")},
+                {JwsAlgorithm.RS384, new RsaUsingSha("SHA384")},
+                {JwsAlgorithm.RS512, new RsaUsingSha("SHA512")},
+                {JwsAlgorithm.PS256, new RsaPssUsingSha(32)},
+                {JwsAlgorithm.PS384, new RsaPssUsingSha(48)},
+                {JwsAlgorithm.PS512, new RsaPssUsingSha(64)},
             };
 
             EncAlgorithms = new Dictionary<JweEncryption, IJweAlgorithm>
@@ -233,8 +239,11 @@ namespace Jose
                 case "RS256": return JwsAlgorithm.RS256;
                 case "RS384": return JwsAlgorithm.RS384;
                 case "RS512": return JwsAlgorithm.RS512;
+                case "PS256": return JwsAlgorithm.PS256;
+                case "PS384": return JwsAlgorithm.PS384;
+                case "PS512": return JwsAlgorithm.PS512;
 
-                default: throw new InvalidAlgorithmException("Signing algorithm is not supported:{0}");
+                default: throw new InvalidAlgorithmException(string.Format("Signing algorithm is not supported:{0}",algorithm));
             }
         }
 
