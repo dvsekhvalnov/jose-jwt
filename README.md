@@ -30,19 +30,35 @@ NuGet is coming.
 	    { "exp", 1300819380 }
 	};
 
-	string token = JWT.JsonWebToken.Encode(payload, JwtHashAlgorithm.none);
-	Console.Out.WriteLine(token);
+	string token = Jose.JWT.Encode(payload, null, JwsAlgorithm.none);
 
 ### Creating signed Tokens
+## HS-* family
+Hmac Sha signatures require byte array key of corresponding length
+
     var payload = new Dictionary<string, object>() 
 	{
         { "sub", "mr.x@contoso.com" },
         { "exp", 1300819380 }
     };
 	
-    var secretKey = "GQDstcKsx0NHjPOuXOYg5MbeJ1XT0uFiwDVvVBrk";
-    string token = JWT.JsonWebToken.Encode(payload, secretKey, JwtHashAlgorithm.HS256);
-    Console.Out.WriteLine(token);
+    var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
+
+    string token=Jose.JWT.Encode(json, secretKey, JwsAlgorithm.HS256);
+
+## RS-* family
+RSA signatures require RSACryptoServiceProvider (usually private) key of corresponding length. CSP need to be forced to use Microsoft Enhanced RSA and AES Cryptographic Provider.
+Which usually can be done be re-importing RSAParams. See http://clrsecurity.codeplex.com/discussions/243156 for details.
+
+    var payload = new Dictionary<string, object>() 
+	{
+        { "sub", "mr.x@contoso.com" },
+        { "exp", 1300819380 }
+    };
+	
+    var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet).PrivateKey as RSACryptoServiceProvider;
+
+    string token=Jose.JWT.Encode(json, privateKey, JwsAlgorithm.RS256);
 
 
 ### Creating encrypted Tokens
