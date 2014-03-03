@@ -29,5 +29,11 @@ namespace Jose
             if(expectedSize!=key.Length * 8)
                 throw new ArgumentException(msg);
         }
+
+        public static void IsNotEmpty(string arg, string msg)
+        {
+            if(string.IsNullOrWhiteSpace(arg))   
+                throw new ArgumentException(msg);
+        }
     }
 }

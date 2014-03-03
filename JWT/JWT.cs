@@ -153,11 +153,13 @@ namespace Jose
         /// Encodes given json string to JWT token and applies requested encryption/compression algorithms.
         /// Json string to encode will be obtained via configured IJsonMapper implementation.              
         /// </summary>
-        /// <param name="payload">json string to encode</param>
+        /// <param name="payload">json string to encode (not null or whitespace)</param>
         /// <param name="key">key for encryption, suitable for provided JWS algorithm, can be null.</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
         public static string Encode(string payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression=null)
         {
+            Ensure.IsNotEmpty(payload, "Payload expected to be not empty, whitespace or null.");
+
             IKeyManagement keys = KeyAlgorithms[alg];
             IJweAlgorithm _enc = EncAlgorithms[enc];
 
@@ -196,12 +198,14 @@ namespace Jose
         /// <summary>
         /// Encodes given json string to JWT token and sign it using given algorithm.        
         /// </summary>
-        /// <param name="payload">json string to encode</param>
+        /// <param name="payload">json string to encode (not null or whitespace)</param>
         /// <param name="key">key for signing, suitable for provided JWS algorithm, can be null.</param>
         /// <returns>JWT in compact serialization form, digitally signed.</returns>
         public static string Encode(string payload, object key, JwsAlgorithm algorithm)
         {
-            var jwtHeader = new Dictionary<string,object> { {"typ", "JWT"}, { "alg", JwsAlgorithms[algorithm]} }; //TODO: fix
+            Ensure.IsNotEmpty(payload, "Payload expected to be not empty, whitespace or null.");
+
+            var jwtHeader = new Dictionary<string,object> { {"typ", "JWT"}, { "alg", JwsAlgorithms[algorithm]} }; 
 
             byte[] headerBytes = Encoding.UTF8.GetBytes(jsMapper.Serialize(jwtHeader));
             byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);
@@ -225,6 +229,8 @@ namespace Jose
         /// <exception cref="InvalidAlgorithmException">if JWT signature,encryption or compression algorithm is not supported</exception>        
         public static string Decode(string token, object key = null)
         {
+            Ensure.IsNotEmpty(token, "Incoming token expected to be in compact serialization form, not empty, whitespace or null.");
+
             byte[][] parts = Compact.Parse(token);
 
             string json;
