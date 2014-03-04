@@ -13,13 +13,17 @@ Moved to separate project in February 2014.
 **Signing**
 - HMAC signatures with HS256, HS384 and HS512.
 - RSASSA-PKCS1-V1_5 signatures with RS256, RS384 and RS512.
-- RSASSA-PSS signatures (probabilistic signature scheme with appendix) with PS256, PS384 and PS512.
+- RSASSA-PSS<sup>*</sup> signatures (probabilistic signature scheme with appendix) with PS256<sup>*</sup>, PS384<sup>*</sup> and PS512<sup>*</sup>.
 - NONE (unprotected) plain text algorithm without integrity protection
 
 **Encryption**
-- RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
-- RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
-- Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM
+- RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>*</sup>, A192GCM<sup>*</sup>, A256GCM<sup>*</sup>
+- RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>*</sup>, A192GCM<sup>*</sup>, A256GCM<sup>*</sup>
+- Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>*</sup>, A192GCM<sup>*</sup> and A256GCM<sup>*</sup>
+
+####Notes: <sup>*</sup> signature and encryption algorithms support provided via CNG BCCrypt API using CLR Security library. Avaliable starting Windows Vista. 
+
+If CLR Security Library can't be found at runtime given algorithms will not be avaliable. But **jose-jwt** can be used without with all other supported algorithms.
 
 ## Installation
 NuGet is coming. 
@@ -117,7 +121,7 @@ Decoding json web tokens is fully symmetric to creating signed or encrypted toke
 
     string json = Jose.JWT.Decode(token, secretKey);
 
-**RS-** signatures and **RSA** key management algorthms expects RSACryptoServiceProvider as a key, public/private is symmetric to encoding:
+**RS-** signatures and **RSA** key management algorthms expects RSACryptoServiceProvider as a key, public/private is asymmetric to encoding:
 
     string token = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bx_4TL7gh14IeM3EClP3iVfY9pbT81pflXd1lEZOVPJR6PaewRFXWmiJcaqH9fcU9IjGGQ19BS-UPtpErenL5kw7KORFgIBm4hObCYxLoAadMy8A-qQeOWyjnxbE0mbQIdoFI4nGK5qWTEQUWZCMwosvyeHLqEZDzr9CNLAAFTujvsZJJ7NLTkA0cTUzz64b57uSvMTaOK6j7Ap9ZaAgF2uaqBdZ1NzqofLeU4XYCG8pWc5Qd-Ri_1KsksjaDHk12ZU4vKIJWJ-puEnpXBLoHuko92BnN8_LXx4sfDdK7wRiXk0LU_iwoT5zb1ro7KaM0hcfidWoz95vfhPhACIsXQ.YcVAPLJ061gvPpVB-zMm4A.PveUBLejLzMjA4tViHTRXbYnxMHFu8W2ECwj9b6sF2u2azi0TbxxMhs65j-t3qm-8EKBJM7LKIlkAtQ1XBeZl4zuTeMFxsQ0VShQfwlN2r8dPFgUzb4f_MzBuFFYfP5hBs-jugm89l2ZTj8oAOOSpAlC7uTmwha3dNaDOzlJniqAl_729q5EvSjaYXMtaET9wSTNSDfMUVFcMERbB50VOhc134JDUVPTuriD0rd4tQm8Do8obFKtFeZ5l3jT73-f1tPZwZ6CmFVxUMh6gSdY5A.tR8bNx9WErquthpWZBeMaw";
 
