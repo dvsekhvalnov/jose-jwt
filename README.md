@@ -33,7 +33,7 @@ NuGet is coming.
 	string token = Jose.JWT.Encode(payload, null, JwsAlgorithm.none);
 
 ### Creating signed Tokens
-## HS-* family
+#### HS-* family
 Hmac Sha signatures require byte array key of corresponding length
 
     var payload = new Dictionary<string, object>() 
@@ -46,12 +46,12 @@ Hmac Sha signatures require byte array key of corresponding length
 
     string token=Jose.JWT.Encode(json, secretKey, JwsAlgorithm.HS256);
 
-## RS-* family
+#### RS-* and PS-* family
 RSA signatures require RSACryptoServiceProvider (usually private) key of corresponding length. CSP need to be forced to use Microsoft Enhanced RSA and AES Cryptographic Provider.
 Which usually can be done be re-importing RSAParams. See http://clrsecurity.codeplex.com/discussions/243156 for details.
 
     var payload = new Dictionary<string, object>() 
-	{
+    {
         { "sub", "mr.x@contoso.com" },
         { "exp", 1300819380 }
     };
