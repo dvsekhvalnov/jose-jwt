@@ -82,11 +82,12 @@ TODO
     }
 
 ### Parsing and mapping json to object model directly
-**jose-jwt** library is agnostic about object model used to represent json payload as well as underlying framework used to serialize/parse json objects. Library provides
-convinient generic methods to work directly with your object model:
+jose-jwt library is agnostic about object model used to represent json payload as well as underlying framework used to serialize/parse json objects. Library provides convinient generic methods to work directly with your object model:
 
-   MyDomainObject obj=Jose.JWT.Decode<MyDomainObject>(token,secretKey); //will invoke configured IJsonMapper to perform parsing/mapping of content to MyDomainObject
-   string data=Jose.JWT.Encode(obj,secrectKey,JwsAlgorithm.HS256); //for other then `string` arguments configured IJsonMapper will be invoked to serialize object to json string before encoding  
+    MyDomainObject obj=Jose.JWT.Decode(token,secretKey); //will invoke configured IJsonMapper to perform parsing/mapping of content to MyDomainObject 
+
+    string data=Jose.JWT.Encode(obj,secrectKey,JwsAlgorithm.HS256); //for object argument configured IJsonMapper will be invoked to serialize object to json string before encoding
+
 
 ### Customizing json <-> object parsing & mapping
 The library provides simple `Jose.IJsonMapper` interface to plug any json processing library or customize default behavior. The only requirement for mapping implementations
