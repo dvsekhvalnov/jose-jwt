@@ -5,7 +5,8 @@ of [JSON Web Algorithms](http://tools.ietf.org/html/draft-ietf-jose-json-web-alg
 Extensively tested for compatibility with [jose.4.j](https://bitbucket.org/b_c/jose4j/wiki/Home), [Nimbus-JOSE-JWT](https://bitbucket.org/nimbusds/nimbus-jose-jwt/wiki/Home) and [json-jwt](https://github.com/nov/json-jwt) libraries.
 
 ## Foreword
-Originally forked from https://github.com/johnsheehan/jwt . Almost re-written from scratch to support JWT encryption capabilities and unified interface for encoding/decoding/encryption.
+Originally forked from https://github.com/johnsheehan/jwt . Almost re-written from scratch to support JWT encryption capabilities and unified interface for encoding/decoding/encryption 
+and other features.
 Moved to separate project in February 2014.
 
 ## Supported JWA algorithms
@@ -21,7 +22,8 @@ Moved to separate project in February 2014.
 - RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
 - Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup> and A256GCM<sup>\*</sup>
 
-##### Notes: <sup>\*</sup> signature and encryption algorithms support provided via CNG BCCrypt API using CLR Security library. Avaliable starting Windows Vista. 
+##### Notes:
+<sup>\*</sup> signature and encryption algorithms support provided via CNG BCCrypt API using CLR Security library. Avaliable starting Windows Vista. 
 
 If CLR Security Library can't be found at runtime given algorithms will not be avaliable. But **jose-jwt** can be used without with all other supported algorithms.
 
@@ -30,7 +32,7 @@ If CLR Security Library can't be found at runtime given algorithms will not be a
 ...is coming. 
 
 ### Manual
-Grab source and compile yourself. CLR Security Library can be found in *JWT/lib/* folder or (http://clrsecurity.codeplex.com/)
+Grab source and compile yourself. CLR Security Library can be found in **JWT/lib/** folder or http://clrsecurity.codeplex.com/
 
 ## Usage
 ### Creating Plaintext (unprotected) Tokens
@@ -43,7 +45,7 @@ Grab source and compile yourself. CLR Security Library can be found in *JWT/lib/
 	string token = Jose.JWT.Encode(payload, null, JwsAlgorithm.none);
 
 ### Creating signed Tokens
-#### HS-* family
+#### HS-\* family
 HMAC SHA signatures require byte array key of corresponding length
 
     var payload = new Dictionary<string, object>() 
@@ -56,7 +58,7 @@ HMAC SHA signatures require byte array key of corresponding length
 
     string token=Jose.JWT.Encode(json, secretKey, JwsAlgorithm.HS256);
 
-#### RS-* and PS-* family
+#### RS-\* and PS-\* family
 RSA signatures require RSACryptoServiceProvider (usually private) key of corresponding length. CSP need to be forced to use Microsoft Enhanced RSA and AES Cryptographic Provider.
 Which usually can be done be re-importing RSAParameters. See http://clrsecurity.codeplex.com/discussions/243156 for details.
 
@@ -72,8 +74,8 @@ Which usually can be done be re-importing RSAParameters. See http://clrsecurity.
 
 
 ### Creating encrypted Tokens
-#### RSA-* key management family of algorithms
-RSA-* key management with AES using SHA or AES GCM encryption requires RSACryptoServiceProvider (usually public) key of corresponding length.
+#### RSA-\* key management family of algorithms
+RSA-\* key management with AES using SHA or AES GCM encryption requires RSACryptoServiceProvider (usually public) key of corresponding length.
 
     var payload = new Dictionary<string, object>() 
     {
@@ -117,7 +119,7 @@ Optional DEFLATE compression is supported
 ### Verifying and Decoding Tokens
 Decoding json web tokens is fully symmetric to creating signed or encrypted tokens:
 
-**HS-** signatures and **DIR** key management algorithm expects byte array key
+**HS-\*** signatures and **DIR** key management algorithm expects byte array key
 
     string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..Fmz3PLVfv-ySl4IJ.LMZpXMDoBIll5yuEs81Bws2-iUUaBSpucJPL-GtDKXkPhFpJmES2T136Vd8xzvp-3JW-fvpRZtlhluqGHjywPctol71Zuz9uFQjuejIU4axA_XiAy-BadbRUm1-25FRT30WtrrxKltSkulmIS5N-Nsi_zmCz5xicB1ZnzneRXGaXY4B444_IHxGBIS_wdurPAN0OEGw4xIi2DAD1Ikc99a90L7rUZfbHNg_iTBr-OshZqDbR6C5KhmMgk5KqDJEN8Ik-Yw.Jbk8ZmO901fqECYVPKOAzg";
 
@@ -125,7 +127,7 @@ Decoding json web tokens is fully symmetric to creating signed or encrypted toke
 
     string json = Jose.JWT.Decode(token, secretKey);
 
-**RS-** signatures and **RSA** key management algorthms expects RSACryptoServiceProvider as a key, public/private is asymmetric to encoding:
+**RS-\*** signatures and **RSA** key management algorthms expects RSACryptoServiceProvider as a key, public/private is asymmetric to encoding:
 
     string token = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bx_4TL7gh14IeM3EClP3iVfY9pbT81pflXd1lEZOVPJR6PaewRFXWmiJcaqH9fcU9IjGGQ19BS-UPtpErenL5kw7KORFgIBm4hObCYxLoAadMy8A-qQeOWyjnxbE0mbQIdoFI4nGK5qWTEQUWZCMwosvyeHLqEZDzr9CNLAAFTujvsZJJ7NLTkA0cTUzz64b57uSvMTaOK6j7Ap9ZaAgF2uaqBdZ1NzqofLeU4XYCG8pWc5Qd-Ri_1KsksjaDHk12ZU4vKIJWJ-puEnpXBLoHuko92BnN8_LXx4sfDdK7wRiXk0LU_iwoT5zb1ro7KaM0hcfidWoz95vfhPhACIsXQ.YcVAPLJ061gvPpVB-zMm4A.PveUBLejLzMjA4tViHTRXbYnxMHFu8W2ECwj9b6sF2u2azi0TbxxMhs65j-t3qm-8EKBJM7LKIlkAtQ1XBeZl4zuTeMFxsQ0VShQfwlN2r8dPFgUzb4f_MzBuFFYfP5hBs-jugm89l2ZTj8oAOOSpAlC7uTmwha3dNaDOzlJniqAl_729q5EvSjaYXMtaET9wSTNSDfMUVFcMERbB50VOhc134JDUVPTuriD0rd4tQm8Do8obFKtFeZ5l3jT73-f1tPZwZ6CmFVxUMh6gSdY5A.tR8bNx9WErquthpWZBeMaw";
 
