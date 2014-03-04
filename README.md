@@ -73,7 +73,7 @@ TODO
     var secretKey = "GQDstcKsx0NHjPOuXOYg5MbeJ1XT0uFiwDVvVBrk";
     try
     {
-        string jsonPayload = JWT.JsonWebToken.Decode(token, secretKey);
+        string jsonPayload = Jose.JWT.Decode(token, secretKey);
         Console.Out.WriteLine(jsonPayload);
     }
     catch (JWT.SignatureVerificationException e)
@@ -81,6 +81,63 @@ TODO
         Console.Out.WriteLine("Invalid token!");
     }
 
-### Customizing json-object parsing & mapping
+### Parsing and mapping json to object model directly
+**jose-jwt** library is agnostic about object model used to represent json payload as well as underlying framework used to serialize/parse json objects. Library provides
+convinient generic methods to work directly with your object model:
+
+   MyDomainObject obj=Jose.JWT.Decode<MyDomainObject>(token,secretKey); //will invoke configured IJsonMapper to perform parsing/mapping of content to MyDomainObject
+   string data=Jose.JWT.Encode(obj,secrectKey,JwsAlgorithm.HS256); //for other then `string` arguments configured IJsonMapper will be invoked to serialize object to json string before encoding  
+
+### Customizing json <-> object parsing & mapping
+The library provides simple `Jose.IJsonMapper` interface to plug any json processing library or customize default behavior. The only requirement for mapping implementations
+is ability to correctly serialize/parse `IDictionary<string,object>` type.
+
+The default supplied `Jose.IJsonMapper` implementation is based on `System.Web.Script.Serialization.JavaScriptSerializer`.
+
+#### Example of Newtonsoft.Json mapper
+
+    public class NewtonsoftMapper : IJsonMapper
+    {
+        public string Serialize(object obj)
+        {
+             var settings = new JsonSerializerSettings
+             {
+             	ContractResolver = new DictionaryKeysResolver(),
+             	NullValueHandling = NullValueHandling.Ignore,                                                              
+             };
+
+            return JsonConvert.SerializeObject(obj, Formatting.Indented, settings);		
+        }
+
+        public T Parse<T>(string json)
+        {
+            var settings = new JsonSerializerSettings
+            {
+                ContractResolver = new DictionaryKeysResolver(),
+                NullValueHandling = NullValueHandling.Ignore,
+            };
+
+            return JsonConvert.DeserializeObject<T>(json, settings);
+        }
+    }
+
+    Jose.JWT.JsonMapper = new NewtonsoftMapper();
+
+#### Example of ServiceStack mapper
+
+    public class ServiceStackMapper : IJsonMapper
+    {
+        public string Serialize(object obj)
+        {
+            return ServiceStack.Text.JsonSerializer.SerializeToString(obj);
+        }
+
+        public T Parse<T>(string json)
+        {
+            return ServiceStack.Text.JsonSerializer.DeserializeFromString<T>(json);
+        }
+    }
+
+    Jose.JWT.JsonMapper = new ServiceStackMapper();
 
 
