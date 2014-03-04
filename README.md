@@ -50,7 +50,7 @@ HMAC SHA signatures require byte array key of corresponding length
 
 #### RS-* and PS-* family
 RSA signatures require RSACryptoServiceProvider (usually private) key of corresponding length. CSP need to be forced to use Microsoft Enhanced RSA and AES Cryptographic Provider.
-Which usually can be done be re-importing RSAParams. See http://clrsecurity.codeplex.com/discussions/243156 for details.
+Which usually can be done be re-importing RSAParameters. See http://clrsecurity.codeplex.com/discussions/243156 for details.
 
     var payload = new Dictionary<string, object>() 
     {
@@ -64,8 +64,48 @@ Which usually can be done be re-importing RSAParams. See http://clrsecurity.code
 
 
 ### Creating encrypted Tokens
+#### RSA-* key management family of algorithms
+RSA-* key management with AES using SHA or AES GCM encryption requires RSACryptoServiceProvider (usually public) key of corresponding length.
 
-TODO
+    var payload = new Dictionary<string, object>() 
+    {
+        { "sub", "mr.x@contoso.com" },
+        { "exp", 1300819380 }
+    };
+	
+    var publicKey=new X509Certificate2("my-key.p12", "password").PublicKey.Key as RSACryptoServiceProvider;
+
+    string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM);
+
+
+#### DIR direct pre-shared symmetric key family of algorithms 
+Direct encryption with pre-shared symmetric keys using AES or AES GCM encryption requires byte array key of corresponding length
+
+    var payload = new Dictionary<string, object>() 
+    {
+        { "sub", "mr.x@contoso.com" },
+        { "exp", 1300819380 }
+    };
+	
+    var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
+
+    string token = Jose.JWT.Encode(json, aes256Key, JweAlgorithm.DIR, JweEncryption.A128CBC_HS256);
+
+
+#### Optional compressing payload before encrypting
+Optional DEFLATE compression is supported
+
+    var payload = new Dictionary<string, object>() 
+    {
+        { "sub", "mr.x@contoso.com" },
+        { "exp", 1300819380 }
+    };
+	
+    var publicKey=new X509Certificate2("my-key.p12", "password").PublicKey.Key as RSACryptoServiceProvider;
+
+    string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.RSA1_5, JweEncryption.A128CBC_HS256, JweCompression.DEF);
+
+
 
 ### Verifying and Decoding Tokens
 
