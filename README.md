@@ -13,20 +13,24 @@ Moved to separate project in February 2014.
 **Signing**
 - HMAC signatures with HS256, HS384 and HS512.
 - RSASSA-PKCS1-V1_5 signatures with RS256, RS384 and RS512.
-- RSASSA-PSS<sup>*</sup> signatures (probabilistic signature scheme with appendix) with PS256<sup>*</sup>, PS384<sup>*</sup> and PS512<sup>*</sup>.
+- RSASSA-PSS<sup>\*</sup> signatures (probabilistic signature scheme with appendix) with PS256<sup>\*</sup>, PS384<sup>\*</sup> and PS512<sup>\*</sup>.
 - NONE (unprotected) plain text algorithm without integrity protection
 
 **Encryption**
-- RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>*</sup>, A192GCM<sup>*</sup>, A256GCM<sup>*</sup>
-- RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>*</sup>, A192GCM<sup>*</sup>, A256GCM<sup>*</sup>
-- Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>*</sup>, A192GCM<sup>*</sup> and A256GCM<sup>*</sup>
+- RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
+- RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
+- Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup> and A256GCM<sup>\*</sup>
 
-####Notes: <sup>*</sup> signature and encryption algorithms support provided via CNG BCCrypt API using CLR Security library. Avaliable starting Windows Vista. 
+##### Notes: <sup>\*</sup> signature and encryption algorithms support provided via CNG BCCrypt API using CLR Security library. Avaliable starting Windows Vista. 
 
 If CLR Security Library can't be found at runtime given algorithms will not be avaliable. But **jose-jwt** can be used without with all other supported algorithms.
 
 ## Installation
-NuGet is coming. 
+### NuGet 
+...is coming. 
+
+### Manual
+Grab source and compile yourself. CLR Security Library can be found in *JWT/lib/* folder or (http://clrsecurity.codeplex.com/)
 
 ## Usage
 ### Creating Plaintext (unprotected) Tokens
