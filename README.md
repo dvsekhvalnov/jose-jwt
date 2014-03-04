@@ -79,7 +79,7 @@ RSA-* key management with AES using SHA or AES GCM encryption requires RSACrypto
 
 
 #### DIR direct pre-shared symmetric key family of algorithms 
-Direct encryption with pre-shared symmetric keys using AES or AES GCM encryption requires byte array key of corresponding length
+Direct key management with pre-shared symmetric keys using AES or AES GCM encryption requires byte array key of corresponding length
 
     var payload = new Dictionary<string, object>() 
     {
@@ -108,6 +108,7 @@ Optional DEFLATE compression is supported
 
 ### Verifying and Decoding Tokens
 Decoding json web tokens is fully symmetric to creating signed or encrypted tokens:
+
 **HS-** signatures and **DIR** key management algorithm expects byte array key
 
     string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..Fmz3PLVfv-ySl4IJ.LMZpXMDoBIll5yuEs81Bws2-iUUaBSpucJPL-GtDKXkPhFpJmES2T136Vd8xzvp-3JW-fvpRZtlhluqGHjywPctol71Zuz9uFQjuejIU4axA_XiAy-BadbRUm1-25FRT30WtrrxKltSkulmIS5N-Nsi_zmCz5xicB1ZnzneRXGaXY4B444_IHxGBIS_wdurPAN0OEGw4xIi2DAD1Ikc99a90L7rUZfbHNg_iTBr-OshZqDbR6C5KhmMgk5KqDJEN8Ik-Yw.Jbk8ZmO901fqECYVPKOAzg";
