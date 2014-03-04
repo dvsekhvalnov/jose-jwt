@@ -1,8 +1,8 @@
 # JSON Web Token (JWT) Implementation for .NET
 
 Minimallistic zero-dependency (almost) library for generating, decoding and ecnryption [JSON Web Tokens](http://tools.ietf.org/html/draft-jones-json-web-token-10). Supports wide range 
-of JWA encryption and signing algorithms. JSON parsing agnostic, can plug any desired JSON processing library. 
-Extensively tested for comopatibility with [Java: jose.4.j](https://bitbucket.org/b_c/jose4j/wiki/Home), [Java: Nimbus-JOSE-JWT](https://bitbucket.org/nimbusds/nimbus-jose-jwt/wiki/Home) and [Ruby: json-jwt](https://github.com/nov/json-jwt)
+of [JSON Web Algorithms](http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-23). JSON parsing agnostic, can plug any desired JSON processing library. 
+Extensively tested for compatibility with [jose.4.j](https://bitbucket.org/b_c/jose4j/wiki/Home), [Nimbus-JOSE-JWT](https://bitbucket.org/nimbusds/nimbus-jose-jwt/wiki/Home) and [json-jwt](https://github.com/nov/json-jwt) libraries.
 
 ## Foreword
 Originally forked from https://github.com/johnsheehan/jwt . Almost re-written from scratch to support JWT encryption capabilities and unified interface for encoding/decoding/encryption.
