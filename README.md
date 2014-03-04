@@ -23,9 +23,9 @@ Moved to separate project in February 2014.
 - Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup> and A256GCM<sup>\*</sup>
 
 ##### Notes:
-<sup>\*</sup> signature and encryption algorithms support provided via CNG BCCrypt API using CLR Security library. Avaliable starting Windows Vista. 
+\* signature and encryption algorithms support provided via CNG BCCrypt API using CLR Security library. Avaliable starting Windows Vista. 
 
-If CLR Security Library can't be found at runtime given algorithms will not be avaliable. But **jose-jwt** can be used without with all other supported algorithms.
+If CLR Security Library is not found at runtime given algorithms will not be avaliable. **jose-jwt** can run without CLR Security with all other supported algorithms.
 
 ## Installation
 ### NuGet 
