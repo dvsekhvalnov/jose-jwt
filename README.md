@@ -1,6 +1,8 @@
 # JSON Web Token (JWT) Implementation for .NET
 
-This library supports generating, decoding and ecnryption [JSON Web Tokens](http://tools.ietf.org/html/draft-jones-json-web-token-10).
+Minimallistic zero-dependency (almost) library for generating, decoding and ecnryption [JSON Web Tokens](http://tools.ietf.org/html/draft-jones-json-web-token-10). Supports wide range 
+of JWA encryption and signing algorithms. JSON parsing agnostic, can plug any desired JSON processing library. 
+Extensively tested for comopatibility with [Java: jose.4.j](https://bitbucket.org/b_c/jose4j/wiki/Home), [Java: Nimbus-JOSE-JWT](https://bitbucket.org/nimbusds/nimbus-jose-jwt/wiki/Home) and [Ruby: json-jwt](https://github.com/nov/json-jwt)
 
 ## Foreword
 Originally forked from https://github.com/johnsheehan/jwt . Almost re-written from scratch to support JWT encryption capabilities and unified interface for encoding/decoding/encryption.
@@ -34,10 +36,10 @@ NuGet is coming.
 
 ### Creating signed Tokens
 #### HS-* family
-Hmac Sha signatures require byte array key of corresponding length
+HMAC SHA signatures require byte array key of corresponding length
 
     var payload = new Dictionary<string, object>() 
-	{
+    {
         { "sub", "mr.x@contoso.com" },
         { "exp", 1300819380 }
     };
@@ -65,7 +67,6 @@ Which usually can be done be re-importing RSAParams. See http://clrsecurity.code
 
 TODO
 
-
 ### Verifying and Decoding Tokens
 
     var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjbGFpbTEiOjAsImNsYWltMiI6ImNsYWltMi12YWx1ZSJ9.8pwBI_HtXqI3UgQHQ_rDRnSQRxFL1SR8fbQoS-5kM5s";
@@ -80,5 +81,6 @@ TODO
         Console.Out.WriteLine("Invalid token!");
     }
 
-### Contribute (wish-list)
-1. Managed AES-GCM implementation (no external libraries)
+### Customizing json-object parsing & mapping
+
+
