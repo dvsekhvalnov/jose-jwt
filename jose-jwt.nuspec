@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>jose-jwt</id>
+    <version>1.0.0</version>
+    <title>Jose JWT</title>
+    <authors>Dmitry Vsekhvalnov</authors>
+    <owners>Dmitry Vsekhvalnov</owners>
+    <licenseUrl>https://raw.github.com/dvsekhvalnov/jose-jwt/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/dvsekhvalnov/jose-jwt</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <summary>Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET 
+Minimallistic zero-dependency library for generating, decoding and encryption of JSON Web Tokens. JSON parsing agnostic. Supports wide range of signature and encryption algorithms, optional compression.</summary>
+    <description>Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET 
+
+Minimallistic zero-dependency library for generating, decoding and encryption of JSON Web Tokens. JSON parsing agnostic. 
+
+Supported algorithms
+
+Signing:
+
+- HMAC signatures with HS256, HS384 and HS512.
+- RSASSA-PKCS1-V1_5 signatures with RS256, RS384 and RS512.
+- RSASSA-PSS signatures (probabilistic signature scheme with appendix) with PS256, PS384 and PS512.
+- NONE (unprotected) plain text algorithm without integrity protection
+
+Encryption:
+
+- RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM
+
+Compression:
+
+- DEFLATE compression
+    </description>
+    <copyright>Copyright dvsekhvalnov 2014</copyright>
+    <language>en-US</language>
+    <tags>jose jwt json jwa jwe jws aes cbc gcm rsa hmac sha rsassa pss rsaes oaep pkcs1-v1_5</tags>
+  </metadata>
+</package>

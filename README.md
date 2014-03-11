@@ -1,6 +1,6 @@
-# JSON Web Token (JWT) Implementation for .NET
+# Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET
 
-Minimallistic zero-dependency (almost) library for generating, decoding and ecnryption [JSON Web Tokens](http://tools.ietf.org/html/draft-jones-json-web-token-10). Supports wide range 
+Minimallistic zero-dependency (almost) library for generating, decoding and encryption [JSON Web Tokens](http://tools.ietf.org/html/draft-jones-json-web-token-10). Supports wide range 
 of [JSON Web Algorithms](http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-23). JSON parsing agnostic, can plug any desired JSON processing library. 
 Extensively tested for compatibility with [jose.4.j](https://bitbucket.org/b_c/jose4j/wiki/Home), [Nimbus-JOSE-JWT](https://bitbucket.org/nimbusds/nimbus-jose-jwt/wiki/Home) and [json-jwt](https://github.com/nov/json-jwt) libraries.
 
@@ -32,7 +32,7 @@ If CLR Security Library is not found at runtime given algorithms will not be ava
 ...is coming. 
 
 ### Manual
-Grab source and compile yourself. CLR Security Library can be found in **JWT/lib/** folder or http://clrsecurity.codeplex.com/
+Grab source and compile yourself. CLR Security Library can be found in **JWT/lib/** folder or http://clrsecurity.codeplex.com/ . Please checkout CLR Security license, which is different from jose-jwt one.
 
 ## Usage
 ### Creating Plaintext (unprotected) Tokens
