@@ -29,7 +29,9 @@ If CLR Security Library is not found at runtime given algorithms will not be ava
 
 ## Installation
 ### NuGet 
-...is coming. 
+`Install-Package jose-jwt`
+
+\* NuGet will install CLR Security Library automatically. Please checkout CLR Security license, which is different from jose-jwt one.
 
 ### Manual
 Grab source and compile yourself. CLR Security Library can be found in **JWT/lib/** folder or http://clrsecurity.codeplex.com/ . Please checkout CLR Security license, which is different from jose-jwt one.
