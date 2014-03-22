@@ -38,11 +38,13 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
     <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Arrays.cs" />
     <Compile Include="Compact.cs" />
+    <Compile Include="Security\Cryptography\EccKey.cs" />
     <Compile Include="Ensure.cs" />
     <Compile Include="json\IJsonMapper.cs" />
     <Compile Include="json\JSSerializerMapper.cs" />
@@ -54,6 +56,7 @@
     <Compile Include="jwe\IJweAlgorithm.cs" />
     <Compile Include="jwe\IKeyManagement.cs" />
     <Compile Include="jwe\RsaKeyManagement.cs" />
+    <Compile Include="jws\EcdsaUsingSha.cs" />
     <Compile Include="jws\HmacUsingSha.cs" />
     <Compile Include="jws\IJwsAlgorithm.cs" />
     <Compile Include="jws\Plaintext.cs" />

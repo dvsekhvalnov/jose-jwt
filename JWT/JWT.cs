@@ -15,7 +15,10 @@ namespace Jose
         RS512,
         PS256,
         PS384,
-        PS512
+        PS512,
+        ES256, // ECDSA using P-256 curve and SHA-256 hash 
+        ES384, // ECDSA using P-384 curve and SHA-384 hash 
+        ES512  // ECDSA using P-521 curve and SHA-512 hash 
     }
 
     public enum JweAlgorithm
@@ -75,7 +78,11 @@ namespace Jose
 
                 {JwsAlgorithm.RS256, new RsaUsingSha("SHA256")},
                 {JwsAlgorithm.RS384, new RsaUsingSha("SHA384")},
-                {JwsAlgorithm.RS512, new RsaUsingSha("SHA512")}
+                {JwsAlgorithm.RS512, new RsaUsingSha("SHA512")},
+
+                {JwsAlgorithm.ES256, new EcdsaUsingSha(256)},
+                {JwsAlgorithm.ES384, new EcdsaUsingSha(384)},
+                {JwsAlgorithm.ES512, new EcdsaUsingSha(521)}
             };
 
             JwsAlgorithms[JwsAlgorithm.none] = "none";
@@ -85,6 +92,9 @@ namespace Jose
             JwsAlgorithms[JwsAlgorithm.RS256] = "RS256";
             JwsAlgorithms[JwsAlgorithm.RS384] = "RS384";
             JwsAlgorithms[JwsAlgorithm.RS512] = "RS512";
+            JwsAlgorithms[JwsAlgorithm.ES256] = "ES256";
+            JwsAlgorithms[JwsAlgorithm.ES384] = "ES384";
+            JwsAlgorithms[JwsAlgorithm.ES512] = "ES512";
 
             if (ClassAvaliable("Security.Cryptography.RSACng, Security.Cryptography"))
             {

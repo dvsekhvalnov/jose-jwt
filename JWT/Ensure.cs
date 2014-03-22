@@ -30,6 +30,12 @@ namespace Jose
                 throw new ArgumentException(msg);
         }
 
+        public static void BitSize(int actualSize, int expectedSize, string msg)
+        {
+            if(expectedSize!=actualSize)
+                throw new ArgumentException(msg);
+        }
+
         public static void IsNotEmpty(string arg, string msg)
         {
             if(string.IsNullOrWhiteSpace(arg))   

@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Jose;
+using Security.Cryptography;
 using NUnit.Framework;
 
 namespace UnitTests
@@ -135,6 +136,51 @@ namespace UnitTests
 
             //when
             string json = Jose.JWT.Decode(token, PubKey());
+
+            Console.Out.WriteLine("json = {0}", json);
+
+            //then
+            Assert.That(json, Is.EqualTo(@"{""hello"": ""world""}"));
+        }
+
+        [Test]
+        public void DecodeES256()
+        {
+            //given
+            string token = "eyJhbGciOiJFUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.EVnmDMlz-oi05AQzts-R3aqWvaBlwVZddWkmaaHyMx5Phb2NSLgyI0kccpgjjAyo1S5KCB3LIMPfmxCX_obMKA";
+
+            //when
+            string json = Jose.JWT.Decode(token, Ecc256Public());
+
+            Console.Out.WriteLine("json = {0}", json);
+
+            //then
+            Assert.That(json, Is.EqualTo(@"{""hello"": ""world""}"));
+        }
+
+        [Test]
+        public void DecodeES384()
+        {
+            //given
+            string token = "eyJhbGciOiJFUzM4NCIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.jVTHd9T0fIQDJLNvAq3LPpgj_npXtWb64FfEK8Sm65Nr9q2goUWASrM9jv3h-71UrP4cBpM3on3yN--o6B-Tl6bscVUfpm1swPp94f7XD9VYLEjGMjQOaozr13iBZJCY";
+
+            //when
+            string json = Jose.JWT.Decode(token, Ecc384Public());
+
+            Console.Out.WriteLine("json = {0}", json);
+
+            //then
+            Assert.That(json, Is.EqualTo(@"{""hello"": ""world""}"));
+        }
+
+        [Test]
+        public void DecodeES512()
+        {
+            //given
+            string token = "eyJhbGciOiJFUzUxMiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.AHxJYFeTVpZmrfZsltpQKkkplmbkycQKFOFucD7hE4Sm3rCswUDi8hlSCfeYByugySYLFzogTQGk79PHP6vdl39sAUc9k2bhnv-NxRmJsN8ZxEx09qYKbc14qiNWZztLweQg0U-pU0DQ66rwJ0HikzSqgmyD1bJ6RxitJwceYLAovv0v";
+
+            //when
+            string json = Jose.JWT.Decode(token, Ecc512Public());
 
             Console.Out.WriteLine("json = {0}", json);
 
@@ -353,6 +399,72 @@ namespace UnitTests
 
             Assert.That(token, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.YJ_5bDkZUgZj1ZoyTbSeYerUnahjt4Llbj6IwUQUY-zH_mMpywJHs2IT8wteUyX32lCCGr4NfNKpkC-zMMq7aDsklSKIg8sdGYDMheGsEw9YD0QRBF1Ovt4yuSZjWsgmdGSapXKc8CBqSzPCr9S1Rns8YhVHAYMfzHrahXuroYK35gVPQKKLbYQGcwnhpgvxMx0EfGyFbSc6r6XYK-fJ5lSqBh4wSxVMBy_5CkTVWpmnDjRuycE_j4c-yuTYUEAsj5o0sW2ahPf8aomBUC5I1ZG2yTAz8BX7dud6s2VPJQRRsUKlMNrUcMGEooJMoL_vmek9z3t_z9KFyyVHuY5XUA"));
             Assert.That(Jose.JWT.Decode(token, PubKey()), Is.EqualTo(json), "Make sure we are consistent with ourselves");
+        }
+
+        [Test]
+        public void EncodeES256()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token=Jose.JWT.Encode(json, Ecc256Private(), JwsAlgorithm.ES256);
+
+            //then
+            Console.Out.WriteLine("ES256 = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(3), "Make sure 3 parts");
+            Assert.That(parts[0], Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9"), "Header is non-encrypted and static text");
+            Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
+            Assert.That(parts[2].Length, Is.EqualTo(86), "signature size");
+
+            Assert.That(Jose.JWT.Decode(token, Ecc256Public()), Is.EqualTo(json), "Make sure we are consistent with ourselves");
+        }
+
+        [Test]
+        public void EncodeES384()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token=Jose.JWT.Encode(json, Ecc384Private(), JwsAlgorithm.ES384);
+
+            //then
+            Console.Out.WriteLine("ES384 = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(3), "Make sure 3 parts");
+            Assert.That(parts[0], Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzM4NCJ9"), "Header is non-encrypted and static text");
+            Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
+            Assert.That(parts[2].Length, Is.EqualTo(128), "signature size");
+
+            Assert.That(Jose.JWT.Decode(token, Ecc384Public()), Is.EqualTo(json), "Make sure we are consistent with ourselves");
+        }
+
+        [Test]
+        public void EncodeES512()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token=Jose.JWT.Encode(json, Ecc512Private(), JwsAlgorithm.ES512);
+
+            //then
+            Console.Out.WriteLine("ES512 = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(3), "Make sure 3 parts");
+            Assert.That(parts[0], Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzUxMiJ9"), "Header is non-encrypted and static text");
+            Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
+            Assert.That(parts[2].Length, Is.EqualTo(176), "signature size");
+
+            Assert.That(Jose.JWT.Decode(token, Ecc512Public()), Is.EqualTo(json), "Make sure we are consistent with ourselves");
         }
 
         [Test]
@@ -1197,6 +1309,59 @@ namespace UnitTests
         private X509Certificate2 X509()
         {
             return new X509Certificate2("jwt-2048.p12", "1", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
+        }
+
+        private CngKey Ecc256Public()
+        {
+            byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+            byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+            byte[] d = { 42, 148, 231, 48, 225, 196, 166, 201, 23, 190, 229, 199, 20, 39, 226, 70, 209, 148, 29, 70, 125, 14, 174, 66, 9, 198, 80, 251, 95, 107, 98, 206 };
+
+            return EccKey.New(x, y);
+        }
+
+        private CngKey Ecc384Public()
+        {
+            byte[] x = { 70, 151, 220, 179, 62, 0, 79, 232, 114, 64, 58, 75, 91, 209, 232, 128, 7, 137, 151, 42, 13, 148, 15, 133, 93, 215, 7, 3, 136, 124, 14, 101, 242, 207, 192, 69, 212, 145, 88, 59, 222, 33, 127, 46, 30, 218, 175, 79 };
+            byte[] y = { 189, 202, 196, 30, 153, 53, 22, 122, 171, 4, 188, 42, 71, 2, 9, 193, 191, 17, 111, 180, 78, 6, 110, 153, 240, 147, 203, 45, 152, 236, 181, 156, 232, 223, 227, 148, 68, 148, 221, 176, 57, 149, 44, 203, 83, 85, 75, 55 };
+
+            return EccKey.New(x, y);
+        }
+
+        private CngKey Ecc384Private()
+        {
+            byte[] x = { 70, 151, 220, 179, 62, 0, 79, 232, 114, 64, 58, 75, 91, 209, 232, 128, 7, 137, 151, 42, 13, 148, 15, 133, 93, 215, 7, 3, 136, 124, 14, 101, 242, 207, 192, 69, 212, 145, 88, 59, 222, 33, 127, 46, 30, 218, 175, 79 };
+            byte[] y = { 189, 202, 196, 30, 153, 53, 22, 122, 171, 4, 188, 42, 71, 2, 9, 193, 191, 17, 111, 180, 78, 6, 110, 153, 240, 147, 203, 45, 152, 236, 181, 156, 232, 223, 227, 148, 68, 148, 221, 176, 57, 149, 44, 203, 83, 85, 75, 55 };
+            byte[] d = { 137, 199, 183, 105, 188, 90, 128, 82, 116, 47, 161, 100, 221, 97, 208, 64, 173, 247, 9, 42, 186, 189, 181, 110, 24, 225, 254, 136, 75, 156, 242, 209, 94, 218, 58, 14, 33, 190, 15, 82, 141, 238, 207, 214, 159, 140, 247, 139 };
+
+            return EccKey.New(x, y, d);
+        }
+
+        private CngKey Ecc256Private()
+        {
+            byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+            byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+            byte[] d = { 42, 148, 231, 48, 225, 196, 166, 201, 23, 190, 229, 199, 20, 39, 226, 70, 209, 148, 29, 70, 125, 14, 174, 66, 9, 198, 80, 251, 95, 107, 98, 206 };
+
+            return EccKey.New(x, y, d);
+
+        }
+
+        private CngKey Ecc512Public()
+        {
+            byte[] x = { 0, 248, 73, 203, 53, 184, 34, 69, 111, 217, 230, 255, 108, 212, 241, 229, 95, 239, 93, 131, 100, 37, 86, 152, 87, 98, 170, 43, 25, 35, 80, 137, 62, 112, 197, 113, 138, 116, 114, 55, 165, 128, 8, 139, 148, 237, 109, 121, 40, 205, 3, 61, 127, 28, 195, 58, 43, 228, 224, 228, 82, 224, 219, 148, 204, 96 };
+            byte[] y = { 0, 60, 71, 97, 112, 106, 35, 121, 80, 182, 20, 167, 143, 8, 246, 108, 234, 160, 193, 10, 3, 148, 45, 11, 58, 177, 190, 172, 26, 178, 188, 240, 91, 25, 67, 79, 64, 241, 203, 65, 223, 218, 12, 227, 82, 178, 66, 160, 19, 194, 217, 172, 61, 250, 23, 78, 218, 130, 160, 105, 216, 208, 235, 124, 46, 32 };
+
+            return EccKey.New(x, y);
+        }
+
+        private CngKey Ecc512Private()
+        {
+            byte[] x = { 0, 248, 73, 203, 53, 184, 34, 69, 111, 217, 230, 255, 108, 212, 241, 229, 95, 239, 93, 131, 100, 37, 86, 152, 87, 98, 170, 43, 25, 35, 80, 137, 62, 112, 197, 113, 138, 116, 114, 55, 165, 128, 8, 139, 148, 237, 109, 121, 40, 205, 3, 61, 127, 28, 195, 58, 43, 228, 224, 228, 82, 224, 219, 148, 204, 96 };
+            byte[] y = { 0, 60, 71, 97, 112, 106, 35, 121, 80, 182, 20, 167, 143, 8, 246, 108, 234, 160, 193, 10, 3, 148, 45, 11, 58, 177, 190, 172, 26, 178, 188, 240, 91, 25, 67, 79, 64, 241, 203, 65, 223, 218, 12, 227, 82, 178, 66, 160, 19, 194, 217, 172, 61, 250, 23, 78, 218, 130, 160, 105, 216, 208, 235, 124, 46, 32 };
+            byte[] d = { 0, 222, 129, 9, 133, 207, 123, 116, 176, 83, 95, 169, 29, 121, 160, 137, 22, 21, 176, 59, 203, 129, 62, 111, 19, 78, 14, 174, 20, 211, 56, 160, 83, 42, 74, 219, 208, 39, 231, 33, 84, 114, 71, 106, 109, 161, 116, 243, 166, 146, 252, 231, 137, 228, 99, 149, 152, 123, 201, 157, 155, 131, 181, 106, 179, 112 };
+
+            return EccKey.New(x, y, d);
         }
 
         #endregion
