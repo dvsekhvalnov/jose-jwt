@@ -13,6 +13,14 @@ namespace Security.Cryptography
         public static readonly byte[] BCRYPT_ECDSA_PUBLIC_P521_MAGIC = BitConverter.GetBytes(0x35534345);
         public static readonly byte[] BCRYPT_ECDSA_PRIVATE_P521_MAGIC = BitConverter.GetBytes(0x36534345);           
 
+        /// <summary>
+        /// Creates CngKey Elliptic Curve Key from given (x,y) curve point - public part 
+        /// and optional d - private part
+        /// </summary>
+        /// <param name="x">x coordinate of curve point</param>
+        /// <param name="y">y coordinate of curve point</param>
+        /// <param name="d">optional private part</param>
+        /// <returns>CngKey for given (x,y) and d</returns>
         public static CngKey New(byte[] x, byte[] y, byte[] d=null)
         {
             if (x.Length != y.Length)

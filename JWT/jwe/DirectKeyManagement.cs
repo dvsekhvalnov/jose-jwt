@@ -1,5 +1,3 @@
-using System;
-
 namespace Jose
 {
     public class DirectKeyManagement : IKeyManagement
