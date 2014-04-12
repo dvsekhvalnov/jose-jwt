@@ -26,9 +26,9 @@ namespace Jose
         RSA1_5, //RSAES with PKCS #1 v1.5 padding, RFC 3447
         RSA_OAEP, //RSAES using Optimal Assymetric Encryption Padding, RFC 3447
         DIR, //Direct use of pre-shared symmetric key
-        A128KW,
-        A192KW,
-        A256KW
+        A128KW, //AES Key Wrap Algorithm using 128 bit keys, RFC 3394
+        A192KW, //AES Key Wrap Algorithm using 192 bit keys, RFC 3394
+        A256KW  //AES Key Wrap Algorithm using 256 bit keys, RFC 3394 
     }
 
     public enum JweEncryption

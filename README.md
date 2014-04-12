@@ -9,6 +9,8 @@ Originally forked from https://github.com/johnsheehan/jwt . Almost re-written fr
 and other features.
 Moved to separate project in February 2014.
 
+AES Kew Wrap implementation ideas and test data from http://www.cryptofreak.org/projects/rfc3394/ by Jay Miller
+
 ## Supported JWA algorithms
 
 **Signing**
@@ -22,9 +24,10 @@ Moved to separate project in February 2014.
 - RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
 - RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
 - Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup> and A256GCM<sup>\*</sup>
+- A128KW, A192KW, A256KW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
 
 ##### Notes:
-\* signature and encryption algorithms support provided via CNG BCCrypt API using CLR Security library. Avaliable starting Windows Vista. 
+\* signature and encryption algorithms support provided via CNG BCrypt API using CLR Security library. Avaliable starting Windows Vista. 
 
 If CLR Security Library is not found at runtime given algorithms will not be avaliable. **jose-jwt** can run without CLR Security with all other supported algorithms.
 
@@ -119,7 +122,21 @@ Direct key management with pre-shared symmetric keys using AES or AES GCM encryp
   	
     var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
 
-    string token = Jose.JWT.Encode(json, aes256Key, JweAlgorithm.DIR, JweEncryption.A128CBC_HS256);
+    string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.DIR, JweEncryption.A128CBC_HS256);
+
+### AES Key Wrap key management family of algorithms
+AES Key Wrap key management requires `byte[]` array key of corresponding length
+
+    var payload = new Dictionary<string, object>() 
+    {
+        { "sub", "mr.x@contoso.com" },
+        { "exp", 1300819380 }
+    };
+  	
+    var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
+
+    string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
+
 
 #### Optional compressing payload before encrypting
 Optional DEFLATE compression is supported
@@ -137,7 +154,7 @@ Optional DEFLATE compression is supported
 ### Verifying and Decoding Tokens
 Decoding json web tokens is fully symmetric to creating signed or encrypted tokens:
 
-**HS-\*** signatures and **DIR** key management algorithm expects `byte[]` array key
+**HS-\*** signatures **A128KW, A192KW, A256KW** and **DIR** key management algorithms expects `byte[]` array key
 
     string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..Fmz3PLVfv-ySl4IJ.LMZpXMDoBIll5yuEs81Bws2-iUUaBSpucJPL-GtDKXkPhFpJmES2T136Vd8xzvp-3JW-fvpRZtlhluqGHjywPctol71Zuz9uFQjuejIU4axA_XiAy-BadbRUm1-25FRT30WtrrxKltSkulmIS5N-Nsi_zmCz5xicB1ZnzneRXGaXY4B444_IHxGBIS_wdurPAN0OEGw4xIi2DAD1Ikc99a90L7rUZfbHNg_iTBr-OshZqDbR6C5KhmMgk5KqDJEN8Ik-Yw.Jbk8ZmO901fqECYVPKOAzg";
 
