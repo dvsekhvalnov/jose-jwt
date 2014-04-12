@@ -9,7 +9,7 @@ Originally forked from https://github.com/johnsheehan/jwt . Almost re-written fr
 and other features.
 Moved to separate project in February 2014.
 
-AES Kew Wrap implementation ideas and test data from http://www.cryptofreak.org/projects/rfc3394/ by Jay Miller
+AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/projects/rfc3394/ by Jay Miller
 
 ## Supported JWA algorithms
 
@@ -154,7 +154,7 @@ Optional DEFLATE compression is supported
 ### Verifying and Decoding Tokens
 Decoding json web tokens is fully symmetric to creating signed or encrypted tokens:
 
-**HS-\*** signatures **A128KW, A192KW, A256KW** and **DIR** key management algorithms expects `byte[]` array key
+**HS-\*** signatures, **A128KW, A192KW, A256KW** and **DIR** key management algorithms expects `byte[]` array key
 
     string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..Fmz3PLVfv-ySl4IJ.LMZpXMDoBIll5yuEs81Bws2-iUUaBSpucJPL-GtDKXkPhFpJmES2T136Vd8xzvp-3JW-fvpRZtlhluqGHjywPctol71Zuz9uFQjuejIU4axA_XiAy-BadbRUm1-25FRT30WtrrxKltSkulmIS5N-Nsi_zmCz5xicB1ZnzneRXGaXY4B444_IHxGBIS_wdurPAN0OEGw4xIi2DAD1Ikc99a90L7rUZfbHNg_iTBr-OshZqDbR6C5KhmMgk5KqDJEN8Ik-Yw.Jbk8ZmO901fqECYVPKOAzg";
 
