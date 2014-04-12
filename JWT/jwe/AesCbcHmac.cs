@@ -108,7 +108,7 @@ namespace Jose
 
         private byte[] ComputeAuthTag(byte[] aad, byte[] iv, byte[] cipherText, byte[] hmacKey)
         {
-            byte[] al = Arrays.SixtyFourBitLength(aad);
+            byte[] al = Arrays.LongToBytes(aad.Length * 8);
             byte[] hmacInput = Arrays.Concat(aad, iv, cipherText, al);
 
             byte[] hmac = hashAlgorithm.Sign(hmacInput, hmacKey);

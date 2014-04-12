@@ -146,7 +146,7 @@ namespace Jose
                 : new[] { (byte)(_value & 0xFF), (byte)((_value >> 8) & 0xFF), (byte)((_value >> 16) & 0xFF), (byte)((_value >> 24) & 0xFF), (byte)((_value >> 32) & 0xFF), (byte)((_value >> 40) & 0xFF), (byte)((_value >> 48) & 0xFF) , (byte)((_value >> 56) & 0xFF) };
         }
 
-        private static long BytesToLong(byte[] array)
+        public static long BytesToLong(byte[] array)
         {
             long msb = BitConverter.IsLittleEndian 
                         ? (long)(array[0] << 24 | array[1] << 16 | array[2] << 8 | array[3]) << 32

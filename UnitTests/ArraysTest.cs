@@ -27,16 +27,6 @@ namespace UnitTests
         }
 
         [Test]
-        public void SixtyFourBitLength()
-        {
-            //given
-            byte[] data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-
-            //then
-            Assert.That(Arrays.SixtyFourBitLength(data), Is.EqualTo(new byte[] {0, 0, 0, 0, 0, 0, 0, 80}));            
-        }
-
-        [Test]
         public void Concat()
         {
             //given
@@ -61,6 +51,20 @@ namespace UnitTests
             Assert.That(test[0], Is.EqualTo(new byte[] {0, 1, 2}));
             Assert.That(test[1], Is.EqualTo(new byte[] {3, 4, 5}));
             Assert.That(test[2], Is.EqualTo(new byte[] {6, 7, 8}));
+        }
+
+        [Test]
+        public void LongToBytes()
+        {
+            Assert.That(Arrays.LongToBytes(255), Is.EqualTo(new byte[]{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xFF}));
+            Assert.That(Arrays.LongToBytes(-2), Is.EqualTo(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE }));
+        }
+
+        [Test]
+        public void BytesToLong()
+        {
+            Assert.That(Arrays.BytesToLong(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF }), Is.EqualTo(255));
+            Assert.That(Arrays.BytesToLong(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE }), Is.EqualTo(-2));
         }
 
         [Test]
