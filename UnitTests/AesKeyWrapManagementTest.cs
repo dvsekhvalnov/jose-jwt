@@ -24,7 +24,7 @@ namespace UnitTests
             byte[] expected = { 31, 166, 139, 10, 129, 18, 180, 71, 174, 243, 75, 216, 251, 90, 123, 130, 157, 62, 134,35, 113, 210, 207, 229};
 
             //when
-            byte[] test = aesKW.Wrap(key, kek);
+            byte[] test = aesKW.Wrap(key, kek, null);
 
             //then
             Assert.That(test,Is.EqualTo(expected));
@@ -46,7 +46,7 @@ namespace UnitTests
             byte[] key = { 31, 166, 139, 10, 129, 18, 180, 71, 174, 243, 75, 216, 251, 90, 123, 130, 157, 62, 134, 35, 113, 210, 207, 229 };
 
             //when
-            byte[] test = aesKW.Unwrap(key, kek);
+            byte[] test = aesKW.Unwrap(key, kek, 128, null);
 
             //then
             Assert.That(test, Is.EqualTo(expected));
@@ -68,7 +68,7 @@ namespace UnitTests
             byte[] expected = { 150, 119, 139, 37, 174, 108, 164, 53, 249, 43, 91, 151, 192, 80, 174, 210, 70, 138, 184, 161, 122, 216, 78, 93 };
 
             //when
-            byte[] test = aesKW.Wrap(key, kek);
+            byte[] test = aesKW.Wrap(key, kek, null);
 
             //then
             Assert.That(test,Is.EqualTo(expected));
@@ -90,7 +90,7 @@ namespace UnitTests
             byte[] key = { 150, 119, 139, 37, 174, 108, 164, 53, 249, 43, 91, 151, 192, 80, 174, 210, 70, 138, 184, 161, 122, 216, 78, 93 };
 
             //when
-            byte[] test = aesKW.Unwrap(key, kek);
+            byte[] test = aesKW.Unwrap(key, kek, 192, null);
 
             //then
             Assert.That(test,Is.EqualTo(expected));
@@ -112,7 +112,7 @@ namespace UnitTests
             byte[] expected = { 100, 232, 195, 249, 206, 15, 91, 162, 99, 233, 119, 121, 5, 129, 138, 42, 147, 200, 25, 30, 125, 110, 138, 231 };
 
             //when
-            byte[] test = aesKW.Wrap(key, kek);
+            byte[] test = aesKW.Wrap(key, kek, null);
 
             //then
             Assert.That(test,Is.EqualTo(expected));
@@ -134,7 +134,7 @@ namespace UnitTests
             byte[] key = { 100, 232, 195, 249, 206, 15, 91, 162, 99, 233, 119, 121, 5, 129, 138, 42, 147, 200, 25, 30, 125, 110, 138, 231 };
 
             //when
-            byte[] test = aesKW.Unwrap(key, kek);
+            byte[] test = aesKW.Unwrap(key, kek, 192, null);
 
             //then
             Assert.That(test,Is.EqualTo(expected));
@@ -156,7 +156,7 @@ namespace UnitTests
             byte[] expected = { 3, 29, 51, 38, 78, 21, 211, 50, 104, 242, 78, 194, 96, 116, 62, 220, 225, 198, 199, 221, 238, 114, 90, 147, 107, 168, 20, 145, 92, 103, 98, 210 };
 
             //when
-            byte[] test = aesKW.Wrap(key, kek);
+            byte[] test = aesKW.Wrap(key, kek, null);
 
             //then
             Assert.That(test,Is.EqualTo(expected));
@@ -178,7 +178,7 @@ namespace UnitTests
             byte[] key = { 3, 29, 51, 38, 78, 21, 211, 50, 104, 242, 78, 194, 96, 116, 62, 220, 225, 198, 199, 221, 238, 114, 90, 147, 107, 168, 20, 145, 92, 103, 98, 210 };
 
             //when
-            byte[] test = aesKW.Unwrap(key, kek);
+            byte[] test = aesKW.Unwrap(key, kek, 192, null);
 
             //then
             Assert.That(test,Is.EqualTo(expected));
@@ -200,7 +200,7 @@ namespace UnitTests
             byte[] expected = { 168, 249, 188, 22, 18, 198, 139, 63, 246, 230, 244, 251, 227, 14, 113, 228, 118, 156, 139, 128, 163, 44, 184, 149, 140, 213, 209, 125, 107, 37, 77, 161 };
 
             //when
-            byte[] test = aesKW.Wrap(key, kek);
+            byte[] test = aesKW.Wrap(key, kek, null);
 
             //then
             Assert.That(test,Is.EqualTo(expected));
@@ -222,7 +222,7 @@ namespace UnitTests
             byte[] key = { 168, 249, 188, 22, 18, 198, 139, 63, 246, 230, 244, 251, 227, 14, 113, 228, 118, 156, 139, 128, 163, 44, 184, 149, 140, 213, 209, 125, 107, 37, 77, 161 };
 
             //when
-            byte[] test = aesKW.Unwrap(key, kek);
+            byte[] test = aesKW.Unwrap(key, kek, 256, null);
 
             //then
             Assert.That(test,Is.EqualTo(expected));
@@ -244,7 +244,7 @@ namespace UnitTests
             byte[] expected = { 40, 201, 244, 4, 196, 184, 16, 244, 203, 204, 179, 92, 251, 135, 248, 38, 63, 87, 134, 226, 216, 14, 211, 38, 203, 199, 240, 231, 26, 153, 244, 59, 251, 152, 139, 155, 122, 2, 221, 33 };
 
             //when
-            byte[] test = aesKW.Wrap(key, kek);
+            byte[] test = aesKW.Wrap(key, kek, null);
 
             //then
             Assert.That(test,Is.EqualTo(expected));
@@ -266,7 +266,7 @@ namespace UnitTests
             byte[] key = { 40, 201, 244, 4, 196, 184, 16, 244, 203, 204, 179, 92, 251, 135, 248, 38, 63, 87, 134, 226, 216, 14, 211, 38, 203, 199, 240, 231, 26, 153, 244, 59, 251, 152, 139, 155, 122, 2, 221, 33 };
 
             //when
-            byte[] test = aesKW.Unwrap(key, kek);
+            byte[] test = aesKW.Unwrap(key, kek, 256, null);
 
             //then
             Assert.That(test,Is.EqualTo(expected));

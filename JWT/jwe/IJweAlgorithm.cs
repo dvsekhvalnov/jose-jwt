@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Jose
 {
     public interface IJweAlgorithm

@@ -68,6 +68,13 @@ namespace UnitTests
         }
 
         [Test]
+        public void IntToBytes()
+        {
+            Assert.That(Arrays.IntToBytes(255), Is.EqualTo(new byte[] { 0x00, 0x00, 0x00, 0xFF }));
+            Assert.That(Arrays.IntToBytes(-2), Is.EqualTo(new byte[] { 0xFF, 0xFF, 0xFF, 0xFE }));
+        }
+
+        [Test]
         public void Xor()
         {
             //given
@@ -80,6 +87,28 @@ namespace UnitTests
             //then
             Assert.That(test, Is.EqualTo(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }));
             Assert.That(test2, Is.EqualTo(new byte[] { 0x00, 0xFF, 0x0F, 0xF0, 0xAA, 0x55, 0x44, 0x33 }));
+        }
+
+        [Test]
+        public void LeftmostBits()
+        {
+            //given
+            byte[] data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+            //then
+            Assert.That(Arrays.LeftmostBits(data,16), Is.EqualTo(new byte[] { 0, 1 }));
+            Assert.That(Arrays.LeftmostBits(data,72), Is.EqualTo(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8}));
+        }
+
+        [Test]
+        public void RightmostBits()
+        {
+            //given
+            byte[] data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+            //then
+            Assert.That(Arrays.RightmostBits(data,16), Is.EqualTo(new byte[] { 8, 9 }));
+            Assert.That(Arrays.RightmostBits(data, 72), Is.EqualTo(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }));
         }
     }
 }

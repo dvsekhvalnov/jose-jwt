@@ -109,6 +109,7 @@ namespace Jose
         public static void Dump(byte[] arr, string label = "")
         {
             var builder=new StringBuilder();
+
             builder.Append(string.Format("{0}({1} bytes): [", label+" ", arr.Length).Trim());
 
             foreach (var b in arr)
@@ -118,7 +119,8 @@ namespace Jose
             }
 
             builder.Remove(builder.Length - 1, 1);
-            builder.Append("]\n");
+            builder.Append("] Base64:").Append(Convert.ToBase64String(arr)).Append("\n");
+            
 
             Console.Out.WriteLine(builder.ToString());
         }        
@@ -135,6 +137,15 @@ namespace Jose
         internal static RNGCryptoServiceProvider RNG
         {
             get { return rng ?? (rng = new RNGCryptoServiceProvider()); }
+        }
+
+        public static byte[] IntToBytes(int value)
+        {
+            uint _value = (uint)value;
+
+            return BitConverter.IsLittleEndian
+                ? new[] { (byte)((_value >> 24) & 0xFF), (byte)((_value >> 16) & 0xFF), (byte)((_value >> 8) & 0xFF), (byte)(_value & 0xFF) }
+                : new[] { (byte)(_value & 0xFF), (byte)((_value >> 8) & 0xFF), (byte)((_value >> 16) & 0xFF), (byte)((_value >> 24) & 0xFF) };
         }
 
         public static byte[] LongToBytes(long value)
@@ -159,5 +170,31 @@ namespace Jose
             return msb | lsb;
         }
 
+        public static byte[] LeftmostBits(byte[] data, int lengthBits)
+        {
+            Ensure.Divisible(lengthBits, 8, "LeftmostBits() expects length in bits divisible by 8, but was given {0}", lengthBits);
+
+            int byteCount = lengthBits/8;            
+
+            var result = new byte[byteCount];
+
+            Buffer.BlockCopy(data, 0, result, 0, byteCount);
+
+            return result;
+        }
+
+        public static byte[] RightmostBits(byte[] data, int lengthBits)
+        {
+            Ensure.Divisible(lengthBits, 8, "RightmostBits() expects length in bits divisible by 8, but was given {0}", lengthBits);
+
+            int byteCount = lengthBits / 8;
+
+            var result = new byte[byteCount];
+
+            Buffer.BlockCopy(data, data.Length-byteCount, result, 0, byteCount);
+
+            return result;
+
+        }
     }
 }

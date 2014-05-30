@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Security.Cryptography;
 
@@ -7,22 +8,22 @@ namespace Jose
     {
         private static readonly byte[] DefaultIV = { 0xA6, 0xA6, 0xA6, 0xA6, 0xA6, 0xA6, 0xA6, 0xA6 }; // http://www.ietf.org/rfc/rfc3394.txt (see 2.2.3)
 
-        private int keyLength;
+        private int kekLengthBits;
 
-        public AesKeyWrapManagement(int keyLength)
+        public AesKeyWrapManagement(int kekLengthBits)
         {
-            this.keyLength = keyLength;
+            this.kekLengthBits = kekLengthBits;
         }
 
-        public byte[] NewKey(int keyLength, object key)
+        public byte[] NewKey(int keyLength, object key, IDictionary<string, object> header)
         {
             return Arrays.Random(keyLength);
         }
 
-        public byte[] Wrap(byte[] cek, object key)
+        public byte[] Wrap(byte[] cek, object key, IDictionary<string, object> header)
         {
             var sharedKey = Ensure.Type<byte[]>(key, "AesKeyWrap management algorithm expectes key to be byte[] array.");
-            Ensure.BitSize(sharedKey, keyLength, string.Format("AesKeyWrap management algorithm expected key of size {0} bits, but was given {1} bits", keyLength, sharedKey.Length * 8));
+            Ensure.BitSize(sharedKey, kekLengthBits, string.Format("AesKeyWrap management algorithm expected key of size {0} bits, but was given {1} bits", kekLengthBits, sharedKey.Length * 8));
             Ensure.MinBitSize(cek, 128, "AesKeyWrap management algorithm expects content length not less than 128 bits, but was {0}",cek.Length * 8);
             Ensure.Divisible(cek.Length, 8, "AesKeyWrap management algorithm expects content length to be divisable by 8, but was given a content of {0} bit size.", cek.Length * 8);
 
@@ -54,10 +55,10 @@ namespace Jose
             return Arrays.Concat(c);
         }
 
-        public byte[] Unwrap(byte[] encryptedCek, object key)
+        public byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
         {
             var sharedKey = Ensure.Type<byte[]>(key, "AesKeyWrap management algorithm expectes key to be byte[] array.");
-            Ensure.BitSize(sharedKey, keyLength, string.Format("AesKeyWrap management algorithm expected key of size {0} bits, but was given {1} bits", keyLength, sharedKey.Length * 8));
+            Ensure.BitSize(sharedKey, kekLengthBits, string.Format("AesKeyWrap management algorithm expected key of size {0} bits, but was given {1} bits", kekLengthBits, sharedKey.Length * 8));
             Ensure.MinBitSize(encryptedCek, 128, "AesKeyWrap management algorithm expects content length not less than 128 bits, but was {0}", encryptedCek.Length * 8);
             Ensure.Divisible(encryptedCek.Length, 8, "AesKeyWrap management algorithm expects content length to be divisable by 8, but was given a content of {0} bit size.",encryptedCek.Length * 8);
 

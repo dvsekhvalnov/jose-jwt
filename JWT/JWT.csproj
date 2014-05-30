@@ -44,7 +44,10 @@
   <ItemGroup>
     <Compile Include="Arrays.cs" />
     <Compile Include="Compact.cs" />
+    <Compile Include="ConcatKDF.cs" />
     <Compile Include="jwe\AesKeyWrapManagement.cs" />
+    <Compile Include="jwe\EcdhKeyManagement.cs" />
+    <Compile Include="native\NCrypt.cs" />
     <Compile Include="Security\Cryptography\EccKey.cs" />
     <Compile Include="Ensure.cs" />
     <Compile Include="json\IJsonMapper.cs" />

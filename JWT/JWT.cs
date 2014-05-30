@@ -28,7 +28,8 @@ namespace Jose
         DIR, //Direct use of pre-shared symmetric key
         A128KW, //AES Key Wrap Algorithm using 128 bit keys, RFC 3394
         A192KW, //AES Key Wrap Algorithm using 192 bit keys, RFC 3394
-        A256KW  //AES Key Wrap Algorithm using 256 bit keys, RFC 3394 
+        A256KW,  //AES Key Wrap Algorithm using 256 bit keys, RFC 3394 
+        ECDH_ES, //Elliptic Curve Diffie Hellman key agreement
     }
 
     public enum JweEncryption
@@ -139,7 +140,8 @@ namespace Jose
                 { JweAlgorithm.DIR, new DirectKeyManagement() },
                 { JweAlgorithm.A128KW, new AesKeyWrapManagement(128) },
                 { JweAlgorithm.A192KW, new AesKeyWrapManagement(192) },
-                { JweAlgorithm.A256KW, new AesKeyWrapManagement(256) }
+                { JweAlgorithm.A256KW, new AesKeyWrapManagement(256) },
+                { JweAlgorithm.ECDH_ES, new EcdhKeyManagement() }
             };
 
             JweAlgorithms[JweAlgorithm.RSA1_5] = "RSA1_5";
@@ -148,6 +150,7 @@ namespace Jose
             JweAlgorithms[JweAlgorithm.A128KW] = "A128KW";
             JweAlgorithms[JweAlgorithm.A192KW] = "A192KW";
             JweAlgorithms[JweAlgorithm.A256KW] = "A256KW";
+            JweAlgorithms[JweAlgorithm.ECDH_ES] = "ECDH-ES";
 
             CompressionAlgorithms = new Dictionary<JweCompression, ICompression>
             {
@@ -182,10 +185,10 @@ namespace Jose
             IKeyManagement keys = KeyAlgorithms[alg];
             IJweAlgorithm _enc = EncAlgorithms[enc];
 
-            byte[] cek = keys.NewKey(_enc.KeySize,key);
-            byte[] encryptedCek = keys.Wrap(cek, key);
+            var jwtHeader = new Dictionary<string, object> { { "alg", JweAlgorithms[alg] }, { "enc", JweEncryptionMethods[enc] } };
 
-            var jwtHeader = new Dictionary<string,object>{ { "alg" , JweAlgorithms[alg]}, { "enc", JweEncryptionMethods[enc]} };
+            byte[] cek = keys.NewKey(_enc.KeySize,key,jwtHeader);
+            byte[] encryptedCek = keys.Wrap(cek, key,jwtHeader);            
             
             byte[] plainText = Encoding.UTF8.GetBytes(payload);            
 
@@ -303,19 +306,19 @@ namespace Jose
             byte[] cipherText = parts[3];
             byte[] authTag = parts[4];
 
-            var jwtHeader = jsMapper.Parse<Dictionary<string, string>>(Encoding.UTF8.GetString(header));
+            IDictionary<string,object> jwtHeader = jsMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(header));
 
-            IKeyManagement keys = KeyAlgorithms[GetJweAlgorithm(jwtHeader["alg"])];
-            IJweAlgorithm enc = EncAlgorithms[GetJweEncryption(jwtHeader["enc"])];
+            IKeyManagement keys = KeyAlgorithms[GetJweAlgorithm((string) jwtHeader["alg"])];
+            IJweAlgorithm enc = EncAlgorithms[GetJweEncryption((string) jwtHeader["enc"])];
 
-            byte[] cek = keys.Unwrap(encryptedCek, key);
+            byte[] cek = keys.Unwrap(encryptedCek, key, enc.KeySize, jwtHeader);
             byte[] aad = Encoding.UTF8.GetBytes(Compact.Serialize(header));
 
             byte[] plainText=enc.Decrypt(aad, cek, iv, cipherText, authTag);
 
             if (jwtHeader.ContainsKey("zip"))
             {
-                plainText = CompressionAlgorithms[GetJweCompression(jwtHeader["zip"])].Decompress(plainText);
+                plainText = CompressionAlgorithms[GetJweCompression((string) jwtHeader["zip"])].Decompress(plainText);
             }
 
             return Encoding.UTF8.GetString(plainText); 

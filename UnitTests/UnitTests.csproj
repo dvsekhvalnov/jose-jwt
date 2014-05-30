@@ -46,6 +46,7 @@
   <ItemGroup>
     <Compile Include="AesKeyWrapManagementTest.cs" />
     <Compile Include="ArraysTest.cs" />
+    <Compile Include="ConcatKDFTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestSuite.cs" />
   </ItemGroup>

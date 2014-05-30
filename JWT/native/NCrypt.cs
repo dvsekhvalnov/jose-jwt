@@ -1,0 +1,87 @@
+using System;
+using System.Linq;
+using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
+
+namespace Jose.native
+{
+    public static class NCrypt
+    {        
+        public const uint KDF_ALGORITHMID = 8;
+        public const uint KDF_PARTYUINFO = 9;
+        public const uint KDF_PARTYVINFO = 10;
+        public const uint KDF_SUPPPUBINFO = 11;
+        public const uint KDF_SUPPPRIVINFO = 12;
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        public class NCryptBufferDesc : IDisposable
+        {
+            public uint ulVersion;
+            public uint cBuffers;
+            public IntPtr pBuffers;
+
+            public NCryptBufferDesc(params NCryptBuffer[] buffers)
+            {
+                cBuffers = (uint) buffers.Length; //number of elements in pBuffer
+                ulVersion = 0;
+
+                pBuffers = Marshal.AllocHGlobal(buffers.Sum(buf => Marshal.SizeOf(buf)));
+
+                int totalSizeBytes = 0;
+
+                foreach (var buf in buffers)
+                {
+                    Marshal.StructureToPtr(buf, pBuffers+totalSizeBytes, false);
+                    totalSizeBytes += Marshal.SizeOf(buf);
+                }
+            }
+
+            public void Dispose()
+            {
+                Marshal.FreeHGlobal(pBuffers);
+            }
+        }
+
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
+        public class NCryptBuffer : IDisposable
+        {
+            public uint cbBuffer;
+            public uint BufferType;
+            public IntPtr pvBuffer;
+
+            public NCryptBuffer(uint bufferType, string data)
+            {
+                BufferType = bufferType;
+                cbBuffer = (uint)((data.Length * 2) + 2);
+                pvBuffer = Marshal.AllocHGlobal(data.Length * 2);
+                Marshal.Copy(data.ToCharArray(), 0, pvBuffer, data.Length);
+            }
+
+            public NCryptBuffer(uint bufferType, byte[] data)
+            {
+                BufferType = bufferType;
+                cbBuffer = (uint)data.Length;
+                pvBuffer = Marshal.AllocHGlobal(data.Length);
+                Marshal.Copy(data, 0, pvBuffer, data.Length);
+            }
+
+            public void Dispose()
+            {
+                Marshal.FreeHGlobal(pvBuffer);
+            }
+        }
+
+
+        [DllImport("ncrypt.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern uint NCryptSecretAgreement(SafeNCryptKeyHandle hPrivKey,SafeNCryptKeyHandle hPublicKey,out SafeNCryptSecretHandle phSecret,uint flags);
+
+        [DllImport("ncrypt.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern uint NCryptDeriveKey(SafeNCryptSecretHandle hSharedSecret,
+                                                  string kdf,
+                                                  NCryptBufferDesc parameterList,
+                                                  byte[] derivedKey,
+                                                  uint derivedKeyByteSize,
+                                                  out uint result,
+                                                  uint flags);
+    }
+}

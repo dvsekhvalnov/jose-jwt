@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Jose
 {
@@ -57,6 +59,14 @@ namespace Jose
         public static void MinBitSize(byte[] arr, int minBitSize, string msg, params object[] args)
         {
             MinValue(arr.Length * 8, minBitSize, msg, args);
+        }
+
+        public static void Contains(IDictionary<string, object> dict, string[] keys, string msg, params  object[] args)
+        {
+            if (keys.Any(key => !dict.ContainsKey(key)))
+            {
+                throw new ArgumentException(string.Format(msg, args));
+            }
         }
     }
 }
