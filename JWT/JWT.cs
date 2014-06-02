@@ -188,7 +188,7 @@ namespace Jose
             var jwtHeader = new Dictionary<string, object> { { "alg", JweAlgorithms[alg] }, { "enc", JweEncryptionMethods[enc] } };
 
             byte[] cek = keys.NewKey(_enc.KeySize,key,jwtHeader);
-            byte[] encryptedCek = keys.Wrap(cek, key,jwtHeader);            
+            byte[] encryptedCek = keys.Wrap(cek, key);            
             
             byte[] plainText = Encoding.UTF8.GetBytes(payload);            
 

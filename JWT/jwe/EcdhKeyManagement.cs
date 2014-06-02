@@ -25,7 +25,7 @@ namespace Jose
             return DeriveKey(header, keyLength, recieverPubKey, ephemeral.Key);            
         }
 
-        public byte[] Wrap(byte[] cek, object key, IDictionary<string, object> header)
+        public byte[] Wrap(byte[] cek, object key)
         {
             return Arrays.Empty;
         }

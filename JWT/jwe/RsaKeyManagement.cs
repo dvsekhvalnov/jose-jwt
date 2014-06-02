@@ -17,7 +17,7 @@ namespace Jose
             return Arrays.Random(keyLength);
         }
 
-        public byte[] Wrap(byte[] cek, object key, IDictionary<string, object> header)
+        public byte[] Wrap(byte[] cek, object key)
         {
             var publicKey = Ensure.Type<RSACryptoServiceProvider>(key, "RsaKeyManagement alg expects key to be of RSACryptoServiceProvider type.");
 

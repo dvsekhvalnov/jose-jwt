@@ -18,9 +18,8 @@ namespace Jose
         /// </summary>
         /// <param name="cek">plain encryption key</param>
         /// <param name="key">management key used to protect CEK</param>
-        /// <param name="header">JWT headers, dictionary can be mutated as part of call (e.g. keys added, e.t.c)</param>
         /// <returns>wrapped(encrypted) CEK</returns>
-        byte[] Wrap(byte[] cek, object key, IDictionary<string, object> header);
+        byte[] Wrap(byte[] cek, object key);
 
         /// <summary>
         /// Unwraps protected CEK using provided management key

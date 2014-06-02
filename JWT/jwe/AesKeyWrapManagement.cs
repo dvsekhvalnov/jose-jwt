@@ -20,7 +20,7 @@ namespace Jose
             return Arrays.Random(keyLength);
         }
 
-        public byte[] Wrap(byte[] cek, object key, IDictionary<string, object> header)
+        public byte[] Wrap(byte[] cek, object key)
         {
             var sharedKey = Ensure.Type<byte[]>(key, "AesKeyWrap management algorithm expectes key to be byte[] array.");
             Ensure.BitSize(sharedKey, kekLengthBits, string.Format("AesKeyWrap management algorithm expected key of size {0} bits, but was given {1} bits", kekLengthBits, sharedKey.Length * 8));
