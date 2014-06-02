@@ -25,11 +25,16 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 - RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
 - Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup> and A256GCM<sup>\*</sup>
 - A128KW, A192KW, A256KW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
+- ECDH-ES<sup>\**</sup> with A128CBC-HS256, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
 
 ##### Notes:
 \* signature and encryption algorithms support provided via CNG BCrypt API using CLR Security library. Avaliable starting Windows Vista. 
 
 If CLR Security Library is not found at runtime given algorithms will not be avaliable. **jose-jwt** can run without CLR Security with all other supported algorithms.
+
+\** It appears that Microsoft CNG implementation of BCryptSecretAgreement/NCryptSecretAgreement contains a bug for calculating Elliptic Curve Diffie–Hellman secret agreement
+on keys higher than 256 bit (P-384 and P-521 NIST curves correspondingly). At least produced secret agreements do not match any other implementation in different languages.
+Technically it is possible to use ECDH-ES with A192CBC-HS384 and A256CBC-HS512 but most likely produced JWT tokens will not be compatible with other platforms and therefore can't be decoded correctly.
 
 ## Installation
 ### NuGet 
@@ -137,6 +142,24 @@ AES Key Wrap key management requires `byte[]` array key of corresponding length
 
     string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
 
+### ECDH-ES key management algorithm
+ECDH-ES key management requires `CngKey` (usually public) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
+But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,usage:CngKeyUsages.KeyAgreement)`.
+
+
+    var payload = new Dictionary<string, object>() 
+    {
+        { "sub", "mr.x@contoso.com" },
+        { "exp", 1300819380 }
+    };
+  	
+    byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+    byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+
+    var publicKey=EccKey.New(x, y, usage:CngKeyUsages.KeyAgreement);
+
+    string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.ECDH_ES, JweEncryption.A256GCM);
+
 
 #### Optional compressing payload before encrypting
 Optional DEFLATE compression is supported
@@ -170,7 +193,8 @@ Decoding json web tokens is fully symmetric to creating signed or encrypted toke
 
     string json = Jose.JWT.Decode(token,privateKey);
 
-**ES-\*** signatures expects `CngKey` as a key, public/private is asymmetric to encoding:
+**ES-\*** signatures and **ECDH-ES** key management algorithm expects `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
+sure correct `usage:` value is set. `CngKeyUsages.KeyAgreement` for ECDH-ES and `CngKeyUsages.Signing` for ES-* (default value, can be ommited).
 
     string token = "eyJhbGciOiJFUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.EVnmDMlz-oi05AQzts-R3aqWvaBlwVZddWkmaaHyMx5Phb2NSLgyI0kccpgjjAyo1S5KCB3LIMPfmxCX_obMKA";
 
@@ -245,3 +269,6 @@ The default supplied `Jose.IJsonMapper` implementation is based on `System.Web.S
 
 ### More examples
 Checkout UnitTests\TestSuite.cs for more examples.
+
+### Wish list
+Get rid of CLR Security dependency.
