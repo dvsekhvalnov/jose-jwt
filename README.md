@@ -26,6 +26,7 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 - Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup> and A256GCM<sup>\*</sup>
 - A128KW, A192KW, A256KW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
 - ECDH-ES<sup>\**</sup> with A128CBC-HS256, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
+- ECDH-ES+A128KW<sup>\**</sup>,ECDH-ES+A192KW<sup>\**</sup>,ECDH-ES+A256KW<sup>\**</sup> with A128CBC-HS256, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
 
 ##### Notes:
 \* signature and encryption algorithms support provided via CNG BCrypt API using CLR Security library. Avaliable starting Windows Vista. 
@@ -34,7 +35,7 @@ If CLR Security Library is not found at runtime given algorithms will not be ava
 
 \** It appears that Microsoft CNG implementation of BCryptSecretAgreement/NCryptSecretAgreement contains a bug for calculating Elliptic Curve Diffie–Hellman secret agreement
 on keys higher than 256 bit (P-384 and P-521 NIST curves correspondingly). At least produced secret agreements do not match any other implementation in different languages.
-Technically it is possible to use ECDH-ES with A192CBC-HS384 and A256CBC-HS512 but most likely produced JWT tokens will not be compatible with other platforms and therefore can't be decoded correctly.
+Technically it is possible to use ECDH-ES or ECDH-ES+AES*KW family with A192CBC-HS384 and A256CBC-HS512 but most likely produced JWT tokens will not be compatible with other platforms and therefore can't be decoded correctly.
 
 ## Installation
 ### NuGet 
@@ -142,8 +143,8 @@ AES Key Wrap key management requires `byte[]` array key of corresponding length
 
     string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
 
-### ECDH-ES key management algorithm
-ECDH-ES key management requires `CngKey` (usually public) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
+### ECDH-ES and ECDH-ES+A\*KW key management family of algorithms
+ECDH-ES and ECDH-ES+AES Key Wrap key management requires `CngKey` (usually public) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
 But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,usage:CngKeyUsages.KeyAgreement)`.
 
 
@@ -193,7 +194,7 @@ Decoding json web tokens is fully symmetric to creating signed or encrypted toke
 
     string json = Jose.JWT.Decode(token,privateKey);
 
-**ES-\*** signatures and **ECDH-ES** key management algorithm expects `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
+**ES-\*** signatures and **ECDH-ES**/**ECDH-ES+A\*KW** key management algorithm expects `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
 sure correct `usage:` value is set. `CngKeyUsages.KeyAgreement` for ECDH-ES and `CngKeyUsages.Signing` for ES-* (default value, can be ommited).
 
     string token = "eyJhbGciOiJFUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.EVnmDMlz-oi05AQzts-R3aqWvaBlwVZddWkmaaHyMx5Phb2NSLgyI0kccpgjjAyo1S5KCB3LIMPfmxCX_obMKA";
