@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>jose-jwt</id>
-    <version>1.3.0</version>
+    <version>1.4.0</version>
     <title>Jose JWT</title>
     <authors>Dmitry Vsekhvalnov</authors>
     <owners>Dmitry Vsekhvalnov</owners>
     <licenseUrl>https://raw.github.com/dvsekhvalnov/jose-jwt/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/dvsekhvalnov/jose-jwt</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <releaseNotes>ECDH-ES key management algorithm added.</releaseNotes>
+    <releaseNotes>ECDH-ES+A128KW,ECDH-ES+A192KW,ECDH-ES+A256KW key management algorithms added.</releaseNotes>
     <summary>Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET 
 Minimallistic zero-dependency library for generating, decoding and encryption of JSON Web Tokens. JSON parsing agnostic. Supports wide range of signature and encryption algorithms, optional compression.</summary>
     <description>Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET 
@@ -33,6 +33,7 @@ Encryption:
 - Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM
 - A128KW, A192KW, A256KW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM
 - ECDH-ES encryption with A128CBC-HS256, A128GCM, A192GCM, A256GCM
+- ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW encryption with A128CBC-HS256, A128GCM, A192GCM, A256GCM
 
 Compression:
 
