@@ -130,7 +130,7 @@ Direct key management with pre-shared symmetric keys using AES or AES GCM encryp
 
     string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.DIR, JweEncryption.A128CBC_HS256);
 
-### AES Key Wrap key management family of algorithms
+#### AES Key Wrap key management family of algorithms
 AES Key Wrap key management requires `byte[]` array key of corresponding length
 
     var payload = new Dictionary<string, object>() 
@@ -143,7 +143,7 @@ AES Key Wrap key management requires `byte[]` array key of corresponding length
 
     string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
 
-### ECDH-ES and ECDH-ES+A\*KW key management family of algorithms
+#### ECDH-ES and ECDH-ES+A\*KW key management family of algorithms
 ECDH-ES and ECDH-ES+AES Key Wrap key management requires `CngKey` (usually public) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
 But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,usage:CngKeyUsages.KeyAgreement)`.
 
