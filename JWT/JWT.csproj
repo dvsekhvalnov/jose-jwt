@@ -42,11 +42,13 @@
     <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AesKeyWrap.cs" />
     <Compile Include="Arrays.cs" />
     <Compile Include="Compact.cs" />
     <Compile Include="ConcatKDF.cs" />
-    <Compile Include="jwe\AesKeyWrapManagement.cs" />
-    <Compile Include="jwe\EcdhKeyManagement.cs" />
+    <Compile Include="jwa\AesKeyWrapManagement.cs" />
+    <Compile Include="jwa\EcdhKeyManagement.cs" />
+    <Compile Include="jwa\EcdhKeyManagementWithAesKeyWrap.cs" />
     <Compile Include="native\NCrypt.cs" />
     <Compile Include="Security\Cryptography\EccKey.cs" />
     <Compile Include="Ensure.cs" />
@@ -55,11 +57,11 @@
     <Compile Include="jwe\AesCbcHmac.cs" />
     <Compile Include="jwe\AesGcm.cs" />
     <Compile Include="jwe\DeflateCompression.cs" />
-    <Compile Include="jwe\DirectKeyManagement.cs" />
-    <Compile Include="jwe\ICompression.cs" />
-    <Compile Include="jwe\IJweAlgorithm.cs" />
-    <Compile Include="jwe\IKeyManagement.cs" />
-    <Compile Include="jwe\RsaKeyManagement.cs" />
+    <Compile Include="jwa\DirectKeyManagement.cs" />
+    <Compile Include="compression\ICompression.cs" />
+    <Compile Include="compression\IJweAlgorithm.cs" />
+    <Compile Include="jwa\IKeyManagement.cs" />
+    <Compile Include="jwa\RsaKeyManagement.cs" />
     <Compile Include="jws\EcdsaUsingSha.cs" />
     <Compile Include="jws\HmacUsingSha.cs" />
     <Compile Include="jws\IJwsAlgorithm.cs" />

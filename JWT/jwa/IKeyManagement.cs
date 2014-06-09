@@ -5,21 +5,13 @@ namespace Jose
     public interface IKeyManagement
     {
         /// <summary>
-        /// Generates new Content Encryption Key (CEK)
+        /// Generates anew Content Encryption Key (CEK) and wraps it via provided management key (Key-Encryption-Key)
         /// </summary>
-        /// <param name="keyLength">Length of key to generate (bits).</param>
-        /// <param name="key">management key</param>
+        /// <param name="cekSizeBits">Length of key to generate (CEK) (bits).</param>
+        /// <param name="key">management key (KEK)</param>
         /// <param name="header">JWT headers, dictionary can be mutated as part of call (e.g. keys added, e.t.c)</param>
-        /// <returns></returns>
-        byte[] NewKey(int keyLength, object key, IDictionary<string, object> header);
-
-        /// <summary>
-        /// Wraps CEK for transmission, usually encryps in some form.
-        /// </summary>
-        /// <param name="cek">plain encryption key</param>
-        /// <param name="key">management key used to protect CEK</param>
-        /// <returns>wrapped(encrypted) CEK</returns>
-        byte[] Wrap(byte[] cek, object key);
+        /// <returns>2 byte[] arrays: [0]=plain CEK, [1]=encrypted CEK</returns>
+        byte[][] WrapNewKey(int cekSizeBits, object key, IDictionary<string, object> header);
 
         /// <summary>
         /// Unwraps protected CEK using provided management key

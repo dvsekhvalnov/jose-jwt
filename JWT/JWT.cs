@@ -30,6 +30,9 @@ namespace Jose
         A192KW, //AES Key Wrap Algorithm using 192 bit keys, RFC 3394
         A256KW,  //AES Key Wrap Algorithm using 256 bit keys, RFC 3394 
         ECDH_ES, //Elliptic Curve Diffie Hellman key agreement
+        ECDH_ES_A128KW, //Elliptic Curve Diffie Hellman key agreement with AES Key Wrap using 128 bit key
+        ECDH_ES_A192KW, //Elliptic Curve Diffie Hellman key agreement with AES Key Wrap using 192 bit key
+        ECDH_ES_A256KW  //Elliptic Curve Diffie Hellman key agreement with AES Key Wrap using 256 bit key
     }
 
     public enum JweEncryption
@@ -141,7 +144,10 @@ namespace Jose
                 { JweAlgorithm.A128KW, new AesKeyWrapManagement(128) },
                 { JweAlgorithm.A192KW, new AesKeyWrapManagement(192) },
                 { JweAlgorithm.A256KW, new AesKeyWrapManagement(256) },
-                { JweAlgorithm.ECDH_ES, new EcdhKeyManagement() }
+                { JweAlgorithm.ECDH_ES, new EcdhKeyManagement(true) },
+                { JweAlgorithm.ECDH_ES_A128KW, new EcdhKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128))},
+                { JweAlgorithm.ECDH_ES_A192KW, new EcdhKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192))},
+                { JweAlgorithm.ECDH_ES_A256KW, new EcdhKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256))}
             };
 
             JweAlgorithms[JweAlgorithm.RSA1_5] = "RSA1_5";
@@ -151,6 +157,9 @@ namespace Jose
             JweAlgorithms[JweAlgorithm.A192KW] = "A192KW";
             JweAlgorithms[JweAlgorithm.A256KW] = "A256KW";
             JweAlgorithms[JweAlgorithm.ECDH_ES] = "ECDH-ES";
+            JweAlgorithms[JweAlgorithm.ECDH_ES_A128KW] = "ECDH-ES+A128KW";
+            JweAlgorithms[JweAlgorithm.ECDH_ES_A192KW] = "ECDH-ES+A192KW";
+            JweAlgorithms[JweAlgorithm.ECDH_ES_A256KW] = "ECDH-ES+A256KW";
 
             CompressionAlgorithms = new Dictionary<JweCompression, ICompression>
             {
@@ -187,8 +196,9 @@ namespace Jose
 
             var jwtHeader = new Dictionary<string, object> { { "alg", JweAlgorithms[alg] }, { "enc", JweEncryptionMethods[enc] } };
 
-            byte[] cek = keys.NewKey(_enc.KeySize,key,jwtHeader);
-            byte[] encryptedCek = keys.Wrap(cek, key);            
+            byte[][] contentKeys = keys.WrapNewKey(_enc.KeySize, key, jwtHeader);
+            byte[] cek = contentKeys[0];
+            byte[] encryptedCek = contentKeys[1];
             
             byte[] plainText = Encoding.UTF8.GetBytes(payload);            
 

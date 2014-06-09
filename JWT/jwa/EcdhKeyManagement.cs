@@ -8,7 +8,22 @@ namespace Jose
 {
     public class EcdhKeyManagement : IKeyManagement
     {
-        public byte[] NewKey(int keyLength, object key, IDictionary<string, object> header)
+        private string algIdHeader;
+
+        public EcdhKeyManagement(bool isDirectAgreement)
+        {
+            algIdHeader = isDirectAgreement ? "enc" : "alg";
+        }
+
+        public virtual byte[][] WrapNewKey(int cekSizeBits, object key, IDictionary<string, object> header)
+        {
+            var cek = NewKey(cekSizeBits, key, header);
+            var encryptedCek = Wrap(cek, key);
+
+            return new[] {cek, encryptedCek};
+        }
+
+        public virtual byte[] NewKey(int keyLength, object key, IDictionary<string, object> header)
         {
             var recieverPubKey = Ensure.Type<CngKey>(key, "EcdhKeyManagement alg expects key to be of CngKey type.");
             
@@ -25,17 +40,17 @@ namespace Jose
             return DeriveKey(header, keyLength, recieverPubKey, ephemeral.Key);            
         }
 
-        public byte[] Wrap(byte[] cek, object key)
+        public virtual byte[] Wrap(byte[] cek, object key)
         {
             return Arrays.Empty;
         }
 
-        public byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string,object> header)
+        public virtual byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string,object> header)
         {
             var privateKey = Ensure.Type<CngKey>(key, "EcdhKeyManagement alg expects key to be of CngKey type.");
 
             Ensure.Contains(header, new[] {"epk"}, "EcdhKeyManagement algorithm expects 'epk' key param in JWT header, but was not found");
-            Ensure.Contains(header, new[] {"enc"}, "EcdhKeyManagement algorithm expects 'enc' header to be present in JWT header, but was not found");
+            Ensure.Contains(header, new[] {algIdHeader}, "EcdhKeyManagement algorithm expects 'enc' header to be present in JWT header, but was not found");
 
             var epk = (IDictionary<string, object>) header["epk"];
 
@@ -51,7 +66,7 @@ namespace Jose
 
         private byte[] DeriveKey(IDictionary<string, object> header, int cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
         {
-            byte[] enc = Encoding.UTF8.GetBytes((string) header["enc"]);
+            byte[] enc = Encoding.UTF8.GetBytes((string) header[algIdHeader]);
             byte[] apv = header.ContainsKey("apv") ? Convert.FromBase64String((string)header["apv"]) : Arrays.Empty;
             byte[] apu = header.ContainsKey("apu") ? Convert.FromBase64String((string)header["apu"]) : Arrays.Empty;          
 
