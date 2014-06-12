@@ -28,6 +28,10 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 - ECDH-ES<sup>\**</sup> with A128CBC-HS256, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
 - ECDH-ES+A128KW<sup>\**</sup>,ECDH-ES+A192KW<sup>\**</sup>,ECDH-ES+A256KW<sup>\**</sup> with A128CBC-HS256, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
 
+**Compression**
+
+- DEFLATE compression
+
 ##### Notes:
 \* signature and encryption algorithms support provided via CNG BCrypt API using CLR Security library. Avaliable starting Windows Vista. 
 
