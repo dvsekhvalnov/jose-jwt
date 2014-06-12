@@ -56,6 +56,12 @@ namespace Jose
                 throw new ArgumentException(string.Format(msg,args));
         }
 
+        public static void MaxValue(int arg, long max, string msg, params object[] args)
+        {
+            if(arg > max)
+                throw new ArgumentException(string.Format(msg,args));
+        }
+
         public static void MinBitSize(byte[] arr, int minBitSize, string msg, params object[] args)
         {
             MinValue(arr.Length * 8, minBitSize, msg, args);
@@ -64,9 +70,13 @@ namespace Jose
         public static void Contains(IDictionary<string, object> dict, string[] keys, string msg, params  object[] args)
         {
             if (keys.Any(key => !dict.ContainsKey(key)))
-            {
                 throw new ArgumentException(string.Format(msg, args));
-            }
+        }
+
+        public static void SameSize(byte[] left, byte[] right, string msg, params object[] args)
+        {
+            if(left.Length!=right.Length)
+                throw new ArgumentException(string.Format(msg, args));
         }
     }
 }

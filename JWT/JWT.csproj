@@ -50,6 +50,7 @@
     <Compile Include="jwa\EcdhKeyManagement.cs" />
     <Compile Include="jwa\EcdhKeyManagementWithAesKeyWrap.cs" />
     <Compile Include="native\NCrypt.cs" />
+    <Compile Include="PBKDF2.cs" />
     <Compile Include="Security\Cryptography\EccKey.cs" />
     <Compile Include="Ensure.cs" />
     <Compile Include="json\IJsonMapper.cs" />

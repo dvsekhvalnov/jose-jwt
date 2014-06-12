@@ -86,6 +86,20 @@ namespace Jose
             return LongToBytes(_left ^ right);
         }
 
+        public static byte[] Xor(byte[] left, byte[] right)
+        {
+            Ensure.SameSize(left,right,"Arrays.Xor(byte[], byte[]) expects both arrays to be same legnth, but was given {0} and {1}",left.Length,right.Length);
+
+            byte[] result=new byte[left.Length];
+
+            for(int i=0;i<left.Length;i++)
+            {
+                result[i] = (byte) (left[i] ^ right[i]);
+            }
+
+            return result;
+        }
+
         public static bool ConstantTimeEquals(byte[] expected, byte[] actual)
         {
             if (expected == actual)
@@ -119,8 +133,8 @@ namespace Jose
             }
 
             builder.Remove(builder.Length - 1, 1);
+            builder.Append("] Hex:[").Append(BitConverter.ToString(arr).Replace("-"," "));
             builder.Append("] Base64:").Append(Convert.ToBase64String(arr)).Append("\n");
-            
 
             Console.Out.WriteLine(builder.ToString());
         }        
