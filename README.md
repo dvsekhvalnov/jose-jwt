@@ -26,7 +26,8 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 - Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup> and A256GCM<sup>\*</sup>
 - A128KW, A192KW, A256KW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
 - ECDH-ES<sup>\**</sup> with A128CBC-HS256, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
-- ECDH-ES+A128KW<sup>\**</sup>,ECDH-ES+A192KW<sup>\**</sup>,ECDH-ES+A256KW<sup>\**</sup> with A128CBC-HS256, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
+- ECDH-ES+A128KW<sup>\**</sup>, ECDH-ES+A192KW<sup>\**</sup>, ECDH-ES+A256KW<sup>\**</sup> with A128CBC-HS256, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
+- PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
 
 **Compression**
 
@@ -151,7 +152,6 @@ AES Key Wrap key management requires `byte[]` array key of corresponding length
 ECDH-ES and ECDH-ES+AES Key Wrap key management requires `CngKey` (usually public) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
 But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,usage:CngKeyUsages.KeyAgreement)`.
 
-
     var payload = new Dictionary<string, object>() 
     {
         { "sub", "mr.x@contoso.com" },
@@ -164,6 +164,17 @@ But if you want to use raw key material (x,y) and d, jose-jwt provides convenien
     var publicKey=EccKey.New(x, y, usage:CngKeyUsages.KeyAgreement);
 
     string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.ECDH_ES, JweEncryption.A256GCM);
+
+#### PBES2 using HMAC SHA with AES Key Wrap key management family of algorithms
+PBES2-HS\*+A\*KW key management requires `string` passphrase from which key will be derived 
+
+    var payload = new Dictionary<string, object>() 
+    {
+        { "sub", "mr.x@contoso.com" },
+        { "exp", 1300819380 }
+    };  	
+
+    string token = Jose.JWT.Encode(json, "top secrect", JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
 
 
 #### Optional compressing payload before encrypting
