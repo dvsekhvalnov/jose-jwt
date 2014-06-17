@@ -1188,6 +1188,65 @@ namespace UnitTests
             Assert.That(json, Is.EqualTo(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}"));
         }
 
+        [Test]
+        public void Decrypt_PBSE2_HS256_A128KW_A128CBC_HS256()
+        {
+            //given
+            string token = "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwicDJjIjo4MTkyLCJwMnMiOiJiMFlFVmxMemtaNW9UUjBMIn0.dhPAhJ9kmaEbP-02VtEoPOF2QSEYM5085V6zYt1U1qIlVNRcHTGDgQ.4QAAq0dVQT41dQKDG7dhRA.H9MgJmesbU1ow6GCa0lEMwv8A_sHvgaWKkaMcdoj_z6O8LaMSgquxA-G85R_5hEILnHUnFllNJ48oJY7VmAJw0BQW73dMnn58u161S6Ftq7Mjxxq7bcksWvFTVtG5RsqqYSol5BZz5xm8Fcj-y5BMYMvrsCyQhYdeGEHkAvwzRdvZ8pGMsU2XPzl6GqxGjjuRh2vApAeNrj6MwKuD-k6AR0MH46EiNkVCmMkd2w8CNAXjJe9z97zky93xbxlOLozaC3NBRO2Q4bmdGdRg5y4Ew.xNqRi0ouQd7uo5UrPraedg";
+
+            //when
+            string json = Jose.JWT.Decode(token, Encoding.UTF8.GetBytes("top secret"));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.That(json, Is.EqualTo(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}"));
+        }
+
+        [Test]
+        public void Decrypt_PBSE2_HS256_A128KW_A256GCM()
+        {
+            //given
+            string token = "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJlbmMiOiJBMjU2R0NNIiwicDJjIjo4MTkyLCJwMnMiOiJqVVozY0NEX2hMZ3pQVHVfIn0.cgEZLTNOoGgDJXhRj0Ca0DL_HTY2xRKzVpoRnOf_Yuxm6IsQJgf0NA.7sAUk5_ryTMO_hLB.y7arc1aQP1--WUwlUsti4SiW6O2nrmGviTYznPjw9KD9Tu4E4QQO3RCU1uo59qNF3jJ5Mgku5OXV8bJHlouMouUfZbEb2cHgH9GLwY7hbCuYfGBIEyZw6qnHCgLGatO59akKaVDa8fqPo5--V_q0T5Z3xWm7UpK8RHaR8z3kuSBEXI1JH-dgj1EikG0yHSxVkFiInrlNLGzhI-cMTSD5xfLlmhmTzqbdpNp947AQ7pix2IvkQdvdgCo3bbSQVUsSJrLZSg.cO4fVMmdniwtEikHv55cqQ";
+
+            //when
+            string json = Jose.JWT.Decode(token, Encoding.UTF8.GetBytes("top secret"));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.That(json, Is.EqualTo(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}"));
+        }
+
+        [Test]
+        public void Decrypt_PBSE2_HS384_A192KW_A192CBC_HS384()
+        {
+            //given
+            string token = "eyJhbGciOiJQQkVTMi1IUzM4NCtBMTkyS1ciLCJlbmMiOiJBMTkyQ0JDLUhTMzg0IiwicDJjIjo4MTkyLCJwMnMiOiIxZEdaODBpQTBqb3lGTzFqIn0.iElgf12HbQWt3enumKP_j3WDxGLfbwSePHYAbYEb_w3himk0swcdiTPo1Jm8MU7le7L_Z8rU2Uk.7LoW9-g7U8c3GNAYO3Z5Jw.guSjXuYN9deq6XIsbkbxAptU9Lp1jf9k11QdhsvjfUvaZRXKrWiE9vg3jEJRJnmF7lZq07cp2Ou8PztMg6R_ygT7gadmP_IYdgQwXD6HGQs__uzvFnqtjWALiwLWuL0V0INrKxBn3CivJ5Hg26nJwLACdVuO_k-fNTaphbox-nKefndS4UXaoe3hEuCzHFPgFivMlND4aZJb8pU8sQbGA29gx5U9qNBmWYOXwV2diYQ2q2SfUEbXoMV7uZyvfQ2juTcyqZBVnEfIYGf_8esALQ.QrgRr0TIlJDFkq2YWNXcoFoMpg4yMC6r";
+
+            //when
+            string json = Jose.JWT.Decode(token, Encoding.UTF8.GetBytes("top secret"));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.That(json, Is.EqualTo(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}"));
+        }
+
+        [Test]
+        public void Decrypt_PBSE2_HS512_A256KW_A256CBC_HS512()
+        {
+            //given
+            string token = "eyJhbGciOiJQQkVTMi1IUzUxMitBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwicDJjIjo4MTkyLCJwMnMiOiJCUlkxQ1M3VXNpaTZJNzhkIn0.ovjAL7yRnB_XdJbK8lAaUDRZ-CyVeio8f4pnqOt1FPj1PoQAdEX3S5x6DlzR8aqN_WR5LUwdqDSyUDYhSurnmq8VLfzd3AEe.YAjH6g_zekXJIlPN4Ooo5Q.tutaltxpeVyayXZ9pQovGXTWTf_GWWvtu25Jeg9jgoH0sUX9KCnL00A69e4GJR6EMxalmWsa45AItffbwjUBmwdyklC4ZbTgaovVRs-UwqsZFBO2fpEb7qLajjwra7o4OegzgXDD0jhrKrUusvRWGBvenvumb5euibUxmIfBUcVF1JbdfYxx7ztFeS-QKJpDkE00zyEkViq-QxfrMVl5p7LGmTz8hMrFL3LXLokypZSDgFBfsUzChJf3mlYzxiGaGUqhs7NksQJDoUYf6prPow.XwRVfVTTPogO74RnxZD_9Mse26fTSehna1pbWy4VHfY";
+
+            //when
+            string json = Jose.JWT.Decode(token, Encoding.UTF8.GetBytes("top secret"));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.That(json, Is.EqualTo(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}"));
+        }
 
         [Test]
         public void Decrypt_A128KW_A128CBC_HS256()
@@ -1233,6 +1292,107 @@ namespace UnitTests
 
             Assert.That(json, Is.EqualTo(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}"));
         }
+
+        [Test]
+        public void Encrypt_PBES2_HS256_A128KW_A128CBC_HS256()
+        {
+            //given     
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes("top secret"), JweAlgorithm.PBES2_HS256_A128KW, JweEncryption.A128CBC_HS256);
+
+            //then
+            Console.Out.WriteLine("PBES2-HS256+A128KW A128CBC_HS256 = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5), "Make sure 5 parts");
+            Assert.That(parts[0].Length, Is.EqualTo(115), "Header size");
+            Assert.That(parts[1].Length, Is.EqualTo(54), "CEK size");
+            Assert.That(parts[2].Length, Is.EqualTo(22), "IV size");
+            Assert.That(parts[3].Length, Is.EqualTo(278), "cipher text size");
+            Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
+
+            Assert.That(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes("top secret")), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+        }
+
+        [Test]
+        public void Encrypt_PBES2_HS256_A128KW_A256GCM()
+        {
+            //given     
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes("top secret"), JweAlgorithm.PBES2_HS256_A128KW, JweEncryption.A256GCM);
+
+            //then
+            Console.Out.WriteLine("PBES2-HS256+A128KW A256GCM = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5), "Make sure 5 parts");
+            Assert.That(parts[0].Length, Is.EqualTo(107), "Header size");
+            Assert.That(parts[1].Length, Is.EqualTo(54), "CEK size");
+            Assert.That(parts[2].Length, Is.EqualTo(16), "IV size");
+            Assert.That(parts[3].Length, Is.EqualTo(262), "cipher text size");
+            Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
+
+            Assert.That(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes("top secret")), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+        }
+
+        [Test]
+        public void Encrypt_PBES2_HS384_A192KW_A192GCM()
+        {
+            //given     
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes("top secret"), JweAlgorithm.PBES2_HS384_A192KW, JweEncryption.A192GCM);
+
+            //then
+            Console.Out.WriteLine("PBES2-HS384+A192KW A192GCM = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5), "Make sure 5 parts");
+            Assert.That(parts[0].Length, Is.EqualTo(107), "Header size");
+            Assert.That(parts[1].Length, Is.EqualTo(43), "CEK size");
+            Assert.That(parts[2].Length, Is.EqualTo(16), "IV size");
+            Assert.That(parts[3].Length, Is.EqualTo(262), "cipher text size");
+            Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
+
+            Assert.That(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes("top secret")), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+        }
+
+        [Test]
+        public void Encrypt_PBES2_HS512_A256KW_A256CBC_HS512()
+        {
+            //given     
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes("top secret"), JweAlgorithm.PBES2_HS512_A256KW, JweEncryption.A256CBC_HS512);
+
+            //then
+            Console.Out.WriteLine("PBES2-HS512+256KW A256CBC_HS512 = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5), "Make sure 5 parts");
+            Assert.That(parts[0].Length, Is.EqualTo(115), "Header size");
+            Assert.That(parts[1].Length, Is.EqualTo(96), "CEK size");
+            Assert.That(parts[2].Length, Is.EqualTo(22), "IV size");
+            Assert.That(parts[3].Length, Is.EqualTo(278), "cipher text size");
+            Assert.That(parts[4].Length, Is.EqualTo(43), "auth tag size");
+
+            Assert.That(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes("top secret")), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+        }
+
 
         [Test]
         public void Encrypt_A128KW_A128CBC_HS256()
@@ -1333,7 +1493,6 @@ namespace UnitTests
 
             Assert.That(Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
         }
-
 
         [Test]
         public void Encrypt_ECDH_ES_A128CBC_HS256()

@@ -32,7 +32,10 @@ namespace Jose
         ECDH_ES, //Elliptic Curve Diffie Hellman key agreement
         ECDH_ES_A128KW, //Elliptic Curve Diffie Hellman key agreement with AES Key Wrap using 128 bit key
         ECDH_ES_A192KW, //Elliptic Curve Diffie Hellman key agreement with AES Key Wrap using 192 bit key
-        ECDH_ES_A256KW  //Elliptic Curve Diffie Hellman key agreement with AES Key Wrap using 256 bit key
+        ECDH_ES_A256KW, //Elliptic Curve Diffie Hellman key agreement with AES Key Wrap using 256 bit key
+        PBES2_HS256_A128KW, //Password Based Encryption using PBES2 schemes with HMAC-SHA and AES Key Wrap using 128 bit key        
+        PBES2_HS384_A192KW, //Password Based Encryption using PBES2 schemes with HMAC-SHA and AES Key Wrap using 192 bit key        
+        PBES2_HS512_A256KW  //Password Based Encryption using PBES2 schemes with HMAC-SHA and AES Key Wrap using 256 bit key        
     }
 
     public enum JweEncryption
@@ -147,7 +150,10 @@ namespace Jose
                 { JweAlgorithm.ECDH_ES, new EcdhKeyManagement(true) },
                 { JweAlgorithm.ECDH_ES_A128KW, new EcdhKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128))},
                 { JweAlgorithm.ECDH_ES_A192KW, new EcdhKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192))},
-                { JweAlgorithm.ECDH_ES_A256KW, new EcdhKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256))}
+                { JweAlgorithm.ECDH_ES_A256KW, new EcdhKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256))},
+                { JweAlgorithm.PBES2_HS256_A128KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128))},
+                { JweAlgorithm.PBES2_HS384_A192KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192))},
+                { JweAlgorithm.PBES2_HS512_A256KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256))}
             };
 
             JweAlgorithms[JweAlgorithm.RSA1_5] = "RSA1_5";
@@ -160,6 +166,9 @@ namespace Jose
             JweAlgorithms[JweAlgorithm.ECDH_ES_A128KW] = "ECDH-ES+A128KW";
             JweAlgorithms[JweAlgorithm.ECDH_ES_A192KW] = "ECDH-ES+A192KW";
             JweAlgorithms[JweAlgorithm.ECDH_ES_A256KW] = "ECDH-ES+A256KW";
+            JweAlgorithms[JweAlgorithm.PBES2_HS256_A128KW] = "PBES2-HS256+A128KW";
+            JweAlgorithms[JweAlgorithm.PBES2_HS384_A192KW] = "PBES2-HS384+A192KW";
+            JweAlgorithms[JweAlgorithm.PBES2_HS512_A256KW] = "PBES2-HS512+A256KW";
 
             CompressionAlgorithms = new Dictionary<JweCompression, ICompression>
             {

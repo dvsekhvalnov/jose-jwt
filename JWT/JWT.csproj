@@ -49,6 +49,7 @@
     <Compile Include="jwa\AesKeyWrapManagement.cs" />
     <Compile Include="jwa\EcdhKeyManagement.cs" />
     <Compile Include="jwa\EcdhKeyManagementWithAesKeyWrap.cs" />
+    <Compile Include="jwa\Pbse2HmacShaKeyManagementWithAesKeyWrap.cs" />
     <Compile Include="native\NCrypt.cs" />
     <Compile Include="PBKDF2.cs" />
     <Compile Include="Security\Cryptography\EccKey.cs" />

@@ -8,6 +8,7 @@ namespace Jose
     public class Arrays
     {
         public readonly static byte[] Empty=new byte[0];
+        public readonly static byte[] Zero = new byte[] { 0 };
 
         private static RNGCryptoServiceProvider rng;
 
