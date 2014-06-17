@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>jose-jwt</id>
-    <version>1.4.0</version>
+    <version>1.5.0</version>
     <title>Jose JWT</title>
     <authors>Dmitry Vsekhvalnov</authors>
     <owners>Dmitry Vsekhvalnov</owners>
     <licenseUrl>https://raw.github.com/dvsekhvalnov/jose-jwt/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/dvsekhvalnov/jose-jwt</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <releaseNotes>ECDH-ES+A128KW,ECDH-ES+A192KW,ECDH-ES+A256KW key management algorithms added.</releaseNotes>
+    <releaseNotes>Password based encryption with PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW key management algorithms.</releaseNotes>
     <summary>Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET 
 Minimallistic zero-dependency library for generating, decoding and encryption of JSON Web Tokens. JSON parsing agnostic. Supports wide range of signature and encryption algorithms, optional compression.</summary>
     <description>Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET 
@@ -34,13 +34,13 @@ Encryption:
 - A128KW, A192KW, A256KW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM
 - ECDH-ES encryption with A128CBC-HS256, A128GCM, A192GCM, A256GCM
 - ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW encryption with A128CBC-HS256, A128GCM, A192GCM, A256GCM
-
+- PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 Compression:
 
 - DEFLATE compression
     </description>
     <copyright>Copyright dvsekhvalnov 2014</copyright>
     <language>en-US</language>
-    <tags>jose jwt json jwa jwe jws aes cbc gcm rsa hmac sha rsassa pss rsaes oaep pkcs1-v1_5 es elliptic curve diffe hellman agreement ecdsa key wrap kw ecdh</tags>
+    <tags>jose jwt json jwa jwe jws aes cbc gcm rsa hmac sha rsassa pss rsaes oaep pkcs1-v1_5 es elliptic curve diffe hellman agreement ecdsa key wrap kw ecdh pbes pbes2 pbkdf pbkdf2 password based encryption</tags>
   </metadata>
 </package>

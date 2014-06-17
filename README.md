@@ -174,7 +174,7 @@ PBES2-HS\*+A\*KW key management requires `string` passphrase from which key will
         { "exp", 1300819380 }
     };  	
 
-    string token = Jose.JWT.Encode(json, "top secrect", JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
+    string token = Jose.JWT.Encode(json, "top secret", JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
 
 
 #### Optional compressing payload before encrypting
