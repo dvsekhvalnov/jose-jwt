@@ -209,7 +209,7 @@ Decoding json web tokens is fully symmetric to creating signed or encrypted toke
 
     string json = Jose.JWT.Decode(token,privateKey);
 
-**ES-\*** signatures and **ECDH-ES**/**ECDH-ES+A\*KW** key management algorithm expects `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
+**ES-\*** signatures and **ECDH-ES**/**ECDH-ES+A\*KW** key management algorithms expects `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
 sure correct `usage:` value is set. `CngKeyUsages.KeyAgreement` for ECDH-ES and `CngKeyUsages.Signing` for ES-* (default value, can be ommited).
 
     string token = "eyJhbGciOiJFUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.EVnmDMlz-oi05AQzts-R3aqWvaBlwVZddWkmaaHyMx5Phb2NSLgyI0kccpgjjAyo1S5KCB3LIMPfmxCX_obMKA";
@@ -220,6 +220,12 @@ sure correct `usage:` value is set. `CngKeyUsages.KeyAgreement` for ECDH-ES and 
     var publicKey=EccKey.New(x, y);
 
     string json = Jose.JWT.Decode(token,publicKey);
+
+**PBES2-HS\*+A\*KW** key management algorithms expects 'string' passpharase as a key
+
+    string token = "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwicDJjIjo4MTkyLCJwMnMiOiJiMFlFVmxMemtaNW9UUjBMIn0.dhPAhJ9kmaEbP-02VtEoPOF2QSEYM5085V6zYt1U1qIlVNRcHTGDgQ.4QAAq0dVQT41dQKDG7dhRA.H9MgJmesbU1ow6GCa0lEMwv8A_sHvgaWKkaMcdoj_z6O8LaMSgquxA-G85R_5hEILnHUnFllNJ48oJY7VmAJw0BQW73dMnn58u161S6Ftq7Mjxxq7bcksWvFTVtG5RsqqYSol5BZz5xm8Fcj-y5BMYMvrsCyQhYdeGEHkAvwzRdvZ8pGMsU2XPzl6GqxGjjuRh2vApAeNrj6MwKuD-k6AR0MH46EiNkVCmMkd2w8CNAXjJe9z97zky93xbxlOLozaC3NBRO2Q4bmdGdRg5y4Ew.xNqRi0ouQd7uo5UrPraedg";
+
+    string json = Jose.JWT.Decode(token, "top secret");
 
 
 ### Parsing and mapping json to object model directly
