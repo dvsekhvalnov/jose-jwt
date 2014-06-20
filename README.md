@@ -124,7 +124,7 @@ RSA-OAEP and RSA1_5 key management requires `RSACryptoServiceProvider` (usually 
 
 
 #### DIR direct pre-shared symmetric key family of algorithms 
-Direct key management with pre-shared symmetric keys using AES or AES GCM encryption requires `byte[]` array key of corresponding length
+Direct key management with pre-shared symmetric keys requires `byte[]` array key of corresponding length
 
     var payload = new Dictionary<string, object>() 
     {
