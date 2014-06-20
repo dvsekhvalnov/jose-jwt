@@ -3,13 +3,13 @@ using System.Security.Cryptography;
 
 namespace Jose
 {
-    public class AesCbcHmac : IJweAlgorithm
+    public class AesCbcHmacEncryption : IJweAlgorithm
     {
         private IJwsAlgorithm hashAlgorithm;
 
         private readonly int keyLength;
 
-        public AesCbcHmac(IJwsAlgorithm hashAlgorithm, int keyLength)
+        public AesCbcHmacEncryption(IJwsAlgorithm hashAlgorithm, int keyLength)
         {
             this.hashAlgorithm = hashAlgorithm;
             this.keyLength = keyLength;

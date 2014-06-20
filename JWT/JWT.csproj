@@ -42,10 +42,12 @@
     <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AesGcm.cs" />
     <Compile Include="AesKeyWrap.cs" />
     <Compile Include="Arrays.cs" />
     <Compile Include="Compact.cs" />
     <Compile Include="ConcatKDF.cs" />
+    <Compile Include="jwa\AesGcmKeyWrapManagement.cs" />
     <Compile Include="jwa\AesKeyWrapManagement.cs" />
     <Compile Include="jwa\EcdhKeyManagement.cs" />
     <Compile Include="jwa\EcdhKeyManagementWithAesKeyWrap.cs" />
@@ -56,9 +58,9 @@
     <Compile Include="Ensure.cs" />
     <Compile Include="json\IJsonMapper.cs" />
     <Compile Include="json\JSSerializerMapper.cs" />
-    <Compile Include="jwe\AesCbcHmac.cs" />
-    <Compile Include="jwe\AesGcm.cs" />
-    <Compile Include="jwe\DeflateCompression.cs" />
+    <Compile Include="jwe\AesCbcHmacEncryption.cs" />
+    <Compile Include="jwe\AesGcmEncryption.cs" />
+    <Compile Include="compression\DeflateCompression.cs" />
     <Compile Include="jwa\DirectKeyManagement.cs" />
     <Compile Include="compression\ICompression.cs" />
     <Compile Include="compression\IJweAlgorithm.cs" />

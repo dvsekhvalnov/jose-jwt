@@ -35,7 +35,10 @@ namespace Jose
         ECDH_ES_A256KW, //Elliptic Curve Diffie Hellman key agreement with AES Key Wrap using 256 bit key
         PBES2_HS256_A128KW, //Password Based Encryption using PBES2 schemes with HMAC-SHA and AES Key Wrap using 128 bit key        
         PBES2_HS384_A192KW, //Password Based Encryption using PBES2 schemes with HMAC-SHA and AES Key Wrap using 192 bit key        
-        PBES2_HS512_A256KW  //Password Based Encryption using PBES2 schemes with HMAC-SHA and AES Key Wrap using 256 bit key        
+        PBES2_HS512_A256KW,  //Password Based Encryption using PBES2 schemes with HMAC-SHA and AES Key Wrap using 256 bit key        
+        A128GCMKW,  //AES GCM Key Wrap Algorithm using 128 bit keys
+        A192GCMKW,  //AES GCM Key Wrap Algorithm using 192 bit keys
+        A256GCMKW   //AES GCM Key Wrap Algorithm using 256 bit keys
     }
 
     public enum JweEncryption
@@ -119,9 +122,9 @@ namespace Jose
 
             EncAlgorithms = new Dictionary<JweEncryption, IJweAlgorithm>
             {
-                { JweEncryption.A128CBC_HS256, new AesCbcHmac(HashAlgorithms[JwsAlgorithm.HS256], 256) },
-                { JweEncryption.A192CBC_HS384, new AesCbcHmac(HashAlgorithms[JwsAlgorithm.HS384], 384) },
-                { JweEncryption.A256CBC_HS512, new AesCbcHmac(HashAlgorithms[JwsAlgorithm.HS512], 512) }
+                { JweEncryption.A128CBC_HS256, new AesCbcHmacEncryption(HashAlgorithms[JwsAlgorithm.HS256], 256) },
+                { JweEncryption.A192CBC_HS384, new AesCbcHmacEncryption(HashAlgorithms[JwsAlgorithm.HS384], 384) },
+                { JweEncryption.A256CBC_HS512, new AesCbcHmacEncryption(HashAlgorithms[JwsAlgorithm.HS512], 512) }
             };
 
             JweEncryptionMethods[JweEncryption.A128CBC_HS256] = "A128CBC-HS256";
@@ -130,9 +133,9 @@ namespace Jose
 
             if(ClassAvaliable("Security.Cryptography.AuthenticatedAesCng, Security.Cryptography"))
             {
-                EncAlgorithms[JweEncryption.A128GCM] = new AesGcm(128);
-                EncAlgorithms[JweEncryption.A192GCM] = new AesGcm(192);
-                EncAlgorithms[JweEncryption.A256GCM] = new AesGcm(256);
+                EncAlgorithms[JweEncryption.A128GCM] = new AesGcmEncryption(128);
+                EncAlgorithms[JweEncryption.A192GCM] = new AesGcmEncryption(192);
+                EncAlgorithms[JweEncryption.A256GCM] = new AesGcmEncryption(256);
 
                 JweEncryptionMethods[JweEncryption.A128GCM] = "A128GCM";
                 JweEncryptionMethods[JweEncryption.A192GCM] = "A192GCM";
@@ -153,7 +156,10 @@ namespace Jose
                 { JweAlgorithm.ECDH_ES_A256KW, new EcdhKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256))},
                 { JweAlgorithm.PBES2_HS256_A128KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128))},
                 { JweAlgorithm.PBES2_HS384_A192KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192))},
-                { JweAlgorithm.PBES2_HS512_A256KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256))}
+                { JweAlgorithm.PBES2_HS512_A256KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256))},
+                { JweAlgorithm.A128GCMKW, new AesGcmKeyWrapManagement(128)},
+                { JweAlgorithm.A192GCMKW, new AesGcmKeyWrapManagement(192)},
+                { JweAlgorithm.A256GCMKW, new AesGcmKeyWrapManagement(256)}
             };
 
             JweAlgorithms[JweAlgorithm.RSA1_5] = "RSA1_5";
@@ -169,6 +175,9 @@ namespace Jose
             JweAlgorithms[JweAlgorithm.PBES2_HS256_A128KW] = "PBES2-HS256+A128KW";
             JweAlgorithms[JweAlgorithm.PBES2_HS384_A192KW] = "PBES2-HS384+A192KW";
             JweAlgorithms[JweAlgorithm.PBES2_HS512_A256KW] = "PBES2-HS512+A256KW";
+            JweAlgorithms[JweAlgorithm.A128GCMKW] = "A128GCMKW";
+            JweAlgorithms[JweAlgorithm.A192GCMKW] = "A192GCMKW";
+            JweAlgorithms[JweAlgorithm.A256GCMKW] = "A256GCMKW";
 
             CompressionAlgorithms = new Dictionary<JweCompression, ICompression>
             {
