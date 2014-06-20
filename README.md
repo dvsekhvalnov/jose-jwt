@@ -91,7 +91,7 @@ Which usually can be done be re-importing RSAParameters. See http://clrsecurity.
     string token=Jose.JWT.Encode(json, privateKey, JwsAlgorithm.RS256);
 
 #### ES-\*  family
-ECDSA signatures require `CngKey` (usually private) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
+ES256, ES384, ES256 ECDSA signatures requires `CngKey` (usually private) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
 But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,d)`.
 
     var payload = new Dictionary<string, object>() 
@@ -110,7 +110,7 @@ But if you want to use raw key material (x,y) and d, jose-jwt provides convenien
 
 ### Creating encrypted Tokens
 #### RSA-\* key management family of algorithms
-RSA-\* key management with AES using SHA or AES GCM encryption requires `RSACryptoServiceProvider` (usually public) key of corresponding length.
+RSA-OAEP and RSA1_5 key management requires `RSACryptoServiceProvider` (usually public) key of corresponding length.
 
     var payload = new Dictionary<string, object>() 
     {
@@ -137,7 +137,7 @@ Direct key management with pre-shared symmetric keys using AES or AES GCM encryp
     string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.DIR, JweEncryption.A128CBC_HS256);
 
 #### AES Key Wrap key management family of algorithms
-AES Key Wrap key management requires `byte[]` array key of corresponding length
+AES128KW, AES192KW and AES256KW key management requires `byte[]` array key of corresponding length
 
     var payload = new Dictionary<string, object>() 
     {
@@ -163,8 +163,8 @@ AES128GCMKW, AES192GCMKW and AES256GCMKW key management requires `byte[]` array 
     string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.A256GCMKW, JweEncryption.A256CBC_HS512);
 
 
-#### ECDH-ES and ECDH-ES+A\*KW key management family of algorithms
-ECDH-ES and ECDH-ES+AES Key Wrap key management requires `CngKey` (usually public) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
+#### ECDH-ES and ECDH-ES with AES Key Wrap key management family of algorithms
+ECDH-ES and ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW key management requires `CngKey` (usually public) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
 But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,usage:CngKeyUsages.KeyAgreement)`.
 
     var payload = new Dictionary<string, object>() 
@@ -181,7 +181,7 @@ But if you want to use raw key material (x,y) and d, jose-jwt provides convenien
     string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.ECDH_ES, JweEncryption.A256GCM);
 
 #### PBES2 using HMAC SHA with AES Key Wrap key management family of algorithms
-PBES2-HS\*+A\*KW key management requires `string` passphrase from which key will be derived 
+PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW key management requires `string` passphrase from which key will be derived 
 
     var payload = new Dictionary<string, object>() 
     {
@@ -216,7 +216,7 @@ Decoding json web tokens is fully symmetric to creating signed or encrypted toke
 
     string json = Jose.JWT.Decode(token, secretKey);
 
-**RS256, RS384, RS512**, **PS256, PS384, PS512** signatures and **RSA** key management algorthms expects `RSACryptoServiceProvider` as a key, public/private is asymmetric to encoding:
+**RS256, RS384, RS512**, **PS256, PS384, PS512** signatures and **RSA-OAEP, RSA1_5** key management algorthms expects `RSACryptoServiceProvider` as a key, public/private is asymmetric to encoding:
 
     string token = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bx_4TL7gh14IeM3EClP3iVfY9pbT81pflXd1lEZOVPJR6PaewRFXWmiJcaqH9fcU9IjGGQ19BS-UPtpErenL5kw7KORFgIBm4hObCYxLoAadMy8A-qQeOWyjnxbE0mbQIdoFI4nGK5qWTEQUWZCMwosvyeHLqEZDzr9CNLAAFTujvsZJJ7NLTkA0cTUzz64b57uSvMTaOK6j7Ap9ZaAgF2uaqBdZ1NzqofLeU4XYCG8pWc5Qd-Ri_1KsksjaDHk12ZU4vKIJWJ-puEnpXBLoHuko92BnN8_LXx4sfDdK7wRiXk0LU_iwoT5zb1ro7KaM0hcfidWoz95vfhPhACIsXQ.YcVAPLJ061gvPpVB-zMm4A.PveUBLejLzMjA4tViHTRXbYnxMHFu8W2ECwj9b6sF2u2azi0TbxxMhs65j-t3qm-8EKBJM7LKIlkAtQ1XBeZl4zuTeMFxsQ0VShQfwlN2r8dPFgUzb4f_MzBuFFYfP5hBs-jugm89l2ZTj8oAOOSpAlC7uTmwha3dNaDOzlJniqAl_729q5EvSjaYXMtaET9wSTNSDfMUVFcMERbB50VOhc134JDUVPTuriD0rd4tQm8Do8obFKtFeZ5l3jT73-f1tPZwZ6CmFVxUMh6gSdY5A.tR8bNx9WErquthpWZBeMaw";
 
@@ -224,7 +224,7 @@ Decoding json web tokens is fully symmetric to creating signed or encrypted toke
 
     string json = Jose.JWT.Decode(token,privateKey);
 
-**ES256, ES256, ES512** signatures, **ECDH-ES** and **ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW** key management algorithms expects `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
+**ES256, ES284, ES512** signatures, **ECDH-ES** and **ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW** key management algorithms expects `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
 sure correct `usage:` value is set. `CngKeyUsages.KeyAgreement` for ECDH-ES and `CngKeyUsages.Signing` for ES-* (default value, can be ommited).
 
     string token = "eyJhbGciOiJFUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.EVnmDMlz-oi05AQzts-R3aqWvaBlwVZddWkmaaHyMx5Phb2NSLgyI0kccpgjjAyo1S5KCB3LIMPfmxCX_obMKA";
