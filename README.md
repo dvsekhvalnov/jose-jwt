@@ -64,7 +64,7 @@ Grab source and compile yourself. CLR Security Library can be found in **JWT/lib
 
 ### Creating signed Tokens
 #### HS-\* family
-HMAC SHA signatures require `byte[]` array key of corresponding length
+HS256, HS384, HS512 signatures require `byte[]` array key of corresponding length
 
     var payload = new Dictionary<string, object>() 
     {
@@ -77,7 +77,7 @@ HMAC SHA signatures require `byte[]` array key of corresponding length
     string token=Jose.JWT.Encode(json, secretKey, JwsAlgorithm.HS256);
 
 #### RS-\* and PS-\* family
-RSA signatures require `RSACryptoServiceProvider` (usually private) key of corresponding length. CSP need to be forced to use Microsoft Enhanced RSA and AES Cryptographic Provider.
+RS256, RS384, RS512 and PS256, PS384, PS512 signatures require `RSACryptoServiceProvider` (usually private) key of corresponding length. CSP need to be forced to use Microsoft Enhanced RSA and AES Cryptographic Provider.
 Which usually can be done be re-importing RSAParameters. See http://clrsecurity.codeplex.com/discussions/243156 for details.
 
     var payload = new Dictionary<string, object>() 
@@ -216,7 +216,7 @@ Decoding json web tokens is fully symmetric to creating signed or encrypted toke
 
     string json = Jose.JWT.Decode(token, secretKey);
 
-**RS256, RS384, RS512** signatures and **RSA** key management algorthms expects `RSACryptoServiceProvider` as a key, public/private is asymmetric to encoding:
+**RS256, RS384, RS512**, **PS256, PS384, PS512** signatures and **RSA** key management algorthms expects `RSACryptoServiceProvider` as a key, public/private is asymmetric to encoding:
 
     string token = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bx_4TL7gh14IeM3EClP3iVfY9pbT81pflXd1lEZOVPJR6PaewRFXWmiJcaqH9fcU9IjGGQ19BS-UPtpErenL5kw7KORFgIBm4hObCYxLoAadMy8A-qQeOWyjnxbE0mbQIdoFI4nGK5qWTEQUWZCMwosvyeHLqEZDzr9CNLAAFTujvsZJJ7NLTkA0cTUzz64b57uSvMTaOK6j7Ap9ZaAgF2uaqBdZ1NzqofLeU4XYCG8pWc5Qd-Ri_1KsksjaDHk12ZU4vKIJWJ-puEnpXBLoHuko92BnN8_LXx4sfDdK7wRiXk0LU_iwoT5zb1ro7KaM0hcfidWoz95vfhPhACIsXQ.YcVAPLJ061gvPpVB-zMm4A.PveUBLejLzMjA4tViHTRXbYnxMHFu8W2ECwj9b6sF2u2azi0TbxxMhs65j-t3qm-8EKBJM7LKIlkAtQ1XBeZl4zuTeMFxsQ0VShQfwlN2r8dPFgUzb4f_MzBuFFYfP5hBs-jugm89l2ZTj8oAOOSpAlC7uTmwha3dNaDOzlJniqAl_729q5EvSjaYXMtaET9wSTNSDfMUVFcMERbB50VOhc134JDUVPTuriD0rd4tQm8Do8obFKtFeZ5l3jT73-f1tPZwZ6CmFVxUMh6gSdY5A.tR8bNx9WErquthpWZBeMaw";
 
