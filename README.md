@@ -1,6 +1,6 @@
-# Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET
+# Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET
 
-Minimallistic zero-dependency (almost) library for generating, decoding and encryption [JSON Web Tokens](http://tools.ietf.org/html/draft-jones-json-web-token-10). Supports wide range 
+Minimallistic zero-dependency (almost) library for generating, decoding and encryption [JSON Web Tokens](http://tools.ietf.org/html/draft-jones-json-web-token-10). Supports full range 
 of [JSON Web Algorithms](http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-23). JSON parsing agnostic, can plug any desired JSON processing library. 
 Extensively tested for compatibility with [jose.4.j](https://bitbucket.org/b_c/jose4j/wiki/Home), [Nimbus-JOSE-JWT](https://bitbucket.org/nimbusds/nimbus-jose-jwt/wiki/Home) and [json-jwt](https://github.com/nov/json-jwt) libraries.
 
@@ -25,6 +25,7 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 - RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
 - Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup> and A256GCM<sup>\*</sup>
 - A128KW, A192KW, A256KW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
+- A128GCMKW<sup>\*</sup>, A192GCMKW<sup>\*</sup>, A256GCMKW<sup>\*</sup> encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
 - ECDH-ES<sup>\**</sup> with A128CBC-HS256, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
 - ECDH-ES+A128KW<sup>\**</sup>, ECDH-ES+A192KW<sup>\**</sup>, ECDH-ES+A256KW<sup>\**</sup> with A128CBC-HS256, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
 - PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
@@ -148,6 +149,20 @@ AES Key Wrap key management requires `byte[]` array key of corresponding length
 
     string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
 
+#### AES GCM Key Wrap key management family of algorithms
+AES128GCMKW, AES192GCMKW and AES256GCMKW key management requires `byte[]` array key of corresponding length
+
+    var payload = new Dictionary<string, object>() 
+    {
+        { "sub", "mr.x@contoso.com" },
+        { "exp", 1300819380 }
+    };
+  	
+    var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
+
+    string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.A256GCMKW, JweEncryption.A256CBC_HS512);
+
+
 #### ECDH-ES and ECDH-ES+A\*KW key management family of algorithms
 ECDH-ES and ECDH-ES+AES Key Wrap key management requires `CngKey` (usually public) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
 But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,usage:CngKeyUsages.KeyAgreement)`.
@@ -193,7 +208,7 @@ Optional DEFLATE compression is supported
 ### Verifying and Decoding Tokens
 Decoding json web tokens is fully symmetric to creating signed or encrypted tokens:
 
-**HS-\*** signatures, **A128KW, A192KW, A256KW** and **DIR** key management algorithms expects `byte[]` array key
+**HS256, HS384, HS512** signatures, **A128KW, A192KW, A256KW**, **A128GCMKW, A192GCMKW, A256GCMKW** and **DIR** key management algorithms expects `byte[]` array key
 
     string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..Fmz3PLVfv-ySl4IJ.LMZpXMDoBIll5yuEs81Bws2-iUUaBSpucJPL-GtDKXkPhFpJmES2T136Vd8xzvp-3JW-fvpRZtlhluqGHjywPctol71Zuz9uFQjuejIU4axA_XiAy-BadbRUm1-25FRT30WtrrxKltSkulmIS5N-Nsi_zmCz5xicB1ZnzneRXGaXY4B444_IHxGBIS_wdurPAN0OEGw4xIi2DAD1Ikc99a90L7rUZfbHNg_iTBr-OshZqDbR6C5KhmMgk5KqDJEN8Ik-Yw.Jbk8ZmO901fqECYVPKOAzg";
 
@@ -201,7 +216,7 @@ Decoding json web tokens is fully symmetric to creating signed or encrypted toke
 
     string json = Jose.JWT.Decode(token, secretKey);
 
-**RS-\*** signatures and **RSA** key management algorthms expects `RSACryptoServiceProvider` as a key, public/private is asymmetric to encoding:
+**RS256, RS384, RS512** signatures and **RSA** key management algorthms expects `RSACryptoServiceProvider` as a key, public/private is asymmetric to encoding:
 
     string token = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bx_4TL7gh14IeM3EClP3iVfY9pbT81pflXd1lEZOVPJR6PaewRFXWmiJcaqH9fcU9IjGGQ19BS-UPtpErenL5kw7KORFgIBm4hObCYxLoAadMy8A-qQeOWyjnxbE0mbQIdoFI4nGK5qWTEQUWZCMwosvyeHLqEZDzr9CNLAAFTujvsZJJ7NLTkA0cTUzz64b57uSvMTaOK6j7Ap9ZaAgF2uaqBdZ1NzqofLeU4XYCG8pWc5Qd-Ri_1KsksjaDHk12ZU4vKIJWJ-puEnpXBLoHuko92BnN8_LXx4sfDdK7wRiXk0LU_iwoT5zb1ro7KaM0hcfidWoz95vfhPhACIsXQ.YcVAPLJ061gvPpVB-zMm4A.PveUBLejLzMjA4tViHTRXbYnxMHFu8W2ECwj9b6sF2u2azi0TbxxMhs65j-t3qm-8EKBJM7LKIlkAtQ1XBeZl4zuTeMFxsQ0VShQfwlN2r8dPFgUzb4f_MzBuFFYfP5hBs-jugm89l2ZTj8oAOOSpAlC7uTmwha3dNaDOzlJniqAl_729q5EvSjaYXMtaET9wSTNSDfMUVFcMERbB50VOhc134JDUVPTuriD0rd4tQm8Do8obFKtFeZ5l3jT73-f1tPZwZ6CmFVxUMh6gSdY5A.tR8bNx9WErquthpWZBeMaw";
 
@@ -209,7 +224,7 @@ Decoding json web tokens is fully symmetric to creating signed or encrypted toke
 
     string json = Jose.JWT.Decode(token,privateKey);
 
-**ES-\*** signatures and **ECDH-ES**/**ECDH-ES+A\*KW** key management algorithms expects `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
+**ES256, ES256, ES512** signatures, **ECDH-ES** and **ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW** key management algorithms expects `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
 sure correct `usage:` value is set. `CngKeyUsages.KeyAgreement` for ECDH-ES and `CngKeyUsages.Signing` for ES-* (default value, can be ommited).
 
     string token = "eyJhbGciOiJFUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.EVnmDMlz-oi05AQzts-R3aqWvaBlwVZddWkmaaHyMx5Phb2NSLgyI0kccpgjjAyo1S5KCB3LIMPfmxCX_obMKA";
