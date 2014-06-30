@@ -109,16 +109,13 @@ namespace Jose
             JwsAlgorithms[JwsAlgorithm.ES384] = "ES384";
             JwsAlgorithms[JwsAlgorithm.ES512] = "ES512";
 
-            if (ClassAvaliable("Security.Cryptography.RSACng, Security.Cryptography"))
-            {
-                HashAlgorithms[JwsAlgorithm.PS256] = new RsaPssUsingSha(32);
-                HashAlgorithms[JwsAlgorithm.PS384] = new RsaPssUsingSha(48);
-                HashAlgorithms[JwsAlgorithm.PS512] = new RsaPssUsingSha(64);
+            HashAlgorithms[JwsAlgorithm.PS256] = new RsaPssUsingSha(32);
+            HashAlgorithms[JwsAlgorithm.PS384] = new RsaPssUsingSha(48);
+            HashAlgorithms[JwsAlgorithm.PS512] = new RsaPssUsingSha(64);
 
-                JwsAlgorithms[JwsAlgorithm.PS256] = "PS256";
-                JwsAlgorithms[JwsAlgorithm.PS384] = "PS384";
-                JwsAlgorithms[JwsAlgorithm.PS512] = "PS512";
-            }
+            JwsAlgorithms[JwsAlgorithm.PS256] = "PS256";
+            JwsAlgorithms[JwsAlgorithm.PS384] = "PS384";
+            JwsAlgorithms[JwsAlgorithm.PS512] = "PS512";
 
             EncAlgorithms = new Dictionary<JweEncryption, IJweAlgorithm>
             {

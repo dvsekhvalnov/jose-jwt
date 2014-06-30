@@ -2010,6 +2010,21 @@ namespace UnitTests
             Assert.That(Jose.JWT.Decode(token, aes512Key), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
         }
 
+        [Test]
+        public void RsaKeyImport()
+        {
+            //given
+            CngKey pk = RsaKey.New(PrivKey().ExportParameters(true));
+
+            Console.Out.WriteLine("key = {0}", pk);
+
+            CngKey pub = RsaKey.New(PubKey().ExportParameters(false));
+
+            Console.Out.WriteLine("pub = {0}", pub);
+            //when
+            //then
+        }
+
         #region test utils
 
         private RSACryptoServiceProvider PrivKey()

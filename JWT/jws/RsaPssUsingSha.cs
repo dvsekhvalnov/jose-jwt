@@ -19,15 +19,7 @@ namespace Jose
 
             try
             {
-                using (RSACng rsa = new RSACng())
-                {
-                    rsa.ImportParameters(privateKey.ExportParameters(true));
-                    rsa.SignatureHashAlgorithm = Hash;
-                    rsa.SignaturePaddingMode = AsymmetricPaddingMode.Pss;
-                    rsa.SignatureSaltBytes = saltSize;
-
-                    return rsa.SignData(securedInput);
-                }
+                return RsaPss.Sign(securedInput, RsaKey.New(privateKey.ExportParameters(true)), Hash, saltSize);
             }
             catch (CryptographicException e)
             {
@@ -41,15 +33,7 @@ namespace Jose
 
             try
             {
-                using (RSACng rsa = new RSACng())
-                {
-                    rsa.ImportParameters(publicKey.ExportParameters(false));
-                    rsa.SignatureHashAlgorithm = Hash;
-                    rsa.SignaturePaddingMode=AsymmetricPaddingMode.Pss;
-                    rsa.SignatureSaltBytes = saltSize;
-
-                    return rsa.VerifyData(securedInput,signature);
-                }
+                return RsaPss.Verify(securedInput, signature, RsaKey.New(publicKey.ExportParameters(false)), Hash, saltSize);
             }
             catch (CryptographicException e)
             {

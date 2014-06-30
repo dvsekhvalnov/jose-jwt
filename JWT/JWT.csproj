@@ -54,6 +54,7 @@
     <Compile Include="jwa\Pbse2HmacShaKeyManagementWithAesKeyWrap.cs" />
     <Compile Include="native\NCrypt.cs" />
     <Compile Include="PBKDF2.cs" />
+    <Compile Include="RsaPss.cs" />
     <Compile Include="Security\Cryptography\EccKey.cs" />
     <Compile Include="Ensure.cs" />
     <Compile Include="json\IJsonMapper.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="jws\RsaUsingSha.cs" />
     <Compile Include="JWT.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Security\Cryptography\RsaKey.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

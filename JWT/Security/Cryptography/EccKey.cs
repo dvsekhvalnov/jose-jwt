@@ -141,7 +141,6 @@ namespace Security.Cryptography
         private void ExportKey()
         {
             byte[] blob = key.Export(CngKeyBlobFormat.EccPrivateBlob);
-            byte[] magic = new[] { blob[0], blob[1], blob[2], blob[3] };
             byte[] length = new[] { blob[4], blob[5], blob[6], blob[7] };
 
             int partSize = BitConverter.ToInt32(length, 0);
