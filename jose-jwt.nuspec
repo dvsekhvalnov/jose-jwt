@@ -2,18 +2,19 @@
 <package >
   <metadata>
     <id>jose-jwt</id>
-    <version>1.6.0</version>
+    <version>1.7.0</version>
     <title>Jose JWT</title>
     <authors>Dmitry Vsekhvalnov</authors>
     <owners>Dmitry Vsekhvalnov</owners>
     <licenseUrl>https://raw.github.com/dvsekhvalnov/jose-jwt/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/dvsekhvalnov/jose-jwt</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <releaseNotes>AES GCM Key Wrap using A128GCMKW, A192GCMKW, A256GCMKW key management algorithms.</releaseNotes>
+    <releaseNotes>Removing dependency on CLR Security dll (AES GCM and RSA PSS). Making library truly zero-dependence.</releaseNotes>
     <summary>Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms. JSON parsing agnostic. Library for generating, decoding and encryption of JSON Web Tokens.</summary>
     <description>Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET 
 
-Minimallistic zero-dependency library for generating, decoding and encryption of JSON Web Tokens. Supports all key management, encryption and compression algorithms. JSON parsing agnostic. 
+Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET. Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms.
+Supports generating, decoding, encryption and compression of JSON Web Tokens. JSON parsing agnostic. 
 
 Supported algorithms
 
