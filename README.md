@@ -1,6 +1,6 @@
 # Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET
 
-Minimallistic zero-dependency (almost) library for generating, decoding and encryption [JSON Web Tokens](http://tools.ietf.org/html/draft-jones-json-web-token-10). Supports full range 
+Minimallistic zero-dependency library for generating, decoding and encryption [JSON Web Tokens](http://tools.ietf.org/html/draft-jones-json-web-token-10). Supports full range 
 of [JSON Web Algorithms](http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-23). JSON parsing agnostic, can plug any desired JSON processing library. 
 Extensively tested for compatibility with [jose.4.j](https://bitbucket.org/b_c/jose4j/wiki/Home), [Nimbus-JOSE-JWT](https://bitbucket.org/nimbusds/nimbus-jose-jwt/wiki/Home) and [json-jwt](https://github.com/nov/json-jwt) libraries.
 
@@ -17,29 +17,25 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 - HMAC signatures with HS256, HS384 and HS512.
 - ECDSA signatures with ES256, ES384 and ES512.
 - RSASSA-PKCS1-V1_5 signatures with RS256, RS384 and RS512.
-- RSASSA-PSS<sup>\*</sup> signatures (probabilistic signature scheme with appendix) with PS256<sup>\*</sup>, PS384<sup>\*</sup> and PS512<sup>\*</sup>.
+- RSASSA-PSS signatures (probabilistic signature scheme with appendix) with PS256, PS384 and PS512.
 - NONE (unprotected) plain text algorithm without integrity protection
 
 **Encryption**
-- RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
-- RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
-- Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup> and A256GCM<sup>\*</sup>
-- A128KW, A192KW, A256KW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
-- A128GCMKW<sup>\*</sup>, A192GCMKW<sup>\*</sup>, A256GCMKW<sup>\*</sup> encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
-- ECDH-ES<sup>\**</sup> with A128CBC-HS256, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
-- ECDH-ES+A128KW<sup>\**</sup>, ECDH-ES+A192KW<sup>\**</sup>, ECDH-ES+A256KW<sup>\**</sup> with A128CBC-HS256, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
-- PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM<sup>\*</sup>, A192GCM<sup>\*</sup>, A256GCM<sup>\*</sup>
+- RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM
+- A128KW, A192KW, A256KW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- A128GCMKW, A192GCMKW, A256GCMKW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- ECDH-ES<sup>\*</sup> with A128CBC-HS256, A128GCM, A192GCM, A256GCM
+- ECDH-ES+A128KW<sup>\*</sup>, ECDH-ES+A192KW<sup>\*</sup>, ECDH-ES+A256KW<sup>\*</sup> with A128CBC-HS256, A128GCM, A192GCM, A256GCM
+- PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 
 **Compression**
 
 - DEFLATE compression
 
 ##### Notes:
-\* signature and encryption algorithms support provided via CNG BCrypt API using CLR Security library. Avaliable starting Windows Vista. 
-
-If CLR Security Library is not found at runtime given algorithms will not be avaliable. **jose-jwt** can run without CLR Security with all other supported algorithms.
-
-\** It appears that Microsoft CNG implementation of BCryptSecretAgreement/NCryptSecretAgreement contains a bug for calculating Elliptic Curve Diffie–Hellman secret agreement
+\* It appears that Microsoft CNG implementation of BCryptSecretAgreement/NCryptSecretAgreement contains a bug for calculating Elliptic Curve Diffie–Hellman secret agreement
 on keys higher than 256 bit (P-384 and P-521 NIST curves correspondingly). At least produced secret agreements do not match any other implementation in different languages.
 Technically it is possible to use ECDH-ES or ECDH-ES+AES Key Wrap family with A192CBC-HS384 and A256CBC-HS512 but most likely produced JWT tokens will not be compatible with other platforms and therefore can't be decoded correctly.
 
@@ -306,6 +302,3 @@ The default supplied `Jose.IJsonMapper` implementation is based on `System.Web.S
 
 ### More examples
 Checkout UnitTests\TestSuite.cs for more examples.
-
-### Wish list
-Get rid of CLR Security dependency.
