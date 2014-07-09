@@ -7,7 +7,6 @@ namespace Jose.native
 {
     public static class NCrypt
     {
-        public const uint ERROR_SUCCESS = 0x00000000;
         public const uint NTE_BAD_SIGNATURE = 0x80090006;
 
         public const uint KDF_ALGORITHMID = 8;
@@ -15,9 +14,6 @@ namespace Jose.native
         public const uint KDF_PARTYVINFO = 10;
         public const uint KDF_SUPPPUBINFO = 11;
         public const uint KDF_SUPPPRIVINFO = 12;
-
-        public const uint BCRYPT_PAD_PSS = 8;
-
 
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
         public class NCryptBufferDesc : IDisposable
@@ -77,20 +73,6 @@ namespace Jose.native
             }
         }
 
-        [StructLayout(LayoutKind.Sequential)]
-        internal struct BCRYPT_PSS_PADDING_INFO
-        {
-            public BCRYPT_PSS_PADDING_INFO(string pszAlgId, int cbSalt)
-            {
-                this.pszAlgId = pszAlgId;
-                this.cbSalt = cbSalt;
-            }
-
-            [MarshalAs(UnmanagedType.LPWStr)]
-            public string pszAlgId;
-            public int cbSalt;
-        }
-
 
         [DllImport("ncrypt.dll", CharSet = CharSet.Auto, SetLastError = true)]
         public static extern uint NCryptSecretAgreement(SafeNCryptKeyHandle hPrivKey,SafeNCryptKeyHandle hPublicKey,out SafeNCryptSecretHandle phSecret,uint flags);
@@ -106,22 +88,22 @@ namespace Jose.native
 
         [DllImport("ncrypt.dll")]
         internal static extern uint NCryptSignHash(SafeNCryptKeyHandle hKey,
-                                                        ref BCRYPT_PSS_PADDING_INFO pPaddingInfo,
-                                                        byte[] pbHashValue,
-                                                        int cbHashValue,
-                                                        byte[] pbSignature,
-                                                        int cbSignature,
-                                                        out uint pcbResult,
-                                                        uint dwFlags);
+                                                   ref BCrypt.BCRYPT_PSS_PADDING_INFO pPaddingInfo,
+                                                   byte[] pbHashValue,
+                                                   int cbHashValue,
+                                                   byte[] pbSignature,
+                                                   int cbSignature,
+                                                   out uint pcbResult,
+                                                   uint dwFlags);
 
         [DllImport("ncrypt.dll")]
         internal static extern uint NCryptVerifySignature(SafeNCryptKeyHandle hKey,
-                                                               ref BCRYPT_PSS_PADDING_INFO pPaddingInfo,
-                                                               byte[] pbHashValue,
-                                                               int cbHashValue,
-                                                               byte[] pbSignature,
-                                                               int cbSignature,
-                                                               uint dwFlags);
+                                                          ref BCrypt.BCRYPT_PSS_PADDING_INFO pPaddingInfo,
+                                                          byte[] pbHashValue,
+                                                          int cbHashValue,
+                                                          byte[] pbSignature,
+                                                          int cbSignature,
+                                                          uint dwFlags);
 
 
     }

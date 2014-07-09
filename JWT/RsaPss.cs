@@ -24,14 +24,14 @@ namespace Jose
 
         private static bool VerifyHash(byte[] hash, byte[] signature, CngKey key, string algorithm, int saltSize)
         {
-            var paddingIndo = new NCrypt.BCRYPT_PSS_PADDING_INFO(algorithm, saltSize);
+            var paddingIndo = new BCrypt.BCRYPT_PSS_PADDING_INFO(algorithm, saltSize);
 
-            uint status = NCrypt.NCryptVerifySignature(key.Handle, ref paddingIndo, hash, hash.Length, signature, signature.Length, NCrypt.BCRYPT_PAD_PSS);
+            uint status = NCrypt.NCryptVerifySignature(key.Handle, ref paddingIndo, hash, hash.Length, signature, signature.Length, BCrypt.BCRYPT_PAD_PSS);
 
             if (status == NCrypt.NTE_BAD_SIGNATURE) //honestly it always failing with NTE_INVALID_PARAMETER, but let's stick to public API
                 return false;
 
-            if (status != NCrypt.ERROR_SUCCESS)
+            if (status != BCrypt.ERROR_SUCCESS)
                 throw new CryptographicException(string.Format("NCrypt.NCryptSignHash() (signature size) failed with status code:{0}", status));
 
             return true;
@@ -39,21 +39,21 @@ namespace Jose
 
         private static byte[] SignHash(byte[] hash, CngKey key, string algorithm, int saltSize)
         {
-            var paddingIndo=new NCrypt.BCRYPT_PSS_PADDING_INFO(algorithm, saltSize);
+            var paddingIndo=new BCrypt.BCRYPT_PSS_PADDING_INFO(algorithm, saltSize);
 
             uint size;
             uint status;
 
-            status = NCrypt.NCryptSignHash(key.Handle, ref paddingIndo, hash, hash.Length, null, 0, out size,NCrypt.BCRYPT_PAD_PSS);
+            status = NCrypt.NCryptSignHash(key.Handle, ref paddingIndo, hash, hash.Length, null, 0, out size,BCrypt.BCRYPT_PAD_PSS);
 
-            if (status != NCrypt.ERROR_SUCCESS)
+            if (status != BCrypt.ERROR_SUCCESS)
                 throw new CryptographicException(string.Format("NCrypt.NCryptSignHash() (signature size) failed with status code:{0}", status));
 
             byte[] signature=new byte[size];
 
-            status = NCrypt.NCryptSignHash(key.Handle, ref paddingIndo, hash, hash.Length, signature, signature.Length, out size, NCrypt.BCRYPT_PAD_PSS);
+            status = NCrypt.NCryptSignHash(key.Handle, ref paddingIndo, hash, hash.Length, signature, signature.Length, out size, BCrypt.BCRYPT_PAD_PSS);
 
-            if (status != NCrypt.ERROR_SUCCESS)
+            if (status != BCrypt.ERROR_SUCCESS)
                 throw new CryptographicException(string.Format("NCrypt.NCryptSignHash() failed with status code:{0}", status));
 
             return signature;

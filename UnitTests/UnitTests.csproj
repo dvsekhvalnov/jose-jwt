@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AesGcmTest.cs" />
     <Compile Include="AesKeyWrapTest.cs" />
     <Compile Include="ArraysTest.cs" />
     <Compile Include="ConcatKDFTest.cs" />

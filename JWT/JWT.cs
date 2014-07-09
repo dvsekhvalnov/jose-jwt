@@ -128,16 +128,13 @@ namespace Jose
             JweEncryptionMethods[JweEncryption.A192CBC_HS384] = "A192CBC-HS384";
             JweEncryptionMethods[JweEncryption.A256CBC_HS512] = "A256CBC-HS512";
 
-            if(ClassAvaliable("Security.Cryptography.AuthenticatedAesCng, Security.Cryptography"))
-            {
-                EncAlgorithms[JweEncryption.A128GCM] = new AesGcmEncryption(128);
-                EncAlgorithms[JweEncryption.A192GCM] = new AesGcmEncryption(192);
-                EncAlgorithms[JweEncryption.A256GCM] = new AesGcmEncryption(256);
+            EncAlgorithms[JweEncryption.A128GCM] = new AesGcmEncryption(128);
+            EncAlgorithms[JweEncryption.A192GCM] = new AesGcmEncryption(192);
+            EncAlgorithms[JweEncryption.A256GCM] = new AesGcmEncryption(256);
 
-                JweEncryptionMethods[JweEncryption.A128GCM] = "A128GCM";
-                JweEncryptionMethods[JweEncryption.A192GCM] = "A192GCM";
-                JweEncryptionMethods[JweEncryption.A256GCM] = "A256GCM";
-            }
+            JweEncryptionMethods[JweEncryption.A128GCM] = "A128GCM";
+            JweEncryptionMethods[JweEncryption.A192GCM] = "A192GCM";
+            JweEncryptionMethods[JweEncryption.A256GCM] = "A256GCM";
                                 
             KeyAlgorithms = new Dictionary<JweAlgorithm, IKeyManagement>
             {
@@ -388,15 +385,6 @@ namespace Jose
 
             throw new InvalidAlgorithmException(string.Format("Compression algorithm is not supported: {0}.", algorithm));
         }
-
-        #region Utils
-
-        private static bool ClassAvaliable(string assemblyQualifiedName)
-        {
-            return Type.GetType(assemblyQualifiedName) != null;
-        }
-
-        #endregion
     }
 
     public class JoseException : Exception

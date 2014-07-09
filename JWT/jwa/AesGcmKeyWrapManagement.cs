@@ -22,7 +22,7 @@ namespace Jose
             byte[] cek = Arrays.Random(cekSizeBits);
 
             byte[][] cipherAndTag = AesGcm.Encrypt(sharedKey, iv, null, cek);
-
+            
             header["iv"] = Compact.Base64UrlEncode(iv);
             header["tag"] = Compact.Base64UrlEncode(cipherAndTag[1]);
 
