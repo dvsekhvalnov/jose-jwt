@@ -43,10 +43,8 @@ Technically it is possible to use ECDH-ES or ECDH-ES+AES Key Wrap family with A1
 ### NuGet 
 `Install-Package jose-jwt`
 
-\* NuGet will install CLR Security Library automatically. Please checkout CLR Security license, which is different from jose-jwt one.
-
 ### Manual
-Grab source and compile yourself. CLR Security Library can be found in **JWT/lib/** folder or http://clrsecurity.codeplex.com/ . Please checkout CLR Security license, which is different from jose-jwt one.
+Grab source and compile yourself. 
 
 ## Usage
 ### Creating Plaintext (unprotected) Tokens
