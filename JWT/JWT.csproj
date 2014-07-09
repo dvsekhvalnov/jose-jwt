@@ -39,11 +39,11 @@
     <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AesGcm.cs" />
-    <Compile Include="AesKeyWrap.cs" />
-    <Compile Include="Arrays.cs" />
-    <Compile Include="Compact.cs" />
-    <Compile Include="ConcatKDF.cs" />
+    <Compile Include="crypto\AesGcm.cs" />
+    <Compile Include="crypto\AesKeyWrap.cs" />
+    <Compile Include="util\Arrays.cs" />
+    <Compile Include="util\Compact.cs" />
+    <Compile Include="crypto\ConcatKDF.cs" />
     <Compile Include="jwa\AesGcmKeyWrapManagement.cs" />
     <Compile Include="jwa\AesKeyWrapManagement.cs" />
     <Compile Include="jwa\EcdhKeyManagement.cs" />
@@ -51,10 +51,10 @@
     <Compile Include="jwa\Pbse2HmacShaKeyManagementWithAesKeyWrap.cs" />
     <Compile Include="native\BCrypt.cs" />
     <Compile Include="native\NCrypt.cs" />
-    <Compile Include="PBKDF2.cs" />
-    <Compile Include="RsaPss.cs" />
+    <Compile Include="crypto\PBKDF2.cs" />
+    <Compile Include="crypto\RsaPss.cs" />
     <Compile Include="Security\Cryptography\EccKey.cs" />
-    <Compile Include="Ensure.cs" />
+    <Compile Include="util\Ensure.cs" />
     <Compile Include="json\IJsonMapper.cs" />
     <Compile Include="json\JSSerializerMapper.cs" />
     <Compile Include="jwe\AesCbcHmacEncryption.cs" />
