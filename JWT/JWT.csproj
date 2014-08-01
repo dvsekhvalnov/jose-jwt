@@ -41,7 +41,9 @@
   <ItemGroup>
     <Compile Include="crypto\AesGcm.cs" />
     <Compile Include="crypto\AesKeyWrap.cs" />
+    <Compile Include="jwe\IJweAlgorithm.cs" />
     <Compile Include="util\Arrays.cs" />
+    <Compile Include="util\Base64Url.cs" />
     <Compile Include="util\Compact.cs" />
     <Compile Include="crypto\ConcatKDF.cs" />
     <Compile Include="jwa\AesGcmKeyWrapManagement.cs" />
@@ -62,7 +64,6 @@
     <Compile Include="compression\DeflateCompression.cs" />
     <Compile Include="jwa\DirectKeyManagement.cs" />
     <Compile Include="compression\ICompression.cs" />
-    <Compile Include="compression\IJweAlgorithm.cs" />
     <Compile Include="jwa\IKeyManagement.cs" />
     <Compile Include="jwa\RsaKeyManagement.cs" />
     <Compile Include="jws\EcdsaUsingSha.cs" />

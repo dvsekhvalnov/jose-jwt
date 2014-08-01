@@ -11,7 +11,7 @@ namespace Jose
 
             foreach (var part in parts)
             {
-                builder.Append(Base64UrlEncode(part)).Append(".");
+                builder.Append(Base64Url.Encode(part)).Append(".");
             }
 
             builder.Remove(builder.Length - 1,1);
@@ -27,37 +27,10 @@ namespace Jose
 
             for (int i = 0; i < parts.Length; i++)
             {
-                result[i] = Base64UrlDecode(parts[i]);
+                result[i] = Base64Url.Decode(parts[i]);
             }
 
             return result;
         }
-
-        public static string Base64UrlEncode(byte[] input)
-        {
-            var output = Convert.ToBase64String(input);
-            output = output.Split('=')[0]; // Remove any trailing '='s
-            output = output.Replace('+', '-'); // 62nd char of encoding
-            output = output.Replace('/', '_'); // 63rd char of encoding
-            return output;
-        }
-
-        public static byte[] Base64UrlDecode(string input)
-        {
-            var output = input;
-            output = output.Replace('-', '+'); // 62nd char of encoding
-            output = output.Replace('_', '/'); // 63rd char of encoding
-            switch (output.Length % 4) // Pad with trailing '='s
-            {
-                case 0: break; // No pad chars in this case
-                case 2: output += "=="; break; // Two pad chars
-                case 3: output += "="; break; // One pad char
-                default: throw new System.Exception("Illegal base64url string!");
-            }
-            var converted = Convert.FromBase64String(output); // Standard base64 decoder
-            return converted;
-        }
-
-
     }
 }

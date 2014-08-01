@@ -137,7 +137,7 @@ namespace Jose
 
             builder.Remove(builder.Length - 1, 1);
             builder.Append("] Hex:[").Append(BitConverter.ToString(arr).Replace("-"," "));
-            builder.Append("] Base64:").Append(Convert.ToBase64String(arr)).Append("\n");
+            builder.Append("] Base64Url:").Append(Base64Url.Encode(arr)).Append("\n");
 
             Console.Out.WriteLine(builder.ToString());
         }        

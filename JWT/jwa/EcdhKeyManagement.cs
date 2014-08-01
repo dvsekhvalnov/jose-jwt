@@ -23,7 +23,7 @@ namespace Jose
             return new[] {cek, encryptedCek};
         }
 
-        public virtual byte[] NewKey(int keyLength, object key, IDictionary<string, object> header)
+        private byte[] NewKey(int keyLength, object key, IDictionary<string, object> header)
         {
             var recieverPubKey = Ensure.Type<CngKey>(key, "EcdhKeyManagement alg expects key to be of CngKey type.");
             
@@ -31,8 +31,8 @@ namespace Jose
 
             IDictionary<string, object> epk=new Dictionary<string, object>();
             epk["kty"] = "EC";
-            epk["x"] = Compact.Base64UrlEncode(ephemeral.X);
-            epk["y"] = Compact.Base64UrlEncode(ephemeral.Y);
+            epk["x"] = Base64Url.Encode(ephemeral.X);
+            epk["y"] = Base64Url.Encode(ephemeral.Y);
             epk["crv"] = Curve(recieverPubKey);
 
             header["epk"] = epk; 
@@ -56,8 +56,8 @@ namespace Jose
 
             Ensure.Contains(epk, new[] {"x","y","crv"}, "EcdhKeyManagement algorithm expects 'epk' key to contain 'x','y' and 'crv' fields.");
 
-            var x = Compact.Base64UrlDecode((string) epk["x"]);
-            var y = Compact.Base64UrlDecode((string) epk["y"]);
+            var x = Base64Url.Decode((string) epk["x"]);
+            var y = Base64Url.Decode((string) epk["y"]);
 
             var externalPublicKey = EccKey.New(x, y, usage: CngKeyUsages.KeyAgreement);
 

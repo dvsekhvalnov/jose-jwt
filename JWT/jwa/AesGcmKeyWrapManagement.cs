@@ -23,8 +23,8 @@ namespace Jose
 
             byte[][] cipherAndTag = AesGcm.Encrypt(sharedKey, iv, null, cek);
             
-            header["iv"] = Compact.Base64UrlEncode(iv);
-            header["tag"] = Compact.Base64UrlEncode(cipherAndTag[1]);
+            header["iv"] = Base64Url.Encode(iv);
+            header["tag"] = Base64Url.Encode(cipherAndTag[1]);
 
             return new[] {cek, cipherAndTag[0]};
         }
@@ -37,8 +37,8 @@ namespace Jose
             Ensure.Contains(header, new[] { "iv" }, "AesGcmKeyWrapManagement algorithm expects 'iv' param in JWT header, but was not found");
             Ensure.Contains(header, new[] { "tag" }, "AesGcmKeyWrapManagement algorithm expects 'tag' param in JWT header, but was not found");
 
-            byte[] iv = Compact.Base64UrlDecode((string) header["iv"]);
-            byte[] authTag = Compact.Base64UrlDecode((string) header["tag"]);
+            byte[] iv = Base64Url.Decode((string) header["iv"]);
+            byte[] authTag = Base64Url.Decode((string) header["tag"]);
 
             return AesGcm.Decrypt(sharedKey, iv, null, encryptedCek, authTag);
         }

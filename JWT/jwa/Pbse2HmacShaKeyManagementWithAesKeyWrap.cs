@@ -27,7 +27,7 @@ namespace Jose
             byte[] saltInput = Arrays.Random(96); //12 bytes
 
             header["p2c"] = iterationCount;
-            header["p2s"] = Compact.Base64UrlEncode(saltInput);
+            header["p2s"] = Base64Url.Encode(saltInput);
 
             byte[] salt = Arrays.Concat(algId, Arrays.Zero, saltInput);
 
@@ -52,7 +52,7 @@ namespace Jose
 
             byte[] algId=Encoding.UTF8.GetBytes((string) header["alg"]);
             int iterationCount=(int) header["p2c"];
-            byte[] saltInput = Compact.Base64UrlDecode((string) header["p2s"]);
+            byte[] saltInput = Base64Url.Decode((string) header["p2s"]);
 
             byte[] salt = Arrays.Concat(algId, Arrays.Zero, saltInput);
 

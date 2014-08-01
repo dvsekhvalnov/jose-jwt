@@ -1,5 +1,6 @@
 using System.IO;
 using System.Security.Cryptography;
+using Jose.jwe;
 
 namespace Jose
 {
