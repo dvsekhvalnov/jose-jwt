@@ -943,8 +943,7 @@ namespace UnitTests
             Assert.That(parts.Length, Is.EqualTo(5), "Make sure 5 parts");
             Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00iLCJ6aXAiOiJERUYifQ"), "Header is non-encrypted and static text");
             Assert.That(parts[1].Length, Is.EqualTo(342), "CEK size");
-            Assert.That(parts[2].Length, Is.EqualTo(16), "IV size, 96 bits");
-            Assert.That(parts[3].Length, Is.EqualTo(334), "cipher text size");
+            Assert.That(parts[2].Length, Is.EqualTo(16), "IV size, 96 bits");            
             Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
 
             Assert.That(Jose.JWT.Decode(token, PrivKey()),Is.EqualTo(json), "Make sure we are consistent with ourselfs");
@@ -2006,8 +2005,7 @@ namespace UnitTests
             Assert.That(parts.Length, Is.EqualTo(5), "Make sure 5 parts");
             Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiemlwIjoiREVGIn0"), "Header is non-encrypted and static text");
             Assert.That(parts[1].Length, Is.EqualTo(0), "CEK size");
-            Assert.That(parts[2].Length, Is.EqualTo(22), "IV size");
-            Assert.That(parts[3].Length, Is.EqualTo(342), "cipher text size");
+            Assert.That(parts[2].Length, Is.EqualTo(22), "IV size");            
             Assert.That(parts[4].Length, Is.EqualTo(43), "auth tag size");
 
             Assert.That(Jose.JWT.Decode(token, aes512Key), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
