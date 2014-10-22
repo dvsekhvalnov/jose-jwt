@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="crypto\AesGcm.cs" />
     <Compile Include="crypto\AesKeyWrap.cs" />
+    <Compile Include="crypto\RsaOaep.cs" />
     <Compile Include="jwe\IJweAlgorithm.cs" />
     <Compile Include="util\Arrays.cs" />
     <Compile Include="util\Base64Url.cs" />

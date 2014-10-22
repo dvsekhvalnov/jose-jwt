@@ -22,14 +22,14 @@ namespace Jose
                             uint derivedSecretByteSize;
                             uint status = NCrypt.NCryptDeriveKey(hSecretAgreement, "SP800_56A_CONCAT", parameters, null, 0, out derivedSecretByteSize, 0);
 
-                            if (status != 0x00000000)
+                            if (status != BCrypt.ERROR_SUCCESS)
                                 throw new CryptographicException(string.Format("NCrypt.NCryptDeriveKey() failed with status code:{0}", status));
 
-                            byte[] secretKey = new byte[derivedSecretByteSize];
+                            var secretKey = new byte[derivedSecretByteSize];
 
                             status = NCrypt.NCryptDeriveKey(hSecretAgreement, "SP800_56A_CONCAT", parameters, secretKey, derivedSecretByteSize, out derivedSecretByteSize, 0);
 
-                            if (status != 0x00000000)
+                            if (status != BCrypt.ERROR_SUCCESS)
                                 throw new CryptographicException(string.Format("NCrypt.NCryptDeriveKey() failed with status code:{0}", status));
 
                             return Arrays.LeftmostBits(secretKey, keyBitLength);

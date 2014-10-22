@@ -26,6 +26,7 @@ namespace Jose
     {
         RSA1_5, //RSAES with PKCS #1 v1.5 padding, RFC 3447
         RSA_OAEP, //RSAES using Optimal Assymetric Encryption Padding, RFC 3447
+        RSA_OAEP_256, //RSAES with SHA-256 using Optimal Assymetric Encryption Padding, RFC 3447
         DIR, //Direct use of pre-shared symmetric key
         A128KW, //AES Key Wrap Algorithm using 128 bit keys, RFC 3394
         A192KW, //AES Key Wrap Algorithm using 192 bit keys, RFC 3394
@@ -140,6 +141,7 @@ namespace Jose
             KeyAlgorithms = new Dictionary<JweAlgorithm, IKeyManagement>
             {
                 { JweAlgorithm.RSA_OAEP, new RsaKeyManagement(true) },
+                { JweAlgorithm.RSA_OAEP_256, new RsaKeyManagement(true,true) },
                 { JweAlgorithm.RSA1_5, new RsaKeyManagement(false) },
                 { JweAlgorithm.DIR, new DirectKeyManagement() },
                 { JweAlgorithm.A128KW, new AesKeyWrapManagement(128) },
@@ -159,6 +161,7 @@ namespace Jose
 
             JweAlgorithms[JweAlgorithm.RSA1_5] = "RSA1_5";
             JweAlgorithms[JweAlgorithm.RSA_OAEP] = "RSA-OAEP";
+            JweAlgorithms[JweAlgorithm.RSA_OAEP_256] = "RSA-OAEP-256";
             JweAlgorithms[JweAlgorithm.DIR] = "dir";
             JweAlgorithms[JweAlgorithm.A128KW] = "A128KW";
             JweAlgorithms[JweAlgorithm.A192KW] = "A192KW";
