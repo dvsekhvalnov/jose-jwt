@@ -4,6 +4,9 @@ Minimallistic zero-dependency library for generating, decoding and encryption [J
 of [JSON Web Algorithms](https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-31) as of July 4, 2014 version. JSON parsing agnostic, can plug any desired JSON processing library. 
 Extensively tested for compatibility with [jose.4.j](https://bitbucket.org/b_c/jose4j/wiki/Home), [Nimbus-JOSE-JWT](https://bitbucket.org/nimbusds/nimbus-jose-jwt/wiki/Home) and [json-jwt](https://github.com/nov/json-jwt) libraries.
 
+
+* WinRT compatible version (Windows 8.1 and Windows Phone 8.1) is avaliable here: [JoseRT](https://github.com/dvsekhvalnov/jose-rt).
+
 ## Foreword
 Originally forked from https://github.com/johnsheehan/jwt . Almost re-written from scratch to support JWT encryption capabilities and unified interface for encoding/decoding/encryption 
 and other features.
