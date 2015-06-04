@@ -52,194 +52,219 @@ Grab source and compile yourself.
 
 ## Usage
 ### Creating Plaintext (unprotected) Tokens
-	var payload = new Dictionary<string, object>() 
-	{
-	    { "sub", "mr.x@contoso.com" },
-	    { "exp", 1300819380 }
-	};
+```C#
+var payload = new Dictionary<string, object>() 
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
 
-	string token = Jose.JWT.Encode(payload, null, JwsAlgorithm.none);
+string token = Jose.JWT.Encode(payload, null, JwsAlgorithm.none);
+```
 
 ### Creating signed Tokens
 #### HS-\* family
 HS256, HS384, HS512 signatures require `byte[]` array key of corresponding length
 
-    var payload = new Dictionary<string, object>() 
-    {
-        { "sub", "mr.x@contoso.com" },
-        { "exp", 1300819380 }
-    };
-	
-    var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
+```C#
+var payload = new Dictionary<string, object>() 
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
 
-    string token=Jose.JWT.Encode(json, secretKey, JwsAlgorithm.HS256);
+var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
 
+string token=Jose.JWT.Encode(json, secretKey, JwsAlgorithm.HS256);
+```
 #### RS-\* and PS-\* family
 RS256, RS384, RS512 and PS256, PS384, PS512 signatures require `RSACryptoServiceProvider` (usually private) key of corresponding length. CSP need to be forced to use Microsoft Enhanced RSA and AES Cryptographic Provider.
 Which usually can be done be re-importing RSAParameters. See http://clrsecurity.codeplex.com/discussions/243156 for details.
 
-    var payload = new Dictionary<string, object>() 
-    {
-        { "sub", "mr.x@contoso.com" },
-        { "exp", 1300819380 }
-    };
-	
-    var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet).PrivateKey as RSACryptoServiceProvider;
+```C#
+var payload = new Dictionary<string, object>() 
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
 
-    string token=Jose.JWT.Encode(json, privateKey, JwsAlgorithm.RS256);
+var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet).PrivateKey as RSACryptoServiceProvider;
+
+string token=Jose.JWT.Encode(json, privateKey, JwsAlgorithm.RS256);
+```
 
 #### ES-\*  family
 ES256, ES384, ES256 ECDSA signatures requires `CngKey` (usually private) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
 But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,d)`.
 
-    var payload = new Dictionary<string, object>() 
-    {
-        { "sub", "mr.x@contoso.com" },
-        { "exp", 1300819380 }
-    };
-	
-    byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
-    byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
-    byte[] d = { 42, 148, 231, 48, 225, 196, 166, 201, 23, 190, 229, 199, 20, 39, 226, 70, 209, 148, 29, 70, 125, 14, 174, 66, 9, 198, 80, 251, 95, 107, 98, 206 };
+```C#
+var payload = new Dictionary<string, object>() 
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
 
-    var privateKey=EccKey.New(x, y, d);
+byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+byte[] d = { 42, 148, 231, 48, 225, 196, 166, 201, 23, 190, 229, 199, 20, 39, 226, 70, 209, 148, 29, 70, 125, 14, 174, 66, 9, 198, 80, 251, 95, 107, 98, 206 };
 
-    string token=Jose.JWT.Encode(json, privateKey, JwsAlgorithm.ES256);
+var privateKey=EccKey.New(x, y, d);
+
+string token=Jose.JWT.Encode(json, privateKey, JwsAlgorithm.ES256);
+```
 
 ### Creating encrypted Tokens
 #### RSA-\* key management family of algorithms
 RSA-OAEP-256, RSA-OAEP and RSA1_5 key management requires `RSACryptoServiceProvider` (usually public) key of corresponding length.
 
-    var payload = new Dictionary<string, object>() 
-    {
-        { "sub", "mr.x@contoso.com" },
-        { "exp", 1300819380 }
-    };
-	
-    var publicKey=new X509Certificate2("my-key.p12", "password").PublicKey.Key as RSACryptoServiceProvider;
+```C#
+var payload = new Dictionary<string, object>() 
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
 
-    string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM);
+var publicKey=new X509Certificate2("my-key.p12", "password").PublicKey.Key as RSACryptoServiceProvider;
 
+string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM);
+```
 
 #### DIR direct pre-shared symmetric key family of algorithms 
 Direct key management with pre-shared symmetric keys requires `byte[]` array key of corresponding length
 
-    var payload = new Dictionary<string, object>() 
-    {
-        { "sub", "mr.x@contoso.com" },
-        { "exp", 1300819380 }
-    };
-  	
-    var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
+```C#
+var payload = new Dictionary<string, object>() 
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
 
-    string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.DIR, JweEncryption.A128CBC_HS256);
+var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
+
+string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.DIR, JweEncryption.A128CBC_HS256);
+```
 
 #### AES Key Wrap key management family of algorithms
 AES128KW, AES192KW and AES256KW key management requires `byte[]` array key of corresponding length
 
-    var payload = new Dictionary<string, object>() 
-    {
-        { "sub", "mr.x@contoso.com" },
-        { "exp", 1300819380 }
-    };
-  	
-    var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
+```C#
+var payload = new Dictionary<string, object>() 
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
 
-    string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
+var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
+
+string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
+```
 
 #### AES GCM Key Wrap key management family of algorithms
 AES128GCMKW, AES192GCMKW and AES256GCMKW key management requires `byte[]` array key of corresponding length
 
-    var payload = new Dictionary<string, object>() 
-    {
-        { "sub", "mr.x@contoso.com" },
-        { "exp", 1300819380 }
-    };
-  	
-    var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
+```C#
+var payload = new Dictionary<string, object>() 
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
 
-    string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.A256GCMKW, JweEncryption.A256CBC_HS512);
+var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
 
+string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.A256GCMKW, JweEncryption.A256CBC_HS512);
+```
 
 #### ECDH-ES and ECDH-ES with AES Key Wrap key management family of algorithms
 ECDH-ES and ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW key management requires `CngKey` (usually public) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
 But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,usage:CngKeyUsages.KeyAgreement)`.
 
-    var payload = new Dictionary<string, object>() 
-    {
-        { "sub", "mr.x@contoso.com" },
-        { "exp", 1300819380 }
-    };
-  	
-    byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
-    byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+```C#
+var payload = new Dictionary<string, object>() 
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
 
-    var publicKey=EccKey.New(x, y, usage:CngKeyUsages.KeyAgreement);
+byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
 
-    string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.ECDH_ES, JweEncryption.A256GCM);
+var publicKey=EccKey.New(x, y, usage:CngKeyUsages.KeyAgreement);
+
+string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.ECDH_ES, JweEncryption.A256GCM);
+```
 
 #### PBES2 using HMAC SHA with AES Key Wrap key management family of algorithms
 PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW key management requires `string` passphrase from which key will be derived 
 
-    var payload = new Dictionary<string, object>() 
-    {
-        { "sub", "mr.x@contoso.com" },
-        { "exp", 1300819380 }
-    };  	
+```C#
+var payload = new Dictionary<string, object>() 
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};  	
 
-    string token = Jose.JWT.Encode(json, "top secret", JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
-
+string token = Jose.JWT.Encode(json, "top secret", JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
+```
 
 #### Optional compressing payload before encrypting
 Optional DEFLATE compression is supported
 
-    var payload = new Dictionary<string, object>() 
-    {
-        { "sub", "mr.x@contoso.com" },
-        { "exp", 1300819380 }
-    };
-	
-    var publicKey=new X509Certificate2("my-key.p12", "password").PublicKey.Key as RSACryptoServiceProvider;
+```C#
+var payload = new Dictionary<string, object>() 
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
 
-    string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.RSA1_5, JweEncryption.A128CBC_HS256, JweCompression.DEF);
+var publicKey=new X509Certificate2("my-key.p12", "password").PublicKey.Key as RSACryptoServiceProvider;
+
+string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.RSA1_5, JweEncryption.A128CBC_HS256, JweCompression.DEF);
+```
 
 ### Verifying and Decoding Tokens
 Decoding json web tokens is fully symmetric to creating signed or encrypted tokens:
 
 **HS256, HS384, HS512** signatures, **A128KW, A192KW, A256KW**, **A128GCMKW, A192GCMKW, A256GCMKW** and **DIR** key management algorithms expects `byte[]` array key
 
-    string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..Fmz3PLVfv-ySl4IJ.LMZpXMDoBIll5yuEs81Bws2-iUUaBSpucJPL-GtDKXkPhFpJmES2T136Vd8xzvp-3JW-fvpRZtlhluqGHjywPctol71Zuz9uFQjuejIU4axA_XiAy-BadbRUm1-25FRT30WtrrxKltSkulmIS5N-Nsi_zmCz5xicB1ZnzneRXGaXY4B444_IHxGBIS_wdurPAN0OEGw4xIi2DAD1Ikc99a90L7rUZfbHNg_iTBr-OshZqDbR6C5KhmMgk5KqDJEN8Ik-Yw.Jbk8ZmO901fqECYVPKOAzg";
+```C#
+string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..Fmz3PLVfv-ySl4IJ.LMZpXMDoBIll5yuEs81Bws2-iUUaBSpucJPL-GtDKXkPhFpJmES2T136Vd8xzvp-3JW-fvpRZtlhluqGHjywPctol71Zuz9uFQjuejIU4axA_XiAy-BadbRUm1-25FRT30WtrrxKltSkulmIS5N-Nsi_zmCz5xicB1ZnzneRXGaXY4B444_IHxGBIS_wdurPAN0OEGw4xIi2DAD1Ikc99a90L7rUZfbHNg_iTBr-OshZqDbR6C5KhmMgk5KqDJEN8Ik-Yw.Jbk8ZmO901fqECYVPKOAzg";
 
-    byte[] secretKey=new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
+byte[] secretKey=new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
 
-    string json = Jose.JWT.Decode(token, secretKey);
+string json = Jose.JWT.Decode(token, secretKey);
+```
 
 **RS256, RS384, RS512**, **PS256, PS384, PS512** signatures and **RSA-OAEP-256**, **RSA-OAEP, RSA1_5** key management algorthms expects `RSACryptoServiceProvider` as a key, public/private is asymmetric to encoding:
 
-    string token = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bx_4TL7gh14IeM3EClP3iVfY9pbT81pflXd1lEZOVPJR6PaewRFXWmiJcaqH9fcU9IjGGQ19BS-UPtpErenL5kw7KORFgIBm4hObCYxLoAadMy8A-qQeOWyjnxbE0mbQIdoFI4nGK5qWTEQUWZCMwosvyeHLqEZDzr9CNLAAFTujvsZJJ7NLTkA0cTUzz64b57uSvMTaOK6j7Ap9ZaAgF2uaqBdZ1NzqofLeU4XYCG8pWc5Qd-Ri_1KsksjaDHk12ZU4vKIJWJ-puEnpXBLoHuko92BnN8_LXx4sfDdK7wRiXk0LU_iwoT5zb1ro7KaM0hcfidWoz95vfhPhACIsXQ.YcVAPLJ061gvPpVB-zMm4A.PveUBLejLzMjA4tViHTRXbYnxMHFu8W2ECwj9b6sF2u2azi0TbxxMhs65j-t3qm-8EKBJM7LKIlkAtQ1XBeZl4zuTeMFxsQ0VShQfwlN2r8dPFgUzb4f_MzBuFFYfP5hBs-jugm89l2ZTj8oAOOSpAlC7uTmwha3dNaDOzlJniqAl_729q5EvSjaYXMtaET9wSTNSDfMUVFcMERbB50VOhc134JDUVPTuriD0rd4tQm8Do8obFKtFeZ5l3jT73-f1tPZwZ6CmFVxUMh6gSdY5A.tR8bNx9WErquthpWZBeMaw";
+```C#
+string token = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bx_4TL7gh14IeM3EClP3iVfY9pbT81pflXd1lEZOVPJR6PaewRFXWmiJcaqH9fcU9IjGGQ19BS-UPtpErenL5kw7KORFgIBm4hObCYxLoAadMy8A-qQeOWyjnxbE0mbQIdoFI4nGK5qWTEQUWZCMwosvyeHLqEZDzr9CNLAAFTujvsZJJ7NLTkA0cTUzz64b57uSvMTaOK6j7Ap9ZaAgF2uaqBdZ1NzqofLeU4XYCG8pWc5Qd-Ri_1KsksjaDHk12ZU4vKIJWJ-puEnpXBLoHuko92BnN8_LXx4sfDdK7wRiXk0LU_iwoT5zb1ro7KaM0hcfidWoz95vfhPhACIsXQ.YcVAPLJ061gvPpVB-zMm4A.PveUBLejLzMjA4tViHTRXbYnxMHFu8W2ECwj9b6sF2u2azi0TbxxMhs65j-t3qm-8EKBJM7LKIlkAtQ1XBeZl4zuTeMFxsQ0VShQfwlN2r8dPFgUzb4f_MzBuFFYfP5hBs-jugm89l2ZTj8oAOOSpAlC7uTmwha3dNaDOzlJniqAl_729q5EvSjaYXMtaET9wSTNSDfMUVFcMERbB50VOhc134JDUVPTuriD0rd4tQm8Do8obFKtFeZ5l3jT73-f1tPZwZ6CmFVxUMh6gSdY5A.tR8bNx9WErquthpWZBeMaw";
 
-    var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet).PrivateKey as RSACryptoServiceProvider;
+var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet).PrivateKey as RSACryptoServiceProvider;
 
-    string json = Jose.JWT.Decode(token,privateKey);
+string json = Jose.JWT.Decode(token,privateKey);
+```
 
 **ES256, ES284, ES512** signatures, **ECDH-ES** and **ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW** key management algorithms expects `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
 sure correct `usage:` value is set. `CngKeyUsages.KeyAgreement` for ECDH-ES and `CngKeyUsages.Signing` for ES-* (default value, can be ommited).
 
-    string token = "eyJhbGciOiJFUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.EVnmDMlz-oi05AQzts-R3aqWvaBlwVZddWkmaaHyMx5Phb2NSLgyI0kccpgjjAyo1S5KCB3LIMPfmxCX_obMKA";
+```C#
+string token = "eyJhbGciOiJFUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.EVnmDMlz-oi05AQzts-R3aqWvaBlwVZddWkmaaHyMx5Phb2NSLgyI0kccpgjjAyo1S5KCB3LIMPfmxCX_obMKA";
 
-    byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
-    byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
 
-    var publicKey=EccKey.New(x, y);
+var publicKey=EccKey.New(x, y);
 
-    string json = Jose.JWT.Decode(token,publicKey);
+string json = Jose.JWT.Decode(token,publicKey);
+```
 
 **PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW** key management algorithms expects `string` passpharase as a key
 
-    string token = "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwicDJjIjo4MTkyLCJwMnMiOiJiMFlFVmxMemtaNW9UUjBMIn0.dhPAhJ9kmaEbP-02VtEoPOF2QSEYM5085V6zYt1U1qIlVNRcHTGDgQ.4QAAq0dVQT41dQKDG7dhRA.H9MgJmesbU1ow6GCa0lEMwv8A_sHvgaWKkaMcdoj_z6O8LaMSgquxA-G85R_5hEILnHUnFllNJ48oJY7VmAJw0BQW73dMnn58u161S6Ftq7Mjxxq7bcksWvFTVtG5RsqqYSol5BZz5xm8Fcj-y5BMYMvrsCyQhYdeGEHkAvwzRdvZ8pGMsU2XPzl6GqxGjjuRh2vApAeNrj6MwKuD-k6AR0MH46EiNkVCmMkd2w8CNAXjJe9z97zky93xbxlOLozaC3NBRO2Q4bmdGdRg5y4Ew.xNqRi0ouQd7uo5UrPraedg";
+```C#
+string token = "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwicDJjIjo4MTkyLCJwMnMiOiJiMFlFVmxMemtaNW9UUjBMIn0.dhPAhJ9kmaEbP-02VtEoPOF2QSEYM5085V6zYt1U1qIlVNRcHTGDgQ.4QAAq0dVQT41dQKDG7dhRA.H9MgJmesbU1ow6GCa0lEMwv8A_sHvgaWKkaMcdoj_z6O8LaMSgquxA-G85R_5hEILnHUnFllNJ48oJY7VmAJw0BQW73dMnn58u161S6Ftq7Mjxxq7bcksWvFTVtG5RsqqYSol5BZz5xm8Fcj-y5BMYMvrsCyQhYdeGEHkAvwzRdvZ8pGMsU2XPzl6GqxGjjuRh2vApAeNrj6MwKuD-k6AR0MH46EiNkVCmMkd2w8CNAXjJe9z97zky93xbxlOLozaC3NBRO2Q4bmdGdRg5y4Ew.xNqRi0ouQd7uo5UrPraedg";
 
-    string json = Jose.JWT.Decode(token, "top secret");
-
+string json = Jose.JWT.Decode(token, "top secret");
+```
 
 ### Adding extra headers
 jose-jwt allows to pass extra headers when encoding token to overide deafault values<sup>\*</sup>. `extraHeaders:` named param can be used, it accepts `IDictionary<string, object>` type. 
@@ -254,12 +279,11 @@ var payload = new Dictionary<string, object>()
   
 var headers = new Dictionary<string, object>() 
 {
-     { "type", "JWT" },
+     { "typ", "JWT" },
      { "cty", "JWT" },
      { "keyid", "111-222-333"}
 };
 
-	
 var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
 
 string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.A256GCMKW, JweEncryption.A256CBC_HS512, extraHeaders: headers);
@@ -272,10 +296,9 @@ var payload = new Dictionary<string, object>()
     { "exp", 1300819380 }
 };
 	
-
 var headers = new Dictionary<string, object>() 
 {
-     { "type", "JWT" },
+     { "typ", "JWT" },
      { "cty", "JWT" },
      { "keyid", "111-222-333"}
 };
@@ -290,10 +313,11 @@ string token=Jose.JWT.Encode(json, privateKey, JwsAlgorithm.RS256, extraHeaders:
 ### Parsing and mapping json to object model directly
 jose-jwt library is agnostic about object model used to represent json payload as well as underlying framework used to serialize/parse json objects. Library provides convinient generic methods to work directly with your object model:
 
-    MyDomainObject obj=Jose.JWT.Decode<MyDomainObject>(token,secretKey); //will invoke configured IJsonMapper to perform parsing/mapping of content to MyDomainObject 
+```C#
+MyDomainObject obj=Jose.JWT.Decode<MyDomainObject>(token,secretKey); //will invoke configured IJsonMapper to perform parsing/mapping of content to MyDomainObject 
 
-    string data=Jose.JWT.Encode(obj,secrectKey,JwsAlgorithm.HS256); //for object argument configured IJsonMapper will be invoked to serialize object to json string before encoding
-
+string data=Jose.JWT.Encode(obj,secrectKey,JwsAlgorithm.HS256); //for object argument configured IJsonMapper will be invoked to serialize object to json string before encoding
+```
 
 ### Customizing json <-> object parsing & mapping
 The library provides simple `Jose.IJsonMapper` interface to plug any json processing library or customize default behavior. The only requirement for mapping implementations
@@ -303,50 +327,52 @@ The default supplied `Jose.IJsonMapper` implementation is based on `System.Web.S
 
 #### Example of Newtonsoft.Json mapper
 
-    public class NewtonsoftMapper : IJsonMapper
+```C#
+public class NewtonsoftMapper : IJsonMapper
+{
+    public string Serialize(object obj)
     {
-        public string Serialize(object obj)
-        {
-             var settings = new JsonSerializerSettings
-             {
-             	ContractResolver = new DictionaryKeysResolver(),
-             	NullValueHandling = NullValueHandling.Ignore,                                                              
-             };
+         var settings = new JsonSerializerSettings
+         {
+         	ContractResolver = new DictionaryKeysResolver(),
+         	NullValueHandling = NullValueHandling.Ignore,                                                              
+         };
 
-            return JsonConvert.SerializeObject(obj, Formatting.Indented, settings);		
-        }
-
-        public T Parse<T>(string json)
-        {
-            var settings = new JsonSerializerSettings
-            {
-                ContractResolver = new DictionaryKeysResolver(),
-                NullValueHandling = NullValueHandling.Ignore,
-            };
-
-            return JsonConvert.DeserializeObject<T>(json, settings);
-        }
+        return JsonConvert.SerializeObject(obj, Formatting.Indented, settings);		
     }
 
-    Jose.JWT.JsonMapper = new NewtonsoftMapper();
+    public T Parse<T>(string json)
+    {
+        var settings = new JsonSerializerSettings
+        {
+            ContractResolver = new DictionaryKeysResolver(),
+            NullValueHandling = NullValueHandling.Ignore,
+        };
+
+        return JsonConvert.DeserializeObject<T>(json, settings);
+    }
+}
+
+Jose.JWT.JsonMapper = new NewtonsoftMapper();
+```
 
 #### Example of ServiceStack mapper
-
-    public class ServiceStackMapper : IJsonMapper
+```C#
+public class ServiceStackMapper : IJsonMapper
+{
+    public string Serialize(object obj)
     {
-        public string Serialize(object obj)
-        {
-            return ServiceStack.Text.JsonSerializer.SerializeToString(obj);
-        }
-
-        public T Parse<T>(string json)
-        {
-            return ServiceStack.Text.JsonSerializer.DeserializeFromString<T>(json);
-        }
+        return ServiceStack.Text.JsonSerializer.SerializeToString(obj);
     }
 
-    Jose.JWT.JsonMapper = new ServiceStackMapper();
+    public T Parse<T>(string json)
+    {
+        return ServiceStack.Text.JsonSerializer.DeserializeFromString<T>(json);
+    }
+}
 
+Jose.JWT.JsonMapper = new ServiceStackMapper();
+```
 
 ### More examples
 Checkout UnitTests\TestSuite.cs for more examples.
