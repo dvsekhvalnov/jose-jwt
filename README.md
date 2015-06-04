@@ -241,6 +241,52 @@ sure correct `usage:` value is set. `CngKeyUsages.KeyAgreement` for ECDH-ES and 
     string json = Jose.JWT.Decode(token, "top secret");
 
 
+### Adding extra headers
+jose-jwt allows to pass extra headers when encoding token to overide deafault values<sup>\*</sup>. `extraHeaders:` named param can be used, it accepts `IDictionary<string, object>` type. 
+jose-jwt is NOT allow to override `alg` and `enc` headers .
+
+```C#
+var payload = new Dictionary<string, object>() 
+{
+     { "sub", "mr.x@contoso.com" },
+     { "exp", 1300819380 }
+};
+  
+var headers = new Dictionary<string, object>() 
+{
+     { "type", "JWT" },
+     { "cty", "JWT" },
+     { "keyid", "111-222-333"}
+};
+
+	
+var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
+
+string token = Jose.JWT.Encode(json, secretKey, JweAlgorithm.A256GCMKW, JweEncryption.A256CBC_HS512, extraHeaders: headers);
+```
+
+```C#
+var payload = new Dictionary<string, object>() 
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
+	
+
+var headers = new Dictionary<string, object>() 
+{
+     { "type", "JWT" },
+     { "cty", "JWT" },
+     { "keyid", "111-222-333"}
+};
+
+var publicKey=new X509Certificate2("my-key.p12", "password").PublicKey.Key as RSACryptoServiceProvider;
+
+string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM);
+```
+
+\* For backwards compatibility signing uses pre-configured `typ: 'JWT'` header by default. 
+
 ### Parsing and mapping json to object model directly
 jose-jwt library is agnostic about object model used to represent json payload as well as underlying framework used to serialize/parse json objects. Library provides convinient generic methods to work directly with your object model:
 
