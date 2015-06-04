@@ -191,9 +191,9 @@ namespace Jose
         /// <param name="payload">json string to encode</param>
         /// <param name="key">key for encryption, suitable for provided JWS algorithm, can be null.</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
-        public static string Encode(object payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null)
+        public static string Encode(object payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null)
         {
-            return Encode(jsMapper.Serialize(payload), key, alg, enc);
+            return Encode(jsMapper.Serialize(payload), key, alg, enc, compression, extraHeaders);
         }
 
         /// <summary>
@@ -203,14 +203,16 @@ namespace Jose
         /// <param name="payload">json string to encode (not null or whitespace)</param>
         /// <param name="key">key for encryption, suitable for provided JWS algorithm, can be null.</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
-        public static string Encode(string payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression=null)
+        public static string Encode(string payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null)
         {
             Ensure.IsNotEmpty(payload, "Payload expected to be not empty, whitespace or null.");
 
             IKeyManagement keys = KeyAlgorithms[alg];
             IJweAlgorithm _enc = EncAlgorithms[enc];
 
-            var jwtHeader = new Dictionary<string, object> { { "alg", JweAlgorithms[alg] }, { "enc", JweEncryptionMethods[enc] } };
+            IDictionary<string, object> jwtHeader = new Dictionary<string, object> { { "alg", JweAlgorithms[alg] }, { "enc", JweEncryptionMethods[enc] } };
+
+            Dictionaries.Append(jwtHeader, extraHeaders);
 
             byte[][] contentKeys = keys.WrapNewKey(_enc.KeySize, key, jwtHeader);
             byte[] cek = contentKeys[0];
@@ -238,9 +240,9 @@ namespace Jose
         /// <param name="payload">object to map to json string and encode</param>
         /// <param name="key">key for signing, suitable for provided JWS algorithm, can be null.</param>
         /// <returns>JWT in compact serialization form, digitally signed.</returns>
-        public static string Encode(object payload, object key, JwsAlgorithm algorithm)
+        public static string Encode(object payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null)
         {
-            return Encode(jsMapper.Serialize(payload), key, algorithm);
+            return Encode(jsMapper.Serialize(payload), key, algorithm, extraHeaders);
         }
 
         /// <summary>
@@ -249,11 +251,18 @@ namespace Jose
         /// <param name="payload">json string to encode (not null or whitespace)</param>
         /// <param name="key">key for signing, suitable for provided JWS algorithm, can be null.</param>
         /// <returns>JWT in compact serialization form, digitally signed.</returns>
-        public static string Encode(string payload, object key, JwsAlgorithm algorithm)
+        public static string Encode(string payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null)
         {
             Ensure.IsNotEmpty(payload, "Payload expected to be not empty, whitespace or null.");
 
-            var jwtHeader = new Dictionary<string,object> { {"typ", "JWT"}, { "alg", JwsAlgorithms[algorithm]} }; 
+            if(extraHeaders == null) //allow overload, but keep backward compatible defaults
+            {
+                extraHeaders = new Dictionary<string, object>{ {"typ", "JWT"} };
+            }
+
+            var jwtHeader = new Dictionary<string,object> { { "alg", JwsAlgorithms[algorithm]} };
+
+            Dictionaries.Append(jwtHeader, extraHeaders);
 
             byte[] headerBytes = Encoding.UTF8.GetBytes(jsMapper.Serialize(jwtHeader));
             byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);

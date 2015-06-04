@@ -43,12 +43,12 @@ namespace UnitTests
                                 hello="world"
                               };
             //when
-            string hashed = Jose.JWT.Encode(payload, null, JwsAlgorithm.none);
+            string token = Jose.JWT.Encode(payload, null, JwsAlgorithm.none);
 
-            Console.Out.WriteLine(hashed);
+            Console.Out.WriteLine("Plaintext:" + token);
 
             //then
-            Assert.That(hashed,Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJoZWxsbyI6IndvcmxkIn0."));
+            Assert.That(token,Is.EqualTo("eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0."));
         }
 
         [Test]
@@ -253,7 +253,7 @@ namespace UnitTests
             string[] parts = token.Split('.');
 
             Assert.That(parts.Length, Is.EqualTo(3), "Make sure 3 parts");
-            Assert.That(parts[0], Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJQUzI1NiJ9"), "Header is non-encrypted and static text");
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJQUzI1NiIsInR5cCI6IkpXVCJ9"), "Header is non-encrypted and static text");
             Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
             Assert.That(parts[2].Length, Is.EqualTo(342), "signature size");
 
@@ -277,7 +277,7 @@ namespace UnitTests
             string[] parts = token.Split('.');
 
             Assert.That(parts.Length, Is.EqualTo(3), "Make sure 3 parts");
-            Assert.That(parts[0], Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJQUzM4NCJ9"), "Header is non-encrypted and static text");
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJQUzM4NCIsInR5cCI6IkpXVCJ9"), "Header is non-encrypted and static text");
             Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
             Assert.That(parts[2].Length, Is.EqualTo(342), "signature size");
 
@@ -301,7 +301,7 @@ namespace UnitTests
             string[] parts = token.Split('.');
 
             Assert.That(parts.Length, Is.EqualTo(3), "Make sure 3 parts");
-            Assert.That(parts[0], Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJQUzUxMiJ9"), "Header is non-encrypted and static text");
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJQUzUxMiIsInR5cCI6IkpXVCJ9"), "Header is non-encrypted and static text");
             Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
             Assert.That(parts[2].Length, Is.EqualTo(342), "signature size");
 
@@ -320,7 +320,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("hashed = {0}", token);
 
-            Assert.That(token, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.KmLWPfxC3JGopWImDgYg9IUpgAi8gwimviUfr6eJyFI"));
+            Assert.That(token, Is.EqualTo("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.VleAUqv_-nc6dwZ9xQ8-4NiOpVRdSSrCCPCQl-7HQ2k"));
             Assert.That(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), Is.EqualTo(json), "Make sure we are consistent with ourselves");
         }
 
@@ -336,7 +336,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("HS384 = {0}", token);
 
-            Assert.That(token, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzM4NCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.Be1KYCRGFbv0uQwelaRj0a5SYDdbk_sYsXkfrbRI6TmYpuWBga_RsiU2TyyyjoXR"));
+            Assert.That(token, Is.EqualTo("eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.VjsBP04wkLVQ9SXqN0qe-J7FHQPGhnMAXnQvVEUdDh8wsvWNEN4wVlSkGuWIIk-b"));
             Assert.That(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), Is.EqualTo(json), "Make sure we are consistent with ourselves");
         }
 
@@ -352,7 +352,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("HS512 = {0}", token);
 
-            Assert.That(token, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9._1m5AmI1xbSfVpykAm9PMXYuQLIdqWuRN8Lz6hFMDq0beqLAaH4Dh2VQNlXzoBG7Nk4vHx2gZgVuhF62cnXcKQ"));
+            Assert.That(token, Is.EqualTo("eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.IIif-Hyd8cS2_oqRb_3PzL7IwoIcPUVl_BVvOr6QbJT_x15RyNy2m_tFfUcm6lriqfAnOudqpyN-yylAXu1eFw"));
             Assert.That(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), Is.EqualTo(json), "Make sure we are consistent with ourselves");
         }
 
@@ -368,7 +368,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("RS256 = {0}", test);
 
-            Assert.That(test, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.M3uJ9g4_e_lCyd0LtSJuSPMHe_s0Bj6LDA2kqf041SA3Les8aUmRQGlkG3ng63Thw6q06hF6r5bXX8tamku8AOyc45TIfPY9caNKKcVJ6RtXBxRWSY3r3Uh9o5zg3EOElfMWuekz0jfVfOaRgMO358ARsKW5BY6jfgmKsVyG1n3uYm8ESpzPlWWLcgUEjUSq3_m5t-COKySXa_zPPtFnA__159kSKCQRm4OcbYWzJD3-xl2i2GRQFLP7npLAuGPv42t5zf8snJvBWbROsdvvs7qzZ5v6bJy8wuBe9mGXmnbRsMFCzooZQ4H8LFrSnT3DakPVdLcDWE5HxZ-Ikr9l0A"));
+            Assert.That(test, Is.EqualTo("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.AzXfyb6BuwLgNUqVkfiKeQRctG25u3-5DJIsGyDnFxOGTet74SjW6Aabm3LSXZ2HgQ5yp8_tCfqA12oDmPiviq4muhgc0LKujTpGtFlf0fcSJQJpxSTMGQZdZnxdKpz7dCSlQNvW6j1tGy1UWkXod-kf4FZckoDkGEbnRAVVVL7xRupFtLneUJGoWZCiMz5oYAoYMUY1bVil1S6lIwUJLtgsvrQMoVIcjlivjZ8fzF3tjQdInxCjYeOKD3WQ2-n3APg-1GEJT-l_2y-scbE55TPSxo9fpHoDn7G0Kcgl8wpjY4j3KR9dEa4unJN3necd83yCMOUzs6vmFncEMTrRZw"));
             Assert.That(Jose.JWT.Decode(test,PubKey()),Is.EqualTo(json),"Make sure we are consistent with outselfs.");
         }
 
@@ -384,7 +384,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("RS384 = {0}", token);
 
-            Assert.That(token, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzM4NCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.Tsq02ZIAOOK8ck0NS7VJ2NOmL6VpATGTb5hVUQC9_DJqiyrp2Vs8KGw9ahRjvIQMElkcFuWRPg-MGgHd7XUPVbhm7jK3cBvQ4y9hal6VNFfsL_DWhijLYgFpBj2nEw_qqZbChrPNRn-B1BrMKuRHOqu-7D3PPPMv9hvSg80WOLlkOUgIhp3a64saPJ8rDEibowdNNXw0k0H2i1D6WLK59Ew-6v6qO8OI9bkVc7SDV9qZSx3n0hm_JfyZbkCb-KKacJnkfVcnlNIRXRbk7cdlp90uYJ1aJDZrcIVTUOOAHQCQ4uaGwxhmH_NNHiY-sjWybP7xQCSq-Ip0yNVstWfUTQ"));
+            Assert.That(token, Is.EqualTo("eyJhbGciOiJSUzM4NCIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.UW4uZuwV8UCFieKAX0IansM0u4-mYfarpim9JKD792an-HcSaq7inyI9GLt-iYflG0M_DmovC8QrjU4mP2FtWYR-Jnu4Ms467TreeDM4KOHSpPYOmdTG2N78L3JsXVZYEibHt5GHBzWUXqEnSthvSq-RHJsOXNjNVJACK2IWXc_PKvIbTVhoukZX_ejfA4B5ynEPax7Bt5mlyf9tSadfIGh1g29sm0hslPcZ9OKbwjvxWb17CdFy4gLq1bqvf7XnroeJGerYSXvbiOjulYizRXWBeDg5VKiEZWyyNt1rc9w_GNIIpY8B17jx6I0_hh_gjSMTTQoKqOp6Q2FWg7ZgLg"));
             Assert.That(Jose.JWT.Decode(token, PubKey()), Is.EqualTo(json), "Make sure we are consistent with ourselves");
         }
 
@@ -400,7 +400,29 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("RS512 = {0}", token);
 
-            Assert.That(token, Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzUxMiJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.YJ_5bDkZUgZj1ZoyTbSeYerUnahjt4Llbj6IwUQUY-zH_mMpywJHs2IT8wteUyX32lCCGr4NfNKpkC-zMMq7aDsklSKIg8sdGYDMheGsEw9YD0QRBF1Ovt4yuSZjWsgmdGSapXKc8CBqSzPCr9S1Rns8YhVHAYMfzHrahXuroYK35gVPQKKLbYQGcwnhpgvxMx0EfGyFbSc6r6XYK-fJ5lSqBh4wSxVMBy_5CkTVWpmnDjRuycE_j4c-yuTYUEAsj5o0sW2ahPf8aomBUC5I1ZG2yTAz8BX7dud6s2VPJQRRsUKlMNrUcMGEooJMoL_vmek9z3t_z9KFyyVHuY5XUA"));
+            Assert.That(token, Is.EqualTo("eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.EkP4VYlDO9a0ycFt6e_vSFwfI5MICvDqLCNFI779lodbs92EwBtxgzoYdgqz8E8H1ZtWEnyULsc7TkwgV-1xj_wbWVLDvQxjZ4wQfGaQBjD5yO9RTxwReWab3mtfixh7pPKi7lpmuO65sWBVnco2p1RXGsM7KtHjToRIFxu9ncA7YYdQ7i-YL1HcUHjjOc95NJzDyfqkwnaD10Wq7GM4XAixZFYYNDaz2nP7Gt8DwvEvFhtP2iPxeK3_AqhQ4T3B2GgcIDnNCjhETtx4oal-gZzujMEbrMx7ea_jdS5QpKv0EEiA2Ppv0-_4dDKELCwhmBuYzHZIGbSJUFMC_fKVqw"));
+            Assert.That(Jose.JWT.Decode(token, PubKey()), Is.EqualTo(json), "Make sure we are consistent with ourselves");
+        }
+
+        [Test]
+        public void EncodeRS512_ExtraHeaders()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            var headers = new Dictionary<string, object>
+            {
+                {"typ", "JWT"},
+                {"keyid", "111-222-333"}
+            };
+
+            //when
+            string token=Jose.JWT.Encode(json, PrivKey(), JwsAlgorithm.RS512, extraHeaders: headers);
+
+            //then
+            Console.Out.WriteLine("RS512 (extra headers) = {0}", token);
+
+            Assert.That(token, Is.EqualTo("eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCIsImtleWlkIjoiMTExLTIyMi0zMzMifQ.eyJoZWxsbyI6ICJ3b3JsZCJ9.Ca6ESMOSM2O45xJtwmZqMACihVTKk0GJQA4tCP3GUIu3r7kZzhZzqwPQ369-e8N0QKfvrjJ5ZpIlHGoeut44FMYFGVNtv4M7CbzPWyIdCeubwH2vkJwBaPs-ztA9aVng4kH3BjdckBtMGRmNKkk9IWjlEMi0RboPOuCpUHcTZ8Z99jocQ6GSKii-vT0YT0wa3U6weSqIojq_h0saMb2XzzTRnXzN2YmsJiiuNksRgaL8BKva2Qxk6fbYqdXXBeTsFZUtdZ30-wYciAbUvT29Z21RZSDCiDzCJtYTOv08zAqyAN3v6ZwpJ53VM4e_ANZtjyeog4xtoUXTg9FGhbuy_g"));
             Assert.That(Jose.JWT.Decode(token, PubKey()), Is.EqualTo(json), "Make sure we are consistent with ourselves");
         }
 
@@ -419,7 +441,7 @@ namespace UnitTests
             string[] parts = token.Split('.');
 
             Assert.That(parts.Length, Is.EqualTo(3), "Make sure 3 parts");
-            Assert.That(parts[0], Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9"), "Header is non-encrypted and static text");
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9"), "Header is non-encrypted and static text");
             Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
             Assert.That(parts[2].Length, Is.EqualTo(86), "signature size");
 
@@ -441,7 +463,7 @@ namespace UnitTests
             string[] parts = token.Split('.');
 
             Assert.That(parts.Length, Is.EqualTo(3), "Make sure 3 parts");
-            Assert.That(parts[0], Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzM4NCJ9"), "Header is non-encrypted and static text");
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJFUzM4NCIsInR5cCI6IkpXVCJ9"), "Header is non-encrypted and static text");
             Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
             Assert.That(parts[2].Length, Is.EqualTo(128), "signature size");
 
@@ -463,7 +485,7 @@ namespace UnitTests
             string[] parts = token.Split('.');
 
             Assert.That(parts.Length, Is.EqualTo(3), "Make sure 3 parts");
-            Assert.That(parts[0], Is.EqualTo("eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzUxMiJ9"), "Header is non-encrypted and static text");
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJFUzUxMiIsInR5cCI6IkpXVCJ9"), "Header is non-encrypted and static text");
             Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
             Assert.That(parts[2].Length, Is.EqualTo(176), "signature size");
 
@@ -1067,6 +1089,37 @@ namespace UnitTests
 
             Assert.That(Jose.JWT.Decode(token, PrivKey()),Is.EqualTo(json), "Make sure we are consistent with ourselfs");
         }
+
+        [Test]
+        public void Encrypt_RSA_OAEP_A128GCM_ExtraHeaders()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            var extra = new Dictionary<string, object>
+                            {
+                                {"cty", "JWT"},
+                                {"keyid","123-456"}
+                            };
+
+            //when
+            string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A128GCM, extraHeaders: extra);
+
+            //then
+            Console.Out.WriteLine("RSA_OAEP_256_A128GCM={0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5), "Make sure 5 parts");
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhHQ00iLCJjdHkiOiJKV1QiLCJrZXlpZCI6IjEyMy00NTYifQ"), "Header is non-encrypted and static text");
+            Assert.That(parts[1].Length, Is.EqualTo(342), "CEK size");
+            Assert.That(parts[2].Length, Is.EqualTo(16), "IV size");
+            Assert.That(parts[3].Length, Is.EqualTo(24), "cipher text size");
+            Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
+
+            Assert.That(Jose.JWT.Decode(token, PrivKey()), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+        }
+
 
         [Test]
         public void Encrypt_RSA1_5_A128GCM()

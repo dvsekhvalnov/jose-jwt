@@ -57,6 +57,7 @@
     <Compile Include="crypto\PBKDF2.cs" />
     <Compile Include="crypto\RsaPss.cs" />
     <Compile Include="Security\Cryptography\EccKey.cs" />
+    <Compile Include="util\Dictionaries.cs" />
     <Compile Include="util\Ensure.cs" />
     <Compile Include="json\IJsonMapper.cs" />
     <Compile Include="json\JSSerializerMapper.cs" />
