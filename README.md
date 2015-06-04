@@ -280,9 +280,9 @@ var headers = new Dictionary<string, object>()
      { "keyid", "111-222-333"}
 };
 
-var publicKey=new X509Certificate2("my-key.p12", "password").PublicKey.Key as RSACryptoServiceProvider;
+var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet).PrivateKey as RSACryptoServiceProvider;
 
-string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM, extraHeaders: headers);
+string token=Jose.JWT.Encode(json, privateKey, JwsAlgorithm.RS256, extraHeaders: headers);
 ```
 
 \* For backwards compatibility signing uses pre-configured `typ: 'JWT'` header by default. 
