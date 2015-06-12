@@ -2184,18 +2184,51 @@ namespace UnitTests
         }
 
         [Test]
-        public void RsaKeyImport()
+        public void Headers()
         {
             //given
-            CngKey pk = RsaKey.New(PrivKey().ExportParameters(true));
+            string token =
+                "eyJhbGciOiJIUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.chIoYWrQMA8XL5nFz6oLDJyvgHk2KA4BrFGrKymjC8E";
 
-            Console.Out.WriteLine("key = {0}", pk);
-
-            CngKey pub = RsaKey.New(PubKey().ExportParameters(false));
-
-            Console.Out.WriteLine("pub = {0}", pub);
             //when
+            var test = Jose.JWT.Headers(token);
+
             //then
+            Assert.That(test.Count, Is.EqualTo(2));
+            Assert.That(test["alg"], Is.EqualTo("HS256"));
+            Assert.That(test["cty"], Is.EqualTo("text/plain"));
+        }
+
+        [Test]
+        public void Payload()
+        {
+            //given
+            string token =
+                "eyJhbGciOiJIUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.chIoYWrQMA8XL5nFz6oLDJyvgHk2KA4BrFGrKymjC8E";
+
+            //when
+            var test = Jose.JWT.Payload(token);
+
+            //then
+            Assert.That(test, Is.EqualTo(@"{""hello"": ""world""}"));           
+        }
+
+        [Test]        
+        public void PayloadOfEncryptedTOken()
+        {
+            //given
+            string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0..ZD93XtD7TOa2WMbqSuaY9g.1J5BAuxNRMWaw43s7hR82gqLiaZOHBmfD3_B9k4I2VIDKzS9oEF_NS2o7UIBa6t_fWHU7vDm9lNAN4rqq7OvtCBHJpFk31dcruQHxwYKn5xNefG7YP-o6QtpyNioNWJpaSD5VRcRO5ufRrw2bu4_nOth00yJU5jjN3O3n9f-0ewrN2UXDJIbZM-NiSuEDEgOVHImQXoOtOQd0BuaDx6xTJydw_rW5-_wtiOH2k-3YGlibfOWNu51kApGarRsAhhqKIPetYf5Mgmpv1bkUo6HJw.nVpOmg3Sxri0rh6nQXaIx5X0fBtCt7Kscg6c66NugHY";
+
+            //when
+            try
+            {
+                var test = JWT.Payload(token);
+                Assert.Fail("JoseException was expected, but got:{0}", test);
+            }
+            catch (JoseException e)
+            {
+                Console.WriteLine(e);
+            }
         }
 
         #region test utils

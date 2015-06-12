@@ -186,6 +186,66 @@ namespace Jose
         }
 
         /// <summary>
+        /// Parses JWT token, extracts and unmarshall headers as IDictionary<string, object>.
+        /// This method is NOT performing integrity checking. 
+        /// </summary>        
+        /// <param name="token">signed JWT token</param>
+        /// <returns>unmarshalled headers</returns>        
+        public static IDictionary<string, object> Headers(string token)
+        {
+            return Headers<IDictionary<string, object>>(token);
+        }
+
+        /// <summary>
+        /// Parses JWT token, extracts and attempst to unmarshall headers to requested type
+        /// This method is NOT performing integrity checking. 
+        /// </summary>        
+        /// <param name="token">signed JWT token</param>
+        /// <typeparam name="T">desired type after unmarshalling</typeparam>
+        /// <returns>unmarshalled headers</returns>        
+        public static T Headers<T>(string token)
+        {
+            byte[][] parts = Compact.Parse(token);
+
+            return jsMapper.Parse<T>(Encoding.UTF8.GetString(parts[0]));
+        }
+
+        /// <summary>
+        /// Parses signed JWT token, extracts and returns payload part as string 
+        /// This method is NOT supported for encrypted JWT tokens.
+        /// This method is NOT performing integrity checking. 
+        /// </summary>        
+        /// <param name="token">signed JWT token</param>
+        /// <returns>unmarshalled payload</returns>
+        /// <exception cref="JoseException">if encrypted JWT token is provided</exception>        
+        public static string Payload(string token)
+        {
+            byte[][] parts = Compact.Parse(token);
+
+            if(parts.Length > 3)
+            {
+                throw new JoseException(
+                    "Getting payload for encrypted tokens is not supported. Please use Jose.JWT.Decode() method instead.");
+            }
+
+            return Encoding.UTF8.GetString(parts[1]);            
+        }
+
+        /// <summary>
+        /// Parses signed JWT token, extracts payload part and attempts to unmarshall string to requested type with configured json mapper.
+        /// This method is NOT supported for encrypted JWT tokens.
+        /// This method is NOT performing integrity checking. 
+        /// </summary>
+        /// <typeparam name="T">desired type after unmarshalling</typeparam>
+        /// <param name="token">signed JWT token</param>
+        /// <returns>unmarshalled payload</returns>
+        /// <exception cref="JoseException">if encrypted JWT token is provided</exception>
+        public static T Payload<T>(string token)
+        {
+            return jsMapper.Parse<T>(Payload(token));            
+        }
+
+        /// <summary>
         /// Serialize and encodes object to JWT token and applies requested encryption/compression algorithms.        
         /// </summary>
         /// <param name="payload">json string to encode</param>

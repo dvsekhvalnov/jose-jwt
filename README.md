@@ -266,6 +266,8 @@ string token = "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2
 string json = Jose.JWT.Decode(token, "top secret");
 ```
 
+## Additional utilities:
+
 ### Adding extra headers
 jose-jwt allows to pass extra headers when encoding token to overide deafault values<sup>\*</sup>. `extraHeaders:` named param can be used, it accepts `IDictionary<string, object>` type. 
 jose-jwt is NOT allow to override `alg` and `enc` headers .
@@ -309,6 +311,43 @@ string token=Jose.JWT.Encode(json, privateKey, JwsAlgorithm.RS256, extraHeaders:
 ```
 
 \* For backwards compatibility signing uses pre-configured `typ: 'JWT'` header by default. 
+
+### Two-phase validation
+In some cases validation (decoding) key can be unknown prior to examining token content. For instance one can use different keys per token issuer or rely on headers information to determine which key to use,
+do logging or other things.
+
+jose-jwt provides helpers method to examine token content without performing actual integrity validation or decryption. 
+
+`IDictionary<string, object> Jose.JWT.Headers(String token)` to return header information as dictionary and `T Headers<T>(string token)` to return headers information as
+unmarshalled type.
+
+`string Jose.JWT.Payload(string token)` to return unparsed payload and `T Payload<T>(string token)` to return unmarshalled payload type. Those 2 methods works only with
+signed tokens and will throw `JoseException` when applied on encrypted token.
+
+*Security warning: please note, you should NOT rely on infromation extracted by given helpers without performing token validation as second step. *
+
+Below are couple examples on how two-phase validation can be implemented with jose-jwt:
+```C#
+//step 1: get headers info
+var headers = Jose.JWT.Headers(token);
+
+//step 1: lookup validation key based on header info
+var key = FindKey(headers["keyid"]);
+
+//step 2: perform actual token validation
+var payload = Jose.JWT.Decode(token, key);
+```
+
+```C#
+//step 1: get payload as custom JwtToken object
+var jwt = Jose.JWT.Payload<JwtToken>(token);
+
+//step 1: lookup validation key based on issuer
+var key = FindKeyByIssuer(jwt.Iss);
+
+//step 2: perform actual token validation
+var payload = Jose.JWT.Decode<JwtToken>(token, key);
+```
 
 ### Parsing and mapping json to object model directly
 jose-jwt library is agnostic about object model used to represent json payload as well as underlying framework used to serialize/parse json objects. Library provides convinient generic methods to work directly with your object model:
