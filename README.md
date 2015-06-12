@@ -318,20 +318,20 @@ do logging or other things.
 
 jose-jwt provides helpers method to examine token content without performing actual integrity validation or decryption. 
 
-`IDictionary<string, object> Jose.JWT.Headers(String token)` to return header information as dictionary and `T Headers<T>(string token)` to return headers information as
+`IDictionary<string, object> Jose.JWT.Headers(String token)` to return header information as dictionary and `T Jose.JWT.Headers<T>(string token)` to return headers information as
 unmarshalled type.
 
-`string Jose.JWT.Payload(string token)` to return unparsed payload and `T Payload<T>(string token)` to return unmarshalled payload type. Those 2 methods works only with
+`string Jose.JWT.Payload(string token)` to return unparsed payload and `T Jose.JWT.Payload<T>(string token)` to return unmarshalled payload type. Those 2 methods works only with
 signed tokens and will throw `JoseException` when applied on encrypted token.
 
-*Security warning: please note, you should NOT rely on infromation extracted by given helpers without performing token validation as second step. *
+**Security warning: please note, you should NOT rely on infromation extracted by given helpers without performing token validation as second step.**
 
 Below are couple examples on how two-phase validation can be implemented with jose-jwt:
 ```C#
-//step 1: get headers info
+//step 1a: get headers info
 var headers = Jose.JWT.Headers(token);
 
-//step 1: lookup validation key based on header info
+//step 1b: lookup validation key based on header info
 var key = FindKey(headers["keyid"]);
 
 //step 2: perform actual token validation
@@ -339,10 +339,10 @@ var payload = Jose.JWT.Decode(token, key);
 ```
 
 ```C#
-//step 1: get payload as custom JwtToken object
+//step 1a: get payload as custom JwtToken object
 var jwt = Jose.JWT.Payload<JwtToken>(token);
 
-//step 1: lookup validation key based on issuer
+//step 1b: lookup validation key based on issuer
 var key = FindKeyByIssuer(jwt.Iss);
 
 //step 2: perform actual token validation
