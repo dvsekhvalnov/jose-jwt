@@ -266,7 +266,7 @@ string token = "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2
 string json = Jose.JWT.Decode(token, "top secret");
 ```
 
-## Additional utilities:
+## Additional utilities
 
 ### Adding extra headers
 jose-jwt allows to pass extra headers when encoding token to overide deafault values<sup>\*</sup>. `extraHeaders:` named param can be used, it accepts `IDictionary<string, object>` type. 
@@ -316,7 +316,7 @@ string token=Jose.JWT.Encode(json, privateKey, JwsAlgorithm.RS256, extraHeaders:
 In some cases validation (decoding) key can be unknown prior to examining token content. For instance one can use different keys per token issuer or rely on headers information to determine which key to use,
 do logging or other things.
 
-jose-jwt provides helpers method to examine token content without performing actual integrity validation or decryption. 
+jose-jwt provides helper methods to examine token content without performing actual integrity validation or decryption. 
 
 `IDictionary<string, object> Jose.JWT.Headers(String token)` to return header information as dictionary and `T Jose.JWT.Headers<T>(string token)` to return headers information as
 unmarshalled type.
