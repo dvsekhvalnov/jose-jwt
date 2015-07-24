@@ -54,6 +54,7 @@
     <Compile Include="Base64UrlTest.cs" />
     <Compile Include="CompactTest.cs" />
     <Compile Include="ConcatKDFTest.cs" />
+    <Compile Include="DictionariesTest.cs" />
     <Compile Include="JSSerializeMapper.cs" />
     <Compile Include="PBKDF2Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

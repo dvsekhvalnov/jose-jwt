@@ -40,6 +40,7 @@
   <ItemGroup>
     <Compile Include="crypto\AesGcm.cs" />
     <Compile Include="crypto\AesKeyWrap.cs" />
+    <Compile Include="crypto\RsaOaep.cs" />
     <Compile Include="jwe\IJweAlgorithm.cs" />
     <Compile Include="util\Arrays.cs" />
     <Compile Include="util\Base64Url.cs" />
@@ -55,6 +56,7 @@
     <Compile Include="crypto\PBKDF2.cs" />
     <Compile Include="crypto\RsaPss.cs" />
     <Compile Include="Security\Cryptography\EccKey.cs" />
+    <Compile Include="util\Dictionaries.cs" />
     <Compile Include="util\Ensure.cs" />
     <Compile Include="json\IJsonMapper.cs" />
     <Compile Include="json\JSSerializerMapper.cs" />
@@ -75,9 +77,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\Cryptography\RsaKey.cs" />
     <Compile Include="util\Extensions.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
