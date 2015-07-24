@@ -26,6 +26,7 @@ namespace Jose
     {
         RSA1_5, //RSAES with PKCS #1 v1.5 padding, RFC 3447
         RSA_OAEP, //RSAES using Optimal Assymetric Encryption Padding, RFC 3447
+        RSA_OAEP_256, //RSAES with SHA-256 using Optimal Assymetric Encryption Padding, RFC 3447
         DIR, //Direct use of pre-shared symmetric key
         A128KW, //AES Key Wrap Algorithm using 128 bit keys, RFC 3394
         A192KW, //AES Key Wrap Algorithm using 192 bit keys, RFC 3394
@@ -140,6 +141,7 @@ namespace Jose
             KeyAlgorithms = new Dictionary<JweAlgorithm, IKeyManagement>
             {
                 { JweAlgorithm.RSA_OAEP, new RsaKeyManagement(true) },
+                { JweAlgorithm.RSA_OAEP_256, new RsaKeyManagement(true,true) },
                 { JweAlgorithm.RSA1_5, new RsaKeyManagement(false) },
                 { JweAlgorithm.DIR, new DirectKeyManagement() },
                 { JweAlgorithm.A128KW, new AesKeyWrapManagement(128) },
@@ -159,6 +161,7 @@ namespace Jose
 
             JweAlgorithms[JweAlgorithm.RSA1_5] = "RSA1_5";
             JweAlgorithms[JweAlgorithm.RSA_OAEP] = "RSA-OAEP";
+            JweAlgorithms[JweAlgorithm.RSA_OAEP_256] = "RSA-OAEP-256";
             JweAlgorithms[JweAlgorithm.DIR] = "dir";
             JweAlgorithms[JweAlgorithm.A128KW] = "A128KW";
             JweAlgorithms[JweAlgorithm.A192KW] = "A192KW";
@@ -183,14 +186,74 @@ namespace Jose
         }
 
         /// <summary>
+        /// Parses JWT token, extracts and unmarshall headers as IDictionary<string, object>.
+        /// This method is NOT performing integrity checking. 
+        /// </summary>        
+        /// <param name="token">signed JWT token</param>
+        /// <returns>unmarshalled headers</returns>        
+        public static IDictionary<string, object> Headers(string token)
+        {
+            return Headers<IDictionary<string, object>>(token);
+        }
+
+        /// <summary>
+        /// Parses JWT token, extracts and attempst to unmarshall headers to requested type
+        /// This method is NOT performing integrity checking. 
+        /// </summary>        
+        /// <param name="token">signed JWT token</param>
+        /// <typeparam name="T">desired type after unmarshalling</typeparam>
+        /// <returns>unmarshalled headers</returns>        
+        public static T Headers<T>(string token)
+        {
+            byte[][] parts = Compact.Parse(token);
+
+            return jsMapper.Parse<T>(Encoding.UTF8.GetString(parts[0]));
+        }
+
+        /// <summary>
+        /// Parses signed JWT token, extracts and returns payload part as string 
+        /// This method is NOT supported for encrypted JWT tokens.
+        /// This method is NOT performing integrity checking. 
+        /// </summary>        
+        /// <param name="token">signed JWT token</param>
+        /// <returns>unmarshalled payload</returns>
+        /// <exception cref="JoseException">if encrypted JWT token is provided</exception>        
+        public static string Payload(string token)
+        {
+            byte[][] parts = Compact.Parse(token);
+
+            if(parts.Length > 3)
+            {
+                throw new JoseException(
+                    "Getting payload for encrypted tokens is not supported. Please use Jose.JWT.Decode() method instead.");
+            }
+
+            return Encoding.UTF8.GetString(parts[1]);            
+        }
+
+        /// <summary>
+        /// Parses signed JWT token, extracts payload part and attempts to unmarshall string to requested type with configured json mapper.
+        /// This method is NOT supported for encrypted JWT tokens.
+        /// This method is NOT performing integrity checking. 
+        /// </summary>
+        /// <typeparam name="T">desired type after unmarshalling</typeparam>
+        /// <param name="token">signed JWT token</param>
+        /// <returns>unmarshalled payload</returns>
+        /// <exception cref="JoseException">if encrypted JWT token is provided</exception>
+        public static T Payload<T>(string token)
+        {
+            return jsMapper.Parse<T>(Payload(token));            
+        }
+
+        /// <summary>
         /// Serialize and encodes object to JWT token and applies requested encryption/compression algorithms.        
         /// </summary>
         /// <param name="payload">json string to encode</param>
         /// <param name="key">key for encryption, suitable for provided JWS algorithm, can be null.</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
-        public static string Encode(object payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null)
+        public static string Encode(object payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null)
         {
-            return Encode(jsMapper.Serialize(payload), key, alg, enc);
+            return Encode(jsMapper.Serialize(payload), key, alg, enc, compression, extraHeaders);
         }
 
         /// <summary>
@@ -200,14 +263,16 @@ namespace Jose
         /// <param name="payload">json string to encode (not null or whitespace)</param>
         /// <param name="key">key for encryption, suitable for provided JWS algorithm, can be null.</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
-        public static string Encode(string payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression=null)
+        public static string Encode(string payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null)
         {
             Ensure.IsNotEmpty(payload, "Payload expected to be not empty, whitespace or null.");
 
             IKeyManagement keys = KeyAlgorithms[alg];
             IJweAlgorithm _enc = EncAlgorithms[enc];
 
-            var jwtHeader = new Dictionary<string, object> { { "alg", JweAlgorithms[alg] }, { "enc", JweEncryptionMethods[enc] } };
+            IDictionary<string, object> jwtHeader = new Dictionary<string, object> { { "alg", JweAlgorithms[alg] }, { "enc", JweEncryptionMethods[enc] } };
+
+            Dictionaries.Append(jwtHeader, extraHeaders);
 
             byte[][] contentKeys = keys.WrapNewKey(_enc.KeySize, key, jwtHeader);
             byte[] cek = contentKeys[0];
@@ -235,9 +300,9 @@ namespace Jose
         /// <param name="payload">object to map to json string and encode</param>
         /// <param name="key">key for signing, suitable for provided JWS algorithm, can be null.</param>
         /// <returns>JWT in compact serialization form, digitally signed.</returns>
-        public static string Encode(object payload, object key, JwsAlgorithm algorithm)
+        public static string Encode(object payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null)
         {
-            return Encode(jsMapper.Serialize(payload), key, algorithm);
+            return Encode(jsMapper.Serialize(payload), key, algorithm, extraHeaders);
         }
 
         /// <summary>
@@ -246,11 +311,18 @@ namespace Jose
         /// <param name="payload">json string to encode (not null or whitespace)</param>
         /// <param name="key">key for signing, suitable for provided JWS algorithm, can be null.</param>
         /// <returns>JWT in compact serialization form, digitally signed.</returns>
-        public static string Encode(string payload, object key, JwsAlgorithm algorithm)
+        public static string Encode(string payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null)
         {
             Ensure.IsNotEmpty(payload, "Payload expected to be not empty, whitespace or null.");
 
-            var jwtHeader = new Dictionary<string,object> { {"typ", "JWT"}, { "alg", JwsAlgorithms[algorithm]} }; 
+            if(extraHeaders == null) //allow overload, but keep backward compatible defaults
+            {
+                extraHeaders = new Dictionary<string, object>{ {"typ", "JWT"} };
+            }
+
+            var jwtHeader = new Dictionary<string,object> { { "alg", JwsAlgorithms[algorithm]} };
+
+            Dictionaries.Append(jwtHeader, extraHeaders);
 
             byte[] headerBytes = Encoding.UTF8.GetBytes(jsMapper.Serialize(jwtHeader));
             byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);

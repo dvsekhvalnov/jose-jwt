@@ -7,6 +7,7 @@ namespace Jose.native
     {
         public const uint ERROR_SUCCESS = 0x00000000;
         public const uint BCRYPT_PAD_PSS = 8;
+        public const uint BCRYPT_PAD_OAEP = 4;
 
         public static readonly byte[] BCRYPT_KEY_DATA_BLOB_MAGIC = BitConverter.GetBytes(0x4d42444b);
 
@@ -16,6 +17,7 @@ namespace Jose.native
         public static readonly string BCRYPT_CHAINING_MODE = "ChainingMode";
         public static readonly string BCRYPT_KEY_DATA_BLOB = "KeyDataBlob";
         public static readonly string BCRYPT_AES_ALGORITHM = "AES";
+        
         public static readonly string MS_PRIMITIVE_PROVIDER = "Microsoft Primitive Provider";
 
         public static readonly int BCRYPT_AUTH_MODE_CHAIN_CALLS_FLAG = 0x00000001;
@@ -99,6 +101,22 @@ namespace Jose.native
             public int dwMinLength;
             public int dwMaxLength;
             public int dwIncrement;
+        }
+
+        [StructLayout(LayoutKind.Sequential)]
+        public struct BCRYPT_OAEP_PADDING_INFO
+        {
+            public BCRYPT_OAEP_PADDING_INFO(string alg) 
+            {
+                pszAlgId = alg;
+                pbLabel=IntPtr.Zero;
+                cbLabel = 0;
+            }
+
+            [MarshalAs(UnmanagedType.LPWStr)]
+            public string pszAlgId;
+            public IntPtr pbLabel;
+            public int cbLabel;
         }
 
         [DllImport("bcrypt.dll")]

@@ -34,7 +34,6 @@
     <Reference Include="nunit.framework">
       <HintPath>lib\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="Security.Cryptography, Version=1.6.0.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
@@ -51,6 +50,7 @@
     <Compile Include="Base64UrlTest.cs" />
     <Compile Include="CompactTest.cs" />
     <Compile Include="ConcatKDFTest.cs" />
+    <Compile Include="DictionariesTest.cs" />
     <Compile Include="PBKDF2Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestSuite.cs" />

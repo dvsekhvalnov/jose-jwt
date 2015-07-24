@@ -24,9 +24,9 @@ namespace Jose
 
         private static bool VerifyHash(byte[] hash, byte[] signature, CngKey key, string algorithm, int saltSize)
         {
-            var paddingIndo = new BCrypt.BCRYPT_PSS_PADDING_INFO(algorithm, saltSize);
+            var paddingInfo = new BCrypt.BCRYPT_PSS_PADDING_INFO(algorithm, saltSize);
 
-            uint status = NCrypt.NCryptVerifySignature(key.Handle, ref paddingIndo, hash, hash.Length, signature, signature.Length, BCrypt.BCRYPT_PAD_PSS);
+            uint status = NCrypt.NCryptVerifySignature(key.Handle, ref paddingInfo, hash, hash.Length, signature, signature.Length, BCrypt.BCRYPT_PAD_PSS);
 
             if (status == NCrypt.NTE_BAD_SIGNATURE) //honestly it always failing with NTE_INVALID_PARAMETER, but let's stick to public API
                 return false;
@@ -69,7 +69,7 @@ namespace Jose
             if (hash == CngAlgorithm.Sha512)
                 return new SHA512Cng();
 
-            throw new ArgumentException(string.Format("RsaPss expectes hash function to be SHA256, SHA384 or SHA512, but was given:{0}",hash));
+            throw new ArgumentException(string.Format("RsaPss expects hash function to be SHA256, SHA384 or SHA512, but was given:{0}",hash));
         }
     }
 }

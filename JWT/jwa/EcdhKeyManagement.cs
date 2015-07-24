@@ -67,8 +67,8 @@ namespace Jose
         private byte[] DeriveKey(IDictionary<string, object> header, int cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
         {
             byte[] enc = Encoding.UTF8.GetBytes((string) header[algIdHeader]);
-            byte[] apv = header.ContainsKey("apv") ? Convert.FromBase64String((string)header["apv"]) : Arrays.Empty;
-            byte[] apu = header.ContainsKey("apu") ? Convert.FromBase64String((string)header["apu"]) : Arrays.Empty;          
+            byte[] apv = header.ContainsKey("apv") ? Base64Url.Decode((string)header["apv"]) : Arrays.Empty;
+            byte[] apu = header.ContainsKey("apu") ? Base64Url.Decode((string)header["apu"]) : Arrays.Empty;          
 
             byte[] algorithmId = Arrays.Concat(Arrays.IntToBytes(enc.Length), enc);
             byte[] partyUInfo = Arrays.Concat(Arrays.IntToBytes(apu.Length), apu);

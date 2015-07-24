@@ -109,6 +109,24 @@ namespace Jose.native
                                                           int cbSignature,
                                                           uint dwFlags);
 
+        [DllImport("ncrypt.dll")]
+        internal static extern uint NCryptDecrypt(SafeNCryptKeyHandle hKey,
+                                                  byte[] pbInput,
+                                                  int cbInput,
+                                                  ref BCrypt.BCRYPT_OAEP_PADDING_INFO pvPadding,
+                                                  byte[] pbOutput,
+                                                  uint cbOutput,
+                                                  out uint pcbResult,
+                                                  uint dwFlags);
 
+        [DllImport("ncrypt.dll")]
+        internal static extern uint NCryptEncrypt(SafeNCryptKeyHandle hKey,
+                                                  byte[] pbInput,
+                                                  int cbInput,
+                                                  ref BCrypt.BCRYPT_OAEP_PADDING_INFO pvPadding,
+                                                  byte[] pbOutput,
+                                                  uint cbOutput,
+                                                  out uint pcbResult,
+                                                  uint dwFlags);
     }
 }
