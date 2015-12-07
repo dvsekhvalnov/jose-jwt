@@ -82,7 +82,7 @@ namespace Jose
 
         static JWT()
         {
-            JsonMapper = new JSSerializerMapper();
+            JsonMapper = new NewtonsoftMapper();
 
             HashAlgorithms = new Dictionary<JwsAlgorithm, IJwsAlgorithm>
             {

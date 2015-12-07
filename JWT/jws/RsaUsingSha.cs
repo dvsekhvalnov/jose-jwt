@@ -14,6 +14,7 @@ namespace Jose
 
         public byte[] Sign(byte[] securedInput, object key)
         {
+        #if DNX451  
             using (var sha = HashAlgorithm)
             {
                 var privateKey = Ensure.Type<AsymmetricAlgorithm>(key, "RsaUsingSha alg expects key to be of AsymmetricAlgorithm type."); 
@@ -22,11 +23,15 @@ namespace Jose
                 pkcs1.SetHashAlgorithm(hashMethod);
 
                 return pkcs1.CreateSignature(sha.ComputeHash(securedInput));                    
-            } 
+            }
+        #elif DNXCORE50
+            throw new NotImplementedException("not yet");
+        #endif
         }
 
         public bool Verify(byte[] signature, byte[] securedInput, object key)
         {
+        #if DNX451
             using (var sha = HashAlgorithm)
             {
                 var publicKey = Ensure.Type<AsymmetricAlgorithm>(key, "RsaUsingSha alg expects key to be of AsymmetricAlgorithm type."); 
@@ -38,12 +43,16 @@ namespace Jose
 
                 return pkcs1.VerifySignature(hash, signature);
             }
+        #elif DNXCORE50
+            throw new NotImplementedException("not yet");
+        #endif
         }
 
         private HashAlgorithm HashAlgorithm
-        {
+        {        
             get
             {
+            #if DNX451
                 if (hashMethod.Equals("SHA256"))
                     return new SHA256Managed();
                 if (hashMethod.Equals("SHA384"))
@@ -52,6 +61,9 @@ namespace Jose
                     return new SHA512Managed();
 
                 throw new ArgumentException("Unsupported hashing algorithm: '{0}'", hashMethod);
+            #elif DNXCORE50
+                throw new NotImplementedException("not yet");
+            #endif
             }
         }
     }

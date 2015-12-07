@@ -10,7 +10,7 @@ namespace Jose
         public readonly static byte[] Empty=new byte[0];
         public readonly static byte[] Zero = new byte[] { 0 };
 
-        private static RNGCryptoServiceProvider rng;
+        private static RandomNumberGenerator rng;
 
         public static byte[] SixtyFourBitLength(byte[] aad)
         {
@@ -123,7 +123,7 @@ namespace Jose
             return equals;
         }
 
-        public static void Dump(byte[] arr, string label = "")
+        public static string Dump(byte[] arr, string label = "")
         {
             var builder=new StringBuilder();
 
@@ -139,7 +139,7 @@ namespace Jose
             builder.Append("] Hex:[").Append(BitConverter.ToString(arr).Replace("-"," "));
             builder.Append("] Base64Url:").Append(Base64Url.Encode(arr)).Append("\n");
 
-            Console.Out.WriteLine(builder.ToString());
+            return builder.ToString();
         }        
 
         public static byte[] Random(int sizeBits=128)
@@ -151,9 +151,12 @@ namespace Jose
             return data;      
         }
 
-        internal static RNGCryptoServiceProvider RNG
-        {
-            get { return rng ?? (rng = new RNGCryptoServiceProvider()); }
+        internal static RandomNumberGenerator RNG
+        {        
+            get
+            {                            
+                return rng ?? (rng = RandomNumberGenerator.Create());
+            }
         }
 
         public static byte[] IntToBytes(int value)

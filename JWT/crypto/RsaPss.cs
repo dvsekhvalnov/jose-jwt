@@ -62,14 +62,19 @@ namespace Jose
 
         private static HashAlgorithm HashAlgorithm(CngAlgorithm hash)
         {
+        #if DNX451
             if (hash == CngAlgorithm.Sha256)
                 return new SHA256Cng();
             if (hash == CngAlgorithm.Sha384)
                 return new SHA384Cng();
             if (hash == CngAlgorithm.Sha512)
                 return new SHA512Cng();
-
+            
             throw new ArgumentException(string.Format("RsaPss expects hash function to be SHA256, SHA384 or SHA512, but was given:{0}",hash));
+            
+        #elif DNXCORE50
+            throw new NotImplementedException("not yet");
+        #endif
         }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using Jose.jwe;
@@ -18,6 +19,7 @@ namespace Jose
 
         public byte[][] Encrypt(byte[] aad, byte[] plainText, byte[] cek)
         {
+        #if DNX451
             Ensure.BitSize(cek, keyLength, string.Format("AES-CBC with HMAC algorithm expected key of size {0} bits, but was given {1} bits", keyLength, cek.Length * 8));
 
             byte[] hmacKey = Arrays.FirstHalf(cek);
@@ -57,10 +59,15 @@ namespace Jose
             byte[] authTag = ComputeAuthTag(aad, iv, cipherText, hmacKey);
 
             return new[] {iv, cipherText, authTag};
+
+        #elif DNXCORE50
+            throw new NotImplementedException("not yet");
+        #endif
         }
 
         public byte[] Decrypt(byte[] aad, byte[] cek, byte[] iv, byte[] cipherText, byte[] authTag)
         {
+        #if DNX451
             Ensure.BitSize(cek, keyLength, string.Format("AES-CBC with HMAC algorithm expected key of size {0} bits, but was given {1} bits", keyLength, cek.Length * 8));
 
             byte[] hmacKey = Arrays.FirstHalf(cek);
@@ -100,6 +107,9 @@ namespace Jose
             {
                 throw new EncryptionException("Unable to decrypt content", e);
             }
+        #elif DNXCORE50
+            throw new NotImplementedException("not yet");
+        #endif
         }
 
         public int KeySize

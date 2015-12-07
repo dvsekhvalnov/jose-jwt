@@ -14,6 +14,7 @@ namespace Jose
 
         public byte[] Sign(byte[] securedInput, object key)
         {
+        #if DNX451  
             var privateKey = Ensure.Type<CngKey>(key, "EcdsaUsingSha alg expects key to be of CngKey type.");
 
             Ensure.BitSize(privateKey.KeySize, keySize, string.Format("ECDSA algorithm expected key of size {0} bits, but was given {1} bits", keySize, privateKey.KeySize));
@@ -31,10 +32,15 @@ namespace Jose
             {
                 throw new JoseException("Unable to sign content.", e);    
             }
+
+        #elif DNXCORE50
+            throw new NotImplementedException("not yet");
+        #endif
         }
 
         public bool Verify(byte[] signature, byte[] securedInput, object key)
         {
+        #if DNX451
             var publicKey = Ensure.Type<CngKey>(key, "EcdsaUsingSha alg expects key to be of CngKey type.");
 
             Ensure.BitSize(publicKey.KeySize, keySize, string.Format("ECDSA algorithm expected key of size {0} bits, but was given {1} bits", keySize, publicKey.KeySize));
@@ -52,6 +58,9 @@ namespace Jose
             {
                 return false;
             }
+        #elif DNXCORE50
+            throw new NotImplementedException("not yet");
+        #endif
         }
 
         protected CngAlgorithm Hash

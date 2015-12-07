@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Security.Cryptography;
 
@@ -78,12 +79,13 @@ namespace Jose
 
         private static byte[] AesDec(byte[] sharedKey, byte[] cipherText)
         {
+        #if DNX451
             using (Aes aes = new AesManaged())
             {
                 aes.Key = sharedKey;
                 aes.Mode = CipherMode.ECB;
                 aes.Padding = PaddingMode.None;
-
+                
                 using (MemoryStream ms = new MemoryStream())
                 {
                     using (ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV))
@@ -98,10 +100,14 @@ namespace Jose
                     }
                 }
             }
+        #elif DNXCORE50
+            throw new NotImplementedException("not yet");
+        #endif
         }
 
         private static byte[] AesEnc(byte[] sharedKey, byte[] plainText)
         {
+        #if DNX451
             using (Aes aes = new AesManaged())
             {
                 aes.Key = sharedKey;
@@ -122,9 +128,9 @@ namespace Jose
                     }
                 }
             }
+        #elif DNXCORE50
+            throw new NotImplementedException("not yet");
+        #endif
         }
-
-
-
     }
 }

@@ -1,18 +1,14 @@
-using System;
-using System.Diagnostics;
-using System.IO;
 using System.Text;
 using Jose;
-using NUnit.Framework;
+using Xunit;
 
 namespace UnitTests
 {
-    [TestFixture]
     public class AesGcmTest
     {
         private byte[] aes128Key = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
 
-        [Test]
+        [Fact]
         public void Encrypt()
         {
             //given
@@ -24,11 +20,11 @@ namespace UnitTests
             byte[][] test=AesGcm.Encrypt(aes128Key, iv, aad, text);
 
             //then  
-            Assert.That(test[0], Is.EqualTo(new byte[] { 245, 242, 160, 166, 250, 62, 102, 211, 158, 42, 62, 73 }));
-            Assert.That(test[1], Is.EqualTo(new byte[] { 195, 69, 216, 140, 118, 58, 48, 131, 47, 225, 205, 198, 78, 12, 180, 76 }));
+            Assert.Equal(test[0], new byte[] { 245, 242, 160, 166, 250, 62, 102, 211, 158, 42, 62, 73 });
+            Assert.Equal(test[1], new byte[] { 195, 69, 216, 140, 118, 58, 48, 131, 47, 225, 205, 198, 78, 12, 180, 76 });
         }
 
-        [Test]
+        [Fact]
         public void Decrypt()
         {
             //given
@@ -41,7 +37,7 @@ namespace UnitTests
             byte[] test=AesGcm.Decrypt(aes128Key, iv, aad, cipher, tag);
 
             //then
-            Assert.That(test, Is.EqualTo(Encoding.UTF8.GetBytes("decrypt me")));
+            Assert.Equal(test, Encoding.UTF8.GetBytes("decrypt me"));
         }
     }
 }

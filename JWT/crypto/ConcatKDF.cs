@@ -1,3 +1,4 @@
+using System;
 using System.Security.Cryptography;
 using Jose.native;
 using Microsoft.Win32.SafeHandles;
@@ -8,6 +9,7 @@ namespace Jose
     {
         public static byte[] DeriveKey(CngKey externalPubKey, CngKey privateKey, int keyBitLength, byte[] algorithmId, byte[] partyVInfo, byte[] partyUInfo, byte[] suppPubInfo)
         {
+        #if DNX451
             using (var cng = new ECDiffieHellmanCng(privateKey))
             {
                 using (SafeNCryptSecretHandle hSecretAgreement = cng.DeriveSecretAgreementHandle(externalPubKey))
@@ -32,12 +34,14 @@ namespace Jose
                             if (status != BCrypt.ERROR_SUCCESS)
                                 throw new CryptographicException(string.Format("NCrypt.NCryptDeriveKey() failed with status code:{0}", status));
 
-                            return Arrays.LeftmostBits(secretKey, keyBitLength);
+                            return Arrays.LeftmostBits(secretKey, keyBitLength);                            
                         }
                     }
                 }
-            }            
-
+            }
+        #elif DNXCORE50
+            throw new NotImplementedException("not yet");
+        #endif
         }
     }
 }

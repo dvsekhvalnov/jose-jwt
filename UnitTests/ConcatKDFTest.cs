@@ -1,16 +1,14 @@
-using System;
 using System.Security.Cryptography;
-using System.Text;
 using Jose;
-using NUnit.Framework;
 using Security.Cryptography;
+
+using Xunit;
 
 namespace UnitTests
 {
-    [TestFixture]
     public class ConcatKDFTest
     {
-        [Test]
+        [Fact]
         public void Derive128BitKey()
         {
             // https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-23#appendix-C
@@ -34,7 +32,7 @@ namespace UnitTests
             string test = Base64Url.Encode(key);
 
             //then
-            Assert.That(test, Is.EqualTo("VqqN6vgjbSBcIijNcacQGg"));
+            Assert.Equal(test, "VqqN6vgjbSBcIijNcacQGg");
         }
     }
 }
