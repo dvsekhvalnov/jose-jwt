@@ -3,11 +3,16 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "JWT", "JWT\JWT.xproj", "{E449D0E1-AEFE-4610-B506-72815C4D3570}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "jose-jwt", "JWT\jose-jwt.xproj", "{E449D0E1-AEFE-4610-B506-72815C4D3570}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "UnitTests", "UnitTests\UnitTests.xproj", "{594D3BE3-8464-424D-B434-0BF35BB709B4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{E449D0E1-AEFE-4610-B506-72815C4D3570} = {E449D0E1-AEFE-4610-B506-72815C4D3570}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0E33B96D-ADDA-46F8-8A73-323CC6A507D5}"
+	ProjectSection(SolutionItems) = preProject
+		JWT\global.json = JWT\global.json
 	EndProjectSection
 EndProject
 Global
