@@ -3,7 +3,7 @@
   "version": 2,
   "targets": {
     "DNX,Version=v4.5.1": {
-      "JWT/2.0.0": {
+      "jose-jwt/2.0.0": {
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "dependencies": {
@@ -269,7 +269,7 @@
       }
     },
     "DNXCore,Version=v5.0": {
-      "JWT/2.0.0": {
+      "jose-jwt/2.0.0": {
         "type": "project",
         "framework": "DNXCore,Version=v5.0",
         "dependencies": {
@@ -1346,7 +1346,7 @@
       }
     },
     "DNX,Version=v4.5.1/win7-x86": {
-      "JWT/2.0.0": {
+      "jose-jwt/2.0.0": {
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "dependencies": {
@@ -1627,7 +1627,7 @@
       }
     },
     "DNX,Version=v4.5.1/win7-x64": {
-      "JWT/2.0.0": {
+      "jose-jwt/2.0.0": {
         "type": "project",
         "framework": "DNX,Version=v4.5.1",
         "dependencies": {
@@ -1908,7 +1908,7 @@
       }
     },
     "DNXCore,Version=v5.0/win7-x86": {
-      "JWT/2.0.0": {
+      "jose-jwt/2.0.0": {
         "type": "project",
         "framework": "DNXCore,Version=v5.0",
         "dependencies": {
@@ -2197,28 +2197,6 @@
           "runtimes/win7/lib/dotnet/System.Diagnostics.TraceSource.dll": {}
         }
       },
-      "runtime.win7.System.IO.Compression/4.0.1-beta-23409": {
-        "type": "package",
-        "dependencies": {
-          "System.Collections": "4.0.10",
-          "System.Diagnostics.Debug": "4.0.10",
-          "System.IO": "4.0.10",
-          "System.Resources.ResourceManager": "4.0.0",
-          "System.Runtime": "4.0.20",
-          "System.Runtime.Extensions": "4.0.10",
-          "System.Runtime.Handles": "4.0.0",
-          "System.Runtime.InteropServices": "4.0.20",
-          "System.Text.Encoding": "4.0.10",
-          "System.Threading": "4.0.0",
-          "System.Threading.Tasks": "4.0.10"
-        },
-        "compile": {
-          "ref/dotnet/_._": {}
-        },
-        "runtime": {
-          "runtimes/win7/lib/dotnet/System.IO.Compression.dll": {}
-        }
-      },
       "runtime.win7.System.IO.FileSystem/4.0.1-beta-23409": {
         "type": "package",
         "dependencies": {
@@ -2340,12 +2318,6 @@
         },
         "runtime": {
           "runtimes/win7/lib/dotnet/System.Security.Cryptography.X509Certificates.dll": {}
-        }
-      },
-      "runtime.win7-x86.System.IO.Compression.clrcompression/4.0.1-beta-23409": {
-        "type": "package",
-        "native": {
-          "runtimes/win7-x86/native/clrcompression.dll": {}
         }
       },
       "System.Collections/4.0.11-beta-23225": {
@@ -2566,6 +2538,12 @@
         },
         "compile": {
           "ref/dotnet/System.IO.Compression.dll": {}
+        }
+      },
+      "System.IO.Compression.clrcompression-x86/4.0.0": {
+        "type": "package",
+        "native": {
+          "runtimes/win7-x86/native/clrcompression.dll": {}
         }
       },
       "System.IO.FileSystem/4.0.1-beta-23409": {
@@ -3350,7 +3328,7 @@
       }
     },
     "DNXCore,Version=v5.0/win7-x64": {
-      "JWT/2.0.0": {
+      "jose-jwt/2.0.0": {
         "type": "project",
         "framework": "DNXCore,Version=v5.0",
         "dependencies": {
@@ -3639,28 +3617,6 @@
           "runtimes/win7/lib/dotnet/System.Diagnostics.TraceSource.dll": {}
         }
       },
-      "runtime.win7.System.IO.Compression/4.0.1-beta-23409": {
-        "type": "package",
-        "dependencies": {
-          "System.Collections": "4.0.10",
-          "System.Diagnostics.Debug": "4.0.10",
-          "System.IO": "4.0.10",
-          "System.Resources.ResourceManager": "4.0.0",
-          "System.Runtime": "4.0.20",
-          "System.Runtime.Extensions": "4.0.10",
-          "System.Runtime.Handles": "4.0.0",
-          "System.Runtime.InteropServices": "4.0.20",
-          "System.Text.Encoding": "4.0.10",
-          "System.Threading": "4.0.0",
-          "System.Threading.Tasks": "4.0.10"
-        },
-        "compile": {
-          "ref/dotnet/_._": {}
-        },
-        "runtime": {
-          "runtimes/win7/lib/dotnet/System.IO.Compression.dll": {}
-        }
-      },
       "runtime.win7.System.IO.FileSystem/4.0.1-beta-23409": {
         "type": "package",
         "dependencies": {
@@ -3782,12 +3738,6 @@
         },
         "runtime": {
           "runtimes/win7/lib/dotnet/System.Security.Cryptography.X509Certificates.dll": {}
-        }
-      },
-      "runtime.win7-x64.System.IO.Compression.clrcompression/4.0.1-beta-23409": {
-        "type": "package",
-        "native": {
-          "runtimes/win7-x64/native/clrcompression.dll": {}
         }
       },
       "System.Collections/4.0.11-beta-23225": {
@@ -4008,6 +3958,12 @@
         },
         "compile": {
           "ref/dotnet/System.IO.Compression.dll": {}
+        }
+      },
+      "System.IO.Compression.clrcompression-x64/4.0.0": {
+        "type": "package",
+        "native": {
+          "runtimes/win7-x64/native/clrcompression.dll": {}
         }
       },
       "System.IO.FileSystem/4.0.1-beta-23409": {
@@ -4793,9 +4749,9 @@
     }
   },
   "libraries": {
-    "JWT/2.0.0": {
+    "jose-jwt/2.0.0": {
       "type": "project",
-      "path": "../JWT/project.json"
+      "path": "../jose-jwt/project.json"
     },
     "Microsoft.CSharp/4.0.1-beta-23225": {
       "type": "package",
@@ -5911,6 +5867,28 @@
         "System.IO.Compression.4.0.1-beta-23409.nupkg",
         "System.IO.Compression.4.0.1-beta-23409.nupkg.sha512",
         "System.IO.Compression.nuspec"
+      ]
+    },
+    "System.IO.Compression.clrcompression-x64/4.0.0": {
+      "type": "package",
+      "sha512": "Lqr+URMwKzf+8HJF6YrqEqzKzDzFJTE4OekaxqdIns71r8Ufbd8SbZa0LKl9q+7nu6Em4SkIEXVMB7plSXekOw==",
+      "files": [
+        "runtimes/win10-x64/native/ClrCompression.dll",
+        "runtimes/win7-x64/native/clrcompression.dll",
+        "System.IO.Compression.clrcompression-x64.4.0.0.nupkg",
+        "System.IO.Compression.clrcompression-x64.4.0.0.nupkg.sha512",
+        "System.IO.Compression.clrcompression-x64.nuspec"
+      ]
+    },
+    "System.IO.Compression.clrcompression-x86/4.0.0": {
+      "type": "package",
+      "sha512": "GmevpuaMRzYDXHu+xuV10fxTO8DsP7OKweWxYtkaxwVnDSj9X6RBupSiXdiveq9yj/xjZ1NbG+oRRRb99kj+VQ==",
+      "files": [
+        "runtimes/win10-x86/native/ClrCompression.dll",
+        "runtimes/win7-x86/native/clrcompression.dll",
+        "System.IO.Compression.clrcompression-x86.4.0.0.nupkg",
+        "System.IO.Compression.clrcompression-x86.4.0.0.nupkg.sha512",
+        "System.IO.Compression.clrcompression-x86.nuspec"
       ]
     },
     "System.IO.FileSystem/4.0.1-beta-23409": {
@@ -7246,7 +7224,7 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "JWT >= 1.0.0-*",
+      "jose-jwt >= 2.0.0",
       "xunit >= 2.1.0",
       "xunit.runner.dnx >= 2.1.0-beta6-build191"
     ],
