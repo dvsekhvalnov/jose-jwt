@@ -2233,7 +2233,11 @@ namespace UnitTests
 
         private RSACryptoServiceProvider PrivKey()
         {
-            var key = (RSACryptoServiceProvider)X509().PrivateKey;
+        #if DNX451
+            var key = (RSACryptoServiceProvider) X509().PrivateKey;
+        #elif DNXCORE50
+            var key = (RSACryptoServiceProvider)X509().GetRSAPrivateKey();
+        #endif
 
             RSACryptoServiceProvider newKey = new RSACryptoServiceProvider();
             newKey.ImportParameters(key.ExportParameters(true));
@@ -2243,7 +2247,11 @@ namespace UnitTests
 
         private RSACryptoServiceProvider PubKey()
         {
+        #if DNX451
             return (RSACryptoServiceProvider)X509().PublicKey.Key;
+        #elif DNXCORE50
+            return (RSACryptoServiceProvider)X509().GetRSAPublicKey();
+        #endif
         }
 
         private X509Certificate2 X509()
