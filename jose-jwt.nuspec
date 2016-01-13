@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>jose-jwt</id>
-    <version>1.9.0</version>
+    <version>1.9.1</version>
     <title>Jose JWT</title>
     <authors>Dmitry Vsekhvalnov</authors>
     <owners>Dmitry Vsekhvalnov</owners>
     <licenseUrl>https://raw.github.com/dvsekhvalnov/jose-jwt/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/dvsekhvalnov/jose-jwt</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <releaseNotes>Helpers to provide custom headers for token encoding. And helpers to support two phase validation.</releaseNotes>
+    <releaseNotes>Small bug fixes</releaseNotes>
     <summary>Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms. JSON parsing agnostic. Library for generating, decoding and encryption of JSON Web Tokens.</summary>
     <description>Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET 
 
