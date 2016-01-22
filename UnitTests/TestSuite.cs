@@ -315,7 +315,7 @@ namespace UnitTests
             string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256);
 
             //then
-            Console.Out.WriteLine("hashed = {0}", token);
+            Console.Out.WriteLine("HS256 = {0}", token);
 
             Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.VleAUqv_-nc6dwZ9xQ8-4NiOpVRdSSrCCPCQl-7HQ2k");
             Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), json);
@@ -2231,26 +2231,27 @@ namespace UnitTests
 
         #region test utils
 
-        private RSACryptoServiceProvider PrivKey()
+        private object PrivKey()
         {
         #if DNX451
             var key = (RSACryptoServiceProvider) X509().PrivateKey;
-        #elif DNXCORE50
-            var key = (RSACryptoServiceProvider)X509().GetRSAPrivateKey();
-        #endif
-
             RSACryptoServiceProvider newKey = new RSACryptoServiceProvider();
             newKey.ImportParameters(key.ExportParameters(true));
 
             return newKey;
+
+        #elif DNXCORE50
+            return (RSACng)X509().GetRSAPrivateKey();
+        #endif
+
         }
 
-        private RSACryptoServiceProvider PubKey()
+        private object PubKey()
         {
         #if DNX451
             return (RSACryptoServiceProvider)X509().PublicKey.Key;
         #elif DNXCORE50
-            return (RSACryptoServiceProvider)X509().GetRSAPublicKey();
+            return (RSACng)X509().GetRSAPublicKey();
         #endif
         }
 

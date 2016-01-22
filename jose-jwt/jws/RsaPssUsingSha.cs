@@ -15,6 +15,7 @@ namespace Jose
 
         public byte[] Sign(byte[] securedInput, object key)
         {
+#if DNX451
             var privateKey = Ensure.Type<RSACryptoServiceProvider>(key, "RsaUsingSha with PSS padding alg expects key to be of RSACryptoServiceProvider type.");
 
             try
@@ -25,22 +26,50 @@ namespace Jose
             {
                 throw new JoseException("Unable to sign content.", e);    
             }
+#elif DNXCORE50
+            var privateKey = Ensure.Type<RSA>(key, "RsaUsingSha with PSS padding alg expects key to be of RSA type.");
+            return privateKey.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
+#endif
         }
 
         public bool Verify(byte[] signature, byte[] securedInput, object key)
         {
-            var publicKey = Ensure.Type<RSACryptoServiceProvider>(key, "RsaUsingSha with PSS padding alg expects key to be of RSACryptoServiceProvider type.");
+#if DNX451
+            var publicKey = Ensure.Type<RSACryptoServiceProvider>(key,
+                "RsaUsingSha with PSS padding alg expects key to be of RSACryptoServiceProvider type.");
 
             try
             {
-                return RsaPss.Verify(securedInput, signature, RsaKey.New(publicKey.ExportParameters(false)), Hash, saltSize);
+                return RsaPss.Verify(securedInput, signature, RsaKey.New(publicKey.ExportParameters(false)), Hash,
+                    saltSize);
             }
             catch (CryptographicException e)
             {
                 return false;
             }
+
+#elif DNXCORE50
+            var publicKey = Ensure.Type<RSA>(key, "RsaUsingSha with PSS padding alg expects key to be of RSA type.");
+            return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
+#endif
         }
 
+#if DNXCORE50
+        private HashAlgorithmName HashAlgorithm
+        {
+            get
+            {
+                if (saltSize == 32)
+                    return HashAlgorithmName.SHA256;
+                if (saltSize == 48)
+                    return HashAlgorithmName.SHA384;
+                if (saltSize == 64)
+                    return HashAlgorithmName.SHA512;
+
+                throw new ArgumentException(string.Format("Unsupported salt size: '{0} bytes'", saltSize));
+            }
+        }
+#endif
         private CngAlgorithm Hash
         {
             get

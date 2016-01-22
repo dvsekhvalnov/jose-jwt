@@ -5026,7 +5026,7 @@
     "runtime.win7.System.Diagnostics.Process/4.1.0-beta-23516": {
       "type": "package",
       "serviceable": true,
-      "sha512": "qCCXX+OG6430kLtN/wyjeLTTiJvOIKB2G+qBvhSqVLWe5ZTiEiSnweKUzdi7raXL0te0WfPE5tf8FuKcEKPnIA==",
+      "sha512": "IDp4dljG6NkpMP9UzrtuvLZ0wfeOHphStOsVLmUTj2g3UH28L5Lo9481/fAXVPs2GEVMRwAvSwph90EcNfV/jQ==",
       "files": [
         "ref/dotnet/_._",
         "runtime.win7.System.Diagnostics.Process.4.1.0-beta-23516.nupkg",
@@ -5043,7 +5043,7 @@
     "runtime.win7.System.Diagnostics.TraceSource/4.0.0-beta-23516": {
       "type": "package",
       "serviceable": true,
-      "sha512": "hpD0T6zOEU/1qUSPitKSgIdsL4tZlZz7CUCu6PP7BYf8CM3vPkSEzN38kX6PnH8F6kvOqxEwzPYhZCK3PJkh/Q==",
+      "sha512": "6YSh7+vRI2ptFNPTWE100MNz0sRAVuBjwU0znK3kzd5GYQgLjvtWn8rT9DvJQA4R6OmC5Q+OgXzb/nibxcbtbA==",
       "files": [
         "ref/dotnet/_._",
         "runtime.win7.System.Diagnostics.TraceSource.4.0.0-beta-23516.nupkg",
@@ -5118,7 +5118,7 @@
     "runtime.win7.System.Net.Sockets/4.1.0-beta-23516": {
       "type": "package",
       "serviceable": true,
-      "sha512": "4FbyzvLhWFFv3OrgkPmd3cXoKUb+oB+rp51ke6nMqR+MjN3sWs/w3C0Jbx84UM6zg9a3JiD72ThjgDnet3QS3w==",
+      "sha512": "NRBFPlDd/ZdflYqJ++i3+jAxWHjLpCn6CUfJFBJXF1k0uZUCuTc13O+6Q4UhaPnWsQ+xlBk5TE8aFU7jRqR2QA==",
       "files": [
         "lib/DNXCore50/System.Net.Sockets.dll",
         "lib/netcore50/System.Net.Sockets.dll",
@@ -5555,7 +5555,7 @@
     "System.Diagnostics.Process/4.1.0-beta-23516": {
       "type": "package",
       "serviceable": true,
-      "sha512": "BfqAj7u+jB3H++dtZayfbsphMP1WIv8dKEgCNmLiiFVKw+0jlYhuCCUQWTQEvWwcfQVXNKdtoLErrKXPB3W9Tg==",
+      "sha512": "uXV0y5jByAnFDoQRHVpsMvqzjYeIhSSiKP0U++erIae/9DFULDlhxpzJsKVC2BU44QGyGoShUbgxBuFyMr3gPA==",
       "files": [
         "lib/MonoAndroid10/_._",
         "lib/MonoTouch10/_._",
@@ -5666,7 +5666,7 @@
     "System.Diagnostics.TraceSource/4.0.0-beta-23516": {
       "type": "package",
       "serviceable": true,
-      "sha512": "OIWB5pvMqOdCraAtiJBhRahrsnP2sNaXbCZNdAadzwiPLzRI7EvLTc7/NlkFDxm3I6YKVGxnJ5aO+YJ/XPC8yw==",
+      "sha512": "gvJNxObthiaV07AKZYjQV69xRBKRR7gTpEVe4qXF4Mta/2zD7sI+Zm//rRCQenLYBuL8nBxVzomtYJ4eT7w8QQ==",
       "files": [
         "lib/MonoAndroid10/_._",
         "lib/MonoTouch10/_._",
@@ -6254,7 +6254,7 @@
     "System.Net.Sockets/4.1.0-beta-23516": {
       "type": "package",
       "serviceable": true,
-      "sha512": "Q2D1ew24ZIH4kOE4ZJCrtvNfSSiea3yOeqow2jsgEPJ9Gafu8atlU5EGfXM0LQvtsIeQ9i1YwqdyZQHaL/RySg==",
+      "sha512": "hJQxXC5OcecCG49Wg9PreHFC2tDZFwpqiGhRnQMK47eo8ozvOMl2XqISanclj1cjCIUZDUSn0XxggVC7Z2WppA==",
       "files": [
         "lib/MonoAndroid10/_._",
         "lib/MonoTouch10/_._",
@@ -6355,7 +6355,7 @@
     "System.Reflection/4.1.0-beta-23225": {
       "type": "package",
       "serviceable": true,
-      "sha512": "nlguo6AocBKGccv4CFSMCOR2/vU+93u/yvzFKO6ViNJ/SBz2VEZ1nOeW93vqKKpOMJkt3YtTvMWmS+kUGz/1bA==",
+      "sha512": "WbLtaCxoe5XdqEyZuGpemSQ8YBJ8cj11zx+yxOxJfHbNrmu7oMQ29+J50swaqg3soUc3BVBMqfIhb/7gocDHQA==",
       "files": [
         "lib/DNXCore50/System.Reflection.dll",
         "lib/MonoAndroid10/_._",

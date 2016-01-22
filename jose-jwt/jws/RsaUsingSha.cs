@@ -14,19 +14,23 @@ namespace Jose
 
         public byte[] Sign(byte[] securedInput, object key)
         {
-        #if DNX451  
+#if DNX451
+            var privateKey = Ensure.Type<RSA>(key, "RsaUsingSha alg expects key to be of AsymmetricAlgorithm type.");
+
             using (var sha = HashAlgorithm)
             {
-                var privateKey = Ensure.Type<AsymmetricAlgorithm>(key, "RsaUsingSha alg expects key to be of AsymmetricAlgorithm type."); 
+                
 
                 var pkcs1 = new RSAPKCS1SignatureFormatter(privateKey);
                 pkcs1.SetHashAlgorithm(hashMethod);
 
                 return pkcs1.CreateSignature(sha.ComputeHash(securedInput));                    
             }
-        #elif DNXCORE50
-            throw new NotImplementedException("not yet");
-        #endif
+
+#elif DNXCORE50
+                var privateKey = Ensure.Type<RSA>(key, "RsaUsingSha alg expects key to be of RSA type.");                
+                return privateKey.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pkcs1);
+#endif
         }
 
         public bool Verify(byte[] signature, byte[] securedInput, object key)
@@ -37,34 +41,47 @@ namespace Jose
                 var publicKey = Ensure.Type<AsymmetricAlgorithm>(key, "RsaUsingSha alg expects key to be of AsymmetricAlgorithm type."); 
                 
                 byte[] hash = sha.ComputeHash(securedInput);
-
                 var pkcs1 = new RSAPKCS1SignatureDeformatter(publicKey);
                 pkcs1.SetHashAlgorithm(hashMethod);
 
                 return pkcs1.VerifySignature(hash, signature);
             }
-        #elif DNXCORE50
-            throw new NotImplementedException("not yet");
-        #endif
+#elif DNXCORE50
+            var publicKey = Ensure.Type<RSA>(key, "RsaUsingSha alg expects key to be of RSA type.");             
+            return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pkcs1);
+#endif
         }
 
+#if DNX451
         private HashAlgorithm HashAlgorithm
         {        
             get
             {
-            #if DNX451
                 if (hashMethod.Equals("SHA256"))
-                    return new SHA256Managed();
+                    return SHA256.Create();
                 if (hashMethod.Equals("SHA384"))
-                    return new SHA384Managed();
+                    return SHA384.Create();
                 if (hashMethod.Equals("SHA512"))
-                    return new SHA512Managed();
+                    return SHA512.Create();
 
                 throw new ArgumentException("Unsupported hashing algorithm: '{0}'", hashMethod);
-            #elif DNXCORE50
-                throw new NotImplementedException("not yet");
-            #endif
             }
         }
+#elif DNXCORE50
+        private HashAlgorithmName HashAlgorithm
+        {
+            get
+            {
+                if (hashMethod.Equals("SHA256"))
+                    return HashAlgorithmName.SHA256;
+                if (hashMethod.Equals("SHA384"))
+                    return HashAlgorithmName.SHA384;
+                if (hashMethod.Equals("SHA512"))
+                    return HashAlgorithmName.SHA512;
+
+                throw new ArgumentException("Unsupported hashing algorithm: '{0}'", hashMethod);
+            }
+        }
+#endif
     }
 }
