@@ -1104,7 +1104,7 @@ namespace UnitTests
             string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A128GCM, extraHeaders: extra);
 
             //then
-            Console.Out.WriteLine("RSA_OAEP_256_A128GCM={0}", token);
+            Console.Out.WriteLine("RSA_OAEP_A128GCM + extra headers={0}", token);
 
             string[] parts = token.Split('.');
 
