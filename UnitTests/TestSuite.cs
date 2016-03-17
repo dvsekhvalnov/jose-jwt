@@ -2231,6 +2231,116 @@ namespace UnitTests
             }
         }
 
+        [Test]
+        public void DecodeSignedTokenValidationSuccess()
+        {
+            // given
+            string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
+
+            // when
+            string json = Jose.JWT.Decode(token, PubKey(), JwsAlgorithm.RS256);
+
+            // then
+            Assert.That(json, Is.EqualTo(@"{""hello"": ""world""}"));
+        }
+
+        [Test]
+        public void DecodeSignedTokenValidationFailure()
+        {
+            // given
+            string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
+
+            // when
+            bool exceptionThrown = false;
+
+            try
+            {
+                Jose.JWT.Decode(token, PubKey(), JwsAlgorithm.RS512);
+            }
+            catch (InvalidAlgorithmException)
+            {
+                exceptionThrown = true;
+            }
+
+            // then
+            Assert.That(exceptionThrown, Is.EqualTo(true));
+        }
+
+        [Test]
+        public void DecodeEncryptedTokenValidationSuccess()
+        {
+            // given
+            string json = @"{""hello"": ""world""}";
+            string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+
+            // when
+            string decodedToken = Jose.JWT.Decode(token, PrivKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+
+            // then
+            Assert.That(decodedToken, Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+        }
+
+        [Test]
+        public void DecodeEncryptedTokenValidationFailure()
+        {
+            // given
+            string json = @"{""hello"": ""world""}";
+            string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+
+            // when
+            bool incorrectAlgorithm = false;
+            bool incorrectEncryption = false;
+
+            try
+            {
+                Jose.JWT.Decode(token, PrivKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A192GCM);
+            }
+            catch (InvalidAlgorithmException)
+            {
+                incorrectAlgorithm = true;
+            }
+
+            try
+            {
+                Jose.JWT.Decode(token, PrivKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128CBC_HS256);
+            }
+            catch (InvalidAlgorithmException)
+            {
+                incorrectEncryption = true;
+            }
+
+            // then
+            Assert.That(incorrectAlgorithm, Is.EqualTo(true));
+            Assert.That(incorrectEncryption, Is.EqualTo(true));
+        }
+
+        [Test]
+        public void DecodeAndMapSignedTokenValidationSuccess()
+        {
+            // given
+            string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
+
+            // when
+            var test = Jose.JWT.Decode<IDictionary<string, object>>(token, PubKey(), JwsAlgorithm.RS256);
+
+            // then
+            Assert.That(test, Is.EqualTo(new Dictionary<string, object> { { "hello", "world" } }));
+        }
+
+        [Test]
+        public void DecodeAndMapEncryptedTokenValidationSuccess()
+        {
+            // given
+            string json = @"{""hello"": ""world""}";
+            string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+
+            // when
+            var test = Jose.JWT.Decode<IDictionary<string, object>>(token, PrivKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+
+            // then
+            Assert.That(test, Is.EqualTo(new Dictionary<string, object> { { "hello", "world" } }));
+        }
+
         #region test utils
 
         private RSACryptoServiceProvider PrivKey()
