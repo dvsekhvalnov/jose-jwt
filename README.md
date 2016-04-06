@@ -1,14 +1,17 @@
-# Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET
+# Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET and .NET Core
 
-Minimallistic zero-dependency library for generating, decoding and encryption [JSON Web Tokens](http://tools.ietf.org/html/draft-jones-json-web-token-10). Supports full suite 
-of [JSON Web Algorithms](https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-31) as of July 4, 2014 version. JSON parsing agnostic, can plug any desired JSON processing library. 
+Minimallistic zero-dependency library for generating, decoding and encryption [JSON Web Tokens](http://tools.ietf.org/html/draft-jones-json-web-token-10). Supports full suite
+of [JSON Web Algorithms](https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-31) as of July 4, 2014 version. JSON parsing agnostic, can plug any desired JSON processing library.
 Extensively tested for compatibility with [jose.4.j](https://bitbucket.org/b_c/jose4j/wiki/Home), [Nimbus-JOSE-JWT](https://bitbucket.org/nimbusds/nimbus-jose-jwt/wiki/Home) and [json-jwt](https://github.com/nov/json-jwt) libraries.
 
+v1.9 is built against .NET framework and should be compatible with v4.0 and above.
+
+As of v2 it is .NET Core compatible and aimed to support both .NET framework CLR and .NET Core runtimes.  
 
 * WinRT compatible version (Windows 8.1 and Windows Phone 8.1) is avaliable here: [JoseRT](https://github.com/dvsekhvalnov/jose-rt).
 
 ## Foreword
-Originally forked from https://github.com/johnsheehan/jwt . Almost re-written from scratch to support JWT encryption capabilities and unified interface for encoding/decoding/encryption 
+Originally forked from https://github.com/johnsheehan/jwt . Almost re-written from scratch to support JWT encryption capabilities and unified interface for encoding/decoding/encryption
 and other features.
 Moved to separate project in February 2014.
 
@@ -20,7 +23,7 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 - HMAC signatures with HS256, HS384 and HS512.
 - ECDSA signatures with ES256, ES384 and ES512.
 - RSASSA-PKCS1-V1_5 signatures with RS256, RS384 and RS512.
-- RSASSA-PSS signatures (probabilistic signature scheme with appendix) with PS256, PS384 and PS512.
+- RSASSA-PSS signatures<sup>CLR only</sup> (probabilistic signature scheme with appendix) with PS256, PS384 and PS512.
 - NONE (unprotected) plain text algorithm without integrity protection
 
 **Encryption**
@@ -28,32 +31,32 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 - RSAES OAEP (using SHA-1 and MGF1 with SHA-1) encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 - RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 - Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM
-- A128KW, A192KW, A256KW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
-- A128GCMKW, A192GCMKW, A256GCMKW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
-- ECDH-ES<sup>\*</sup> with A128CBC-HS256, A128GCM, A192GCM, A256GCM
-- ECDH-ES+A128KW<sup>\*</sup>, ECDH-ES+A192KW<sup>\*</sup>, ECDH-ES+A256KW<sup>\*</sup> with A128CBC-HS256, A128GCM, A192GCM, A256GCM
-- PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- A128KW, A192KW, A256KW encryption<sup>CLR only</sup> with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- A128GCMKW, A192GCMKW, A256GCMKW encryption<sup>CLR only</sup> with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- ECDH-ES<sup>\*</sup><sup> CLR only</sup> with A128CBC-HS256, A128GCM, A192GCM, A256GCM
+- ECDH-ES+A128KW<sup>\*</sup>, ECDH-ES+A192KW<sup>\*</sup>, ECDH-ES+A256KW<sup>\*</sup><sup> CLR only</sup> with A128CBC-HS256, A128GCM, A192GCM, A256GCM
+- PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW<sup>CLR only</sup> with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 
 **Compression**
 
-- DEFLATE compression
+- DEFLATE compression<sup>CLR only</sup>
 
 ##### Notes:
-\* It appears that Microsoft CNG implementation of BCryptSecretAgreement/NCryptSecretAgreement contains a bug for calculating Elliptic Curve Diffie–Hellman secret agreement
+\* It appears that Microsoft CNG implementation of BCryptSecretAgreement/NCryptSecretAgreement contains a bug for calculating Elliptic Curve Diffie-Hellman secret agreement
 on keys higher than 256 bit (P-384 and P-521 NIST curves correspondingly). At least produced secret agreements do not match any other implementation in different languages.
 Technically it is possible to use ECDH-ES or ECDH-ES+AES Key Wrap family with A192CBC-HS384 and A256CBC-HS512 but most likely produced JWT tokens will not be compatible with other platforms and therefore can't be decoded correctly.
 
 ## Installation
-### NuGet 
+### NuGet
 `Install-Package jose-jwt`
 
 ### Manual
-Grab source and compile yourself. 
+Grab source and compile yourself.
 
 ## Usage
 ### Creating Plaintext (unprotected) Tokens
 ```C#
-var payload = new Dictionary<string, object>() 
+var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
     { "exp", 1300819380 }
@@ -67,7 +70,7 @@ string token = Jose.JWT.Encode(payload, null, JwsAlgorithm.none);
 HS256, HS384, HS512 signatures require `byte[]` array key of corresponding length
 
 ```C#
-var payload = new Dictionary<string, object>() 
+var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
     { "exp", 1300819380 }
@@ -82,7 +85,7 @@ RS256, RS384, RS512 and PS256, PS384, PS512 signatures require `RSACryptoService
 Which usually can be done be re-importing RSAParameters. See http://clrsecurity.codeplex.com/discussions/243156 for details.
 
 ```C#
-var payload = new Dictionary<string, object>() 
+var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
     { "exp", 1300819380 }
@@ -98,7 +101,7 @@ ES256, ES384, ES256 ECDSA signatures requires `CngKey` (usually private) ellipti
 But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,d)`.
 
 ```C#
-var payload = new Dictionary<string, object>() 
+var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
     { "exp", 1300819380 }
@@ -118,7 +121,7 @@ string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
 RSA-OAEP-256, RSA-OAEP and RSA1_5 key management requires `RSACryptoServiceProvider` (usually public) key of corresponding length.
 
 ```C#
-var payload = new Dictionary<string, object>() 
+var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
     { "exp", 1300819380 }
@@ -129,11 +132,11 @@ var publicKey=new X509Certificate2("my-key.p12", "password").PublicKey.Key as RS
 string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM);
 ```
 
-#### DIR direct pre-shared symmetric key family of algorithms 
+#### DIR direct pre-shared symmetric key family of algorithms
 Direct key management with pre-shared symmetric keys requires `byte[]` array key of corresponding length
 
 ```C#
-var payload = new Dictionary<string, object>() 
+var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
     { "exp", 1300819380 }
@@ -148,7 +151,7 @@ string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.DIR, JweEncrypti
 AES128KW, AES192KW and AES256KW key management requires `byte[]` array key of corresponding length
 
 ```C#
-var payload = new Dictionary<string, object>() 
+var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
     { "exp", 1300819380 }
@@ -163,7 +166,7 @@ string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.A256KW, JweEncry
 AES128GCMKW, AES192GCMKW and AES256GCMKW key management requires `byte[]` array key of corresponding length
 
 ```C#
-var payload = new Dictionary<string, object>() 
+var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
     { "exp", 1300819380 }
@@ -179,7 +182,7 @@ ECDH-ES and ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW key management requir
 But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,usage:CngKeyUsages.KeyAgreement)`.
 
 ```C#
-var payload = new Dictionary<string, object>() 
+var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
     { "exp", 1300819380 }
@@ -194,10 +197,10 @@ string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.ECDH_ES, JweEncr
 ```
 
 #### PBES2 using HMAC SHA with AES Key Wrap key management family of algorithms
-PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW key management requires `string` passphrase from which key will be derived 
+PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW key management requires `string` passphrase from which key will be derived
 
 ```C#
-var payload = new Dictionary<string, object>() 
+var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
     { "exp", 1300819380 }
@@ -210,7 +213,7 @@ string token = Jose.JWT.Encode(payload, "top secret", JweAlgorithm.A256KW, JweEn
 Optional DEFLATE compression is supported
 
 ```C#
-var payload = new Dictionary<string, object>() 
+var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
     { "exp", 1300819380 }
@@ -269,17 +272,17 @@ string json = Jose.JWT.Decode(token, "top secret");
 ## Additional utilities
 
 ### Adding extra headers
-jose-jwt allows to pass extra headers when encoding token to overide deafault values<sup>\*</sup>. `extraHeaders:` named param can be used, it accepts `IDictionary<string, object>` type. 
+jose-jwt allows to pass extra headers when encoding token to overide deafault values<sup>\*</sup>. `extraHeaders:` named param can be used, it accepts `IDictionary<string, object>` type.
 jose-jwt is NOT allow to override `alg` and `enc` headers .
 
 ```C#
-var payload = new Dictionary<string, object>() 
+var payload = new Dictionary<string, object>()
 {
      { "sub", "mr.x@contoso.com" },
      { "exp", 1300819380 }
 };
-  
-var headers = new Dictionary<string, object>() 
+
+var headers = new Dictionary<string, object>()
 {
      { "typ", "JWT" },
      { "cty", "JWT" },
@@ -292,13 +295,13 @@ string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.A256GCMKW, JweEn
 ```
 
 ```C#
-var payload = new Dictionary<string, object>() 
+var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
     { "exp", 1300819380 }
 };
-	
-var headers = new Dictionary<string, object>() 
+
+var headers = new Dictionary<string, object>()
 {
      { "typ", "JWT" },
      { "cty", "JWT" },
@@ -310,13 +313,13 @@ var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlag
 string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.RS256, extraHeaders: headers);
 ```
 
-\* For backwards compatibility signing uses pre-configured `typ: 'JWT'` header by default. 
+\* For backwards compatibility signing uses pre-configured `typ: 'JWT'` header by default.
 
 ### Two-phase validation
 In some cases validation (decoding) key can be unknown prior to examining token content. For instance one can use different keys per token issuer or rely on headers information to determine which key to use,
 do logging or other things.
 
-jose-jwt provides helper methods to examine token content without performing actual integrity validation or decryption. 
+jose-jwt provides helper methods to examine token content without performing actual integrity validation or decryption.
 
 `IDictionary<string, object> Jose.JWT.Headers(String token)` to return header information as dictionary and `T Jose.JWT.Headers<T>(string token)` to return headers information as
 unmarshalled type.
@@ -353,7 +356,7 @@ var payload = Jose.JWT.Decode<JwtToken>(token, key);
 jose-jwt library is agnostic about object model used to represent json payload as well as underlying framework used to serialize/parse json objects. Library provides convinient generic methods to work directly with your object model:
 
 ```C#
-MyDomainObject obj=Jose.JWT.Decode<MyDomainObject>(token,secretKey); //will invoke configured IJsonMapper to perform parsing/mapping of content to MyDomainObject 
+MyDomainObject obj=Jose.JWT.Decode<MyDomainObject>(token,secretKey); //will invoke configured IJsonMapper to perform parsing/mapping of content to MyDomainObject
 
 string data=Jose.JWT.Encode(obj,secrectKey,JwsAlgorithm.HS256); //for object argument configured IJsonMapper will be invoked to serialize object to json string before encoding
 ```
