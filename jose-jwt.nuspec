@@ -2,14 +2,14 @@
 <package >
   <metadata>
     <id>jose-jwt</id>
-    <version>1.9.1</version>
+    <version>1.9.2</version>
     <title>Jose JWT</title>
     <authors>Dmitry Vsekhvalnov</authors>
     <owners>Dmitry Vsekhvalnov</owners>
     <licenseUrl>https://raw.github.com/dvsekhvalnov/jose-jwt/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/dvsekhvalnov/jose-jwt</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <releaseNotes>Small bug fixes</releaseNotes>
+    <releaseNotes>Strict validation enhancements</releaseNotes>
     <summary>Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms. JSON parsing agnostic. Library for generating, decoding and encryption of JSON Web Tokens.</summary>
     <description>Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET 
 
@@ -42,7 +42,7 @@ Compression:
 
 - DEFLATE compression
     </description>
-    <copyright>Copyright dvsekhvalnov 2014-2015</copyright>
+    <copyright>Copyright dvsekhvalnov 2014-2016</copyright>
     <language>en-US</language>
     <tags>jose jwt json jwa jwe jws aes cbc gcm rsa hmac sha rsassa pss rsaes oaep pkcs1-v1_5 es elliptic curve diffe hellman agreement ecdsa key wrap kw ecdh pbes pbes2 pbkdf pbkdf2 password based encryption javascript object signing two phase validation</tags>
   </metadata>
