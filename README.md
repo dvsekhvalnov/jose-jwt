@@ -19,11 +19,13 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 
 ## Supported JWA algorithms
 
+### CLR
+
 **Signing**
 - HMAC signatures with HS256, HS384 and HS512.
 - ECDSA signatures with ES256, ES384 and ES512.
 - RSASSA-PKCS1-V1_5 signatures with RS256, RS384 and RS512.
-- RSASSA-PSS signatures<sup>CLR only</sup> (probabilistic signature scheme with appendix) with PS256, PS384 and PS512.
+- RSASSA-PSS signatures (probabilistic signature scheme with appendix) with PS256, PS384 and PS512.
 - NONE (unprotected) plain text algorithm without integrity protection
 
 **Encryption**
@@ -31,15 +33,29 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 - RSAES OAEP (using SHA-1 and MGF1 with SHA-1) encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 - RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 - Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM
-- A128KW, A192KW, A256KW encryption<sup>CLR only</sup> with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
-- A128GCMKW, A192GCMKW, A256GCMKW encryption<sup>CLR only</sup> with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- A128KW, A192KW, A256KW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- A128GCMKW, A192GCMKW, A256GCMKW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 - ECDH-ES<sup>\*</sup><sup> CLR only</sup> with A128CBC-HS256, A128GCM, A192GCM, A256GCM
 - ECDH-ES+A128KW<sup>\*</sup>, ECDH-ES+A192KW<sup>\*</sup>, ECDH-ES+A256KW<sup>\*</sup><sup> CLR only</sup> with A128CBC-HS256, A128GCM, A192GCM, A256GCM
-- PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW<sup>CLR only</sup> with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 
 **Compression**
 
-- DEFLATE compression<sup>CLR only</sup>
+- DEFLATE compression
+
+### CORECLR
+
+**Signing**
+- HMAC signatures with HS256, HS384 and HS512.
+- ECDSA signatures with ES256, ES384 and ES512.
+- RSASSA-PKCS1-V1_5 signatures with RS256, RS384 and RS512.
+- NONE (unprotected) plain text algorithm without integrity protection
+
+**Encryption**
+- RSAES OAEP 256 (using SHA-256 and MGF1 with SHA-256) encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- RSAES OAEP (using SHA-1 and MGF1 with SHA-1) encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM
 
 ##### Notes:
 \* It appears that Microsoft CNG implementation of BCryptSecretAgreement/NCryptSecretAgreement contains a bug for calculating Elliptic Curve Diffie-Hellman secret agreement
@@ -81,6 +97,8 @@ var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,
 string token=Jose.JWT.Encode(payload, secretKey, JwsAlgorithm.HS256);
 ```
 #### RS-\* and PS-\* family
+**CLR:**
+
 RS256, RS384, RS512 and PS256, PS384, PS512 signatures require `RSACryptoServiceProvider` (usually private) key of corresponding length. CSP need to be forced to use Microsoft Enhanced RSA and AES Cryptographic Provider.
 Which usually can be done be re-importing RSAParameters. See http://clrsecurity.codeplex.com/discussions/243156 for details.
 
@@ -95,6 +113,24 @@ var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlag
 
 string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.RS256);
 ```
+
+**CORECLR**:
+RS256, RS384, RS512 signatures require `RSA` (usually private) key of corresponding length.
+
+```C#
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
+
+var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet).GetRSAPrivateKey() as RSACng;
+
+string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.RS256);
+```
+
+
+
 
 #### ES-\*  family
 ES256, ES384, ES256 ECDSA signatures requires `CngKey` (usually private) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
@@ -118,6 +154,9 @@ string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
 
 ### Creating encrypted Tokens
 #### RSA-\* key management family of algorithms
+
+**CLR:**
+
 RSA-OAEP-256, RSA-OAEP and RSA1_5 key management requires `RSACryptoServiceProvider` (usually public) key of corresponding length.
 
 ```C#
@@ -131,6 +170,22 @@ var publicKey=new X509Certificate2("my-key.p12", "password").PublicKey.Key as RS
 
 string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM);
 ```
+
+**CORELR:**
+RSA-OAEP-256, RSA-OAEP and RSA1_5 key management requires `RSA` (usually public) key of corresponding length.
+
+```C#
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
+
+var publicKey=new X509Certificate2("my-key.p12", "password").GetRSAPublicKey() as RSACng;
+
+string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM);
+```
+
 
 #### DIR direct pre-shared symmetric key family of algorithms
 Direct key management with pre-shared symmetric keys requires `byte[]` array key of corresponding length
@@ -237,7 +292,9 @@ byte[] secretKey=new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159
 string json = Jose.JWT.Decode(token, secretKey);
 ```
 
-**RS256, RS384, RS512**, **PS256, PS384, PS512** signatures and **RSA-OAEP-256**, **RSA-OAEP, RSA1_5** key management algorthms expects `RSACryptoServiceProvider` as a key, public/private is asymmetric to encoding:
+**RS256, RS384, RS512**, **PS256, PS384, PS512** signatures and **RSA-OAEP-256**, **RSA-OAEP, RSA1_5** key management algorithms expects
+
+**CLR**: `RSACryptoServiceProvider` as a key, public/private is asymmetric to encoding:
 
 ```C#
 string token = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bx_4TL7gh14IeM3EClP3iVfY9pbT81pflXd1lEZOVPJR6PaewRFXWmiJcaqH9fcU9IjGGQ19BS-UPtpErenL5kw7KORFgIBm4hObCYxLoAadMy8A-qQeOWyjnxbE0mbQIdoFI4nGK5qWTEQUWZCMwosvyeHLqEZDzr9CNLAAFTujvsZJJ7NLTkA0cTUzz64b57uSvMTaOK6j7Ap9ZaAgF2uaqBdZ1NzqofLeU4XYCG8pWc5Qd-Ri_1KsksjaDHk12ZU4vKIJWJ-puEnpXBLoHuko92BnN8_LXx4sfDdK7wRiXk0LU_iwoT5zb1ro7KaM0hcfidWoz95vfhPhACIsXQ.YcVAPLJ061gvPpVB-zMm4A.PveUBLejLzMjA4tViHTRXbYnxMHFu8W2ECwj9b6sF2u2azi0TbxxMhs65j-t3qm-8EKBJM7LKIlkAtQ1XBeZl4zuTeMFxsQ0VShQfwlN2r8dPFgUzb4f_MzBuFFYfP5hBs-jugm89l2ZTj8oAOOSpAlC7uTmwha3dNaDOzlJniqAl_729q5EvSjaYXMtaET9wSTNSDfMUVFcMERbB50VOhc134JDUVPTuriD0rd4tQm8Do8obFKtFeZ5l3jT73-f1tPZwZ6CmFVxUMh6gSdY5A.tR8bNx9WErquthpWZBeMaw";
@@ -246,6 +303,17 @@ var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlag
 
 string json = Jose.JWT.Decode(token,privateKey);
 ```
+
+**CORECLR**: `RSA` as a key, public/private is asymmetric to encoding:
+```C#
+string token = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bx_4TL7gh14IeM3EClP3iVfY9pbT81pflXd1lEZOVPJR6PaewRFXWmiJcaqH9fcU9IjGGQ19BS-UPtpErenL5kw7KORFgIBm4hObCYxLoAadMy8A-qQeOWyjnxbE0mbQIdoFI4nGK5qWTEQUWZCMwosvyeHLqEZDzr9CNLAAFTujvsZJJ7NLTkA0cTUzz64b57uSvMTaOK6j7Ap9ZaAgF2uaqBdZ1NzqofLeU4XYCG8pWc5Qd-Ri_1KsksjaDHk12ZU4vKIJWJ-puEnpXBLoHuko92BnN8_LXx4sfDdK7wRiXk0LU_iwoT5zb1ro7KaM0hcfidWoz95vfhPhACIsXQ.YcVAPLJ061gvPpVB-zMm4A.PveUBLejLzMjA4tViHTRXbYnxMHFu8W2ECwj9b6sF2u2azi0TbxxMhs65j-t3qm-8EKBJM7LKIlkAtQ1XBeZl4zuTeMFxsQ0VShQfwlN2r8dPFgUzb4f_MzBuFFYfP5hBs-jugm89l2ZTj8oAOOSpAlC7uTmwha3dNaDOzlJniqAl_729q5EvSjaYXMtaET9wSTNSDfMUVFcMERbB50VOhc134JDUVPTuriD0rd4tQm8Do8obFKtFeZ5l3jT73-f1tPZwZ6CmFVxUMh6gSdY5A.tR8bNx9WErquthpWZBeMaw";
+
+var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet).GetRSAPrivateKey() as RSACng;
+
+string json = Jose.JWT.Decode(token,privateKey);
+```
+
+
 
 **ES256, ES284, ES512** signatures, **ECDH-ES** and **ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW** key management algorithms expects `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
 sure correct `usage:` value is set. `CngKeyUsages.KeyAgreement` for ECDH-ES and `CngKeyUsages.Signing` for ES-* (default value, can be ommited).
