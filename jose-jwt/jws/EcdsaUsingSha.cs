@@ -22,7 +22,7 @@ namespace Jose
             {
                 using (var signer = new ECDsaCng(privateKey))
                 {
-                #if DNX451
+                #if DNX451 || NET40
                     signer.HashAlgorithm = Hash;
 
                     return signer.SignData(securedInput);
@@ -47,7 +47,7 @@ namespace Jose
             {
                 using (var signer = new ECDsaCng(publicKey))
                 {
-                #if DNX451
+                #if DNX451 || NET40
                     signer.HashAlgorithm = Hash;
                 
                     return signer.VerifyData(securedInput, signature);
@@ -62,7 +62,7 @@ namespace Jose
             }
         }
 
-#if DNX451
+#if DNX451 || NET40
         protected CngAlgorithm Hash
         {
             get

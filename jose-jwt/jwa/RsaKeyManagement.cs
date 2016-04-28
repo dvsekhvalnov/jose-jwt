@@ -20,7 +20,7 @@ namespace Jose
         {
             var cek = Arrays.Random(cekSizeBits);
 
-#if DNX451
+#if DNX451 || NET40
             var publicKey = Ensure.Type<RSACryptoServiceProvider>(key, "RsaKeyManagement alg expects key to be of RSACryptoServiceProvider type.");
 
             return useSha256 ? new[] { cek, RsaOaep.Encrypt(cek, RsaKey.New(publicKey.ExportParameters(false)), CngAlgorithm.Sha256) }
@@ -38,7 +38,7 @@ namespace Jose
 
         public byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
         {
-#if DNX451
+#if DNX451 || NET40
             var privateKey = Ensure.Type<RSACryptoServiceProvider>(key, "RsaKeyManagement alg expects key to be of RSACryptoServiceProvider type.");
 
             return useSha256 ? RsaOaep.Decrypt(encryptedCek, RsaKey.New(privateKey.ExportParameters(true)), CngAlgorithm.Sha256)

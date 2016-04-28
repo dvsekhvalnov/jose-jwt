@@ -2,6 +2,17 @@
   "locked": false,
   "version": 2,
   "targets": {
+    ".NETFramework,Version=v4.0": {
+      "Newtonsoft.Json/7.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/net40/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/net40/Newtonsoft.Json.dll": {}
+        }
+      }
+    },
     "DNX,Version=v4.5.1": {
       "Newtonsoft.Json/7.0.1": {
         "type": "package",
@@ -342,6 +353,28 @@
         },
         "compile": {
           "ref/dotnet/System.Threading.Tasks.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.0/win7-x86": {
+      "Newtonsoft.Json/7.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/net40/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/net40/Newtonsoft.Json.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.0/win7-x64": {
+      "Newtonsoft.Json/7.0.1": {
+        "type": "package",
+        "compile": {
+          "lib/net40/Newtonsoft.Json.dll": {}
+        },
+        "runtime": {
+          "lib/net40/Newtonsoft.Json.dll": {}
         }
       }
     },
@@ -2826,13 +2859,15 @@
   },
   "projectFileDependencyGroups": {
     "": [
-      "Newtonsoft.Json >= 7.0.1",
-      "System.IO.Compression >= 4.0.1-beta-23409"
+      "Newtonsoft.Json >= 7.0.1"
     ],
+    ".NETFramework,Version=v4.0": [],
     "DNX,Version=v4.5.1": [
+      "System.IO.Compression >= 4.0.1-beta-23409",
       "xunit.runner.visualstudio >= 2.1.0"
     ],
     "DNXCore,Version=v5.0": [
+      "System.IO.Compression >= 4.0.1-beta-23409",
       "System.Collections >= 4.0.11-beta-23516",
       "System.Linq >= 4.0.1-beta-23516",
       "System.Runtime >= 4.0.21-beta-23516",

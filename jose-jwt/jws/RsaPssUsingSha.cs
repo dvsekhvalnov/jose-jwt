@@ -15,7 +15,7 @@ namespace Jose
 
         public byte[] Sign(byte[] securedInput, object key)
         {
-#if DNX451
+#if DNX451 || NET40
             var privateKey = Ensure.Type<RSACryptoServiceProvider>(key, "RsaUsingSha with PSS padding alg expects key to be of RSACryptoServiceProvider type.");
 
             try
@@ -26,7 +26,7 @@ namespace Jose
             {
                 throw new JoseException("Unable to sign content.", e);    
             }
-#elif DNXCORE50
+#elif DNXCORE50 || NET40
             var privateKey = Ensure.Type<RSA>(key, "RsaUsingSha with PSS padding alg expects key to be of RSA type.");
             return privateKey.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
 #endif
@@ -34,7 +34,7 @@ namespace Jose
 
         public bool Verify(byte[] signature, byte[] securedInput, object key)
         {
-#if DNX451
+#if DNX451 || NET40
             var publicKey = Ensure.Type<RSACryptoServiceProvider>(key,
                 "RsaUsingSha with PSS padding alg expects key to be of RSACryptoServiceProvider type.");
 

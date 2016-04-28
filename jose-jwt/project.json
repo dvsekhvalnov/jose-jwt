@@ -3,20 +3,20 @@
   "title": "Jose JWT",
   "authors": [ "Dmitry Vsekhvalnov" ],
   "owners": [ "Dmitry Vsekhvalnov" ],
-  "tags": [ "jose", "jwt", "json", "jwa", "jwe", "jws", "aes", "cbc", "gcm", "rsa", "hmac", "sha", "rsassa", "pss", "rsaes", "oaep", "pkcs1-v1_5", "es", "elliptic", "curve", "diffe", "hellman", "agreement", "ecdsa", "key wrap", "kw", "ecdh", "pbes", "pbes2", "pbkdf", "pbkdf2", "password based encryption", "javascript object signing", "two phase validation" ],
+  "tags": [ "jose", "jwt", "json", "jwa", "jwe", "jws", "aes", "cbc", "gcm", "rsa", "hmac", "sha", "rsassa", "pss", "rsaes", "oaep", "pkcs1-v1_5", "es", "elliptic", "curve", "diffe", "hellman", "agreement", "ecdsa", "key wrap", "kw", "ecdh", "pbes", "pbes2", "pbkdf", "pbkdf2", "password based encryption", "javascript object signing", "two phase validation", "netcore", "clr", "coreclr", "portable" ],
   "projectUrl": "https://github.com/dvsekhvalnov/jose-jwt",
   "licenseUrl": "https://raw.github.com/dvsekhvalnov/jose-jwt/master/LICENSE",
   "language": "en-US",
   "copyright": "Copyright dvsekhvalnov 2014-2016",
   "requireLicenseAcceptance": false,
-  "releaseNotes": ".NET Core support (CLR runtime)",
+  "releaseNotes": "This is major release which aimed to support .NET Core support (CLR/CORECLR runtime)",
   "summary": "Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET Core. Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms. Library for generating, decoding and encryption of JSON Web Tokens.",
   "description": "Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET \r\r
 
 Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET. Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms. \r
 Supports generating, decoding, encryption and compression of JSON Web Tokens. JSON parsing agnostic. Supports two-phase validation. \r\r
 
-Supported algorithms \r\r
+CLR supported algorithms \r\r
 
 Signing: \r\r
 
@@ -40,17 +40,36 @@ Encryption: \r\r
 
 Compression: \r\r
 
-- DEFLATE compression",
+- DEFLATE compression\r\r\r
+
+CORECLR supported algorithms \r\r
+
+Signing: \r\r
+
+- HMAC signatures with HS256, HS384 and HS512. \r
+- ECDSA signatures with ES256, ES384 and ES512. \r
+- RSASSA-PKCS1-V1_5 signatures with RS256, RS384 and RS512. \r
+- NONE (unprotected) plain text algorithm without integrity protection \r\r
+
+Encryption: \r\r
+
+- RSAES OAEP 256 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM \r
+- RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM \r
+- RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM \r
+- Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM \r",
   "frameworks": {
+    "net4": {},
     "dnx451": {
       "frameworkAssemblies": {
       },
       "dependencies": {
+	"System.IO.Compression": "4.0.1-beta-23409",
         "xunit.runner.visualstudio": "2.1.0"
       }
     },
     "dnxcore50": {
       "dependencies": {
+	"System.IO.Compression": "4.0.1-beta-23409",
         "System.Collections": "4.0.11-beta-23516",
         "System.Linq": "4.0.1-beta-23516",
         "System.Runtime": "4.0.21-beta-23516",
@@ -65,6 +84,5 @@ Compression: \r\r
   },
   "dependencies": {
     "Newtonsoft.Json": "7.0.1",
-    "System.IO.Compression": "4.0.1-beta-23409"
   }
 }

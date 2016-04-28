@@ -62,7 +62,7 @@ namespace Jose
 
         private static HashAlgorithm HashAlgorithm(CngAlgorithm hash)
         {
-        #if DNX451
+        #if DNX451 || NET40
             if (hash == CngAlgorithm.Sha256)
                 return new SHA256Cng();
             if (hash == CngAlgorithm.Sha384)
