@@ -100,7 +100,7 @@ namespace Jose
                     }
                 }
             }
-        #elif DNXCORE50
+        #elif DNXCORE50 || NETCOREAPP1_0
             throw new NotImplementedException("not yet");
         #endif
         }
@@ -128,7 +128,7 @@ namespace Jose
                     }
                 }
             }
-        #elif DNXCORE50
+        #elif DNXCORE50 || NETCOREAPP1_0
             throw new NotImplementedException("not yet");
         #endif
         }

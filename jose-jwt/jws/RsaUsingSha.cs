@@ -27,8 +27,8 @@ namespace Jose
                 return pkcs1.CreateSignature(sha.ComputeHash(securedInput));                    
             }
 
-#elif DNXCORE50
-                var privateKey = Ensure.Type<RSA>(key, "RsaUsingSha alg expects key to be of RSA type.");                
+#elif DNXCORE50 || NETCOREAPP1_0
+            var privateKey = Ensure.Type<RSA>(key, "RsaUsingSha alg expects key to be of RSA type.");                
                 return privateKey.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pkcs1);
 #endif
         }
@@ -46,7 +46,7 @@ namespace Jose
 
                 return pkcs1.VerifySignature(hash, signature);
             }
-#elif DNXCORE50
+#elif DNXCORE50 || NETCOREAPP1_0
             var publicKey = Ensure.Type<RSA>(key, "RsaUsingSha alg expects key to be of RSA type.");             
             return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pkcs1);
 #endif
@@ -67,7 +67,7 @@ namespace Jose
                 throw new ArgumentException("Unsupported hashing algorithm: '{0}'", hashMethod);
             }
         }
-#elif DNXCORE50
+#elif DNXCORE50 || NETCOREAPP1_0
         private HashAlgorithmName HashAlgorithm
         {
             get

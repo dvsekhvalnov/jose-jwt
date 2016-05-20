@@ -9,7 +9,7 @@ namespace Jose
     {
         public static byte[] DeriveKey(CngKey externalPubKey, CngKey privateKey, int keyBitLength, byte[] algorithmId, byte[] partyVInfo, byte[] partyUInfo, byte[] suppPubInfo)
         {
-        #if DNX451 || NET40
+#if DNX451 || NET40
             using (var cng = new ECDiffieHellmanCng(privateKey))
             {
                 using (SafeNCryptSecretHandle hSecretAgreement = cng.DeriveSecretAgreementHandle(externalPubKey))
@@ -39,7 +39,7 @@ namespace Jose
                     }
                 }
             }
-        #elif DNXCORE50
+        #elif DNXCORE50 || NETCOREAPP1_0
             throw new NotImplementedException("not yet");
         #endif
         }

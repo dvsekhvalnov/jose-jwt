@@ -26,7 +26,7 @@ namespace Jose
             {
                 throw new JoseException("Unable to sign content.", e);    
             }
-#elif DNXCORE50 || NET40
+#elif DNXCORE50 || NETCOREAPP1_0
             var privateKey = Ensure.Type<RSA>(key, "RsaUsingSha with PSS padding alg expects key to be of RSA type.");
             return privateKey.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
 #endif
@@ -48,13 +48,13 @@ namespace Jose
                 return false;
             }
 
-#elif DNXCORE50
+#elif DNXCORE50 || NETCOREAPP1_0
             var publicKey = Ensure.Type<RSA>(key, "RsaUsingSha with PSS padding alg expects key to be of RSA type.");
             return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
 #endif
         }
 
-#if DNXCORE50
+#if DNXCORE50 || NETCOREAPP1_0
         private HashAlgorithmName HashAlgorithm
         {
             get
