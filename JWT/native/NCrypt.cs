@@ -33,7 +33,11 @@ namespace Jose.native
 
                 foreach (var buf in buffers)
                 {
-                    Marshal.StructureToPtr(buf, pBuffers+totalSizeBytes, false);
+#if NET35
+                    Marshal.StructureToPtr(buf, new IntPtr(pBuffers.ToInt32() + totalSizeBytes), false);
+#else
+                    Marshal.StructureToPtr(buf, pBuffers + totalSizeBytes, false);
+#endif
                     totalSizeBytes += Marshal.SizeOf(buf);
                 }
             }

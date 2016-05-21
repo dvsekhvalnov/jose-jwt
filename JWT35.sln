@@ -3,9 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JWT", "JWT\JWT.csproj", "{A80B51B8-DDF6-4026-98A4-B59653E50B38}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JWT35", "JWT\JWT35.csproj", "{7B6B0007-BFB7-4B7D-83A8-53D199DCA02D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{2484B30F-97B4-4C2A-802D-07EE1F330C80}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests35", "UnitTests\UnitTests35.csproj", "{2484B30F-97B4-4C2A-802D-07EE1F330C80}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7B6B0007-BFB7-4B7D-83A8-53D199DCA02D} = {7B6B0007-BFB7-4B7D-83A8-53D199DCA02D}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -13,10 +16,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A80B51B8-DDF6-4026-98A4-B59653E50B38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A80B51B8-DDF6-4026-98A4-B59653E50B38}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A80B51B8-DDF6-4026-98A4-B59653E50B38}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A80B51B8-DDF6-4026-98A4-B59653E50B38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B6B0007-BFB7-4B7D-83A8-53D199DCA02D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B6B0007-BFB7-4B7D-83A8-53D199DCA02D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B6B0007-BFB7-4B7D-83A8-53D199DCA02D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B6B0007-BFB7-4B7D-83A8-53D199DCA02D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{2484B30F-97B4-4C2A-802D-07EE1F330C80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{2484B30F-97B4-4C2A-802D-07EE1F330C80}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2484B30F-97B4-4C2A-802D-07EE1F330C80}.Release|Any CPU.ActiveCfg = Release|Any CPU

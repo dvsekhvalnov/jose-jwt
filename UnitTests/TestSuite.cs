@@ -20,7 +20,10 @@ namespace UnitTests
         private byte[] aes512Key = new byte[] { 238, 71, 183, 66, 57, 207, 194, 93, 82, 80, 80, 152, 92, 242, 84, 206, 194, 46, 67, 43, 231, 118, 208, 168, 156, 212, 33, 105, 27, 45, 60, 160, 232, 63, 61, 235, 68, 171, 206, 35, 152, 11, 142, 121, 174, 165, 140, 11, 172, 212, 13, 101, 13, 190, 82, 244, 109, 113, 70, 150, 251, 82, 215, 226 };
 
         [SetUp]
-        public void SetUp() {}
+        public void SetUp()
+        {
+            JWT.JsonMapper = new JSSerializeMapper();
+        }
      
         [Test]
         public void DecodePlaintext()
