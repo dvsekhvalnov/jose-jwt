@@ -2213,6 +2213,22 @@ namespace UnitTests
             Assert.That(test, Is.EqualTo(@"{""hello"": ""world""}"));           
         }
 
+        [Test]
+        public void PayloadBytes()
+        {
+            //given
+            string token =
+                "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.AQIDBAMCAQ.n-yEkyHXbqD87wxayy0raX_hK1csnVT5qnBOXrabz2olndAH2nZf1W-w7xejFcqofZI4MwhUToWtME0AltD8yUZ5hO1hK4TDHe13Z8tdJ5LiNVZuIoUjJgn2eJ8NyuRSZgMf-_q9PnMmU-7r6W6sFdP7TfcBKC2AE6J5jfYGc8_KWrJNGvivR0e6M8aEJB75pkKceYFmT2rBD6OJtK1NWzkVB2QObOx95rQLpS8tBmiNbz48QQTNAsCZ47zwswy4v0LEnBOHlvVKyjRAnWfjPENr0yRJcpQ1hFgHoU3-afAI47A4P53oMo4tJ6pBfJ1_uNdOlZu-dDFe8UzzH3p9Ig";
+
+            //when
+            var test = Jose.JWT.PayloadBytes(token);
+
+            Console.Out.WriteLine("PayloadBytes = {0}", BitConverter.ToString(test));
+
+            //then
+            Assert.That(test, Is.EquivalentTo(new byte[] { 1, 2, 3, 4, 3, 2, 1 }));
+        }
+
         [Test]        
         public void PayloadOfEncryptedTOken()
         {
