@@ -39,7 +39,7 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 - DEFLATE compression
 
 ##### Notes:
-\* It appears that Microsoft CNG implementation of BCryptSecretAgreement/NCryptSecretAgreement contains a bug for calculating Elliptic Curve Diffie–Hellman secret agreement
+\* It appears that Microsoft CNG implementation of BCryptSecretAgreement/NCryptSecretAgreement contains a bug for calculating Elliptic Curve Diffieï¿½Hellman secret agreement
 on keys higher than 256 bit (P-384 and P-521 NIST curves correspondingly). At least produced secret agreements do not match any other implementation in different languages.
 Technically it is possible to use ECDH-ES or ECDH-ES+AES Key Wrap family with A192CBC-HS384 and A256CBC-HS512 but most likely produced JWT tokens will not be compatible with other platforms and therefore can't be decoded correctly.
 
@@ -371,6 +371,25 @@ byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159
 var publicKey = EccKey.New(x, y);
 
 string json = Jose.JWT.Decode(token, publicKey, JwsAlgorithm.ES256);
+```
+
+### Working with binary payload
+
+It is possible to encode and decode JOSE objects that have a payload consisting of arbitrary binary data. The methods that work with a binary payload have the Bytes suffix in the name to distinguish them in cases of potential ambiguity, e.g. `EncodeBytes()`.
+
+Example of working with signed binary payloads in JOSE objects:
+```C#
+var payload = new byte[] { 1, 2, 3, 0, 255 };
+var signingKey = Convert.FromBase64String("WbQs8GowdRX1zYCFi3/VuQ==");
+
+// Encoding a token with a binary payload.
+var token = Jose.JWT.EncodeBytes(payload, signingKey, Jose.JwsAlgorithm.HS256);
+
+// Reading the binary payload from a token (with signature verification).
+var decoded = Jose.JWT.DecodeBytes(token, signingKey);
+
+// Reading the binary payload from a token (without signature verification).
+decoded = Jose.JWT.PayloadBytes(token);
 ```
 
 ### Parsing and mapping json to object model directly
