@@ -12,15 +12,15 @@
     "licenseUrl": "",
     "frameworks": {
 
-        "netcoreapp1.0": {
-	   "imports": [
+      "netcoreapp1.0": {
+	        "imports": [
                 "dnxcore50",
                 "portable-net45+win8"
             ],
           "dependencies": {
             "Microsoft.NETCore.App": {
                "type": "platform",
-               "version": "1.0.0-rc2-3002700",
+               "version": "1.0.0",
             },
             "dotnet-test-xunit": "1.0.0-rc2-build10025"
           }

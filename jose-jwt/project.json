@@ -69,7 +69,7 @@ Encryption: \r\r
       "dependencies": {
         "Microsoft.NETCore.App": {
            "type": "platform",
-           "version": "1.0.0-rc2-3002700",
+           "version": "1.0.0",
         },
         "Newtonsoft.Json": "8.0.3",
         "System.Security.Cryptography.Algorithms": "4.1.0-rc2-24027",
