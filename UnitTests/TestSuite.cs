@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -16,7 +17,10 @@ namespace UnitTests
         private byte[] aes192Key = new byte[] { 139, 156, 136, 148, 17, 147, 27, 233, 145, 80, 115, 197, 223, 11, 100, 221, 5, 50, 155, 226, 136, 222, 216, 14 };
         private byte[] aes256Key = new byte[] { 164, 60, 194, 0, 161, 189, 41, 38, 130, 89, 141, 164, 45, 170, 159, 209, 69, 137, 243, 216, 191, 131, 47, 250, 32, 107, 231, 117, 37, 158, 225, 234 };
         private byte[] aes384Key = new byte[] { 185, 30, 233, 199, 32, 98, 209, 3, 114, 250, 30, 124, 207, 173, 227, 152, 243, 202, 238, 165, 227, 199, 202, 230, 218, 185, 216, 113, 13, 53, 40, 100, 100, 20, 59, 67, 88, 97, 191, 3, 161, 37, 147, 223, 149, 237, 190, 156 };
-        private byte[] aes512Key = new byte[] { 238, 71, 183, 66, 57, 207, 194, 93, 82, 80, 80, 152, 92, 242, 84, 206, 194, 46, 67, 43, 231, 118, 208, 168, 156, 212, 33, 105, 27, 45, 60, 160, 232, 63, 61, 235, 68, 171, 206, 35, 152, 11, 142, 121, 174, 165, 140, 11, 172, 212, 13, 101, 13, 190, 82, 244, 109, 113, 70, 150, 251, 82, 215, 226 };      
+        private byte[] aes512Key = new byte[] { 238, 71, 183, 66, 57, 207, 194, 93, 82, 80, 80, 152, 92, 242, 84, 206, 194, 46, 67, 43, 231, 118, 208, 168, 156, 212, 33, 105, 27, 45, 60, 160, 232, 63, 61, 235, 68, 171, 206, 35, 152, 11, 142, 121, 174, 165, 140, 11, 172, 212, 13, 101, 13, 190, 82, 244, 109, 113, 70, 150, 251, 82, 215, 226 };
+
+        // The binary payload is a blob consisting of all possible byte values.
+        private byte[] BinaryPayload = Enumerable.Range(byte.MinValue, byte.MaxValue + 1).Select(i => (byte)i).ToArray();
 
         [Fact]
         public void DecodePlaintext()
@@ -46,6 +50,52 @@ namespace UnitTests
 
             //then
             Assert.Equal(token, "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.");
+        }
+
+        [Fact]
+        public void EncodeBytesHS512()
+        {
+            // This test encodes a payload consisting of arbitrary binary data. Only a single signature algorithm is tested
+            // in the binary data scenario, as the internal flow is the same as for the non-Bytes methods and the
+            // other tests also cover the primary JOSE functionality, with only the binary-payload-specific part tested here.
+
+            string token = Jose.JWT.EncodeBytes(BinaryPayload, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS512);
+
+            Console.Out.WriteLine("EncodeBytesHS512: " + token);
+
+            Assert.Equal(token, "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w.3_-H4HJiNi8--Ss-VAMM1Dg0JtTGEXNvMo1LAHEnQ7bZpQiblqAu5tt-G9p8KFnSlSYOG6l64pIqmqu5p5RvuQ");
+        }
+
+        [Fact]
+        public void DecodeBytesHS512()
+        {
+            // This test decodes a payload consisting of arbitrary binary data. Only a single signature algorithm is tested
+            // in the binary data scenario, as the internal flow is the same as for the non-Bytes methods and the
+            // other tests also cover the primary JOSE functionality, with only the binary-payload-specific part tested here.
+
+            string token = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w.3_-H4HJiNi8--Ss-VAMM1Dg0JtTGEXNvMo1LAHEnQ7bZpQiblqAu5tt-G9p8KFnSlSYOG6l64pIqmqu5p5RvuQ";
+
+            var payload = Jose.JWT.DecodeBytes(token, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS512);
+
+            Console.Out.WriteLine("DecodeBytesHS512: " + BitConverter.ToString(payload));
+
+            Assert.Equal(payload, BinaryPayload);
+        }
+
+        [Fact]
+        public void EncryptAndDecryptBytes_RSA1_5_A256GCM()
+        {
+            // This test encodes a payload consisting of arbitrary binary data. Only a single encryption algorithm is tested
+            // in the binary data scenario, as the internal flow is the same as for the non-Bytes methods and the
+            // other tests also cover the primary JOSE functionality, with only the binary-payload-specific part tested here.
+
+            string token = Jose.JWT.EncodeBytes(BinaryPayload, PubKey(), JweAlgorithm.RSA1_5, JweEncryption.A256GCM);
+
+            Console.Out.WriteLine("EncryptAndDecryptBytes_RSA1_5_A256GCM: " + token);
+
+            var payload = Jose.JWT.DecodeBytes(token, PrivKey(), JweAlgorithm.RSA1_5, JweEncryption.A256GCM);
+
+            Assert.Equal(payload, BinaryPayload);
         }
 
         [Fact]

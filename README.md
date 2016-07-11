@@ -420,6 +420,25 @@ var key = FindKeyByIssuer(jwt.Iss);
 var payload = Jose.JWT.Decode<JwtToken>(token, key);
 ```
 
+### Working with binary payload
+
+It is possible to encode and decode JOSE objects that have a payload consisting of arbitrary binary data. The methods that work with a binary payload have the Bytes suffix in the name to distinguish them in cases of potential ambiguity, e.g. `EncodeBytes()`.
+
+Example of working with signed binary payloads in JOSE objects:
+```C#
+var payload = new byte[] { 1, 2, 3, 0, 255 };
+var signingKey = Convert.FromBase64String("WbQs8GowdRX1zYCFi3/VuQ==");
+
+// Encoding a token with a binary payload.
+var token = Jose.JWT.EncodeBytes(payload, signingKey, Jose.JwsAlgorithm.HS256);
+
+// Reading the binary payload from a token (with signature verification).
+var decoded = Jose.JWT.DecodeBytes(token, signingKey);
+
+// Reading the binary payload from a token (without signature verification).
+decoded = Jose.JWT.PayloadBytes(token);
+```
+
 ### Parsing and mapping json to object model directly
 jose-jwt library is agnostic about object model used to represent json payload as well as underlying framework used to serialize/parse json objects. Library provides convinient generic methods to work directly with your object model:
 

@@ -228,7 +228,28 @@ namespace Jose
                     "Getting payload for encrypted tokens is not supported. Please use Jose.JWT.Decode() method instead.");
             }
 
-            return Encoding.UTF8.GetString(parts[1]);            
+            return Encoding.UTF8.GetString(parts[1]);
+        }
+
+        /// <summary>
+        /// Parses signed JWT token, extracts and returns payload part as binary data. 
+        /// This method is NOT supported for encrypted JWT tokens.
+        /// This method is NOT performing integrity checking. 
+        /// </summary>        
+        /// <param name="token">signed JWT token</param>
+        /// <returns>unmarshalled payload</returns>
+        /// <exception cref="JoseException">if encrypted JWT token is provided</exception>        
+        public static byte[] PayloadBytes(string token)
+        {
+            byte[][] parts = Compact.Parse(token);
+
+            if (parts.Length > 3)
+            {
+                throw new JoseException(
+                    "Getting payload for encrypted tokens is not supported. Please use Jose.JWT.Decode() method instead.");
+            }
+
+            return parts[1];
         }
 
         /// <summary>
@@ -267,6 +288,22 @@ namespace Jose
         {
             Ensure.IsNotEmpty(payload, "Payload expected to be not empty, whitespace or null.");
 
+            byte[] plainText = Encoding.UTF8.GetBytes(payload);
+
+            return EncodeBytes(plainText, key, alg, enc, compression, extraHeaders);
+        }
+
+        /// <summary>
+        /// Encodes given binary data to JWT token and applies requested encryption/compression algorithms.
+        /// </summary>
+        /// <param name="payload">Binary data to encode (not null)</param>
+        /// <param name="key">key for encryption, suitable for provided JWS algorithm, can be null.</param>
+        /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
+        public static string EncodeBytes(byte[] payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null)
+        {
+            if (payload == null)
+                throw new ArgumentNullException(nameof(payload));
+
             IKeyManagement keys = KeyAlgorithms[alg];
             IJweAlgorithm _enc = EncAlgorithms[enc];
 
@@ -277,18 +314,16 @@ namespace Jose
             byte[][] contentKeys = keys.WrapNewKey(_enc.KeySize, key, jwtHeader);
             byte[] cek = contentKeys[0];
             byte[] encryptedCek = contentKeys[1];
-            
-            byte[] plainText = Encoding.UTF8.GetBytes(payload);            
 
             if (compression.HasValue)
             {
                 jwtHeader["zip"] = JweCompressionMethods[compression.Value];
-                plainText = CompressionAlgorithms[compression.Value].Compress(plainText);
+                payload = CompressionAlgorithms[compression.Value].Compress(payload);
             }
 
             byte[] header = Encoding.UTF8.GetBytes(jsMapper.Serialize(jwtHeader));
             byte[] aad = Encoding.UTF8.GetBytes(Compact.Serialize(header));
-            byte[][] encParts = _enc.Encrypt(aad, plainText, cek);
+            byte[][] encParts = _enc.Encrypt(aad, payload, cek);
 
             return Compact.Serialize(header, encryptedCek, encParts[0], encParts[1], encParts[2]);
         }
@@ -315,23 +350,38 @@ namespace Jose
         {
             Ensure.IsNotEmpty(payload, "Payload expected to be not empty, whitespace or null.");
 
-            if(extraHeaders == null) //allow overload, but keep backward compatible defaults
+            byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);
+
+            return EncodeBytes(payloadBytes, key, algorithm, extraHeaders);
+        }
+
+        /// <summary>
+        /// Encodes given binary data to JWT token and sign it using given algorithm.        
+        /// </summary>
+        /// <param name="payload">Binary data to encode (not null)</param>
+        /// <param name="key">key for signing, suitable for provided JWS algorithm, can be null.</param>
+        /// <returns>JWT in compact serialization form, digitally signed.</returns>
+        public static string EncodeBytes(byte[] payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null)
+        {
+            if (payload == null)
+                throw new ArgumentNullException(nameof(payload));
+
+            if (extraHeaders == null) //allow overload, but keep backward compatible defaults
             {
-                extraHeaders = new Dictionary<string, object>{ {"typ", "JWT"} };
+                extraHeaders = new Dictionary<string, object> { { "typ", "JWT" } };
             }
 
-            var jwtHeader = new Dictionary<string,object> { { "alg", JwsAlgorithms[algorithm]} };
+            var jwtHeader = new Dictionary<string, object> { { "alg", JwsAlgorithms[algorithm] } };
 
             Dictionaries.Append(jwtHeader, extraHeaders);
 
             byte[] headerBytes = Encoding.UTF8.GetBytes(jsMapper.Serialize(jwtHeader));
-            byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);
 
-            var bytesToSign = Encoding.UTF8.GetBytes(Compact.Serialize(headerBytes, payloadBytes));
+            var bytesToSign = Encoding.UTF8.GetBytes(Compact.Serialize(headerBytes, payload));
 
             byte[] signature = HashAlgorithms[algorithm].Sign(bytesToSign, key);
 
-            return Compact.Serialize(headerBytes, payloadBytes, signature);
+            return Compact.Serialize(headerBytes, payload, signature);
         }
 
         /// <summary>
@@ -339,22 +389,157 @@ namespace Jose
         /// Resulting json string is returned untouched (e.g. no parsing or mapping)
         /// </summary>
         /// <param name="token">JWT token in compact serialization form.</param>
-        /// <param name="key">key for decoding suitable for JWT algorithm used, can be null.</param>
+        /// <param name="key">key for decoding suitable for JWT algorithm used.</param>
+        /// <param name="alg">The algorithm type that we expect to receive in the header.</param>
+        /// <param name="enc">The encryption type that we expect to receive in the header.</param>
         /// <returns>decoded json string</returns>
         /// <exception cref="IntegrityException">if signature valdation failed</exception>
         /// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
-        /// <exception cref="InvalidAlgorithmException">if JWT signature,encryption or compression algorithm is not supported</exception>        
-        public static string Decode(string token, object key = null)
+        /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
+        public static string Decode(string token, object key, JweAlgorithm alg, JweEncryption enc)
+        {
+            return Decode(token, key, null, alg, enc);
+        }
+
+		/// <summary>
+		/// Decodes JWT token by performining necessary decompression/decryption and signature verification as defined in JWT token header.
+		/// Resulting bytes of the payload are returned untouched (e.g. no parsing or mapping)
+		/// </summary>
+		/// <param name="token">JWT token in compact serialization form.</param>
+		/// <param name="key">key for decoding suitable for JWT algorithm used.</param>
+		/// <param name="alg">The algorithm type that we expect to receive in the header.</param>
+		/// <param name="enc">The encryption type that we expect to receive in the header.</param>
+		/// <returns>Decrypted payload as binary data</returns>
+		/// <exception cref="IntegrityException">if signature valdation failed</exception>
+		/// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
+		/// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
+		public static byte[] DecodeBytes(string token, object key, JweAlgorithm alg, JweEncryption enc)
+		{
+			return DecodeBytes(token, key, null, alg, enc);
+		}
+
+		/// <summary>
+		/// Decodes JWT token by performining necessary decompression/decryption and signature verification as defined in JWT token header.
+		/// Resulting json string is returned untouched (e.g. no parsing or mapping)
+		/// </summary>
+		/// <param name="token">JWT token in compact serialization form.</param>
+		/// <param name="key">key for decoding suitable for JWT algorithm used.</param>
+		/// <param name="alg">The algorithm type that we expect to receive in the header.</param>
+		/// <returns>decoded json string</returns>
+		/// <exception cref="IntegrityException">if signature valdation failed</exception>
+		/// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
+		/// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
+		public static string Decode(string token, object key, JwsAlgorithm alg)
+        {
+            return Decode(token, key, alg, null, null);
+        }
+
+		/// <summary>
+		/// Decodes JWT token by performining necessary decompression/decryption and signature verification as defined in JWT token header.
+		/// Resulting bytes of the payload are returned untouched (e.g. no parsing or mapping)
+		/// </summary>
+		/// <param name="token">JWT token in compact serialization form.</param>
+		/// <param name="key">key for decoding suitable for JWT algorithm used.</param>
+		/// <param name="alg">The algorithm type that we expect to receive in the header.</param>
+		/// <returns>The payload as binary data</returns>
+		/// <exception cref="IntegrityException">if signature valdation failed</exception>
+		/// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
+		/// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
+		public static byte[] DecodeBytes(string token, object key, JwsAlgorithm alg)
+		{
+			return DecodeBytes(token, key, alg, null, null);
+		}
+
+		/// <summary>
+		/// Decodes JWT token by performining necessary decompression/decryption and signature verification as defined in JWT token header.
+		/// Resulting json string is returned untouched (e.g. no parsing or mapping)
+		/// </summary>
+		/// <param name="token">JWT token in compact serialization form.</param>
+		/// <param name="key">key for decoding suitable for JWT algorithm used, can be null.</param>
+		/// <returns>decoded json string</returns>
+		/// <exception cref="IntegrityException">if signature valdation failed</exception>
+		/// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
+		/// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
+		public static string Decode(string token, object key = null)
+        {
+            return Decode(token, key, null, null, null);
+        }
+
+		/// <summary>
+		/// Decodes JWT token by performining necessary decompression/decryption and signature verification as defined in JWT token header.
+		/// Resulting binary payload is returned untouched (e.g. no parsing or mapping)
+		/// </summary>
+		/// <param name="token">JWT token in compact serialization form.</param>
+		/// <param name="key">key for decoding suitable for JWT algorithm used, can be null.</param>
+		/// <returns>The payload as binary data</returns>
+		/// <exception cref="IntegrityException">if signature valdation failed</exception>
+		/// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
+		/// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
+		public static byte[] DecodeBytes(string token, object key = null)
+		{
+			return DecodeBytes(token, key, null, null, null);
+		}
+
+		/// <summary>
+		/// Decodes JWT token by performining necessary decompression/decryption and signature verification as defined in JWT token header.
+		/// Resulting json string will be parsed and mapped to desired type via configured IJsonMapper implementation.
+		/// </summary>
+		/// <typeparam name="T">Deserid object type after json mapping</typeparam>
+		/// <param name="token">JWT token in compact serialization form.</param>
+		/// <param name="key">key for decoding suitable for JWT algorithm used.</param>
+		/// <param name="alg">The algorithm type that we expect to receive in the header.</param>
+		/// <param name="enc">The encryption type that we expect to receive in the header.</param>
+		/// <returns>object of provided T, result of decoded json mapping</returns>
+		/// <exception cref="IntegrityException">if signature valdation failed</exception>
+		/// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
+		/// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
+		public static T Decode<T>(string token, object key, JweAlgorithm alg, JweEncryption enc)
+        {
+            return jsMapper.Parse<T>(Decode(token, key, alg, enc));
+        }
+
+        /// <summary>
+        /// Decodes JWT token by performining necessary decompression/decryption and signature verification as defined in JWT token header.
+        /// Resulting json string will be parsed and mapped to desired type via configured IJsonMapper implementation.
+        /// </summary>
+        /// <typeparam name="T">Deserid object type after json mapping</typeparam>
+        /// <param name="token">JWT token in compact serialization form.</param>
+        /// <param name="key">key for decoding suitable for JWT algorithm used.</param>
+        /// <param name="alg">The algorithm type that we expect to receive in the header.</param>
+        /// <returns>object of provided T, result of decoded json mapping</returns>
+        /// <exception cref="IntegrityException">if signature valdation failed</exception>
+        /// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
+        /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
+        public static T Decode<T>(string token, object key, JwsAlgorithm alg)
+        {
+            return jsMapper.Parse<T>(Decode(token, key, alg));
+        }
+
+        /// <summary>
+        /// Decodes JWT token by performining necessary decompression/decryption and signature verification as defined in JWT token header.
+        /// Resulting json string will be parsed and mapped to desired type via configured IJsonMapper implementation.
+        /// </summary>
+        /// <typeparam name="T">Deserid object type after json mapping</typeparam>
+        /// <param name="token">JWT token in compact serialization form.</param>
+        /// <param name="key">key for decoding suitable for JWT algorithm used, can be null.</param>
+        /// <returns>object of provided T, result of decoded json mapping</returns>
+        /// <exception cref="IntegrityException">if signature valdation failed</exception>
+        /// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
+        /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
+        public static T Decode<T>(string token, object key=null)
+        {
+            return jsMapper.Parse<T>(Decode(token, key));
+        }
+
+        private static byte[] DecodeBytes(string token, object key = null, JwsAlgorithm? jwsAlg = null, JweAlgorithm? jweAlg = null, JweEncryption? jweEnc = null)
         {
             Ensure.IsNotEmpty(token, "Incoming token expected to be in compact serialization form, not empty, whitespace or null.");
 
             byte[][] parts = Compact.Parse(token);
 
-            string json;
-
             if (parts.Length == 5) //encrypted JWT
             {
-                json = Decrypt(parts, key);
+                return DecryptBytes(parts, key, jweAlg, jweEnc);
             }
             else
             {
@@ -368,32 +553,24 @@ namespace Jose
                 var headerData = jsMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(header));
                 var algorithm = (string)headerData["alg"];
 
+                if (jwsAlg != null && (JwsAlgorithm)jwsAlg != GetHashAlgorithm(algorithm))
+                    throw new InvalidAlgorithmException("The algorithm type passed to the Decode method did not match the algorithm type in the header.");
+
                 if (!HashAlgorithms[GetHashAlgorithm(algorithm)].Verify(signature, securedInput, key))
                     throw new IntegrityException("Invalid signature.");
 
-                json = Encoding.UTF8.GetString(payload);
+                return payload;
             }
-
-            return json;
         }
 
-        /// <summary>
-        /// Decodes JWT token by performining necessary decompression/decryption and signature verification as defined in JWT token header.
-        /// Resulting json string will be parsed and mapped to desired type via configured IJsonMapper implementation.
-        /// </summary>
-        /// <typeparam name="T">Deserid object type after json mapping</typeparam>
-        /// <param name="token">JWT token in compact serialization form.</param>
-        /// <param name="key">key for decoding suitable for JWT algorithm used, can be null.</param>
-        /// <returns>object of provided T, result of decoded json mapping</returns>
-        /// <exception cref="IntegrityException">if signature valdation failed</exception>
-        /// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
-        /// <exception cref="InvalidAlgorithmException">if JWT signature,encryption or compression algorithm is not supported</exception>        
-        public static T Decode<T>(string token, object key=null)
+        private static string Decode(string token, object key = null, JwsAlgorithm? jwsAlg = null, JweAlgorithm? jweAlg = null, JweEncryption? jweEnc = null)
         {
-            return jsMapper.Parse<T>(Decode(token, key));
+            var payloadBytes = DecodeBytes(token, key, jwsAlg, jweAlg, jweEnc);
+
+            return Encoding.UTF8.GetString(payloadBytes);
         }
 
-        private static string Decrypt(byte[][] parts, object key)
+        private static byte[] DecryptBytes(byte[][] parts, object key, JweAlgorithm? jweAlg, JweEncryption? jweEnc)
         {
             byte[] header = parts[0];
             byte[] encryptedCek = parts[1];
@@ -401,22 +578,35 @@ namespace Jose
             byte[] cipherText = parts[3];
             byte[] authTag = parts[4];
 
-            IDictionary<string,object> jwtHeader = jsMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(header));
+            IDictionary<string, object> jwtHeader = jsMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(header));
 
-            IKeyManagement keys = KeyAlgorithms[GetJweAlgorithm((string) jwtHeader["alg"])];
-            IJweAlgorithm enc = EncAlgorithms[GetJweEncryption((string) jwtHeader["enc"])];
+            IKeyManagement keys = KeyAlgorithms[GetJweAlgorithm((string)jwtHeader["alg"])];
+            IJweAlgorithm enc = EncAlgorithms[GetJweEncryption((string)jwtHeader["enc"])];
+
+            if (jweAlg != null && (JweAlgorithm)jweAlg != GetJweAlgorithm((string)jwtHeader["alg"]))
+                throw new InvalidAlgorithmException("The algorithm type passed to the Decrypt method did not match the algorithm type in the header.");
+
+            if (jweEnc != null && (JweEncryption)jweEnc != GetJweEncryption((string)jwtHeader["enc"]))
+                throw new InvalidAlgorithmException("The encryption type passed to the Decrypt method did not match the encryption type in the header.");
 
             byte[] cek = keys.Unwrap(encryptedCek, key, enc.KeySize, jwtHeader);
             byte[] aad = Encoding.UTF8.GetBytes(Compact.Serialize(header));
 
-            byte[] plainText=enc.Decrypt(aad, cek, iv, cipherText, authTag);
+            byte[] plainText = enc.Decrypt(aad, cek, iv, cipherText, authTag);
 
             if (jwtHeader.ContainsKey("zip"))
             {
-                plainText = CompressionAlgorithms[GetJweCompression((string) jwtHeader["zip"])].Decompress(plainText);
+                plainText = CompressionAlgorithms[GetJweCompression((string)jwtHeader["zip"])].Decompress(plainText);
             }
 
-            return Encoding.UTF8.GetString(plainText); 
+            return plainText;
+        }
+
+        private static string Decrypt(byte[][] parts, object key, JweAlgorithm? jweAlg, JweEncryption? jweEnc)
+        {
+            var payloadBytes = DecryptBytes(parts, key, jweAlg, jweEnc);
+
+            return Encoding.UTF8.GetString(payloadBytes); 
         }
 
         private static JwsAlgorithm GetHashAlgorithm(string algorithm)
