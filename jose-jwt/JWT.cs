@@ -82,10 +82,13 @@ namespace Jose
 
         static JWT()
         {
+#if NET40
+            JsonMapper = new JSSerializerMapper();
+#elif DNXCORE50 || NETCOREAPP1_0
             JsonMapper = new NewtonsoftMapper();
-
+#endif
             HashAlgorithms = new Dictionary<JwsAlgorithm, IJwsAlgorithm>
-            {
+            {       
                 {JwsAlgorithm.none, new Plaintext()},
                 {JwsAlgorithm.HS256, new HmacUsingSha("SHA256")},
                 {JwsAlgorithm.HS384, new HmacUsingSha("SHA384")},

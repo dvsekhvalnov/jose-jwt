@@ -1,10 +1,12 @@
-﻿using System;
+﻿#if DNXCORE50 || NETCOREAPP1_0
+using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace Jose
 {
+
     public class NewtonsoftMapper : IJsonMapper
     {
         public string Serialize(object obj)
@@ -45,3 +47,4 @@ namespace Jose
         }
     }
 }
+#endif

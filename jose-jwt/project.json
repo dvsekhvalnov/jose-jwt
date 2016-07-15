@@ -59,8 +59,8 @@ Encryption: \r\r
 - Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM \r",
   "frameworks": {
     "net4": {
-      "dependencies": {
-        "Newtonsoft.Json": "8.0.3"
+      "frameworkAssemblies": {
+        "System.Web.Extensions": "4.0.0.0"
       }
     },
     

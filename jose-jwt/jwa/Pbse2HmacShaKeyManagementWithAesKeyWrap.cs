@@ -52,7 +52,7 @@ namespace Jose
             Ensure.Contains(header, new[] { "p2s" }, "Pbse2HmacShaKeyManagementWithAesKeyWrap algorithm expects 'p2s' param in JWT header, but was not found");
 
             byte[] algId=Encoding.UTF8.GetBytes((string) header["alg"]);
-            long iterationCount=(long) header["p2c"];
+            int iterationCount= Convert.ToInt32(header["p2c"]);
             byte[] saltInput = Base64Url.Decode((string) header["p2s"]);
 
             byte[] salt = Arrays.Concat(algId, Arrays.Zero, saltInput);
@@ -60,9 +60,8 @@ namespace Jose
             byte[] kek; 
 
             using(var prf=PRF)
-            {
-                //TODO: this is weird, redo to use long
-                kek=PBKDF2.DeriveKey(sharedKey, salt, (int)iterationCount, keyLengthBits, prf);
+            {                
+                kek=PBKDF2.DeriveKey(sharedKey, salt, iterationCount, keyLengthBits, prf);
             }
 
             return aesKW.Unwrap(encryptedCek, kek, cekSizeBits, header);
