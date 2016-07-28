@@ -1,4 +1,4 @@
-﻿#if DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
+﻿#if NETSTANDARD1_4
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;

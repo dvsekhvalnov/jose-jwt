@@ -79,7 +79,7 @@ namespace Jose
 
         private static byte[] AesDec(byte[] sharedKey, byte[] cipherText)
         {
-        #if DNX451 || NET40
+        #if NET40
             using (Aes aes = new AesManaged())
             {
                 aes.Key = sharedKey;
@@ -100,14 +100,14 @@ namespace Jose
                     }
                 }
             }
-        #elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
+        #elif NETSTANDARD1_4
             throw new NotImplementedException("not yet");
         #endif
         }
 
         private static byte[] AesEnc(byte[] sharedKey, byte[] plainText)
         {
-        #if DNX451 || NET40
+        #if NET40
             using (Aes aes = new AesManaged())
             {
                 aes.Key = sharedKey;
@@ -128,7 +128,7 @@ namespace Jose
                     }
                 }
             }
-        #elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
+        #elif NETSTANDARD1_4
             throw new NotImplementedException("not yet");
         #endif
         }

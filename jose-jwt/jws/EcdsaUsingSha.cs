@@ -22,11 +22,11 @@ namespace Jose
             {
                 using (var signer = new ECDsaCng(privateKey))
                 {
-                #if DNX451 || NET40
+                #if NET40
                     signer.HashAlgorithm = Hash;
 
                     return signer.SignData(securedInput);
-                #elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
+                #elif NETSTANDARD1_4
                     return signer.SignData(securedInput, Hash);
                 #endif
                 }
@@ -47,11 +47,11 @@ namespace Jose
             {
                 using (var signer = new ECDsaCng(publicKey))
                 {
-                #if DNX451 || NET40
+                #if NET40
                     signer.HashAlgorithm = Hash;
                 
                     return signer.VerifyData(securedInput, signature);
-                #elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
+                #elif NETSTANDARD1_4
                     return signer.VerifyData(securedInput, signature, Hash);
                 #endif
                 }
@@ -62,7 +62,7 @@ namespace Jose
             }
         }
 
-#if DNX451 || NET40
+#if NET40
         protected CngAlgorithm Hash
         {
             get
@@ -78,7 +78,7 @@ namespace Jose
             }
         }
 
-#elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
+#elif NETSTANDARD1_4
         protected HashAlgorithmName Hash
         {
             get

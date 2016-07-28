@@ -2283,14 +2283,14 @@ namespace UnitTests
 
         private object PrivKey()
         {
-        #if DNX451 || NET40
+        #if NET40
             var key = (RSACryptoServiceProvider) X509().PrivateKey;
             RSACryptoServiceProvider newKey = new RSACryptoServiceProvider();
             newKey.ImportParameters(key.ExportParameters(true));
 
             return newKey;
 
-        #elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
+        #elif NETCOREAPP1_0
             return (RSACng)X509().GetRSAPrivateKey();
         #endif
 
@@ -2298,9 +2298,9 @@ namespace UnitTests
 
         private object PubKey()
         {
-        #if DNX451 || NET40
+        #if NET40
             return (RSACryptoServiceProvider)X509().PublicKey.Key;
-        #elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
+        #elif NETCOREAPP1_0
             return (RSACng)X509().GetRSAPublicKey();
         #endif
         }

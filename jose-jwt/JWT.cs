@@ -84,7 +84,7 @@ namespace Jose
         {
 #if NET40
             JsonMapper = new JSSerializerMapper();
-#elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
+#elif NETSTANDARD1_4
             JsonMapper = new NewtonsoftMapper();
 #endif
             HashAlgorithms = new Dictionary<JwsAlgorithm, IJwsAlgorithm>

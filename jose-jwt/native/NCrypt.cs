@@ -15,9 +15,9 @@ namespace Jose.native
         public const uint KDF_SUPPPUBINFO = 11;
         public const uint KDF_SUPPPRIVINFO = 12;
 
-    #if DNX451 || NET40
+    #if NET40
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-    #elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
+    #elif NETSTANDARD1_4
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     #endif
         public class NCryptBufferDesc : IDisposable
@@ -48,9 +48,9 @@ namespace Jose.native
             }
         }
 
-    #if DNX451 || NET40
+    #if NET40
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-    #elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
+    #elif NETSTANDARD1_4
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
     #endif
         public class NCryptBuffer : IDisposable
@@ -81,16 +81,16 @@ namespace Jose.native
             }
         }
 
-    #if DNX451 || NET40
+    #if NET40
         [DllImport("ncrypt.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    #elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
+    #elif NETSTANDARD1_4
         [DllImport("ncrypt.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     #endif
         public static extern uint NCryptSecretAgreement(SafeNCryptKeyHandle hPrivKey,SafeNCryptKeyHandle hPublicKey,out SafeNCryptSecretHandle phSecret,uint flags);
 
-    #if DNX451 || NET40
+    #if NET40
         [DllImport("ncrypt.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    #elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
+    #elif NETSTANDARD1_4
         [DllImport("ncrypt.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     #endif
         public static extern uint NCryptDeriveKey(SafeNCryptSecretHandle hSharedSecret,
