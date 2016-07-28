@@ -2290,7 +2290,7 @@ namespace UnitTests
 
             return newKey;
 
-        #elif DNXCORE50 || NETCOREAPP1_0
+        #elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
             return (RSACng)X509().GetRSAPrivateKey();
         #endif
 
@@ -2300,7 +2300,7 @@ namespace UnitTests
         {
         #if DNX451 || NET40
             return (RSACryptoServiceProvider)X509().PublicKey.Key;
-        #elif DNXCORE50 || NETCOREAPP1_0
+        #elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
             return (RSACng)X509().GetRSAPublicKey();
         #endif
         }

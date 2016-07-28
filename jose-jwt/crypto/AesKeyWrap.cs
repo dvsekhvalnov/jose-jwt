@@ -100,7 +100,7 @@ namespace Jose
                     }
                 }
             }
-        #elif DNXCORE50 || NETCOREAPP1_0
+        #elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
             throw new NotImplementedException("not yet");
         #endif
         }
@@ -128,7 +128,7 @@ namespace Jose
                     }
                 }
             }
-        #elif DNXCORE50 || NETCOREAPP1_0
+        #elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
             throw new NotImplementedException("not yet");
         #endif
         }

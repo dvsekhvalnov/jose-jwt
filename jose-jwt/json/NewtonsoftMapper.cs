@@ -1,4 +1,4 @@
-﻿#if DNXCORE50 || NETCOREAPP1_0
+﻿#if DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
@@ -15,7 +15,7 @@ namespace Jose
         }
 
         public T Parse<T>(string json)
-        {                       
+        {      
             return JsonConvert.DeserializeObject<T>(json, new NestedDictionariesConverter());
         }
     }

@@ -25,7 +25,7 @@ namespace Jose
 
             return useSha256 ? new[] { cek, RsaOaep.Encrypt(cek, RsaKey.New(publicKey.ExportParameters(false)), CngAlgorithm.Sha256) }
                              : new[] { cek, publicKey.Encrypt(cek, useRsaOaepPadding) };
-#elif DNXCORE50 || NETCOREAPP1_0
+#elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
             var publicKey = Ensure.Type<RSA>(key, "RsaKeyManagement alg expects key to be of RSA type.");
 
             var padding = useSha256         ? RSAEncryptionPadding.OaepSHA256 :
@@ -43,7 +43,7 @@ namespace Jose
 
             return useSha256 ? RsaOaep.Decrypt(encryptedCek, RsaKey.New(privateKey.ExportParameters(true)), CngAlgorithm.Sha256)
                              : privateKey.Decrypt(encryptedCek, useRsaOaepPadding);
-#elif DNXCORE50 || NETCOREAPP1_0
+#elif DNXCORE50 || NETCOREAPP1_0 || NETSTANDARD1_4
             var privateKey = Ensure.Type<RSA>(key, "RsaKeyManagement alg expects key to be of RSA type.");
 
             var padding = useSha256         ? RSAEncryptionPadding.OaepSHA256 :

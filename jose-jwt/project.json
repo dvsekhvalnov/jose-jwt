@@ -64,19 +64,15 @@ Encryption: \r\r
       }
     },
     
-    "netcoreapp1.0": {
-       "imports": "portable-net45+wp80+win8+wpa81+dnxcore50",
+    "netstandard1.4": {
       "dependencies": {
-        "Microsoft.NETCore.App": {
-           "type": "platform",
-           "version": "1.0.0",
-        },
-        "Newtonsoft.Json": "8.0.3",
-        "System.Security.Cryptography.Algorithms": "4.1.0-rc2-24027",
-        "System.Security.Cryptography.Csp": "4.0.0-rc2-24027",
-        "System.Security.Cryptography.Cng": "4.1.0-rc2-24027",
-        "System.Security.Cryptography.X509Certificates": "4.1.0-rc2-24027",
-	"System.Runtime.Serialization.Primitives": "4.1.1-rc2-24027"
+        "NETStandard.Library":"1.6.0",
+        "Newtonsoft.Json": "9.0.1",
+        "System.Security.Cryptography.Algorithms": "4.2.0",
+        "System.Security.Cryptography.Csp": "4.0.0",
+        "System.Security.Cryptography.Cng": "4.2.0",
+        "System.Security.Cryptography.X509Certificates": "4.1.0",
+	"System.Runtime.Serialization.Primitives": "4.1.1"
       }
     },
 
@@ -86,7 +82,7 @@ Encryption: \r\r
       "dependencies": {
 	"System.IO.Compression": "4.0.1-beta-23409",
         "xunit.runner.visualstudio": "2.1.0",
-        "Newtonsoft.Json": "8.0.3"
+        "Newtonsoft.Json": "9.0.1"
       }
     },
 
@@ -102,7 +98,7 @@ Encryption: \r\r
         "System.Security.Cryptography.RandomNumberGenerator": "4.0.0-beta-23225",
         "System.Security.Cryptography.X509Certificates": "4.0.0-beta-23516",
         "System.Threading": "4.0.11-beta-23516",
-        "Newtonsoft.Json": "8.0.3"
+        "Newtonsoft.Json": "9.0.1"
       }
     }
   }
