@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{B7BAF1B4-91A0-4618-8364-815238220A54}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Jose</RootNamespace>
+    <AssemblyName>jose-jwt</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;NET40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;NET40</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="compression\DeflateCompression.cs" />
+    <Compile Include="compression\ICompression.cs" />
+    <Compile Include="crypto\AesGcm.cs" />
+    <Compile Include="crypto\AesKeyWrap.cs" />
+    <Compile Include="crypto\ConcatKDF.cs" />
+    <Compile Include="crypto\PBKDF2.cs" />
+    <Compile Include="crypto\RsaOaep.cs" />
+    <Compile Include="crypto\RsaPss.cs" />
+    <Compile Include="json\IJsonMapper.cs" />
+    <Compile Include="json\JSSerializerMapper.cs" />
+    <Compile Include="json\NewtonsoftMapper.cs" />
+    <Compile Include="jwa\AesGcmKeyWrapManagement.cs" />
+    <Compile Include="jwa\AesKeyWrapManagement.cs" />
+    <Compile Include="jwa\DirectKeyManagement.cs" />
+    <Compile Include="jwa\EcdhKeyManagement.cs" />
+    <Compile Include="jwa\EcdhKeyManagementWithAesKeyWrap.cs" />
+    <Compile Include="jwa\IKeyManagement.cs" />
+    <Compile Include="jwa\Pbse2HmacShaKeyManagementWithAesKeyWrap.cs" />
+    <Compile Include="jwa\RsaKeyManagement.cs" />
+    <Compile Include="jwe\AesCbcHmacEncryption.cs" />
+    <Compile Include="jwe\AesGcmEncryption.cs" />
+    <Compile Include="jwe\IJweAlgorithm.cs" />
+    <Compile Include="jws\EcdsaUsingSha.cs" />
+    <Compile Include="jws\HmacUsingSha.cs" />
+    <Compile Include="jws\IJwsAlgorithm.cs" />
+    <Compile Include="jws\Plaintext.cs" />
+    <Compile Include="jws\RsaPssUsingSha.cs" />
+    <Compile Include="jws\RsaUsingSha.cs" />
+    <Compile Include="JWT.cs" />
+    <Compile Include="native\BCrypt.cs" />
+    <Compile Include="native\NCrypt.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Security\Cryptography\EccKey.cs" />
+    <Compile Include="Security\Cryptography\RsaKey.cs" />
+    <Compile Include="util\Arrays.cs" />
+    <Compile Include="util\Base64Url.cs" />
+    <Compile Include="util\Compact.cs" />
+    <Compile Include="util\Dictionaries.cs" />
+    <Compile Include="util\Ensure.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

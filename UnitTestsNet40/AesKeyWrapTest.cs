@@ -1,32 +1,33 @@
 using Jose;
-using Xunit;
+using NUnit.Framework;
 
 namespace UnitTests
 {
+    [TestFixture]
     public class AesKeyWrapTest
     {
-        [Fact]
+        [Test]
         public void Wrap_128Key_128Kek()
         {
             //given (Section 4.1)
 
             //000102030405060708090A0B0C0D0E0F
-            byte[] kek = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+            byte[] kek = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
 
             //00112233445566778899AABBCCDDEEFF
-            byte[] key = { 0, 17, 34, 51, 68, 85, 102, 119, 136, 153, 170, 187, 204, 221, 238, 255 };
+            byte[] key = {0,17,34,51,68,85,102,119,136,153,170,187,204,221,238,255};
 
             //1FA68B0A8112B447AEF34BD8FB5A7B829D3E862371D2CFE5
-            byte[] expected = { 31, 166, 139, 10, 129, 18, 180, 71, 174, 243, 75, 216, 251, 90, 123, 130, 157, 62, 134, 35, 113, 210, 207, 229 };
+            byte[] expected = { 31, 166, 139, 10, 129, 18, 180, 71, 174, 243, 75, 216, 251, 90, 123, 130, 157, 62, 134,35, 113, 210, 207, 229};
 
             //when
             byte[] test = AesKeyWrap.Wrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.That(test,Is.EqualTo(expected));
         }
 
-        [Fact]
+        [Test]
         public void Unwrap_128key_128kek()
         {
             //given (Section 4.1)
@@ -44,10 +45,10 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Unwrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.That(test, Is.EqualTo(expected));
         }
 
-        [Fact]
+        [Test]
         public void Wrap_128Key_192Kek()
         {
             //given (Section 4.2)
@@ -65,10 +66,10 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Wrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.That(test,Is.EqualTo(expected));
         }
 
-        [Fact]
+        [Test]
         public void Unwrap_128Key_192Kek()
         {
             //given (Section 4.2)
@@ -86,10 +87,10 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Unwrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.That(test,Is.EqualTo(expected));
         }
 
-        [Fact]
+        [Test]
         public void Wrap_128Key_256Kek()
         {
             //given (Section 4.3)
@@ -107,10 +108,10 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Wrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.That(test,Is.EqualTo(expected));
         }
 
-        [Fact]
+        [Test]
         public void Unwrap_128Key_256Kek()
         {
             //given (Section 4.3)
@@ -128,10 +129,10 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Unwrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.That(test,Is.EqualTo(expected));
         }
 
-        [Fact]
+        [Test]
         public void Wrap_192Key_192Kek()
         {
             //given (Section 4.4)
@@ -149,10 +150,10 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Wrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.That(test,Is.EqualTo(expected));
         }
 
-        [Fact]
+        [Test]
         public void UnWwrap_192Key_192Kek()
         {
             //given (Section 4.4)
@@ -170,10 +171,10 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Unwrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.That(test,Is.EqualTo(expected));
         }
 
-        [Fact]
+        [Test]
         public void Wrap_192Key_256Kek()
         {
             //given (Section 4.5)
@@ -191,10 +192,10 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Wrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.That(test,Is.EqualTo(expected));
         }
 
-        [Fact]
+        [Test]
         public void Unwrap_192Key_256Kek()
         {
             //given (Section 4.5)
@@ -212,10 +213,10 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Unwrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.That(test,Is.EqualTo(expected));
         }
 
-        [Fact]
+        [Test]
         public void Wrap_256Key_256Kek()
         {
             //given (Section 4.6)
@@ -233,10 +234,10 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Wrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.That(test,Is.EqualTo(expected));
         }
 
-        [Fact]
+        [Test]
         public void Unwrap_256Key_256Kek()
         {
             //given (Section 4.6)
@@ -254,7 +255,7 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Unwrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.That(test,Is.EqualTo(expected));
         }
     }
 }

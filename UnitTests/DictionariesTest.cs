@@ -1,30 +1,29 @@
 using System.Collections.Generic;
 using Jose;
-using NUnit.Framework;
+using Xunit;
 
 namespace UnitTests
 {
-    [TestFixture]
     public class DictionariesTest
     {
-        [Test]
+        [Fact]
         public void Append()
         {
             //given
-            var src = new Dictionary<string, string> {{"one", "1"}, {"two", "2"}};
-            var other = new Dictionary<string, string> {{"three", "3"}, {"two", "3"}};
-            
+            var src = new Dictionary<string, string> { { "one", "1" }, { "two", "2" } };
+            var other = new Dictionary<string, string> { { "three", "3" }, { "two", "3" } };
+
             //when
             Dictionaries.Append(src, other);
 
             //then
-            Assert.That(src, Has.Count.EqualTo(3));
-            Assert.That(src["one"],Is.EqualTo("1"));
-            Assert.That(src["two"],Is.EqualTo("2"));
-            Assert.That(src["three"],Is.EqualTo("3"));
+            Assert.Equal(src.Count, 3);
+            Assert.Equal(src["one"], "1");
+            Assert.Equal(src["two"], "2");
+            Assert.Equal(src["three"], "3");
         }
 
-        [Test]
+        [Fact]
         public void AppendNull()
         {
             //given
@@ -34,9 +33,9 @@ namespace UnitTests
             Dictionaries.Append(src, null);
 
             //then
-            Assert.That(src, Has.Count.EqualTo(2));
-            Assert.That(src["one"], Is.EqualTo("1"));
-            Assert.That(src["two"], Is.EqualTo("2"));
+            Assert.Equal(src.Count, 2);
+            Assert.Equal(src["one"], "1");
+            Assert.Equal(src["two"], "2");
         }
     }
 }

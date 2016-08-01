@@ -1,0 +1,36 @@
+{
+    "version": "1.0.0-*",
+    "testRunner": "xunit",
+    "description": "UnitTests Class Library",
+    "authors": [
+        "Administrator"
+    ],
+    "tags": [
+        ""
+    ],
+    "projectUrl": "",
+    "licenseUrl": "",
+    "frameworks": {
+
+      "netcoreapp1.0": {
+	        "imports": [
+                "dnxcore50",
+                "portable-net45+win8"
+            ],
+          "dependencies": {
+            "Microsoft.NETCore.App": {
+               "type": "platform",
+               "version": "1.0.0",
+            },
+            "dotnet-test-xunit": "1.0.0-rc2-build10025"
+          }
+        }
+    },
+    "dependencies": {
+        "jose-jwt": "2.0.0",
+        "xunit": "2.1.0"
+    },
+    "commands": {
+        "test": "xunit.runner.dnx"
+    }
+}
