@@ -4,11 +4,16 @@ Minimallistic zero-dependency library for generating, decoding and encryption [J
 of [JSON Web Algorithms](https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-31) as of July 4, 2014 version. JSON parsing agnostic, can plug any desired JSON processing library.
 Extensively tested for compatibility with [jose.4.j](https://bitbucket.org/b_c/jose4j/wiki/Home), [Nimbus-JOSE-JWT](https://bitbucket.org/nimbusds/nimbus-jose-jwt/wiki/Home) and [json-jwt](https://github.com/nov/json-jwt) libraries.
 
-v1.9 is built against .NET framework and should be compatible with v4.0 and above.
+## Which version?
 
-As of v2 it is .NET Core compatible and aimed to support both .NET framework CLR and .NET Core runtimes.  
+- v2.0 and above is .NET Core compatible and aimed to support both .NET framework (`NET40`) and .NET Core (`netstandard1.4`) runtimes. This is the version you should prefer unless you have really strong reason to stay with v1.9.
 
-* WinRT compatible version (Windows 8.1 and Windows Phone 8.1) is avaliable here: [JoseRT](https://github.com/dvsekhvalnov/jose-rt).
+- v1.9 is built against .NET framework only and should be compatible with `NET40` and above. The version is not actively maintained anymore except critical bug fixes.
+
+- WinRT compatible version (Windows 8.1 and Windows Phone 8.1) is avaliable as standalone project here: [jose-rt](https://github.com/dvsekhvalnov/jose-rt).
+
+- PCLCrypto based experimental project living up here: [jose-pcl](https://github.com/dvsekhvalnov/jose-pcl).
+
 
 ## Foreword
 Originally forked from https://github.com/johnsheehan/jwt . Almost re-written from scratch to support JWT encryption capabilities and unified interface for encoding/decoding/encryption
@@ -64,10 +69,14 @@ Technically it is possible to use ECDH-ES or ECDH-ES+AES Key Wrap family with A1
 
 ## Installation
 ### NuGet
+https://www.nuget.org/packages/jose-jwt/
+
 `Install-Package jose-jwt`
 
 ### Manual
-Grab source and compile yourself.
+Grab source and compile yourself:
+  1. `dotnet restore`
+  1. `dotnet pack -c Release`
 
 ## Usage
 ### Creating Plaintext (unprotected) Tokens
