@@ -2281,28 +2281,14 @@ namespace UnitTests
 
         #region test utils
 
-        private object PrivKey()
+        private RSA PrivKey()
         {
-        #if NET40
-            var key = (RSACryptoServiceProvider) X509().PrivateKey;
-            RSACryptoServiceProvider newKey = new RSACryptoServiceProvider();
-            newKey.ImportParameters(key.ExportParameters(true));
-
-            return newKey;
-
-        #elif NETCOREAPP1_0
             return (RSA)X509().GetRSAPrivateKey();
-        #endif
-
         }
 
-        private object PubKey()
+        private RSA PubKey()
         {
-        #if NET40
-            return (RSACryptoServiceProvider)X509().PublicKey.Key;
-        #elif NETCOREAPP1_0
             return (RSA)X509().GetRSAPublicKey();
-        #endif
         }
 
         private X509Certificate2 X509()

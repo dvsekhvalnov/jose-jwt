@@ -144,7 +144,7 @@ namespace Jose
             KeyAlgorithms = new Dictionary<JweAlgorithm, IKeyManagement>
             {
                 { JweAlgorithm.RSA_OAEP, new RsaKeyManagement(true) },
-                { JweAlgorithm.RSA_OAEP_256, new RsaKeyManagement(true,true) },
+                { JweAlgorithm.RSA_OAEP_256, new RsaOaep256KeyManagement() },
                 { JweAlgorithm.RSA1_5, new RsaKeyManagement(false) },
                 { JweAlgorithm.DIR, new DirectKeyManagement() },
                 { JweAlgorithm.A128KW, new AesKeyWrapManagement(128) },

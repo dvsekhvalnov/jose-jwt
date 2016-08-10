@@ -59,6 +59,7 @@
     <Compile Include="jwa\IKeyManagement.cs" />
     <Compile Include="jwa\Pbse2HmacShaKeyManagementWithAesKeyWrap.cs" />
     <Compile Include="jwa\RsaKeyManagement.cs" />
+    <Compile Include="jwa\RsaOaep256KeyManagement.cs" />
     <Compile Include="jwe\AesCbcHmacEncryption.cs" />
     <Compile Include="jwe\AesGcmEncryption.cs" />
     <Compile Include="jwe\IJweAlgorithm.cs" />
