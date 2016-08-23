@@ -248,7 +248,7 @@ namespace UnitTests
             string token = "eyJhbGciOiJQUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.S9xuR-IGfXEj5qsHcMtK-jcj1lezvVstw1AISp8dEQVRNgwOMZhUQnSCx9i1CA-pMucxR-lv4e7zd6h3cYCfMnyv7iuxraxNiNAgREhOT-bkBCZMNgb5t15xEtDSJ3MuBlK3YBtXyVcDDIdKH_Bwj-u363y6LuvZ8FEOGmIK5WSFi18Xjg-ihhvH1C6UzH1G82wrRbX6DyJKqrUnHAg8yzUJVP1AdgjWRt5BKpuYbXSib-MKZZkaE4q_hCb-j25xCzn8Ez8a7PO7p0fDGvZuOk_yzSfvXSavg7iE0GLuUTNv3nQ_xW-rfbrpYeyXNtstoK3JPFpdtORTyH1iIh7VVA";
 
             //when
-            string json = Jose.JWT.Decode(token, PubKey());
+            string json = Jose.JWT.Decode(token, RsaKey.New(PubKey().ExportParameters(false)));
 
             Console.Out.WriteLine("token = {0}", json);
 
@@ -263,7 +263,7 @@ namespace UnitTests
             string token = "eyJhbGciOiJQUzM4NCIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.EKqVLw6nLGNt1h7KNFZbzkKhf788VBYCfnigYc0dBZBa64MrfbIFHtJuFgIGkCVSDYH-qs-i4w9ke6mD8mxTZFniMgzFXXaCFIrv6QZeMbKh6VYtSEPp7l0B1zMZiQw6egZbZ6a8VBkCRipuZggSlUTg5tHMMTj_jNVxxlY4uUwXlz7vakpbqgXe19pCDJrzEoXE0cNKV13eRCNA1tXOHx0dFL7Jm9NUq7blvhJ8iTw1jMFzK8bV6g6L7GclHBMoJ3MIvRp71m6idir-QeW1KCUfVtBs3HRn3a822LW02vGqopSkaGdRzQZOI28136AMeW4679UXE852srA2v3mWHQ";
 
             //when
-            string json = Jose.JWT.Decode(token, PubKey());
+            string json = Jose.JWT.Decode(token, RsaKey.New(PubKey().ExportParameters(false)));
 
             Console.Out.WriteLine("token = {0}", json);
 
@@ -278,7 +278,7 @@ namespace UnitTests
             string token = "eyJhbGciOiJQUzUxMiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.IvbnmxhKvM70C0n0grkF807wOQLyPOBwJOee-p7JHCQcSstNeml3Owdyw9C3HGHzOdK9db51yAkjJ2TCojxqHW4OR5Apna8tvafYgD2femn1V3GdkGj6ZvYdV3q4ldnmahVeO36vHYy5P0zFcEGU1_j3S3DwGmhw2ktZ4p5fLZ2up2qwhzlOjbtsQpWywHj7cLdeA32MLId9MTAPVGUHIZHw_W0xwjJRS6TgxD9vPQQnP70MY-q_2pVAhfRCM_pauPYO1XH5ldizrTvVr27q_-Uqtw-wV-UDUnyWYQUDDiMTpLBoX1EEXmsbvUGx0OH3yWEaNINoCsepgZvTKbiEQQ";
 
             //when
-            string json = Jose.JWT.Decode(token, PubKey());
+            string json = Jose.JWT.Decode(token, RsaKey.New(PubKey().ExportParameters(false)));
 
             Console.Out.WriteLine("token = {0}", json);
 
@@ -293,7 +293,7 @@ namespace UnitTests
             string json = @"{""hello"": ""world""}";
 
             //when
-            string token = Jose.JWT.Encode(json, PrivKey(), JwsAlgorithm.PS256);
+            string token = Jose.JWT.Encode(json, RsaKey.New(PrivKey().ExportParameters(true)), JwsAlgorithm.PS256);
 
             Console.Out.WriteLine("PS256 = {0}", token);
 
@@ -307,7 +307,7 @@ namespace UnitTests
             Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
             Assert.That(parts[2].Length, Is.EqualTo(342), "signature size");
 
-            Assert.That(Jose.JWT.Decode(token,PubKey()),Is.EqualTo(json),"Make sure we are consistent with ourselves");
+            Assert.That(Jose.JWT.Decode(token, RsaKey.New(PubKey().ExportParameters(false))), Is.EqualTo(json),"Make sure we are consistent with ourselves");
         }
 
         [Test]
@@ -317,7 +317,7 @@ namespace UnitTests
             string json = @"{""hello"": ""world""}";
 
             //when
-            string token = Jose.JWT.Encode(json, PrivKey(), JwsAlgorithm.PS384);
+            string token = Jose.JWT.Encode(json, RsaKey.New(PrivKey().ExportParameters(true)), JwsAlgorithm.PS384);
 
             Console.Out.WriteLine("PS384 = {0}", token);
 
@@ -331,7 +331,7 @@ namespace UnitTests
             Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
             Assert.That(parts[2].Length, Is.EqualTo(342), "signature size");
 
-            Assert.That(Jose.JWT.Decode(token,PubKey()),Is.EqualTo(json),"Make sure we are consistent with ourselves");
+            Assert.That(Jose.JWT.Decode(token, RsaKey.New(PubKey().ExportParameters(false))), Is.EqualTo(json),"Make sure we are consistent with ourselves");
         }
 
         [Test]
@@ -341,7 +341,7 @@ namespace UnitTests
             string json = @"{""hello"": ""world""}";
 
             //when
-            string token = Jose.JWT.Encode(json, PrivKey(), JwsAlgorithm.PS512);
+            string token = Jose.JWT.Encode(json, RsaKey.New(PrivKey().ExportParameters(true)), JwsAlgorithm.PS512);
 
             Console.Out.WriteLine("PS512 = {0}", token);
 
@@ -355,7 +355,7 @@ namespace UnitTests
             Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
             Assert.That(parts[2].Length, Is.EqualTo(342), "signature size");
 
-            Assert.That(Jose.JWT.Decode(token,PubKey()),Is.EqualTo(json),"Make sure we are consistent with ourselves");
+            Assert.That(Jose.JWT.Decode(token, RsaKey.New(PubKey().ExportParameters(false))), Is.EqualTo(json),"Make sure we are consistent with ourselves");
         }
 
         [Test]

@@ -16,11 +16,11 @@ namespace Jose
         public byte[] Sign(byte[] securedInput, object key)
         {
 #if NET40
-            var privateKey = Ensure.Type<RSACryptoServiceProvider>(key, "RsaUsingSha with PSS padding alg expects key to be of RSACryptoServiceProvider type.");
+            var privateKey = Ensure.Type<CngKey>(key, "RsaUsingSha with PSS padding alg expects key to be of RSACryptoServiceProvider type.");
 
             try
             {
-                return RsaPss.Sign(securedInput, RsaKey.New(privateKey.ExportParameters(true)), Hash, saltSize);
+                return RsaPss.Sign(securedInput, privateKey, Hash, saltSize);
             }
             catch (CryptographicException e)
             {
@@ -35,13 +35,12 @@ namespace Jose
         public bool Verify(byte[] signature, byte[] securedInput, object key)
         {
 #if NET40
-            var publicKey = Ensure.Type<RSACryptoServiceProvider>(key,
+            var publicKey = Ensure.Type<CngKey>(key,
                 "RsaUsingSha with PSS padding alg expects key to be of RSACryptoServiceProvider type.");
 
             try
             {
-                return RsaPss.Verify(securedInput, signature, RsaKey.New(publicKey.ExportParameters(false)), Hash,
-                    saltSize);
+                return RsaPss.Verify(securedInput, signature, publicKey, Hash, saltSize);
             }
             catch (CryptographicException e)
             {
