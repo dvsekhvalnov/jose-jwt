@@ -101,7 +101,26 @@ namespace Jose
                 }
             }
         #elif NETSTANDARD1_4
-            throw new NotImplementedException("not yet");
+            using (Aes aes = System.Security.Cryptography.Aes.Create())
+            {
+                aes.Key = sharedKey;
+                aes.Mode = CipherMode.ECB;
+                aes.Padding = PaddingMode.None;
+               
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV))
+                    {
+                        using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Write))
+                        {
+                            cs.Write(cipherText, 0, cipherText.Length);
+                            cs.FlushFinalBlock();
+ 
+                            return ms.ToArray();
+                        }
+                    }
+                }
+            }
         #endif
         }
 
@@ -129,7 +148,26 @@ namespace Jose
                 }
             }
         #elif NETSTANDARD1_4
-            throw new NotImplementedException("not yet");
+            using (Aes aes = System.Security.Cryptography.Aes.Create())
+            {
+                aes.Key = sharedKey;
+                aes.Mode = CipherMode.ECB;
+                aes.Padding = PaddingMode.None;
+ 
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    using (ICryptoTransform encryptor = aes.CreateEncryptor(aes.Key, aes.IV))
+                    {
+                        using (CryptoStream encrypt = new CryptoStream(ms, encryptor, CryptoStreamMode.Write))
+                        {
+                            encrypt.Write(plainText, 0, plainText.Length);
+                            encrypt.FlushFinalBlock();
+ 
+                            return ms.ToArray();
+                        }
+                    }
+                }
+            }
         #endif
         }
     }

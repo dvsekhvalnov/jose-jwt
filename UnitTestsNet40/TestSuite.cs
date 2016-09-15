@@ -248,7 +248,7 @@ namespace UnitTests
             string token = "eyJhbGciOiJQUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.S9xuR-IGfXEj5qsHcMtK-jcj1lezvVstw1AISp8dEQVRNgwOMZhUQnSCx9i1CA-pMucxR-lv4e7zd6h3cYCfMnyv7iuxraxNiNAgREhOT-bkBCZMNgb5t15xEtDSJ3MuBlK3YBtXyVcDDIdKH_Bwj-u363y6LuvZ8FEOGmIK5WSFi18Xjg-ihhvH1C6UzH1G82wrRbX6DyJKqrUnHAg8yzUJVP1AdgjWRt5BKpuYbXSib-MKZZkaE4q_hCb-j25xCzn8Ez8a7PO7p0fDGvZuOk_yzSfvXSavg7iE0GLuUTNv3nQ_xW-rfbrpYeyXNtstoK3JPFpdtORTyH1iIh7VVA";
 
             //when
-            string json = Jose.JWT.Decode(token, PubKey());
+            string json = Jose.JWT.Decode(token, RsaKey.New(PubKey().ExportParameters(false)));
 
             Console.Out.WriteLine("token = {0}", json);
 
@@ -263,7 +263,7 @@ namespace UnitTests
             string token = "eyJhbGciOiJQUzM4NCIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.EKqVLw6nLGNt1h7KNFZbzkKhf788VBYCfnigYc0dBZBa64MrfbIFHtJuFgIGkCVSDYH-qs-i4w9ke6mD8mxTZFniMgzFXXaCFIrv6QZeMbKh6VYtSEPp7l0B1zMZiQw6egZbZ6a8VBkCRipuZggSlUTg5tHMMTj_jNVxxlY4uUwXlz7vakpbqgXe19pCDJrzEoXE0cNKV13eRCNA1tXOHx0dFL7Jm9NUq7blvhJ8iTw1jMFzK8bV6g6L7GclHBMoJ3MIvRp71m6idir-QeW1KCUfVtBs3HRn3a822LW02vGqopSkaGdRzQZOI28136AMeW4679UXE852srA2v3mWHQ";
 
             //when
-            string json = Jose.JWT.Decode(token, PubKey());
+            string json = Jose.JWT.Decode(token, RsaKey.New(PubKey().ExportParameters(false)));
 
             Console.Out.WriteLine("token = {0}", json);
 
@@ -278,7 +278,7 @@ namespace UnitTests
             string token = "eyJhbGciOiJQUzUxMiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.IvbnmxhKvM70C0n0grkF807wOQLyPOBwJOee-p7JHCQcSstNeml3Owdyw9C3HGHzOdK9db51yAkjJ2TCojxqHW4OR5Apna8tvafYgD2femn1V3GdkGj6ZvYdV3q4ldnmahVeO36vHYy5P0zFcEGU1_j3S3DwGmhw2ktZ4p5fLZ2up2qwhzlOjbtsQpWywHj7cLdeA32MLId9MTAPVGUHIZHw_W0xwjJRS6TgxD9vPQQnP70MY-q_2pVAhfRCM_pauPYO1XH5ldizrTvVr27q_-Uqtw-wV-UDUnyWYQUDDiMTpLBoX1EEXmsbvUGx0OH3yWEaNINoCsepgZvTKbiEQQ";
 
             //when
-            string json = Jose.JWT.Decode(token, PubKey());
+            string json = Jose.JWT.Decode(token, RsaKey.New(PubKey().ExportParameters(false)));
 
             Console.Out.WriteLine("token = {0}", json);
 
@@ -293,7 +293,7 @@ namespace UnitTests
             string json = @"{""hello"": ""world""}";
 
             //when
-            string token = Jose.JWT.Encode(json, PrivKey(), JwsAlgorithm.PS256);
+            string token = Jose.JWT.Encode(json, RsaKey.New(PrivKey().ExportParameters(true)), JwsAlgorithm.PS256);
 
             Console.Out.WriteLine("PS256 = {0}", token);
 
@@ -307,7 +307,7 @@ namespace UnitTests
             Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
             Assert.That(parts[2].Length, Is.EqualTo(342), "signature size");
 
-            Assert.That(Jose.JWT.Decode(token,PubKey()),Is.EqualTo(json),"Make sure we are consistent with ourselves");
+            Assert.That(Jose.JWT.Decode(token, RsaKey.New(PubKey().ExportParameters(false))), Is.EqualTo(json),"Make sure we are consistent with ourselves");
         }
 
         [Test]
@@ -317,7 +317,7 @@ namespace UnitTests
             string json = @"{""hello"": ""world""}";
 
             //when
-            string token = Jose.JWT.Encode(json, PrivKey(), JwsAlgorithm.PS384);
+            string token = Jose.JWT.Encode(json, RsaKey.New(PrivKey().ExportParameters(true)), JwsAlgorithm.PS384);
 
             Console.Out.WriteLine("PS384 = {0}", token);
 
@@ -331,7 +331,7 @@ namespace UnitTests
             Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
             Assert.That(parts[2].Length, Is.EqualTo(342), "signature size");
 
-            Assert.That(Jose.JWT.Decode(token,PubKey()),Is.EqualTo(json),"Make sure we are consistent with ourselves");
+            Assert.That(Jose.JWT.Decode(token, RsaKey.New(PubKey().ExportParameters(false))), Is.EqualTo(json),"Make sure we are consistent with ourselves");
         }
 
         [Test]
@@ -341,7 +341,7 @@ namespace UnitTests
             string json = @"{""hello"": ""world""}";
 
             //when
-            string token = Jose.JWT.Encode(json, PrivKey(), JwsAlgorithm.PS512);
+            string token = Jose.JWT.Encode(json, RsaKey.New(PrivKey().ExportParameters(true)), JwsAlgorithm.PS512);
 
             Console.Out.WriteLine("PS512 = {0}", token);
 
@@ -355,7 +355,7 @@ namespace UnitTests
             Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
             Assert.That(parts[2].Length, Is.EqualTo(342), "signature size");
 
-            Assert.That(Jose.JWT.Decode(token,PubKey()),Is.EqualTo(json),"Make sure we are consistent with ourselves");
+            Assert.That(Jose.JWT.Decode(token, RsaKey.New(PubKey().ExportParameters(false))), Is.EqualTo(json),"Make sure we are consistent with ourselves");
         }
 
         [Test]
@@ -611,7 +611,7 @@ namespace UnitTests
             string token = "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bje66yTjMUpyGzbt3QvPNOmCmUPowgEmoBHXw-pByhST2VBSs0_67JKDymKW0VpmQC5Qb7ZLC6nNG8YW5pxTZDOeTQLodhAvzoNAsrx4M2R_N58ZVqBPLKTq7FKi1NNd8oJ80dwWbOJ13dkLH68SlhOK5bhqKFgtbzalnglL2kq8Fki1GkN4YyFnS8-chC-mlrS5bJrPSHUF7oAsG_flL_e9-KzYqYTQgGCB3GYSo_pgalsp2rUO3Oz2Pfe9IEJNlX7R9wOT1nTT0UUg-lSzQ2oOaXNvNyaPgEa76mJ1nk7ZQq7ZNix1m8snjk0Vizd8EOFCSRyOGcp4mHMn7-s00Q.tMFMCdFNQXbhEnwE6mP_XQ.E_O_ZBtJ8P0FvhKOV_W98oxIySDgdd0up0c8FAjo-3OVZ_6XMEQYFDKVG_Zc3zkbaz1Z2hmc7D7M28RbhRdya3yJN6Hcv1KuXeZ9ociI7o739Ni_bPvv8xCmGxlASS5AF7N4JR7XjrWL-SYKGNL1p0XNTlPo3B3qYqgAY6jFNvlcjWupim-pQbWKNqPbO2KmSCtUzyKE5oHjsomH0hnQs0_DXv3cgQ_ZFLFZBc1tC4AjQ8QZex5kWg5BmlJDM5F_jD7QRhb7B1u4Mi563-AKVA.0lraw3IXMM6wPqUZVYA8pg";
 
             //when
-            string json = Jose.JWT.Decode(token, PrivKey());
+            string json = Jose.JWT.Decode(token, RsaKey.New(PrivKey().ExportParameters(true)));
 
             //then
             Console.Out.WriteLine("json = {0}", json);
@@ -626,7 +626,7 @@ namespace UnitTests
             string token = "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTkyQ0JDLUhTMzg0In0.COuKvozBVi2vkEPpFdx0HTMpU9tmpP1lLngbmGn8RVphY-vjhVaduv8D_Ay_1j8LuMz4tgP98xWtbJkTyhxY1kBwXe0CgqFUOSJ1mTEPRkKSXpdFR7rT1Pv68qug2yKaXT_qcviyBerIcUVFbXBmtiYAosYO4kaPSOE1IvLadFOrMkxdZv6QiiCROzWgJNCCMgNQZGRoPhqLe3wrcxi86DhNO7Bpqq_yeNVyHdU_qObMuMVZIWWEQIDhiU4nE8WGJLG_NtKElc_nQwbmclL_YYgTiHsIAKWZCdj0nwfLe5mwJQN4r7pjakiUVzCbNNgI1-iBH1vJD5VCPxgWldzfYA.7cDs4wzbNDt1Kq40Q5ae4w.u1bR6ChVd90QkFIp3H6IkOCIMwf5aIKsQOvqgFangRLrDjctl5qO5jTHr1o1GwBQvAkRmaGSE7fRIwWB_l-Ayx2c2WDFOkVXFSR_D23GrWaLMLbugPItQd2Mny6H4QOzO3O0EK_Qm7frqwKQI3og72SB8DUqzEaKsrz7HR2z_qMa2CEEApxai_R6NIlAdMUbYvOfZx262MWFGrITBDmma-Mnqiz9WJUv2wexfwjROaaS4wXfkGy5B6ltESifpZZk5NerExR3GA6yX7cFqJc4pQ.FKcbLyB9eP1UXmxyliTu1_GQrnS-JtAB";
 
             //when
-            string json = Jose.JWT.Decode(token, PrivKey());
+            string json = Jose.JWT.Decode(token, RsaKey.New(PrivKey().ExportParameters(true)));
 
             //then
             Console.Out.WriteLine("json = {0}", json);
@@ -641,7 +641,7 @@ namespace UnitTests
             string token = "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0.Pt1q6MNdaiVWhMnY7r6DVpkYQmzyIjhb0cj10LowP_FgMu1dOQVuNwhK14MO1ki1y1Pvxouct9wwmb5gE7jNJBy6vU-FrrY62WNr_hKL3Cq2030LlJwauv1XQrEE-GCw1srxOAsw6LNT14v4f0qjeW46mIHNX4CZMEO9ntwojWsHTNsh4Qk6SU1QlS3WbbVl7gjjfqTP54j2ZwZM38s7Cs4pSAChP04UbW6Uhrm65JSi0lyg25OBXIxMEt1z9WY8lnjuh3iL_WttnFn9lf5fUuuR2N70HwANz2mxH3CxjO0ygXJtV-FhFzz3HqI2-ELrve4Igj_2f2_S6OrRTWRucA.er5K9Gk0wp3wF_sq7ib7BQ.L80B9FGSjUbEblpJ6tuiaq6NAsW89YQGD0awxtE-irKN65PT8nndBd0hlel8RRThXRF0kiYYor2GpgvVVaoOzSQcwL-aDgNO7BeRsaOL5ku2NlyT1erbg_8jEVG5BFMM0-jCb4kD0jBKWYCGoB7qs_QQxZ394H5GPwG68vlizKEa8PoaNIM0at5oFT7EHPdmGmwQyQCHR43e6uN4k28PWNxjN9Ndo5lvlYnxnAyDGVDu8lCjozaA_ZTrEPS-UBb6lOEW39CXdwVk1MgvyQfswQ.yuDMf_77Wr9Er3FG1_0FwHXJTOVQPjzBwGoKEg81mQo";
 
             //when
-            string json = Jose.JWT.Decode(token, PrivKey());
+            string json = Jose.JWT.Decode(token, RsaKey.New(PrivKey().ExportParameters(true)));
 
             //then
             Console.Out.WriteLine("json = {0}", json);
@@ -657,7 +657,7 @@ namespace UnitTests
                 
 
             //when
-            string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM);
+            string token = Jose.JWT.Encode(json, RsaKey.New(PubKey().ExportParameters(false)), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM);
 
             //then
             Console.Out.WriteLine("RSA_OAEP_256_A128GCM={0}", token);
@@ -671,7 +671,7 @@ namespace UnitTests
             Assert.That(parts[3].Length, Is.EqualTo(24), "cipher text size");
             Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
 
-            Assert.That(Jose.JWT.Decode(token, PrivKey()), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+            Assert.That(Jose.JWT.Decode(token, RsaKey.New(PrivKey().ExportParameters(true))), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
         }
 
         [Test]
@@ -682,7 +682,7 @@ namespace UnitTests
                 
 
             //when
-            string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+            string token = Jose.JWT.Encode(json, RsaKey.New(PubKey().ExportParameters(false)), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
 
             //then
             Console.Out.WriteLine("RSA_OAEP_256_A192GCM={0}", token);
@@ -696,7 +696,7 @@ namespace UnitTests
             Assert.That(parts[3].Length, Is.EqualTo(24), "cipher text size");
             Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
 
-            Assert.That(Jose.JWT.Decode(token, PrivKey()), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+            Assert.That(Jose.JWT.Decode(token, RsaKey.New(PrivKey().ExportParameters(true))), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
         }
         
         [Test]
@@ -706,7 +706,7 @@ namespace UnitTests
             string json = @"{""hello"": ""world""}";
 
             //when
-            string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A256GCM);
+            string token = Jose.JWT.Encode(json, RsaKey.New(PrivKey().ExportParameters(false)), JweAlgorithm.RSA_OAEP_256, JweEncryption.A256GCM);
 
             //then
             Console.Out.WriteLine("RSA_OAEP_256_A256GCM={0}", token);
@@ -720,7 +720,7 @@ namespace UnitTests
             Assert.That(parts[3].Length, Is.EqualTo(24), "cipher text size");
             Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
 
-            Assert.That(Jose.JWT.Decode(token, PrivKey()), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+            Assert.That(Jose.JWT.Decode(token, RsaKey.New(PrivKey().ExportParameters(true))), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
         }
 
         [Test]
@@ -2337,10 +2337,10 @@ namespace UnitTests
         {
             // given
             string json = @"{""hello"": ""world""}";
-            string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+            string token = Jose.JWT.Encode(json, RsaKey.New(PubKey().ExportParameters(false)), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
 
             // when
-            string decodedToken = Jose.JWT.Decode(token, PrivKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+            string decodedToken = Jose.JWT.Decode(token, RsaKey.New(PrivKey().ExportParameters(true)), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
 
             // then
             Assert.That(decodedToken, Is.EqualTo(json), "Make sure we are consistent with ourselfs");
@@ -2351,7 +2351,7 @@ namespace UnitTests
         {
             // given
             string json = @"{""hello"": ""world""}";
-            string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+            string token = Jose.JWT.Encode(json, RsaKey.New(PubKey().ExportParameters(false)), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
 
             // when
             bool incorrectAlgorithm = false;
@@ -2398,10 +2398,10 @@ namespace UnitTests
         {
             // given
             string json = @"{""hello"": ""world""}";
-            string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+            string token = Jose.JWT.Encode(json, RsaKey.New(PrivKey().ExportParameters(false)), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
 
             // when
-            var test = Jose.JWT.Decode<IDictionary<string, object>>(token, PrivKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+            var test = Jose.JWT.Decode<IDictionary<string, object>>(token, RsaKey.New(PrivKey().ExportParameters(true)), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
 
             // then
             Assert.That(test, Is.EqualTo(new Dictionary<string, object> { { "hello", "world" } }));

@@ -1,5 +1,5 @@
 {
-  "version": "2.0.0-*",
+  "version": "2.0.1-*",
   "title": "Jose JWT",
   "authors": [ "Dmitry Vsekhvalnov" ],
   "owners": [ "Dmitry Vsekhvalnov" ],
@@ -9,7 +9,7 @@
   "language": "en-US",
   "copyright": "Copyright dvsekhvalnov 2014-2016",
   "requireLicenseAcceptance": false,
-  "releaseNotes": "This is major release which aimed to support .NET Core support (CLR/CORECLR runtime)",
+  "releaseNotes": "This is major release which is aimed to add .NET Core support (CLR/CORECLR runtimes)",
   "summary": "Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET Core. Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms. Library for generating, decoding and encryption of JSON Web Tokens.",
   "description": "Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET \r\r
 

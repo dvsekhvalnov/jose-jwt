@@ -4,11 +4,16 @@ Minimallistic zero-dependency library for generating, decoding and encryption [J
 of [JSON Web Algorithms](https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-31) as of July 4, 2014 version. JSON parsing agnostic, can plug any desired JSON processing library.
 Extensively tested for compatibility with [jose.4.j](https://bitbucket.org/b_c/jose4j/wiki/Home), [Nimbus-JOSE-JWT](https://bitbucket.org/nimbusds/nimbus-jose-jwt/wiki/Home) and [json-jwt](https://github.com/nov/json-jwt) libraries.
 
-v1.9 is built against .NET framework and should be compatible with v4.0 and above.
+## Which version?
 
-As of v2 it is .NET Core compatible and aimed to support both .NET framework CLR and .NET Core runtimes.  
+- v2.0 and above is .NET Core compatible and aimed to support both .NET framework (`NET40`) and .NET Core (`netstandard1.4`) runtimes. This is the version you should prefer unless you have really strong reason to stay with v1.9.
 
-* WinRT compatible version (Windows 8.1 and Windows Phone 8.1) is avaliable here: [JoseRT](https://github.com/dvsekhvalnov/jose-rt).
+- v1.9 is built against .NET framework only and should be compatible with `NET40` and above. The version is not actively maintained anymore except critical bug fixes.
+
+- WinRT compatible version (Windows 8.1 and Windows Phone 8.1) is avaliable as standalone project here: [jose-rt](https://github.com/dvsekhvalnov/jose-rt).
+
+- PCLCrypto based experimental project living up here: [jose-pcl](https://github.com/dvsekhvalnov/jose-pcl).
+
 
 ## Foreword
 Originally forked from https://github.com/johnsheehan/jwt . Almost re-written from scratch to support JWT encryption capabilities and unified interface for encoding/decoding/encryption
@@ -64,10 +69,14 @@ Technically it is possible to use ECDH-ES or ECDH-ES+AES Key Wrap family with A1
 
 ## Installation
 ### NuGet
+https://www.nuget.org/packages/jose-jwt/
+
 `Install-Package jose-jwt`
 
 ### Manual
-Grab source and compile yourself.
+Grab source and compile yourself:
+  1. `dotnet restore`
+  1. `dotnet pack -c Release`
 
 ## Usage
 ### Creating Plaintext (unprotected) Tokens
@@ -418,6 +427,30 @@ var key = FindKeyByIssuer(jwt.Iss);
 
 //step 2: perform actual token validation
 var payload = Jose.JWT.Decode<JwtToken>(token, key);
+```
+
+### Strict validation
+It is possible to use strict validation before decoding a token. This means that you will specify which algorithm and possibly encryption type you are expecting to receive in the header. If the received header doesn't match with the types that you have specified an exception will be thrown and the parsing will be stopped. 
+
+Example of how to strictly validate an encrypted token:
+```C#
+string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..Fmz3PLVfv-ySl4IJ.LMZpXMDoBIll5yuEs81Bws2-iUUaBSpucJPL-GtDKXkPhFpJmES2T136Vd8xzvp-3JW-fvpRZtlhluqGHjywPctol71Zuz9uFQjuejIU4axA_XiAy-BadbRUm1-25FRT30WtrrxKltSkulmIS5N-Nsi_zmCz5xicB1ZnzneRXGaXY4B444_IHxGBIS_wdurPAN0OEGw4xIi2DAD1Ikc99a90L7rUZfbHNg_iTBr-OshZqDbR6C5KhmMgk5KqDJEN8Ik-Yw.Jbk8ZmO901fqECYVPKOAzg";
+
+byte[] secretKey = new byte[] { 164, 60, 194, 0, 161, 189, 41, 38, 130, 89, 141, 164, 45, 170, 159, 209, 69, 137, 243, 216, 191, 131, 47, 250, 32, 107, 231, 117, 37, 158, 225, 234 };
+
+string json = Jose.JWT.Decode(token, secretKey, JweAlgorithm.DIR, JweEncryption.A256GCM);
+```
+
+Example of how to strictly validate a signed token:
+```C#
+string token = "eyJhbGciOiJFUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.EVnmDMlz-oi05AQzts-R3aqWvaBlwVZddWkmaaHyMx5Phb2NSLgyI0kccpgjjAyo1S5KCB3LIMPfmxCX_obMKA";
+
+byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+
+var publicKey = EccKey.New(x, y);
+
+string json = Jose.JWT.Decode(token, publicKey, JwsAlgorithm.ES256);
 ```
 
 ### Working with binary payload

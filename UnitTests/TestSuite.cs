@@ -294,7 +294,7 @@ namespace UnitTests
 
             Console.Out.WriteLine("PS256 = {0}", token);
 
-            //then            
+            //then
             //can't assert whole signature, because PSS padding is non deterministic
 
             string[] parts = token.Split('.');
@@ -318,7 +318,7 @@ namespace UnitTests
 
             Console.Out.WriteLine("PS384 = {0}", token);
 
-            //then            
+            //then
             //can't assert whole signature, because PSS padding is non deterministic
 
             string[] parts = token.Split('.');
@@ -342,7 +342,7 @@ namespace UnitTests
 
             Console.Out.WriteLine("PS512 = {0}", token);
 
-            //then            
+            //then
             //can't assert whole signature, because PSS padding is non deterministic
 
             string[] parts = token.Split('.');
@@ -836,7 +836,7 @@ namespace UnitTests
                 iat = 1389188952
             };
 
-            //when            
+            //when
             string token = Jose.JWT.Encode(payload, PubKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A256CBC_HS512);
 
             //then
@@ -1132,7 +1132,7 @@ namespace UnitTests
             Assert.Equal(parts.Length, 5); //Make sure 5 parts
             Assert.Equal(parts[0], "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00iLCJ6aXAiOiJERUYifQ"); //Header is non-encrypted and static text
             Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size, 96 bits            
+            Assert.Equal(parts[2].Length, 16); //IV size, 96 bits
             Assert.Equal(parts[4].Length, 22); //auth tag size
 
             Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
@@ -1578,7 +1578,7 @@ namespace UnitTests
         [Fact]
         public void Encrypt_PBES2_HS256_A128KW_A128CBC_HS256()
         {
-            //given     
+            //given
             string json =
                 @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
 
@@ -1603,7 +1603,7 @@ namespace UnitTests
         [Fact]
         public void Encrypt_PBES2_HS256_A128KW_A256GCM()
         {
-            //given     
+            //given
             string json =
                 @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
 
@@ -1628,7 +1628,7 @@ namespace UnitTests
         [Fact]
         public void Encrypt_PBES2_HS384_A192KW_A192GCM()
         {
-            //given     
+            //given
             string json =
                 @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
 
@@ -1653,7 +1653,7 @@ namespace UnitTests
         [Fact]
         public void Encrypt_PBES2_HS512_A256KW_A256CBC_HS512()
         {
-            //given     
+            //given
             string json =
                 @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
 
@@ -2225,7 +2225,7 @@ namespace UnitTests
             Assert.Equal(parts.Length, 5); //Make sure 5 parts
             Assert.Equal(parts[0], "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiemlwIjoiREVGIn0"); //Header is non-encrypted and static text
             Assert.Equal(parts[1].Length, 0); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size            
+            Assert.Equal(parts[2].Length, 22); //IV size
             Assert.Equal(parts[4].Length, 43); //auth tag size
 
             Assert.Equal(Jose.JWT.Decode(token, aes512Key), json);
@@ -2243,7 +2243,7 @@ namespace UnitTests
 
             //then
             Assert.Equal(test.Count, 2);
-            Assert.Equal(test["alg"], "HS256"); 
+            Assert.Equal(test["alg"], "HS256");
             Assert.Equal(test["cty"], "text/plain");
         }
 
@@ -2281,28 +2281,14 @@ namespace UnitTests
 
         #region test utils
 
-        private object PrivKey()
+        private RSA PrivKey()
         {
-        #if NET40
-            var key = (RSACryptoServiceProvider) X509().PrivateKey;
-            RSACryptoServiceProvider newKey = new RSACryptoServiceProvider();
-            newKey.ImportParameters(key.ExportParameters(true));
-
-            return newKey;
-
-        #elif NETCOREAPP1_0
-            return (RSACng)X509().GetRSAPrivateKey();
-        #endif
-
+            return (RSA)X509().GetRSAPrivateKey();
         }
 
-        private object PubKey()
+        private RSA PubKey()
         {
-        #if NET40
-            return (RSACryptoServiceProvider)X509().PublicKey.Key;
-        #elif NETCOREAPP1_0
-            return (RSACng)X509().GetRSAPublicKey();
-        #endif
+            return (RSA)X509().GetRSAPublicKey();
         }
 
         private X509Certificate2 X509()
