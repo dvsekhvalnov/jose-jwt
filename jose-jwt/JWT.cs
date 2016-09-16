@@ -71,7 +71,9 @@ namespace Jose
         private static Dictionary<JweAlgorithm, string> JweAlgorithms = new Dictionary<JweAlgorithm, string>();
         private static Dictionary<JweEncryption, string> JweEncryptionMethods = new Dictionary<JweEncryption, string>();
         private static Dictionary<JweCompression, string> JweCompressionMethods = new Dictionary<JweCompression, string>();
-        private static Dictionary<JwsAlgorithm, string> JwsAlgorithms = new Dictionary<JwsAlgorithm, string>();         
+        private static Dictionary<JwsAlgorithm, string> JwsAlgorithms = new Dictionary<JwsAlgorithm, string>();
+
+        private static Dictionary<string, JweEncryption> JweEncryptionMethodAliases = new Dictionary<string, JweEncryption>();     
 
         private static IJsonMapper jsMapper;
 
@@ -132,6 +134,11 @@ namespace Jose
             JweEncryptionMethods[JweEncryption.A128CBC_HS256] = "A128CBC-HS256";
             JweEncryptionMethods[JweEncryption.A192CBC_HS384] = "A192CBC-HS384";
             JweEncryptionMethods[JweEncryption.A256CBC_HS512] = "A256CBC-HS512";
+
+            // for compatibility with services still using a Draft 7 version of these names
+            JweEncryptionMethodAliases["A128CBC+HS256"] = JweEncryption.A128CBC_HS256;
+            JweEncryptionMethodAliases["A192CBC+HS384"] = JweEncryption.A192CBC_HS384;
+            JweEncryptionMethodAliases["A256CBC+HS512"] = JweEncryption.A256CBC_HS512;
 
             EncAlgorithms[JweEncryption.A128GCM] = new AesGcmEncryption(128);
             EncAlgorithms[JweEncryption.A192GCM] = new AesGcmEncryption(192);
@@ -637,6 +644,11 @@ namespace Jose
             foreach (var pair in JweEncryptionMethods)
             {
                 if (pair.Value.Equals(algorithm)) return pair.Key;
+            }
+            JweEncryption enc;
+            if (JweEncryptionMethodAliases.TryGetValue(algorithm, out enc))
+            {
+                return enc;
             }
 
             throw new InvalidAlgorithmException(string.Format("Encryption algorithm is not supported: {0}.", algorithm));
