@@ -433,7 +433,7 @@ var payload = Jose.JWT.Decode<JwtToken>(token, key);
 ```
 
 ### Strict validation
-It is possible to use strict validation before decoding a token. This means that you will specify which algorithm and possibly encryption type you are expecting to receive in the header. If the received header doesn't match with the types that you have specified an exception will be thrown and the parsing will be stopped. 
+It is possible to use strict validation before decoding a token. This means that you will specify which algorithm and possibly encryption type you are expecting to receive in the header. If the received header doesn't match with the types that you have specified an exception will be thrown and the parsing will be stopped.
 
 Example of how to strictly validate an encrypted token:
 ```C#
@@ -539,5 +539,59 @@ public class ServiceStackMapper : IJsonMapper
 Jose.JWT.JsonMapper = new ServiceStackMapper();
 ```
 
-### More examples
+## More examples
 Checkout UnitTests\TestSuite.cs for more examples.
+
+## Dealing with keys
+Below is collection of links and approaches to nail down some common questions around key management:
+
+### RSACryptoServiceProvider
+When you dealing with `RSACryptoServiceProvider` you can face `Invalid algorithm specified` exception while performing signing or encryption operations. The reason usually is that underneath `RSACryptoServiceProvider` is not using Microsoft Enhanced RSA and AES Cryptographic Provider. There are several ways to fix that:
+
+1. re-import RSAParameters:
+
+  ```C#
+  public static FixCSP PrivKey(RSACryptoServiceProvider key)
+  {
+      var privKey = key.PrivateKey;
+
+      RSACryptoServiceProvider newKey = new RSACryptoServiceProvider();
+      newKey.ImportParameters(privKey.ExportParameters(true));
+
+      return newKey;
+  }
+  ```
+
+  The limitation of this approach is that private key should be marked exportable. It is not recommended for production environments but can be handy for testing.
+
+1. Enforce correct CSP:
+  ```C#
+  public static FixCSP PrivKey(RSACryptoServiceProvider key)
+  {
+    var privKey = key.PrivateKey;
+    var enhCsp = new RSACryptoServiceProvider().CspKeyContainerInfo;
+    var cspParams = new CspParameters(enhCsp.ProviderType, enhCsp.ProviderName, privKey.CspKeyContainerInfo.KeyContainerName);
+
+    return new RSACryptoServiceProvider(cspParams);
+  }
+  ```
+
+  For more details see: http://stackoverflow.com/questions/7444586/how-can-i-sign-a-file-using-rsa-and-sha256-with-net
+
+1. Actually use certificate which supports SHA-2, see http://hintdesk.com/c-how-to-fix-invalid-algorithm-specified-when-signing-with-sha256/ for details how to create one.
+
+### If you have only RSA private key
+E.g. if you don't have .p12 file where certificate is combined with private key that can be loaded via `X509Certificate2` but rather have
+only private key:
+ ```
+ -----BEGIN RSA PRIVATE KEY-----
+ ............................
+ -----END RSA PRIVATE KEY-----
+ ```
+
+Then take a look at: http://www.donaldsbaconbytes.com/2016/08/create-jwt-with-a-private-rsa-key/
+
+## Strong-Named assembly
+`jose-jwt` is not providing standalone strong-named assembly as of now. If you need one in your project, please take a look at https://github.com/dvsekhvalnov/jose-jwt/issues/5
+
+Usually people have success with https://github.com/brutaldev/StrongNameSigner
