@@ -149,9 +149,6 @@ string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.RS256);
 ES256, ES384, ES256 ECDSA signatures requires `CngKey` (usually private) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
 But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,d)`.
 
-**CORECLR**:
-ES256, ES384, ES256 ECDSA signatures can accept either `CngKey` or `ECDsa` (usually private) elliptic curve key of corresponding length.
-
 ```C#
 var payload = new Dictionary<string, object>()
 {
@@ -167,6 +164,9 @@ var privateKey=EccKey.New(x, y, d);
 
 string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
 ```
+
+**CORECLR**:
+ES256, ES384, ES256 ECDSA signatures can accept either `CngKey`(see above) or `ECDsa` (usually private) elliptic curve key of corresponding length.
 
 ```C#
 var payload = new Dictionary<string, object>()
@@ -369,9 +369,9 @@ var payload = new Dictionary<string, object>()
     { "exp", 1300819380 }
 };
 
-var privateKey=new X509Certificate2("ecc-key.p12", "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet).GetECDsaPublicKey();
+var publicKey=new X509Certificate2("ecc-key.p12", "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet).GetECDsaPublicKey();
 
-string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
+string token=Jose.JWT.Encode(payload, publicKey, JwsAlgorithm.ES256);
 ```
 
 
