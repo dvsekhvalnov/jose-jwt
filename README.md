@@ -175,7 +175,7 @@ var payload = new Dictionary<string, object>()
     { "exp", 1300819380 }
 };
 
-var privateKey=new X509Certificate2("ecc-key.p12", "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet).GetECDsaPublicKey();
+var privateKey=new X509Certificate2("ecc-key.p12", "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet).GetECDsaPrivateKey();
 
 string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
 ```
@@ -344,7 +344,9 @@ string json = Jose.JWT.Decode(token,privateKey);
 
 
 
-**ES256, ES284, ES512** signatures, **ECDH-ES** and **ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW** key management algorithms expects `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
+**ES256, ES284, ES512** signatures, **ECDH-ES** and **ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW** key management algorithms expects 
+
+**CLR**: `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
 sure correct `usage:` value is set. `CngKeyUsages.KeyAgreement` for ECDH-ES and `CngKeyUsages.Signing` for ES-* (default value, can be ommited).
 
 ```C#
@@ -357,6 +359,21 @@ var publicKey=EccKey.New(x, y);
 
 string json = Jose.JWT.Decode(token,publicKey);
 ```
+
+**CORECLR**: can accept either `CngKey` (see above) or `ECDsa` as a key, public/private is asymmetric to encoding.
+
+```C#
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
+
+var privateKey=new X509Certificate2("ecc-key.p12", "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet).GetECDsaPublicKey();
+
+string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
+```
+
 
 **PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW** key management algorithms expects `string` passpharase as a key
 
