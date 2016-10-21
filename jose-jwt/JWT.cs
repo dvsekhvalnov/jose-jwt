@@ -99,10 +99,15 @@ namespace Jose
                 {JwsAlgorithm.RS256, new RsaUsingSha("SHA256")},
                 {JwsAlgorithm.RS384, new RsaUsingSha("SHA384")},
                 {JwsAlgorithm.RS512, new RsaUsingSha("SHA512")},
-
+#if NET40
                 {JwsAlgorithm.ES256, new EcdsaUsingSha(256)},
                 {JwsAlgorithm.ES384, new EcdsaUsingSha(384)},
                 {JwsAlgorithm.ES512, new EcdsaUsingSha(521)}
+#elif NETSTANDARD1_4
+                {JwsAlgorithm.ES256, new Jose.netstandard1_4.EcdsaUsingSha(256)},
+                {JwsAlgorithm.ES384, new Jose.netstandard1_4.EcdsaUsingSha(384)},
+                {JwsAlgorithm.ES512, new Jose.netstandard1_4.EcdsaUsingSha(521)}
+#endif
             };
 
             JwsAlgorithms[JwsAlgorithm.none] = "none";

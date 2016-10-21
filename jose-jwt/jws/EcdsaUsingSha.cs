@@ -1,3 +1,4 @@
+#if NET40
 using System;
 using System.Security.Cryptography;
 
@@ -22,13 +23,9 @@ namespace Jose
             {
                 using (var signer = new ECDsaCng(privateKey))
                 {
-                #if NET40
                     signer.HashAlgorithm = Hash;
 
                     return signer.SignData(securedInput);
-                #elif NETSTANDARD1_4
-                    return signer.SignData(securedInput, Hash);
-                #endif
                 }
             }
             catch (CryptographicException e)
@@ -47,13 +44,9 @@ namespace Jose
             {
                 using (var signer = new ECDsaCng(publicKey))
                 {
-                #if NET40
                     signer.HashAlgorithm = Hash;
                 
                     return signer.VerifyData(securedInput, signature);
-                #elif NETSTANDARD1_4
-                    return signer.VerifyData(securedInput, signature, Hash);
-                #endif
                 }
             }
             catch (CryptographicException e)
@@ -62,7 +55,6 @@ namespace Jose
             }
         }
 
-#if NET40
         protected CngAlgorithm Hash
         {
             get
@@ -77,22 +69,6 @@ namespace Jose
                 throw new ArgumentException(string.Format("Unsupported key size: '{0} bytes'", keySize));
             }
         }
-
-#elif NETSTANDARD1_4
-        protected HashAlgorithmName Hash
-        {
-            get
-            {
-                if (keySize == 256)
-                    return HashAlgorithmName.SHA256;
-                if (keySize == 384)
-                    return HashAlgorithmName.SHA384;
-                if (keySize == 521)
-                    return HashAlgorithmName.SHA512;
-
-                throw new ArgumentException(string.Format("Unsupported key size: '{0} bytes'", keySize));
-            }
-        }
-#endif
     }
 }
+#endif
