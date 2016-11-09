@@ -66,7 +66,8 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 - PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 
 ##### Notes:
-\* It appears that Microsoft CNG implementation of BCryptSecretAgreement/NCryptSecretAgreement contains a bug for calculating Elliptic Curve Diffie-Hellman secret agreement
+* Types returned by crytographic methods MAY be different on Windows and Linux. e.g. GetRSAPrivateKey() on X509Certificate2 on Windows returns RsaCng and OpenSslRsa on *nix.
+* It appears that Microsoft CNG implementation of BCryptSecretAgreement/NCryptSecretAgreement contains a bug for calculating Elliptic Curve Diffie-Hellman secret agreement
 on keys higher than 256 bit (P-384 and P-521 NIST curves correspondingly). At least produced secret agreements do not match any other implementation in different languages.
 Technically it is possible to use ECDH-ES or ECDH-ES+AES Key Wrap family with A192CBC-HS384 and A256CBC-HS512 but most likely produced JWT tokens will not be compatible with other platforms and therefore can't be decoded correctly.
 
@@ -136,7 +137,7 @@ var payload = new Dictionary<string, object>()
     { "exp", 1300819380 }
 };
 
-var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet).GetRSAPrivateKey() as RSACng;
+var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet).GetRSAPrivateKey();
 
 string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.RS256);
 ```
