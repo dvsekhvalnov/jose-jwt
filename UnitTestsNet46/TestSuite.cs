@@ -671,6 +671,23 @@ namespace UnitTests
 
 
         [Fact]
+        public void Decrypt_RSA_OAEP_256_A128CBC_HS256_RsaCryptoProvider()
+        {
+            //given
+            string token = "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bje66yTjMUpyGzbt3QvPNOmCmUPowgEmoBHXw-pByhST2VBSs0_67JKDymKW0VpmQC5Qb7ZLC6nNG8YW5pxTZDOeTQLodhAvzoNAsrx4M2R_N58ZVqBPLKTq7FKi1NNd8oJ80dwWbOJ13dkLH68SlhOK5bhqKFgtbzalnglL2kq8Fki1GkN4YyFnS8-chC-mlrS5bJrPSHUF7oAsG_flL_e9-KzYqYTQgGCB3GYSo_pgalsp2rUO3Oz2Pfe9IEJNlX7R9wOT1nTT0UUg-lSzQ2oOaXNvNyaPgEa76mJ1nk7ZQq7ZNix1m8snjk0Vizd8EOFCSRyOGcp4mHMn7-s00Q.tMFMCdFNQXbhEnwE6mP_XQ.E_O_ZBtJ8P0FvhKOV_W98oxIySDgdd0up0c8FAjo-3OVZ_6XMEQYFDKVG_Zc3zkbaz1Z2hmc7D7M28RbhRdya3yJN6Hcv1KuXeZ9ociI7o739Ni_bPvv8xCmGxlASS5AF7N4JR7XjrWL-SYKGNL1p0XNTlPo3B3qYqgAY6jFNvlcjWupim-pQbWKNqPbO2KmSCtUzyKE5oHjsomH0hnQs0_DXv3cgQ_ZFLFZBc1tC4AjQ8QZex5kWg5BmlJDM5F_jD7QRhb7B1u4Mi563-AKVA.0lraw3IXMM6wPqUZVYA8pg";
+
+            //when
+
+            string json = Jose.JWT.Decode(token, PrivKey());
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+        }
+
+
+        [Fact]
         public void Decrypt_RSA_OAEP_256_A192CBC_HS384()
         {
             //given
@@ -734,6 +751,31 @@ namespace UnitTests
 
             //when
             string token = Jose.JWT.Encode(json, PubRsaKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM);
+
+            //then
+            Console.Out.WriteLine("RSA_OAEP_256_A128GCM(RSA key)={0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(parts.Length, 5); //Make sure 5 parts
+            Assert.Equal(parts[0], "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTI4R0NNIn0"); //Header is non-encrypted and static text
+            Assert.Equal(parts[1].Length, 342); //CEK size
+            Assert.Equal(parts[2].Length, 16); //IV size
+            Assert.Equal(parts[3].Length, 24); //cipher text size
+            Assert.Equal(parts[4].Length, 22); //auth tag size
+
+            Assert.Equal(Jose.JWT.Decode(token, RsaKey.New(PrivKey().ExportParameters(true))), json);
+        }
+
+        [Fact]
+        public void Encrypt_RSA_OAEP_256_A128GCM_RsaCryptoProvider()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+
+            //when
+            string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM);
 
             //then
             Console.Out.WriteLine("RSA_OAEP_256_A128GCM(RSA key)={0}", token);
