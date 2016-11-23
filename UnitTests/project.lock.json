@@ -2582,7 +2582,7 @@
           "lib/dotnet/xunit.runner.utility.dotnet.dll": {}
         }
       },
-      "jose-jwt/2.0.2": {
+      "jose-jwt/2.0.1": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.4",
         "dependencies": {
@@ -7613,7 +7613,7 @@
         "xunit.runner.utility.nuspec"
       ]
     },
-    "jose-jwt/2.0.2": {
+    "jose-jwt/2.0.1": {
       "type": "project",
       "path": "../jose-jwt/project.json",
       "msbuildProject": "../jose-jwt/jose-jwt.xproj"

@@ -3,6 +3,7 @@
   "version": 2,
   "targets": {
     ".NETFramework,Version=v4.0": {},
+    ".NETFramework,Version=v4.6.1": {},
     ".NETStandard,Version=v1.4": {
       "Microsoft.CSharp/4.0.1": {
         "type": "package",
@@ -4058,6 +4059,9 @@
     "": [],
     ".NETFramework,Version=v4.0": [
       "System.Web.Extensions >= 4.0.0"
+    ],
+    ".NETFramework,Version=v4.6.1": [
+      "System.Web.Extensions >= 4.6.0"
     ],
     ".NETStandard,Version=v1.4": [
       "NETStandard.Library >= 1.6.0",

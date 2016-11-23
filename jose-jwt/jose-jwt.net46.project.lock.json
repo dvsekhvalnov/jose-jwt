@@ -1,0 +1,15 @@
+{
+  "locked": false,
+  "version": 2,
+  "targets": {
+    ".NETFramework,Version=v4.6.1": {},
+    ".NETFramework,Version=v4.6.1/win": {}
+  },
+  "libraries": {},
+  "projectFileDependencyGroups": {
+    "": [],
+    ".NETFramework,Version=v4.6.1": []
+  },
+  "tools": {},
+  "projectFileToolGroups": {}
+}

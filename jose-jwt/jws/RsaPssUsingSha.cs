@@ -15,8 +15,8 @@ namespace Jose
 
         public byte[] Sign(byte[] securedInput, object key)
         {
-#if NET40
-            var privateKey = Ensure.Type<CngKey>(key, "RsaUsingSha with PSS padding alg expects key to be of RSACryptoServiceProvider type.");
+#if NET40 || NET46
+            var privateKey = Ensure.Type<CngKey>(key, "RsaUsingSha with PSS padding alg expects key to be of CngKey type.");
 
             try
             {
@@ -34,9 +34,9 @@ namespace Jose
 
         public bool Verify(byte[] signature, byte[] securedInput, object key)
         {
-#if NET40
+#if NET40 || NET46
             var publicKey = Ensure.Type<CngKey>(key,
-                "RsaUsingSha with PSS padding alg expects key to be of RSACryptoServiceProvider type.");
+                "RsaUsingSha with PSS padding alg expects key to be of CngKey type.");
 
             try
             {

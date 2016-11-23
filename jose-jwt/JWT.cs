@@ -84,7 +84,7 @@ namespace Jose
 
         static JWT()
         {
-#if NET40
+#if NET40 || NET46
             JsonMapper = new JSSerializerMapper();
 #elif NETSTANDARD1_4
             JsonMapper = new NewtonsoftMapper();
@@ -99,7 +99,7 @@ namespace Jose
                 {JwsAlgorithm.RS256, new RsaUsingSha("SHA256")},
                 {JwsAlgorithm.RS384, new RsaUsingSha("SHA384")},
                 {JwsAlgorithm.RS512, new RsaUsingSha("SHA512")},
-#if NET40
+#if NET40 || NET46
                 {JwsAlgorithm.ES256, new EcdsaUsingSha(256)},
                 {JwsAlgorithm.ES384, new EcdsaUsingSha(384)},
                 {JwsAlgorithm.ES512, new EcdsaUsingSha(521)}
@@ -141,9 +141,9 @@ namespace Jose
             JweEncryptionMethods[JweEncryption.A256CBC_HS512] = "A256CBC-HS512";
 
             // for compatibility with services still using a Draft 7 version of these names
-            JweEncryptionMethodAliases["A128CBC+HS256"] = JweEncryption.A128CBC_HS256;
-            JweEncryptionMethodAliases["A192CBC+HS384"] = JweEncryption.A192CBC_HS384;
-            JweEncryptionMethodAliases["A256CBC+HS512"] = JweEncryption.A256CBC_HS512;
+//            JweEncryptionMethodAliases["A128CBC+HS256"] = JweEncryption.A128CBC_HS256;
+//            JweEncryptionMethodAliases["A192CBC+HS384"] = JweEncryption.A192CBC_HS384;
+//            JweEncryptionMethodAliases["A256CBC+HS512"] = JweEncryption.A256CBC_HS512;
 
             EncAlgorithms[JweEncryption.A128GCM] = new AesGcmEncryption(128);
             EncAlgorithms[JweEncryption.A192GCM] = new AesGcmEncryption(192);

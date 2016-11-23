@@ -63,6 +63,11 @@ Encryption: \r\r
         "System.Web.Extensions": "4.0.0.0"
       }
     },
+    "net461": {
+      "frameworkAssemblies": {
+        "System.Web.Extensions": "4.6.0.0"
+      }
+    },
     
     "netstandard1.4": {
       "dependencies": {
