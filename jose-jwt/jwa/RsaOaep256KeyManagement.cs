@@ -16,7 +16,7 @@ namespace Jose
 
             return new[] {cek, RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256)};
 
-	    #elif NET46
+	    #elif NET461
             if (key is CngKey)
             {
                 var publicKey = (CngKey) key;
@@ -48,7 +48,7 @@ namespace Jose
 
             return RsaOaep.Decrypt(encryptedCek, privateKey, CngAlgorithm.Sha256);
 
-        #elif NET46
+        #elif NET461
             if (key is CngKey)
             {
                 var privateKey = (CngKey) key;

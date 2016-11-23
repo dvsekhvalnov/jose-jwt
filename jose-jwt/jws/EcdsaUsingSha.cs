@@ -1,4 +1,4 @@
-#if NET40 || NET46
+#if NET40 || NET461
 using System;
 using System.Security.Cryptography;
 

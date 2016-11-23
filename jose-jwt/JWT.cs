@@ -84,7 +84,7 @@ namespace Jose
 
         static JWT()
         {
-#if NET40 || NET46
+#if NET40 || NET461
             JsonMapper = new JSSerializerMapper();
 #elif NETSTANDARD1_4
             JsonMapper = new NewtonsoftMapper();
@@ -99,7 +99,7 @@ namespace Jose
                 {JwsAlgorithm.RS256, new RsaUsingSha("SHA256")},
                 {JwsAlgorithm.RS384, new RsaUsingSha("SHA384")},
                 {JwsAlgorithm.RS512, new RsaUsingSha("SHA512")},
-#if NET40 || NET46
+#if NET40 || NET461
                 {JwsAlgorithm.ES256, new EcdsaUsingSha(256)},
                 {JwsAlgorithm.ES384, new EcdsaUsingSha(384)},
                 {JwsAlgorithm.ES512, new EcdsaUsingSha(521)}

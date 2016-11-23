@@ -14,7 +14,7 @@ namespace Jose
 
         public byte[] Sign(byte[] securedInput, object key)
         {
-#if NET40 || NET46
+#if NET40 || NET461
             var privateKey = Ensure.Type<RSA>(key, "RsaUsingSha alg expects key to be of AsymmetricAlgorithm type.");
 
             using (var sha = HashAlgorithm)
@@ -35,7 +35,7 @@ namespace Jose
 
         public bool Verify(byte[] signature, byte[] securedInput, object key)
         {
-#if NET40 || NET46
+#if NET40 || NET461
             using (var sha = HashAlgorithm)
             {
                 var publicKey = Ensure.Type<AsymmetricAlgorithm>(key, "RsaUsingSha alg expects key to be of AsymmetricAlgorithm type."); 
@@ -52,7 +52,7 @@ namespace Jose
 #endif
         }
 
-#if NET40 || NET46
+#if NET40 || NET461
         private HashAlgorithm HashAlgorithm
         {        
             get

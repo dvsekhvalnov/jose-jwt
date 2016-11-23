@@ -79,7 +79,7 @@ namespace Jose
 
         private static byte[] AesDec(byte[] sharedKey, byte[] cipherText)
         {
-        #if NET40 || NET46
+        #if NET40 || NET461
             using (Aes aes = new AesManaged())
             {
                 aes.Key = sharedKey;
@@ -126,7 +126,7 @@ namespace Jose
 
         private static byte[] AesEnc(byte[] sharedKey, byte[] plainText)
         {
-        #if NET40 || NET46
+        #if NET40 || NET461
             using (Aes aes = new AesManaged())
             {
                 aes.Key = sharedKey;
