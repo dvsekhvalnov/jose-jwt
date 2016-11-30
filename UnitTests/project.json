@@ -26,10 +26,11 @@
           }
         }
     },
-    "dependencies": {
-        "jose-jwt": "2.0.0",
-        "xunit": "2.1.0"
-    },
+  "dependencies": {
+    "jose-jwt": "2.0.0",
+    "Microsoft.NETCore.App": "1.1.0",
+    "xunit": "2.1.0"
+  },
     "commands": {
         "test": "xunit.runner.dnx"
     }

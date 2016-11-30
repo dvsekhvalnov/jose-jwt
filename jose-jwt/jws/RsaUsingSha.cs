@@ -58,13 +58,13 @@ namespace Jose
             get
             {
                 if (hashMethod.Equals("SHA256"))
-                    return SHA256.Create();
+                    return new SHA256CryptoServiceProvider();
                 if (hashMethod.Equals("SHA384"))
-                    return SHA384.Create();
+                    return new SHA384CryptoServiceProvider();
                 if (hashMethod.Equals("SHA512"))
-                    return SHA512.Create();
+                    return new SHA512CryptoServiceProvider();
 
-                throw new ArgumentException("Unsupported hashing algorithm: '{0}'", hashMethod);
+        throw new ArgumentException("Unsupported hashing algorithm: '{0}'", hashMethod);
             }
         }
 #elif NETSTANDARD1_4
