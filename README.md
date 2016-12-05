@@ -4,6 +4,9 @@ Minimallistic zero-dependency library for generating, decoding and encryption [J
 of [JSON Web Algorithms](https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-31) as of July 4, 2014 version. JSON parsing agnostic, can plug any desired JSON processing library.
 Extensively tested for compatibility with [jose.4.j](https://bitbucket.org/b_c/jose4j/wiki/Home), [Nimbus-JOSE-JWT](https://bitbucket.org/nimbusds/nimbus-jose-jwt/wiki/Home) and [json-jwt](https://github.com/nov/json-jwt) libraries.
 
+## FIPS compliance ##
+Library is fully FIPS compliant since v2.1
+
 ## Which version?
 
 - v2.0 and above is .NET Core compatible and aimed to support both .NET framework (`NET40`) and .NET Core (`netstandard1.4`) runtimes. This is the version you should prefer unless you have really strong reason to stay with v1.9.
