@@ -257,6 +257,21 @@ namespace UnitTests
         }
 
         [Test]
+        public void DecodePS256_RsaCSPKey()
+        {
+            //given
+            string token = "eyJhbGciOiJQUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.S9xuR-IGfXEj5qsHcMtK-jcj1lezvVstw1AISp8dEQVRNgwOMZhUQnSCx9i1CA-pMucxR-lv4e7zd6h3cYCfMnyv7iuxraxNiNAgREhOT-bkBCZMNgb5t15xEtDSJ3MuBlK3YBtXyVcDDIdKH_Bwj-u363y6LuvZ8FEOGmIK5WSFi18Xjg-ihhvH1C6UzH1G82wrRbX6DyJKqrUnHAg8yzUJVP1AdgjWRt5BKpuYbXSib-MKZZkaE4q_hCb-j25xCzn8Ez8a7PO7p0fDGvZuOk_yzSfvXSavg7iE0GLuUTNv3nQ_xW-rfbrpYeyXNtstoK3JPFpdtORTyH1iIh7VVA";
+
+            //when
+            string json = Jose.JWT.Decode(token, PubKey());
+
+            Console.Out.WriteLine("token = {0}", json);
+
+            //then
+            Assert.That(json, Is.EqualTo(@"{""hello"": ""world""}"));
+        }
+
+        [Test]
         public void DecodePS384()
         {
             //given
@@ -299,6 +314,30 @@ namespace UnitTests
 
             //then            
             //can't assert whole signature, because PSS padding is non deterministic
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(3), "Make sure 3 parts");
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJQUzI1NiIsInR5cCI6IkpXVCJ9"), "Header is non-encrypted and static text");
+            Assert.That(parts[1], Is.EqualTo("eyJoZWxsbyI6ICJ3b3JsZCJ9"), "Pyaload is non encrypted and static text");
+            Assert.That(parts[2].Length, Is.EqualTo(342), "signature size");
+
+            Assert.That(Jose.JWT.Decode(token, RsaKey.New(PubKey().ExportParameters(false))), Is.EqualTo(json),"Make sure we are consistent with ourselves");
+        }
+
+        [Test]
+        public void EncodePS256_RsaCSPKey()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, PrivKey(), JwsAlgorithm.PS256);
+
+            Console.Out.WriteLine("PS256 = {0}", token);
+
+            //then            
+            //can't assert whole signature, because PSS  padding is non deterministic
 
             string[] parts = token.Split('.');
 
@@ -620,6 +659,21 @@ namespace UnitTests
         }
 
         [Test]
+        public void Decrypt_RSA_OAEP_256_A128CBC_HS256_RsaCSPKey()
+        {
+            //given
+            string token = "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bje66yTjMUpyGzbt3QvPNOmCmUPowgEmoBHXw-pByhST2VBSs0_67JKDymKW0VpmQC5Qb7ZLC6nNG8YW5pxTZDOeTQLodhAvzoNAsrx4M2R_N58ZVqBPLKTq7FKi1NNd8oJ80dwWbOJ13dkLH68SlhOK5bhqKFgtbzalnglL2kq8Fki1GkN4YyFnS8-chC-mlrS5bJrPSHUF7oAsG_flL_e9-KzYqYTQgGCB3GYSo_pgalsp2rUO3Oz2Pfe9IEJNlX7R9wOT1nTT0UUg-lSzQ2oOaXNvNyaPgEa76mJ1nk7ZQq7ZNix1m8snjk0Vizd8EOFCSRyOGcp4mHMn7-s00Q.tMFMCdFNQXbhEnwE6mP_XQ.E_O_ZBtJ8P0FvhKOV_W98oxIySDgdd0up0c8FAjo-3OVZ_6XMEQYFDKVG_Zc3zkbaz1Z2hmc7D7M28RbhRdya3yJN6Hcv1KuXeZ9ociI7o739Ni_bPvv8xCmGxlASS5AF7N4JR7XjrWL-SYKGNL1p0XNTlPo3B3qYqgAY6jFNvlcjWupim-pQbWKNqPbO2KmSCtUzyKE5oHjsomH0hnQs0_DXv3cgQ_ZFLFZBc1tC4AjQ8QZex5kWg5BmlJDM5F_jD7QRhb7B1u4Mi563-AKVA.0lraw3IXMM6wPqUZVYA8pg";
+
+            //when
+            string json = Jose.JWT.Decode(token, PrivKey());
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.That(json, Is.EqualTo(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}"));
+        }
+
+        [Test]
         public void Decrypt_RSA_OAEP_256_A192CBC_HS384()
         {
             //given
@@ -672,6 +726,31 @@ namespace UnitTests
             Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
 
             Assert.That(Jose.JWT.Decode(token, RsaKey.New(PrivKey().ExportParameters(true))), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+        }
+
+        [Test]
+        public void Encrypt_RSA_OAEP_256_A128GCM_RsaCSPKey()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+                
+
+            //when
+            string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM);
+
+            //then
+            Console.Out.WriteLine("RSA_OAEP_256_A128GCM={0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5), "Make sure 5 parts");
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTI4R0NNIn0"), "Header is non-encrypted and static text");
+            Assert.That(parts[1].Length, Is.EqualTo(342), "CEK size");
+            Assert.That(parts[2].Length, Is.EqualTo(16), "IV size");
+            Assert.That(parts[3].Length, Is.EqualTo(24), "cipher text size");
+            Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
+
+            Assert.That(Jose.JWT.Decode(token, PrivKey()), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
         }
 
         [Test]

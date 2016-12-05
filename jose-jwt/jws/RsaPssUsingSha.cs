@@ -15,45 +15,168 @@ namespace Jose
 
         public byte[] Sign(byte[] securedInput, object key)
         {
-#if NET40 || NET461
-            var privateKey = Ensure.Type<CngKey>(key, "RsaUsingSha with PSS padding alg expects key to be of CngKey type.");
+    #if NET40
+            if (key is CngKey)
+            {
+                var privateKey = (CngKey)key;
 
-            try
-            {
-                return RsaPss.Sign(securedInput, privateKey, Hash, saltSize);
+                try
+                {
+                    return RsaPss.Sign(securedInput, privateKey, Hash, saltSize);
+                }
+                catch (CryptographicException e)
+                {
+                    throw new JoseException("Unable to sign content.", e);    
+                }
             }
-            catch (CryptographicException e)
+
+            else if (key is RSACryptoServiceProvider)
             {
-                throw new JoseException("Unable to sign content.", e);    
+                //This is for backward compatibility only with 2.x 
+                //To be removed in 3.x 
+                var privateKey = RsaKey.New(((RSACryptoServiceProvider)key).ExportParameters(true));
+
+                try
+                {
+                    return RsaPss.Sign(securedInput, privateKey, Hash, saltSize);
+                }
+                catch (CryptographicException e)
+                {
+	            throw new JoseException("Unable to sign content.", e);    
+                }
+
             }
-#elif NETSTANDARD1_4
+
+            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of CngKey type.");
+    
+    #elif NET461
+            if (key is CngKey)
+            {
+                var privateKey = (CngKey)key;
+
+                try
+                {
+                    return RsaPss.Sign(securedInput, privateKey, Hash, saltSize);
+                }
+                catch (CryptographicException e)
+                {
+                    throw new JoseException("Unable to sign content.", e);    
+                }
+            }
+
+            if (key is RSACryptoServiceProvider)
+            {
+                //This is for backward compatibility only with 2.x 
+                //To be removed in 3.x 
+                var privateKey = RsaKey.New(((RSACryptoServiceProvider)key).ExportParameters(true));
+
+                try
+                {
+                    return RsaPss.Sign(securedInput, privateKey, Hash, saltSize);
+                }
+                catch (CryptographicException e)
+                {
+                    throw new JoseException("Unable to sign content.", e);    
+                }
+            }
+
+            if (key is RSA)
+            {
+                var privateKey = (RSA) key;
+                return privateKey.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
+            }
+
+            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either CngKey or RSA types.");
+
+    #elif NETSTANDARD1_4
             var privateKey = Ensure.Type<RSA>(key, "RsaUsingSha with PSS padding alg expects key to be of RSA type.");
+
             return privateKey.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
-#endif
+    #endif
         }
 
         public bool Verify(byte[] signature, byte[] securedInput, object key)
         {
-#if NET40 || NET461
-            var publicKey = Ensure.Type<CngKey>(key,
-                "RsaUsingSha with PSS padding alg expects key to be of CngKey type.");
-
-            try
+    #if NET40
+            if (key is CngKey)
             {
-                return RsaPss.Verify(securedInput, signature, publicKey, Hash, saltSize);
-            }
-            catch (CryptographicException e)
-            {
-                return false;
+                var publicKey = (CngKey)key;
+
+                try
+                {
+                    return RsaPss.Verify(securedInput, signature, publicKey, Hash, saltSize);
+                }
+                catch (CryptographicException e)
+                {
+                    return false;
+                }
             }
 
-#elif NETSTANDARD1_4
+            if (key is RSACryptoServiceProvider)
+            {
+                //This is for backward compatibility only with 2.x 
+                //To be removed in 3.x 
+                var publicKey = RsaKey.New(((RSACryptoServiceProvider)key).ExportParameters(false));
+
+                try
+                {
+                    return RsaPss.Verify(securedInput, signature, publicKey, Hash, saltSize);
+                }
+                catch (CryptographicException e)
+                {
+                    return false;
+                }
+            }
+
+            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of CngKey type.");
+
+    #elif NET461
+            if (key is CngKey)
+            {
+                var publicKey = (CngKey)key;
+
+                try
+                {
+                    return RsaPss.Verify(securedInput, signature, publicKey, Hash, saltSize);
+                }
+                catch (CryptographicException e)
+                {
+                    return false;
+                }
+            }
+
+            if (key is RSACryptoServiceProvider)
+            {
+                //This is for backward compatibility only with 2.x 
+                //To be removed in 3.x 
+                var publicKey = RsaKey.New(((RSACryptoServiceProvider)key).ExportParameters(false));
+
+                try
+                {
+                    return RsaPss.Verify(securedInput, signature, publicKey, Hash, saltSize);
+                }
+                catch (CryptographicException e)
+                {
+                    return false;
+                }
+            }
+
+            if (key is RSA)
+            {
+                var publicKey = (RSA) key;
+
+                return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
+            }
+
+            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either CngKey or RSA types.");
+
+    #elif NETSTANDARD1_4
             var publicKey = Ensure.Type<RSA>(key, "RsaUsingSha with PSS padding alg expects key to be of RSA type.");
             return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
-#endif
+    #endif
         }
 
-#if NETSTANDARD1_4
+    #if NETSTANDARD1_4 || NET461
         private HashAlgorithmName HashAlgorithm
         {
             get
@@ -68,7 +191,8 @@ namespace Jose
                 throw new ArgumentException(string.Format("Unsupported salt size: '{0} bytes'", saltSize));
             }
         }
-#endif
+    #endif
+
         private CngAlgorithm Hash
         {
             get
