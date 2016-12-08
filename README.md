@@ -633,3 +633,101 @@ Then take a look at: http://www.donaldsbaconbytes.com/2016/08/create-jwt-with-a-
 `jose-jwt` is not providing standalone strong-named assembly as of now. If you need one in your project, please take a look at https://github.com/dvsekhvalnov/jose-jwt/issues/5
 
 Usually people have success with https://github.com/brutaldev/StrongNameSigner
+
+## ASP.NET Core MVC JWT Authentication
+
+ASP.NET Team provides `Microsoft.AspNetCore.Authentication.JwtBearer` that can be used to authorize web service routes using JWT Tokens created using JOSE-JWT that are passed via `Authorize: Bearer` HTTP header.
+
+In `startup.cs`, you can add JWT Authorization middleware by using `UseJwtBearerAuthentication` extension method against the `IApplicationBuilder app` parameter in `void Configure` method.
+
+Below is the example for setting up the middleware using HS-\* signed token:
+
+```csharp
+// The key length needs to be of sufficient length, or otherwise an error will occur.
+var tokenSecretKey = System.Text.Encoding.UTF8.GetBytes(Configuration["TokenSecretKey"]);
+
+var tokenValidationParameters = new TokenValidationParameters
+{
+    // Token signature will be verified using a private key.
+    ValidateIssuerSigningKey = true,
+    RequireSignedTokens = true,
+    IssuerSigningKey = new SymmetricSecurityKey(tokenSecretKey),
+
+    // Token will only be valid if contains "accelist.com" for "iss" claim.
+    ValidateIssuer = true,
+    ValidIssuer = "accelist.com",
+
+    // Token will only be valid if contains "accelist.com" for "aud" claim.
+    ValidateAudience = true,
+    ValidAudience = "accelist.com",
+
+    // Token will only be valid if not expired yet, with 5 minutes clock skew.
+    ValidateLifetime = true,
+    RequireExpirationTime = true,
+    ClockSkew = new TimeSpan(0, 5, 0),
+
+    ValidateActor = false,
+};
+            
+app.UseJwtBearerAuthentication(new JwtBearerOptions
+{
+    AutomaticAuthenticate = true,
+    TokenValidationParameters = tokenValidationParameters,
+});
+```
+
+After that, your Controllers or Actions can be secured by using `[Authorize]` attribute.
+
+In addition, certain JWT reserved claims will be automatically be populated into `HttpContext.User` as the following Claim Type (from `System.Security.Claims` namespace):
+
+|JWT Claim Name|Data Type     |Claim Type                 |
+|--------------|--------------|---------------------------|
+|sub           |`string`      |`ClaimTypes.NameIdentifier`|
+|email         |`string`      |`ClaimTypes.Email`         |
+|unique_name   |`string`      |`ClaimTypes.Name`          |
+|roles         |`List<string>`|`ClaimTypes.Role`          |
+
+Therefore, you can use role-based authorization as well, for example: `[Authorize(Roles = "Administrator")]`
+
+If you wish to do more than one separate authentications, you should use `app.UseWhen`, for example:
+
+```csharp
+public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+{
+    app.UseStaticFiles();
+    AuthenticateUI(app);
+    AuthenticateAPI(app);
+    app.UseMvc(routes =>
+    {
+        routes.MapRoute(
+            name: "default",
+            template: "{controller=Home}/{action=Index}/{id?}");
+    });
+}
+
+public void AuthenticateAPI(IApplicationBuilder app)
+{
+    app.UseWhen(context => IsAPI(context), builder =>
+    {
+        builder.UseJwtBearerAuthentication(new JwtBearerOptions
+        {
+            AutomaticAuthenticate = true,
+            TokenValidationParameters = tokenValidationParameters,
+        });
+    });
+}
+
+public void AuthenticateUI(IApplicationBuilder app)
+{
+    app.UseWhen(context => !IsAPI(context), builder =>
+    {
+        builder.UseCookieAuthentication(new CookieAuthenticationOptions
+        {
+            AuthenticationScheme = "Accelist_Identity",
+            LoginPath = new PathString("/auth/login"),
+            AutomaticAuthenticate = true,
+            AutomaticChallenge = true
+        });
+    });
+}
+```
