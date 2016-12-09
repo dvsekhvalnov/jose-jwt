@@ -633,3 +633,195 @@ Then take a look at: http://www.donaldsbaconbytes.com/2016/08/create-jwt-with-a-
 `jose-jwt` is not providing standalone strong-named assembly as of now. If you need one in your project, please take a look at https://github.com/dvsekhvalnov/jose-jwt/issues/5
 
 Usually people have success with https://github.com/brutaldev/StrongNameSigner
+
+## ASP.NET Core MVC JWT Authentication
+
+### Securing Controllers Using AuthorizeAttribute
+
+ASP.NET Team provides [Microsoft.AspNetCore.Authentication.JwtBearer](https://www.nuget.org/packages/Microsoft.AspNetCore.Authentication.JwtBearer/) that can be used to authorize web service routes using JWT Tokens created using JOSE-JWT that are passed via `Authorize: Bearer` HTTP header.
+
+In `startup.cs`, you can add JWT Authorization middleware by using `UseJwtBearerAuthentication` extension method against the `IApplicationBuilder app` parameter in `void Configure` method.
+
+Below is the example for setting up the middleware using HS-\* signed token:
+
+```csharp
+using System;
+using System.Text;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Builder;
+
+// The key length needs to be of sufficient length, or otherwise an error will occur.
+var tokenSecretKey = Encoding.UTF8.GetBytes(Configuration["TokenSecretKey"]);
+
+var tokenValidationParameters = new TokenValidationParameters
+{
+    // Token signature will be verified using a private key.
+    ValidateIssuerSigningKey = true,
+    RequireSignedTokens = true,
+    IssuerSigningKey = new SymmetricSecurityKey(tokenSecretKey),
+
+    // Token will only be valid if contains "accelist.com" for "iss" claim.
+    ValidateIssuer = true,
+    ValidIssuer = "accelist.com",
+
+    // Token will only be valid if contains "accelist.com" for "aud" claim.
+    ValidateAudience = true,
+    ValidAudience = "accelist.com",
+
+    // Token will only be valid if not expired yet, with 5 minutes clock skew.
+    ValidateLifetime = true,
+    RequireExpirationTime = true,
+    ClockSkew = new TimeSpan(0, 5, 0),
+
+    ValidateActor = false,
+};
+            
+app.UseJwtBearerAuthentication(new JwtBearerOptions
+{
+    AutomaticAuthenticate = true,
+    TokenValidationParameters = tokenValidationParameters,
+});
+```
+
+After that, your Controllers or Actions can be secured by using `[Authorize]` attribute.
+
+In addition, certain JWT reserved claims will be automatically be populated into `HttpContext.User` as the following Claim Type (from `System.Security.Claims` namespace):
+
+|JWT Claim Name|Data Type     |Claim Type                 |
+|--------------|--------------|---------------------------|
+|sub           |`string`      |`ClaimTypes.NameIdentifier`|
+|email         |`string`      |`ClaimTypes.Email`         |
+|unique_name   |`string`      |`ClaimTypes.Name`          |
+|roles         |`List<string>`|`ClaimTypes.Role`          |
+
+*This list is anything but complete. There might be more claims that are transformed but not listed yet.*
+
+Therefore, you can use role-based authorization as well, for example: `[Authorize(Roles = "Administrator")]`
+
+If you wish to do more than one type of authentication to separate routes, you should use `app.UseWhen`, for example:
+
+```csharp
+public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+{
+    app.UseStaticFiles();
+    AuthenticateUI(app);
+    AuthenticateAPI(app);
+    app.UseMvc(routes =>
+    {
+        routes.MapRoute(
+            name: "default",
+            template: "{controller=Home}/{action=Index}/{id?}");
+    });
+}
+
+public void AuthenticateAPI(IApplicationBuilder app)
+{
+    // IsAPI method returns TRUE when a request route is started with "/api".
+    // For those routes, we'll use JWT Authorization:
+    app.UseWhen(context => IsAPI(context), builder =>
+    {
+        builder.UseJwtBearerAuthentication(new JwtBearerOptions
+        {
+            AutomaticAuthenticate = true,
+            TokenValidationParameters = tokenValidationParameters,
+        });
+    });
+}
+
+public void AuthenticateUI(IApplicationBuilder app)
+{
+    // For non-API routes, we'll use Cookie Authorization, as an example.
+    app.UseWhen(context => !IsAPI(context), builder =>
+    {
+        builder.UseCookieAuthentication(new CookieAuthenticationOptions
+        {
+            AuthenticationScheme = "Accelist_Identity",
+            LoginPath = new PathString("/auth/login"),
+            AutomaticAuthenticate = true,
+            AutomaticChallenge = true
+        });
+    });
+}
+```
+
+### Creating and Using a JWT Token
+
+We can use an MVC web API to accept a request containing a user's credentials in exchange for a JWT token.
+
+```csharp
+public class TokenRequest
+{
+    [Required]
+    public string Username { set; get; }
+
+    [Required]
+    public string Password { set; get; }
+}
+
+[Route("api/v1/token")]
+public class TokenApiController : Controller
+{
+    private readonly AuthService AuthService;
+
+    public TokenApiController(AuthService authService)
+    {
+        // AuthService is your own class that handles your application's authentication functions.
+        // AuthService is injected via Controller's constructor and registered At startup.cs
+        // Read more: https://docs.microsoft.com/en-us/aspnet/core/mvc/controllers/dependency-injection
+        this.AuthService = authService;
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Post([FromBody]TokenRequest model)
+    {
+        if (ModelState.IsValid == false)
+        {
+            return BadRequest("Username and password must not be empty!");
+        }
+
+        // Authenticates username and password to your SQL Server database, for example.
+        // If authentication is successful, return a user's claims.
+        var claims = await AuthService.TryLogin(model.Username, model.Password);
+        if (claims == null)
+        {
+            return BadRequest("Invalid username or password!");
+        }
+
+        // As an example, AuthService.CreateToken can return Jose.JWT.Encode(claims, YourTokenSecretKey, Jose.JwsAlgorithm.HS256);
+        var token = AuthService.CreateToken(claims);
+        return Ok(token);
+    }
+}
+```
+
+Therefore, by sending a HTTP POST request containing `Username` and `Password` to that endpoint, you will receive a token that is signed by the server.
+
+Example for making a request from the client using JavaScript Promise using [AngularJS](https://angularjs.org/) [$http](https://docs.angularjs.org/api/ng/service/$http):
+
+```javascript
+$http.post("/api/v1/token", {
+    username: "foo",
+    password: "bar"
+}).then(function(response) {
+    // Request successful.
+    MyToken = response.data;
+}, function(response) {
+    // Request failed! Do something with the response.
+});
+```
+
+Then later, you can use the obtained token for sending requests to secured routes by attaching it to the request header.
+
+```javascript
+$http.post("/api/v1/function", {
+    foo: "bar"
+}, {
+    headers: {
+        Authorization: "Bearer " + MyToken
+    }
+}).then(function(response) {
+    // Request successful. Do something with the response.
+}, function(response) {
+    // Request failed! Do something with the response.
+});
+```
