@@ -208,20 +208,20 @@ namespace UnitTests
             Assert.Equal(json, @"{""hello"": ""world""}");
         }
 
-//        [Fact]
-//        public void DecodeES256_ECDsaKey()
-//        {
-//            //given
-//            string token = "eyJhbGciOiJFUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.EVnmDMlz-oi05AQzts-R3aqWvaBlwVZddWkmaaHyMx5Phb2NSLgyI0kccpgjjAyo1S5KCB3LIMPfmxCX_obMKA";
-//
-//            //when
-//            string json = Jose.JWT.Decode(token, ECDSa256Public());
-//
-//            Console.Out.WriteLine("json = {0}", json);
-//
-//            //then
-//            Assert.Equal(json, @"{""hello"": ""world""}");
-//        }
+        [Fact]
+        public void DecodeES256_ECDsaKey()
+        {
+            //given
+            string token = "eyJhbGciOiJFUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.EVnmDMlz-oi05AQzts-R3aqWvaBlwVZddWkmaaHyMx5Phb2NSLgyI0kccpgjjAyo1S5KCB3LIMPfmxCX_obMKA";
+
+            //when
+            string json = Jose.JWT.Decode(token, ECDSa256Public());
+
+            Console.Out.WriteLine("json = {0}", json);
+
+            //then
+            Assert.Equal(json, @"{""hello"": ""world""}");
+        }
 
         [Fact]
         public void DecodeES384()
@@ -588,27 +588,27 @@ namespace UnitTests
             Assert.Equal(Jose.JWT.Decode(token, Ecc256Public()), json);
         }
 
-//        [Fact]
-//        public void EncodeES256_ECDsaKey()
-//        {
-//            //given
-//            string json = @"{""hello"": ""world""}";
-//
-//            //when
-//            string token = Jose.JWT.Encode(json, ECDSa256Private(), JwsAlgorithm.ES256);
-//
-//            //then
-//            Console.Out.WriteLine("ES256 (ECDsa key) = {0}", token);
-//
-//            string[] parts = token.Split('.');
-//
-//            Assert.Equal(parts.Length, 3); //Make sure 3 parts
-//            Assert.Equal(parts[0], "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9"); //Header is non-encrypted and static text
-//            Assert.Equal(parts[1], "eyJoZWxsbyI6ICJ3b3JsZCJ9"); //Pyaload is non encrypted and static text
-//            Assert.Equal(parts[2].Length, 86); //signature size
-//
-//            Assert.Equal(Jose.JWT.Decode(token, ECDSa256Public()), json);
-//        }
+        [Fact]
+        public void EncodeES256_ECDsaKey()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, ECDSa256Private(), JwsAlgorithm.ES256);
+
+            //then
+            Console.Out.WriteLine("ES256 (ECDsa key) = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(parts.Length, 3); //Make sure 3 parts
+            Assert.Equal(parts[0], "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9"); //Header is non-encrypted and static text
+            Assert.Equal(parts[1], "eyJoZWxsbyI6ICJ3b3JsZCJ9"); //Pyaload is non encrypted and static text
+            Assert.Equal(parts[2].Length, 86); //signature size
+
+            Assert.Equal(Jose.JWT.Decode(token, Ecc256Public()), json);
+        }
 
         [Fact]
         public void EncodeES384()
@@ -2554,14 +2554,14 @@ namespace UnitTests
 
         private ECDsa ECDSa256Public()
         {
-            var x095 = new X509Certificate2("ecc256.p12", "12345", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
+            var x095 = new X509Certificate2("ecc256.p12", "12345");
 
             return x095.GetECDsaPublicKey();
         }
 
         private ECDsa ECDSa256Private()
         {
-            var x095 = new X509Certificate2("ecc256.p12", "12345", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
+            var x095 = new X509Certificate2("ecc256.p12", "12345");
 
             return x095.GetECDsaPrivateKey();
         }
