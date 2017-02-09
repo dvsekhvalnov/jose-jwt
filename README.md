@@ -68,6 +68,10 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 - A128GCMKW, A192GCMKW, A256GCMKW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 - PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 
+**Compression**
+
+- DEFLATE compression
+
 ##### Notes:
 * Types returned by crytographic methods MAY be different on Windows and Linux. e.g. GetRSAPrivateKey() on X509Certificate2 on Windows returns RsaCng and OpenSslRsa on *nix.
 * It appears that Microsoft CNG implementation of BCryptSecretAgreement/NCryptSecretAgreement contains a bug for calculating Elliptic Curve Diffie-Hellman secret agreement

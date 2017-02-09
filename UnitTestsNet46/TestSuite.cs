@@ -164,6 +164,22 @@ namespace UnitTests
         }
 
         [Fact]
+        public void DecodeRS256_RSAKey()
+        {
+            //given
+            string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
+
+
+            //when
+            string json = Jose.JWT.Decode(token, PubRsaKey());
+
+            Console.Out.WriteLine("json = {0}", json);
+
+            //then
+            Assert.Equal(json, @"{""hello"": ""world""}");
+        }
+
+        [Fact]
         public void DecodeRS384()
         {
             //given
@@ -504,6 +520,22 @@ namespace UnitTests
 
             //when
             string test = Jose.JWT.Encode(json, PrivKey(), JwsAlgorithm.RS256);
+
+            //then
+            Console.Out.WriteLine("RS256 = {0}", test);
+
+            Assert.Equal(test, "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.AzXfyb6BuwLgNUqVkfiKeQRctG25u3-5DJIsGyDnFxOGTet74SjW6Aabm3LSXZ2HgQ5yp8_tCfqA12oDmPiviq4muhgc0LKujTpGtFlf0fcSJQJpxSTMGQZdZnxdKpz7dCSlQNvW6j1tGy1UWkXod-kf4FZckoDkGEbnRAVVVL7xRupFtLneUJGoWZCiMz5oYAoYMUY1bVil1S6lIwUJLtgsvrQMoVIcjlivjZ8fzF3tjQdInxCjYeOKD3WQ2-n3APg-1GEJT-l_2y-scbE55TPSxo9fpHoDn7G0Kcgl8wpjY4j3KR9dEa4unJN3necd83yCMOUzs6vmFncEMTrRZw");
+            Assert.Equal(Jose.JWT.Decode(test, PubKey()), json);
+        }
+
+        [Fact]
+        public void EncodeRS256_RSAKey()
+        {   
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string test = Jose.JWT.Encode(json, PrivRsaKey(), JwsAlgorithm.RS256);
 
             //then
             Console.Out.WriteLine("RS256 = {0}", test);
