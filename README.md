@@ -92,6 +92,7 @@ Grab source and compile yourself:
 
 ## Usage
 ### Creating Plaintext (unprotected) Tokens
+
 ```C#
 var payload = new Dictionary<string, object>()
 {
@@ -337,7 +338,7 @@ string json = Jose.JWT.Decode(token, secretKey);
 
 **RS256, RS384, RS512**, **PS256, PS384, PS512** signatures and **RSA-OAEP-256**, **RSA-OAEP, RSA1_5** key management algorithms expects
 
-**CLR**: `RSACryptoServiceProvider` as a key, public/private is asymmetric to encoding:
+**NET40-NET45**: `RSACryptoServiceProvider` as a key, public/private is asymmetric to encoding:
 
 ```C#
 string token = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bx_4TL7gh14IeM3EClP3iVfY9pbT81pflXd1lEZOVPJR6PaewRFXWmiJcaqH9fcU9IjGGQ19BS-UPtpErenL5kw7KORFgIBm4hObCYxLoAadMy8A-qQeOWyjnxbE0mbQIdoFI4nGK5qWTEQUWZCMwosvyeHLqEZDzr9CNLAAFTujvsZJJ7NLTkA0cTUzz64b57uSvMTaOK6j7Ap9ZaAgF2uaqBdZ1NzqofLeU4XYCG8pWc5Qd-Ri_1KsksjaDHk12ZU4vKIJWJ-puEnpXBLoHuko92BnN8_LXx4sfDdK7wRiXk0LU_iwoT5zb1ro7KaM0hcfidWoz95vfhPhACIsXQ.YcVAPLJ061gvPpVB-zMm4A.PveUBLejLzMjA4tViHTRXbYnxMHFu8W2ECwj9b6sF2u2azi0TbxxMhs65j-t3qm-8EKBJM7LKIlkAtQ1XBeZl4zuTeMFxsQ0VShQfwlN2r8dPFgUzb4f_MzBuFFYfP5hBs-jugm89l2ZTj8oAOOSpAlC7uTmwha3dNaDOzlJniqAl_729q5EvSjaYXMtaET9wSTNSDfMUVFcMERbB50VOhc134JDUVPTuriD0rd4tQm8Do8obFKtFeZ5l3jT73-f1tPZwZ6CmFVxUMh6gSdY5A.tR8bNx9WErquthpWZBeMaw";
@@ -347,7 +348,7 @@ var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlag
 string json = Jose.JWT.Decode(token,privateKey);
 ```
 
-**CORECLR**: `RSA` as a key, public/private is asymmetric to encoding:
+**NETCORE**: `RSA` as a key, public/private is asymmetric to encoding:
 ```C#
 string token = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bx_4TL7gh14IeM3EClP3iVfY9pbT81pflXd1lEZOVPJR6PaewRFXWmiJcaqH9fcU9IjGGQ19BS-UPtpErenL5kw7KORFgIBm4hObCYxLoAadMy8A-qQeOWyjnxbE0mbQIdoFI4nGK5qWTEQUWZCMwosvyeHLqEZDzr9CNLAAFTujvsZJJ7NLTkA0cTUzz64b57uSvMTaOK6j7Ap9ZaAgF2uaqBdZ1NzqofLeU4XYCG8pWc5Qd-Ri_1KsksjaDHk12ZU4vKIJWJ-puEnpXBLoHuko92BnN8_LXx4sfDdK7wRiXk0LU_iwoT5zb1ro7KaM0hcfidWoz95vfhPhACIsXQ.YcVAPLJ061gvPpVB-zMm4A.PveUBLejLzMjA4tViHTRXbYnxMHFu8W2ECwj9b6sF2u2azi0TbxxMhs65j-t3qm-8EKBJM7LKIlkAtQ1XBeZl4zuTeMFxsQ0VShQfwlN2r8dPFgUzb4f_MzBuFFYfP5hBs-jugm89l2ZTj8oAOOSpAlC7uTmwha3dNaDOzlJniqAl_729q5EvSjaYXMtaET9wSTNSDfMUVFcMERbB50VOhc134JDUVPTuriD0rd4tQm8Do8obFKtFeZ5l3jT73-f1tPZwZ6CmFVxUMh6gSdY5A.tR8bNx9WErquthpWZBeMaw";
 
@@ -355,12 +356,13 @@ var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlag
 
 string json = Jose.JWT.Decode(token,privateKey);
 ```
+**NET461**: `RSACryptoServiceProvider`, `RSA` or `CngKey` types of keys, public/private is asymmetric to encoding.
 
 
 
 **ES256, ES284, ES512** signatures, **ECDH-ES** and **ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW** key management algorithms expects 
 
-**CLR**: `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
+**NET40-NET45**: `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
 sure correct `usage:` value is set. `CngKeyUsages.KeyAgreement` for ECDH-ES and `CngKeyUsages.Signing` for ES-* (default value, can be ommited).
 
 ```C#
@@ -374,7 +376,7 @@ var publicKey=EccKey.New(x, y);
 string json = Jose.JWT.Decode(token,publicKey);
 ```
 
-**CORECLR**: can accept either `CngKey` (see above) or `ECDsa` as a key, public/private is asymmetric to encoding.
+**NETCORE**: can accept either `CngKey` (see above) or `ECDsa` as a key, public/private is asymmetric to encoding.
 
 ```C#
 var payload = new Dictionary<string, object>()
@@ -387,6 +389,8 @@ var publicKey=new X509Certificate2("ecc-key.p12", "password", X509KeyStorageFlag
 
 string token=Jose.JWT.Encode(payload, publicKey, JwsAlgorithm.ES256);
 ```
+
+**NET461**: accepts `CngKey` and `ECDsa` types of keys, public/private is asymmetric to encoding.
 
 
 **PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW** key management algorithms expects `string` passpharase as a key
