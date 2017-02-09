@@ -117,7 +117,7 @@ var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,
 string token=Jose.JWT.Encode(payload, secretKey, JwsAlgorithm.HS256);
 ```
 #### RS-\* and PS-\* family
-**CLR:**
+**NET40-NET451**:
 
 RS256, RS384, RS512 and PS256, PS384, PS512 signatures require `RSACryptoServiceProvider` (usually private) key of corresponding length. CSP need to be forced to use Microsoft Enhanced RSA and AES Cryptographic Provider.
 Which usually can be done be re-importing RSAParameters. See http://clrsecurity.codeplex.com/discussions/243156 for details.
@@ -134,8 +134,8 @@ var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlag
 string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.RS256);
 ```
 
-**CORECLR**:
-RS256, RS384, RS512 signatures require `RSA` (usually private) key of corresponding length.
+**NETCORE**:
+RS256, RS384, RS512 and PS256, PS384, PS512 signatures require `RSA` (usually private) key of corresponding length.
 
 ```C#
 var payload = new Dictionary<string, object>()
@@ -148,8 +148,8 @@ var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlag
 
 string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.RS256);
 ```
-
-
+**NET461**:
+Accepts `RSACryptoServiceProvider`, `RSA` or `CngKey` types of keys. 
 
 
 #### ES-\*  family
