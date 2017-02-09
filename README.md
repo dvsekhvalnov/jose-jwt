@@ -189,13 +189,13 @@ var privateKey=new X509Certificate2("ecc-key.p12", "password", X509KeyStorageFla
 string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
 ```
 **NET461**:
-Accepts `CngKey`and `ECDsa` types of keys. 
+Accepts `CngKey` and `ECDsa` types of keys. 
 
 
 ### Creating encrypted Tokens
 #### RSA-\* key management family of algorithms
 
-**CLR:**
+**NET40-NET45**:
 
 RSA-OAEP-256, RSA-OAEP and RSA1_5 key management requires `RSACryptoServiceProvider` (usually public) key of corresponding length.
 
@@ -211,7 +211,7 @@ var publicKey=new X509Certificate2("my-key.p12", "password").PublicKey.Key as RS
 string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM);
 ```
 
-**CORELR:**
+**NETCORE:**
 RSA-OAEP-256, RSA-OAEP and RSA1_5 key management requires `RSA` (usually public) key of corresponding length.
 
 ```C#
@@ -225,6 +225,9 @@ var publicKey=new X509Certificate2("my-key.p12", "password").GetRSAPublicKey();
 
 string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM);
 ```
+
+**NET461**:
+Accepts `RSACryptoServiceProvider`, `RSA` or `CngKey` types of keys. 
 
 
 #### DIR direct pre-shared symmetric key family of algorithms
