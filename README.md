@@ -8,6 +8,7 @@ Extensively tested for compatibility with [jose.4.j](https://bitbucket.org/b_c/j
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
+- v2.1 and above added extra features support for .NET461+ and coming with 3 version of binaries (`NET4`, `NET461` and `netstandard1.4`).
 
 - v2.0 and above is .NET Core compatible and aimed to support both .NET framework (`NET40`) and .NET Core (`netstandard1.4`) runtimes. This is the version you should prefer unless you have really strong reason to stay with v1.9.
 
@@ -117,7 +118,7 @@ var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,
 string token=Jose.JWT.Encode(payload, secretKey, JwsAlgorithm.HS256);
 ```
 #### RS-\* and PS-\* family
-**NET40-NET451**:
+**NET40-NET45**:
 
 RS256, RS384, RS512 and PS256, PS384, PS512 signatures require `RSACryptoServiceProvider` (usually private) key of corresponding length. CSP need to be forced to use Microsoft Enhanced RSA and AES Cryptographic Provider.
 Which usually can be done be re-importing RSAParameters. See http://clrsecurity.codeplex.com/discussions/243156 for details.
@@ -153,7 +154,7 @@ Accepts `RSACryptoServiceProvider`, `RSA` or `CngKey` types of keys.
 
 
 #### ES-\*  family
-**CLR:**
+**NET40-NET45**:
 ES256, ES384, ES512 ECDSA signatures requires `CngKey` (usually private) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
 But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,d)`.
 
@@ -173,7 +174,7 @@ var privateKey=EccKey.New(x, y, d);
 string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
 ```
 
-**CORECLR**:
+**NETCORE**:
 ES256, ES384, ES512 ECDSA signatures can accept either `CngKey`(see above) or `ECDsa` (usually private) elliptic curve key of corresponding length.
 
 ```C#
@@ -187,6 +188,8 @@ var privateKey=new X509Certificate2("ecc-key.p12", "password", X509KeyStorageFla
 
 string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
 ```
+**NET461**:
+Accepts `CngKey`and `ECDsa` types of keys. 
 
 
 ### Creating encrypted Tokens
