@@ -1,5 +1,5 @@
 {
-  "version": "2.1.0-*",
+  "version": "2.2.0-*",
   "title": "Jose JWT",
   "authors": [ "Dmitry Vsekhvalnov" ],
   "owners": [ "Dmitry Vsekhvalnov" ],
@@ -9,7 +9,7 @@
   "language": "en-US",
   "copyright": "Copyright dvsekhvalnov 2014-2016",
   "requireLicenseAcceptance": false,
-  "releaseNotes": "Now fully FIPS compliant !",
+  "releaseNotes": "Better key management for .NET 4.6. Enabled to work with X509Certificate2 keys extensions.",
   "summary": "Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET Core. Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms. Library for generating, decoding and encryption of JSON Web Tokens.",
   "description": "Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET \r\r
 
@@ -56,7 +56,11 @@ Encryption: \r\r
 - RSAES OAEP 256 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM \r
 - RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM \r
 - RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM \r
-- Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM \r",
+- Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM \r
+
+Compression: \r\r
+
+- DEFLATE compression\r\r\r",
   "frameworks": {
     "net4": {
       "frameworkAssemblies": {
