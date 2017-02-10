@@ -75,13 +75,14 @@ Compression: \r\r
     
     "netstandard1.4": {
       "dependencies": {
-        "NETStandard.Library":"1.6.0",
         "Newtonsoft.Json": "9.0.1",
-        "System.Security.Cryptography.Algorithms": "4.2.0",
-        "System.Security.Cryptography.Csp": "4.0.0",
-        "System.Security.Cryptography.Cng": "4.2.0",
-        "System.Security.Cryptography.X509Certificates": "4.1.0",
-	"System.Runtime.Serialization.Primitives": "4.1.1"
+	"System.Runtime.InteropServices": "4.3.0",
+	"System.IO.Compression": "4.3.0",
+        "System.Security.Cryptography.Algorithms": "4.3.0",
+        "System.Security.Cryptography.Csp": "4.3.0",
+        "System.Security.Cryptography.Cng": "4.3.0",
+        "System.Security.Cryptography.X509Certificates": "4.3.0",
+	"System.Runtime.Serialization.Primitives": "4.3.0"
       }
     }
   }
