@@ -66,6 +66,7 @@
     <Compile Include="CompactTest.cs" />
     <Compile Include="ConcatKDFTest.cs" />
     <Compile Include="DictionariesTest.cs" />
+    <Compile Include="SecurityVulnerabilitiesTest.cs" />
     <Compile Include="TestSuite.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
