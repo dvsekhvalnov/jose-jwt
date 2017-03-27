@@ -63,52 +63,32 @@ namespace Jose
     /// </summary>
     public static class JWT
     {        
-        private static Dictionary<JwsAlgorithm, IJwsAlgorithm> HashAlgorithms;
-        private static Dictionary<JweEncryption, IJweAlgorithm> EncAlgorithms;
-        private static Dictionary<JweAlgorithm, IKeyManagement> KeyAlgorithms;
-        private static Dictionary<JweCompression, ICompression> CompressionAlgorithms;
-
         private static Dictionary<JweAlgorithm, string> JweAlgorithms = new Dictionary<JweAlgorithm, string>();
         private static Dictionary<JweEncryption, string> JweEncryptionMethods = new Dictionary<JweEncryption, string>();
         private static Dictionary<JweCompression, string> JweCompressionMethods = new Dictionary<JweCompression, string>();
         private static Dictionary<JwsAlgorithm, string> JwsAlgorithms = new Dictionary<JwsAlgorithm, string>();
 
-        private static Dictionary<string, JweEncryption> JweEncryptionMethodAliases = new Dictionary<string, JweEncryption>();     
+        private static Dictionary<string, JweEncryption> JweEncryptionMethodAliases = new Dictionary<string, JweEncryption>();
 
-        private static IJsonMapper jsMapper;
+        private static JWTSettings defaultSettings;
 
+        /// <summary>
+        /// Global default settings for JWT.
+        /// </summary>
+        public static JWTSettings DefaultSettings
+        {
+            get { return defaultSettings; }
+        }
+
+        [Obsolete("Custom JsonMappers should be set in DefaultSettings")]
         public static IJsonMapper JsonMapper
         {
-            set { jsMapper = value; }
+            set { defaultSettings.JsonMapper = value; }
         }
 
         static JWT()
         {
-#if NET40 || NET461
-            JsonMapper = new JSSerializerMapper();
-#elif NETSTANDARD1_4
-            JsonMapper = new NewtonsoftMapper();
-#endif
-            HashAlgorithms = new Dictionary<JwsAlgorithm, IJwsAlgorithm>
-            {       
-                {JwsAlgorithm.none, new Plaintext()},
-                {JwsAlgorithm.HS256, new HmacUsingSha("SHA256")},
-                {JwsAlgorithm.HS384, new HmacUsingSha("SHA384")},
-                {JwsAlgorithm.HS512, new HmacUsingSha("SHA512")},
-
-                {JwsAlgorithm.RS256, new RsaUsingSha("SHA256")},
-                {JwsAlgorithm.RS384, new RsaUsingSha("SHA384")},
-                {JwsAlgorithm.RS512, new RsaUsingSha("SHA512")},
-#if NET40
-                {JwsAlgorithm.ES256, new EcdsaUsingSha(256)},
-                {JwsAlgorithm.ES384, new EcdsaUsingSha(384)},
-                {JwsAlgorithm.ES512, new EcdsaUsingSha(521)}
-#elif NETSTANDARD1_4 || NET461
-                {JwsAlgorithm.ES256, new Jose.netstandard1_4.EcdsaUsingSha(256)},
-                {JwsAlgorithm.ES384, new Jose.netstandard1_4.EcdsaUsingSha(384)},
-                {JwsAlgorithm.ES512, new Jose.netstandard1_4.EcdsaUsingSha(521)}
-#endif
-            };
+            defaultSettings = new JWTSettings();
 
             JwsAlgorithms[JwsAlgorithm.none] = "none";
             JwsAlgorithms[JwsAlgorithm.HS256] = "HS256";
@@ -120,59 +100,16 @@ namespace Jose
             JwsAlgorithms[JwsAlgorithm.ES256] = "ES256";
             JwsAlgorithms[JwsAlgorithm.ES384] = "ES384";
             JwsAlgorithms[JwsAlgorithm.ES512] = "ES512";
-
-            HashAlgorithms[JwsAlgorithm.PS256] = new RsaPssUsingSha(32);
-            HashAlgorithms[JwsAlgorithm.PS384] = new RsaPssUsingSha(48);
-            HashAlgorithms[JwsAlgorithm.PS512] = new RsaPssUsingSha(64);
-
             JwsAlgorithms[JwsAlgorithm.PS256] = "PS256";
             JwsAlgorithms[JwsAlgorithm.PS384] = "PS384";
             JwsAlgorithms[JwsAlgorithm.PS512] = "PS512";
 
-            EncAlgorithms = new Dictionary<JweEncryption, IJweAlgorithm>
-            {
-                { JweEncryption.A128CBC_HS256, new AesCbcHmacEncryption(HashAlgorithms[JwsAlgorithm.HS256], 256) },
-                { JweEncryption.A192CBC_HS384, new AesCbcHmacEncryption(HashAlgorithms[JwsAlgorithm.HS384], 384) },
-                { JweEncryption.A256CBC_HS512, new AesCbcHmacEncryption(HashAlgorithms[JwsAlgorithm.HS512], 512) }
-            };
-
             JweEncryptionMethods[JweEncryption.A128CBC_HS256] = "A128CBC-HS256";
             JweEncryptionMethods[JweEncryption.A192CBC_HS384] = "A192CBC-HS384";
             JweEncryptionMethods[JweEncryption.A256CBC_HS512] = "A256CBC-HS512";
-
-            // for compatibility with services still using a Draft 7 version of these names
-//            JweEncryptionMethodAliases["A128CBC+HS256"] = JweEncryption.A128CBC_HS256;
-//            JweEncryptionMethodAliases["A192CBC+HS384"] = JweEncryption.A192CBC_HS384;
-//            JweEncryptionMethodAliases["A256CBC+HS512"] = JweEncryption.A256CBC_HS512;
-
-            EncAlgorithms[JweEncryption.A128GCM] = new AesGcmEncryption(128);
-            EncAlgorithms[JweEncryption.A192GCM] = new AesGcmEncryption(192);
-            EncAlgorithms[JweEncryption.A256GCM] = new AesGcmEncryption(256);
-
             JweEncryptionMethods[JweEncryption.A128GCM] = "A128GCM";
             JweEncryptionMethods[JweEncryption.A192GCM] = "A192GCM";
             JweEncryptionMethods[JweEncryption.A256GCM] = "A256GCM";
-                                
-            KeyAlgorithms = new Dictionary<JweAlgorithm, IKeyManagement>
-            {
-                { JweAlgorithm.RSA_OAEP, new RsaKeyManagement(true) },
-                { JweAlgorithm.RSA_OAEP_256, new RsaOaep256KeyManagement() },
-                { JweAlgorithm.RSA1_5, new RsaKeyManagement(false) },
-                { JweAlgorithm.DIR, new DirectKeyManagement() },
-                { JweAlgorithm.A128KW, new AesKeyWrapManagement(128) },
-                { JweAlgorithm.A192KW, new AesKeyWrapManagement(192) },
-                { JweAlgorithm.A256KW, new AesKeyWrapManagement(256) },
-                { JweAlgorithm.ECDH_ES, new EcdhKeyManagement(true) },
-                { JweAlgorithm.ECDH_ES_A128KW, new EcdhKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128))},
-                { JweAlgorithm.ECDH_ES_A192KW, new EcdhKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192))},
-                { JweAlgorithm.ECDH_ES_A256KW, new EcdhKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256))},
-                { JweAlgorithm.PBES2_HS256_A128KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128))},
-                { JweAlgorithm.PBES2_HS384_A192KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192))},
-                { JweAlgorithm.PBES2_HS512_A256KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256))},
-                { JweAlgorithm.A128GCMKW, new AesGcmKeyWrapManagement(128)},
-                { JweAlgorithm.A192GCMKW, new AesGcmKeyWrapManagement(192)},
-                { JweAlgorithm.A256GCMKW, new AesGcmKeyWrapManagement(256)}
-            };
 
             JweAlgorithms[JweAlgorithm.RSA1_5] = "RSA1_5";
             JweAlgorithms[JweAlgorithm.RSA_OAEP] = "RSA-OAEP";
@@ -192,11 +129,6 @@ namespace Jose
             JweAlgorithms[JweAlgorithm.A192GCMKW] = "A192GCMKW";
             JweAlgorithms[JweAlgorithm.A256GCMKW] = "A256GCMKW";
 
-            CompressionAlgorithms = new Dictionary<JweCompression, ICompression>
-            {
-                {JweCompression.DEF, new DeflateCompression()}                        
-            };
-
             JweCompressionMethods[JweCompression.DEF] = "DEF";
         }
 
@@ -205,10 +137,11 @@ namespace Jose
         /// This method is NOT performing integrity checking. 
         /// </summary>        
         /// <param name="token">signed JWT token</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>unmarshalled headers</returns>        
-        public static IDictionary<string, object> Headers(string token)
+        public static IDictionary<string, object> Headers(string token, JWTSettings settings = null)
         {
-            return Headers<IDictionary<string, object>>(token);
+            return Headers<IDictionary<string, object>>(token, settings);
         }
 
         /// <summary>
@@ -216,13 +149,14 @@ namespace Jose
         /// This method is NOT performing integrity checking. 
         /// </summary>        
         /// <param name="token">signed JWT token</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <typeparam name="T">desired type after unmarshalling</typeparam>
         /// <returns>unmarshalled headers</returns>        
-        public static T Headers<T>(string token)
+        public static T Headers<T>(string token, JWTSettings settings = null)
         {
             byte[][] parts = Compact.Parse(token);
 
-            return jsMapper.Parse<T>(Encoding.UTF8.GetString(parts[0]));
+            return GetSettings(settings).JsonMapper.Parse<T>(Encoding.UTF8.GetString(parts[0]));
         }
 
         /// <summary>
@@ -231,9 +165,10 @@ namespace Jose
         /// This method is NOT performing integrity checking. 
         /// </summary>        
         /// <param name="token">signed JWT token</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>unmarshalled payload</returns>
         /// <exception cref="JoseException">if encrypted JWT token is provided</exception>        
-        public static string Payload(string token)
+        public static string Payload(string token, JWTSettings settings = null)
         {
             byte[][] parts = Compact.Parse(token);
 
@@ -252,9 +187,10 @@ namespace Jose
         /// This method is NOT performing integrity checking. 
         /// </summary>        
         /// <param name="token">signed JWT token</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>unmarshalled payload</returns>
         /// <exception cref="JoseException">if encrypted JWT token is provided</exception>        
-        public static byte[] PayloadBytes(string token)
+        public static byte[] PayloadBytes(string token, JWTSettings settings = null)
         {
             byte[][] parts = Compact.Parse(token);
 
@@ -274,11 +210,12 @@ namespace Jose
         /// </summary>
         /// <typeparam name="T">desired type after unmarshalling</typeparam>
         /// <param name="token">signed JWT token</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>unmarshalled payload</returns>
         /// <exception cref="JoseException">if encrypted JWT token is provided</exception>
-        public static T Payload<T>(string token)
+        public static T Payload<T>(string token, JWTSettings settings = null)
         {
-            return jsMapper.Parse<T>(Payload(token));            
+            return GetSettings(settings).JsonMapper.Parse<T>(Payload(token));            
         }
 
         /// <summary>
@@ -286,11 +223,11 @@ namespace Jose
         /// </summary>
         /// <param name="payload">json string to encode</param>
         /// <param name="key">key for encryption, suitable for provided JWS algorithm, can be null.</param>
-        /// <param name="keyManagement">Optional custom IKeyManagement implementation.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
-        public static string Encode(object payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, IKeyManagement keyManagement = null)
+        public static string Encode(object payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, JWTSettings settings = null)
         {
-            return Encode(jsMapper.Serialize(payload), key, alg, enc, compression, extraHeaders, keyManagement);
+            return Encode(GetSettings(settings).JsonMapper.Serialize(payload), key, alg, enc, compression, extraHeaders, settings);
         }
 
         /// <summary>
@@ -299,15 +236,15 @@ namespace Jose
         /// </summary>
         /// <param name="payload">json string to encode (not null or whitespace)</param>
         /// <param name="key">key for encryption, suitable for provided JWS algorithm, can be null.</param>
-        /// <param name="keyManagement">Optional custom IKeyManagement implementation.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
-        public static string Encode(string payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, IKeyManagement keyManagement = null)
+        public static string Encode(string payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, JWTSettings settings = null)
         {
             Ensure.IsNotEmpty(payload, "Payload expected to be not empty, whitespace or null.");
 
             byte[] plainText = Encoding.UTF8.GetBytes(payload);
 
-            return EncodeBytes(plainText, key, alg, enc, compression, extraHeaders, keyManagement);
+            return EncodeBytes(plainText, key, alg, enc, compression, extraHeaders, settings);
         }
 
         /// <summary>
@@ -315,15 +252,15 @@ namespace Jose
         /// </summary>
         /// <param name="payload">Binary data to encode (not null)</param>
         /// <param name="key">key for encryption, suitable for provided JWS algorithm, can be null.</param>
-        /// <param name="keyManagement">Optional custom IKeyManagement implementation.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
-        public static string EncodeBytes(byte[] payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, IKeyManagement keyManagement = null)
+        public static string EncodeBytes(byte[] payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, JWTSettings settings = null)
         {
             if (payload == null)
                 throw new ArgumentNullException(nameof(payload));
 
-            IKeyManagement keys = keyManagement != null ? keyManagement : KeyAlgorithms[alg];
-            IJweAlgorithm _enc = EncAlgorithms[enc];
+            IKeyManagement keys = GetSettings(settings).KeyAlgorithms[alg];
+            IJweAlgorithm _enc = GetSettings(settings).EncAlgorithms[enc];
 
             IDictionary<string, object> jwtHeader = new Dictionary<string, object> { { "alg", JweAlgorithms[alg] }, { "enc", JweEncryptionMethods[enc] } };
 
@@ -336,10 +273,10 @@ namespace Jose
             if (compression.HasValue)
             {
                 jwtHeader["zip"] = JweCompressionMethods[compression.Value];
-                payload = CompressionAlgorithms[compression.Value].Compress(payload);
+                payload = GetSettings(settings).CompressionAlgorithms[compression.Value].Compress(payload);
             }
 
-            byte[] header = Encoding.UTF8.GetBytes(jsMapper.Serialize(jwtHeader));
+            byte[] header = Encoding.UTF8.GetBytes(GetSettings(settings).JsonMapper.Serialize(jwtHeader));
             byte[] aad = Encoding.UTF8.GetBytes(Compact.Serialize(header));
             byte[][] encParts = _enc.Encrypt(aad, payload, cek);
 
@@ -352,10 +289,11 @@ namespace Jose
         /// </summary>
         /// <param name="payload">object to map to json string and encode</param>
         /// <param name="key">key for signing, suitable for provided JWS algorithm, can be null.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, digitally signed.</returns>
-        public static string Encode(object payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null)
+        public static string Encode(object payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null, JWTSettings settings = null)
         {
-            return Encode(jsMapper.Serialize(payload), key, algorithm, extraHeaders);
+            return Encode(GetSettings(settings).JsonMapper.Serialize(payload), key, algorithm, extraHeaders, settings);
         }
 
         /// <summary>
@@ -363,14 +301,15 @@ namespace Jose
         /// </summary>
         /// <param name="payload">json string to encode (not null or whitespace)</param>
         /// <param name="key">key for signing, suitable for provided JWS algorithm, can be null.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, digitally signed.</returns>
-        public static string Encode(string payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null)
+        public static string Encode(string payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null, JWTSettings settings = null)
         {
             Ensure.IsNotEmpty(payload, "Payload expected to be not empty, whitespace or null.");
 
             byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);
 
-            return EncodeBytes(payloadBytes, key, algorithm, extraHeaders);
+            return EncodeBytes(payloadBytes, key, algorithm, extraHeaders, settings);
         }
 
         /// <summary>
@@ -378,8 +317,9 @@ namespace Jose
         /// </summary>
         /// <param name="payload">Binary data to encode (not null)</param>
         /// <param name="key">key for signing, suitable for provided JWS algorithm, can be null.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, digitally signed.</returns>
-        public static string EncodeBytes(byte[] payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null)
+        public static string EncodeBytes(byte[] payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null, JWTSettings settings = null)
         {
             if (payload == null)
                 throw new ArgumentNullException(nameof(payload));
@@ -393,11 +333,11 @@ namespace Jose
 
             Dictionaries.Append(jwtHeader, extraHeaders);
 
-            byte[] headerBytes = Encoding.UTF8.GetBytes(jsMapper.Serialize(jwtHeader));
+            byte[] headerBytes = Encoding.UTF8.GetBytes(GetSettings(settings).JsonMapper.Serialize(jwtHeader));
 
             var bytesToSign = Encoding.UTF8.GetBytes(Compact.Serialize(headerBytes, payload));
 
-            byte[] signature = HashAlgorithms[algorithm].Sign(bytesToSign, key);
+            byte[] signature = GetSettings(settings).HashAlgorithms[algorithm].Sign(bytesToSign, key);
 
             return Compact.Serialize(headerBytes, payload, signature);
         }
@@ -410,14 +350,14 @@ namespace Jose
         /// <param name="key">key for decoding suitable for JWT algorithm used.</param>
         /// <param name="alg">The algorithm type that we expect to receive in the header.</param>
         /// <param name="enc">The encryption type that we expect to receive in the header.</param>
-        /// <param name="keyManagement">Optional custom IKeyManagement implementation.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>decoded json string</returns>
         /// <exception cref="IntegrityException">if signature valdation failed</exception>
         /// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
-        public static string Decode(string token, object key, JweAlgorithm alg, JweEncryption enc, IKeyManagement keyManagement = null)
+        public static string Decode(string token, object key, JweAlgorithm alg, JweEncryption enc, JWTSettings settings = null)
         {
-            return Decode(token, key, null, alg, enc, keyManagement);
+            return Decode(token, key, null, alg, enc, settings);
         }
 
         /// <summary>
@@ -428,14 +368,14 @@ namespace Jose
         /// <param name="key">key for decoding suitable for JWT algorithm used.</param>
         /// <param name="alg">The algorithm type that we expect to receive in the header.</param>
         /// <param name="enc">The encryption type that we expect to receive in the header.</param>
-        /// <param name="keyManagement">Optional custom IKeyManagement implementation.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>Decrypted payload as binary data</returns>
         /// <exception cref="IntegrityException">if signature valdation failed</exception>
         /// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
-        public static byte[] DecodeBytes(string token, object key, JweAlgorithm alg, JweEncryption enc, IKeyManagement keyManagement = null)
+        public static byte[] DecodeBytes(string token, object key, JweAlgorithm alg, JweEncryption enc, JWTSettings settings = null)
 		{
-			return DecodeBytes(token, key, null, alg, enc, keyManagement);
+			return DecodeBytes(token, key, null, alg, enc, settings);
 		}
 
         /// <summary>
@@ -445,14 +385,14 @@ namespace Jose
         /// <param name="token">JWT token in compact serialization form.</param>
         /// <param name="key">key for decoding suitable for JWT algorithm used.</param>
         /// <param name="alg">The algorithm type that we expect to receive in the header.</param>
-        /// <param name="keyManagement">Optional custom IKeyManagement implementation.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>decoded json string</returns>
         /// <exception cref="IntegrityException">if signature valdation failed</exception>
         /// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
-        public static string Decode(string token, object key, JwsAlgorithm alg, IKeyManagement keyManagement = null)
+        public static string Decode(string token, object key, JwsAlgorithm alg, JWTSettings settings = null)
         {
-            return Decode(token, key, alg, null, null, keyManagement);
+            return Decode(token, key, alg, null, null, settings);
         }
 
         /// <summary>
@@ -462,14 +402,14 @@ namespace Jose
         /// <param name="token">JWT token in compact serialization form.</param>
         /// <param name="key">key for decoding suitable for JWT algorithm used.</param>
         /// <param name="alg">The algorithm type that we expect to receive in the header.</param>
-        /// <param name="keyManagement">Optional custom IKeyManagement implementation.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>The payload as binary data</returns>
         /// <exception cref="IntegrityException">if signature valdation failed</exception>
         /// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
-        public static byte[] DecodeBytes(string token, object key, JwsAlgorithm alg, IKeyManagement keyManagement = null)
+        public static byte[] DecodeBytes(string token, object key, JwsAlgorithm alg, JWTSettings settings = null)
 		{
-			return DecodeBytes(token, key, alg, null, null, keyManagement);
+			return DecodeBytes(token, key, alg, null, null, settings);
 		}
 
         /// <summary>
@@ -478,14 +418,14 @@ namespace Jose
         /// </summary>
         /// <param name="token">JWT token in compact serialization form.</param>
         /// <param name="key">key for decoding suitable for JWT algorithm used, can be null.</param>
-        /// <param name="keyManagement">Optional custom IKeyManagement implementation.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>decoded json string</returns>
         /// <exception cref="IntegrityException">if signature valdation failed</exception>
         /// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
-        public static string Decode(string token, object key = null, IKeyManagement keyManagement = null)
+        public static string Decode(string token, object key = null, JWTSettings settings = null)
         {
-            return Decode(token, key, null, null, null, keyManagement);
+            return Decode(token, key, null, null, null, settings);
         }
 
         /// <summary>
@@ -494,14 +434,14 @@ namespace Jose
         /// </summary>
         /// <param name="token">JWT token in compact serialization form.</param>
         /// <param name="key">key for decoding suitable for JWT algorithm used, can be null.</param>
-        /// <param name="keyManagement">Optional custom IKeyManagement implementation.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>The payload as binary data</returns>
         /// <exception cref="IntegrityException">if signature valdation failed</exception>
         /// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
-        public static byte[] DecodeBytes(string token, object key = null, IKeyManagement keyManagement = null)
+        public static byte[] DecodeBytes(string token, object key = null, JWTSettings settings = null)
 		{
-			return DecodeBytes(token, key, null, null, null, keyManagement);
+			return DecodeBytes(token, key, null, null, null, settings);
 		}
 
         /// <summary>
@@ -513,14 +453,14 @@ namespace Jose
         /// <param name="key">key for decoding suitable for JWT algorithm used.</param>
         /// <param name="alg">The algorithm type that we expect to receive in the header.</param>
         /// <param name="enc">The encryption type that we expect to receive in the header.</param>
-        /// <param name="keyManagement">Optional custom IKeyManagement implementation.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>object of provided T, result of decoded json mapping</returns>
         /// <exception cref="IntegrityException">if signature valdation failed</exception>
         /// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
-        public static T Decode<T>(string token, object key, JweAlgorithm alg, JweEncryption enc, IKeyManagement keyManagement = null)
+        public static T Decode<T>(string token, object key, JweAlgorithm alg, JweEncryption enc, JWTSettings settings = null)
         {
-            return jsMapper.Parse<T>(Decode(token, key, alg, enc, keyManagement));
+            return GetSettings(settings).JsonMapper.Parse<T>(Decode(token, key, alg, enc, settings));
         }
 
         /// <summary>
@@ -531,14 +471,14 @@ namespace Jose
         /// <param name="token">JWT token in compact serialization form.</param>
         /// <param name="key">key for decoding suitable for JWT algorithm used.</param>
         /// <param name="alg">The algorithm type that we expect to receive in the header.</param>
-        /// <param name="keyManagement">Optional custom IKeyManagement implementation.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>object of provided T, result of decoded json mapping</returns>
         /// <exception cref="IntegrityException">if signature valdation failed</exception>
         /// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
-        public static T Decode<T>(string token, object key, JwsAlgorithm alg, IKeyManagement keyManagement = null)
+        public static T Decode<T>(string token, object key, JwsAlgorithm alg, JWTSettings settings = null)
         {
-            return jsMapper.Parse<T>(Decode(token, key, alg, keyManagement));
+            return GetSettings(settings).JsonMapper.Parse<T>(Decode(token, key, alg, settings));
         }
 
         /// <summary>
@@ -548,17 +488,17 @@ namespace Jose
         /// <typeparam name="T">Deserid object type after json mapping</typeparam>
         /// <param name="token">JWT token in compact serialization form.</param>
         /// <param name="key">key for decoding suitable for JWT algorithm used, can be null.</param>
-        /// <param name="keyManagement">Optional custom IKeyManagement implementation.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>object of provided T, result of decoded json mapping</returns>
         /// <exception cref="IntegrityException">if signature valdation failed</exception>
         /// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
-        public static T Decode<T>(string token, object key=null, IKeyManagement keyManagement = null)
+        public static T Decode<T>(string token, object key=null, JWTSettings settings = null)
         {
-            return jsMapper.Parse<T>(Decode(token, key, keyManagement));
+            return GetSettings(settings).JsonMapper.Parse<T>(Decode(token, key, settings));
         }
 
-        private static byte[] DecodeBytes(string token, object key = null, JwsAlgorithm? jwsAlg = null, JweAlgorithm? jweAlg = null, JweEncryption? jweEnc = null, IKeyManagement keyManagement = null)
+        private static byte[] DecodeBytes(string token, object key = null, JwsAlgorithm? jwsAlg = null, JweAlgorithm? jweAlg = null, JweEncryption? jweEnc = null, JWTSettings settings = null)
         {
             Ensure.IsNotEmpty(token, "Incoming token expected to be in compact serialization form, not empty, whitespace or null.");
 
@@ -566,7 +506,7 @@ namespace Jose
 
             if (parts.Length == 5) //encrypted JWT
             {
-                return DecryptBytes(parts, key, jweAlg, jweEnc, keyManagement);
+                return DecryptBytes(parts, key, jweAlg, jweEnc, settings);
             }
             else
             {
@@ -577,27 +517,27 @@ namespace Jose
 
                 byte[] securedInput = Encoding.UTF8.GetBytes(Compact.Serialize(header, payload));
 
-                var headerData = jsMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(header));
+                var headerData = GetSettings(settings).JsonMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(header));
                 var algorithm = (string)headerData["alg"];
 
                 if (jwsAlg != null && (JwsAlgorithm)jwsAlg != GetHashAlgorithm(algorithm))
                     throw new InvalidAlgorithmException("The algorithm type passed to the Decode method did not match the algorithm type in the header.");
 
-                if (!HashAlgorithms[GetHashAlgorithm(algorithm)].Verify(signature, securedInput, key))
+                if (!GetSettings(settings).HashAlgorithms[GetHashAlgorithm(algorithm)].Verify(signature, securedInput, key))
                     throw new IntegrityException("Invalid signature.");
 
                 return payload;
             }
         }
 
-        private static string Decode(string token, object key = null, JwsAlgorithm? jwsAlg = null, JweAlgorithm? jweAlg = null, JweEncryption? jweEnc = null, IKeyManagement keyManagement = null)
+        private static string Decode(string token, object key = null, JwsAlgorithm? jwsAlg = null, JweAlgorithm? jweAlg = null, JweEncryption? jweEnc = null, JWTSettings settings = null)
         {
-            var payloadBytes = DecodeBytes(token, key, jwsAlg, jweAlg, jweEnc, keyManagement);
+            var payloadBytes = DecodeBytes(token, key, jwsAlg, jweAlg, jweEnc, settings);
 
             return Encoding.UTF8.GetString(payloadBytes);
         }
 
-        private static byte[] DecryptBytes(byte[][] parts, object key, JweAlgorithm? jweAlg, JweEncryption? jweEnc, IKeyManagement keyManagement = null)
+        private static byte[] DecryptBytes(byte[][] parts, object key, JweAlgorithm? jweAlg, JweEncryption? jweEnc, JWTSettings settings = null)
         {
             byte[] header = parts[0];
             byte[] encryptedCek = parts[1];
@@ -605,15 +545,18 @@ namespace Jose
             byte[] cipherText = parts[3];
             byte[] authTag = parts[4];
 
-            IDictionary<string, object> jwtHeader = jsMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(header));
+            IDictionary<string, object> jwtHeader = GetSettings(settings).JsonMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(header));
 
-            IKeyManagement keys = keyManagement != null ? keyManagement : KeyAlgorithms[GetJweAlgorithm((string)jwtHeader["alg"])];
-            IJweAlgorithm enc = EncAlgorithms[GetJweEncryption((string)jwtHeader["enc"])];
+            JweAlgorithm headerAlg = GetJweAlgorithm((string)jwtHeader["alg"]);
+            JweEncryption headerEnc = GetJweEncryption((string)jwtHeader["enc"]);
 
-            if (jweAlg != null && (JweAlgorithm)jweAlg != GetJweAlgorithm((string)jwtHeader["alg"]))
+            IKeyManagement keys = GetSettings(settings).KeyAlgorithms[headerAlg];
+            IJweAlgorithm enc = GetSettings(settings).EncAlgorithms[headerEnc];
+
+            if (jweAlg != null && (JweAlgorithm)jweAlg != headerAlg)
                 throw new InvalidAlgorithmException("The algorithm type passed to the Decrypt method did not match the algorithm type in the header.");
 
-            if (jweEnc != null && (JweEncryption)jweEnc != GetJweEncryption((string)jwtHeader["enc"]))
+            if (jweEnc != null && (JweEncryption)jweEnc != headerEnc)
                 throw new InvalidAlgorithmException("The encryption type passed to the Decrypt method did not match the encryption type in the header.");
 
             byte[] cek = keys.Unwrap(encryptedCek, key, enc.KeySize, jwtHeader);
@@ -623,17 +566,15 @@ namespace Jose
 
             if (jwtHeader.ContainsKey("zip"))
             {
-                plainText = CompressionAlgorithms[GetJweCompression((string)jwtHeader["zip"])].Decompress(plainText);
+                plainText = GetSettings(settings).CompressionAlgorithms[GetJweCompression((string)jwtHeader["zip"])].Decompress(plainText);
             }
 
             return plainText;
         }
 
-        private static string Decrypt(byte[][] parts, object key, JweAlgorithm? jweAlg, JweEncryption? jweEnc)
+        private static JWTSettings GetSettings(JWTSettings settings)
         {
-            var payloadBytes = DecryptBytes(parts, key, jweAlg, jweEnc);
-
-            return Encoding.UTF8.GetString(payloadBytes); 
+            return settings ?? defaultSettings;
         }
 
         private static JwsAlgorithm GetHashAlgorithm(string algorithm)
