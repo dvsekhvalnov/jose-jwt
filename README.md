@@ -553,6 +553,24 @@ MyDomainObject obj=Jose.JWT.Decode<MyDomainObject>(token,secretKey); //will invo
 string data=Jose.JWT.Encode(obj,secrectKey,JwsAlgorithm.HS256); //for object argument configured IJsonMapper will be invoked to serialize object to json string before encoding
 ```
 
+## Settings
+Settings can be configured either globally or on a per-call basis using a `JWTSettings` object.  The `JWT.DefaultSettings` object can be modified to change global settings, or a `JWTSettings` instance can be passed to any public method on `JWT` to override the global settings for that method call.
+
+### Example of JWTSettings
+
+```C#
+// global setting
+Jose.JWT.DefaultSettings.JsonMapper = new Jose.NewtonsoftMapper();
+
+
+Jose.JWTSettings settings = new Jose.JWTSettings();
+settings.JsonMapper = new Jose.JSSerializerMapper();
+
+// override global settings for this call
+Jose.JWT.Decode(token, secretKey, settings: settings);
+
+```
+
 ### Customizing json <-> object parsing & mapping
 The library provides simple `Jose.IJsonMapper` interface to plug any json processing library or customize default behavior. The only requirement for mapping implementations
 is ability to correctly serialize/parse `IDictionary<string,object>` type.
@@ -587,7 +605,7 @@ public class NewtonsoftMapper : IJsonMapper
     }
 }
 
-Jose.JWT.JsonMapper = new NewtonsoftMapper();
+Jose.JWT.DefaultSettings.JsonMapper = new NewtonsoftMapper();
 ```
 
 #### Example of ServiceStack mapper
@@ -605,7 +623,31 @@ public class ServiceStackMapper : IJsonMapper
     }
 }
 
-Jose.JWT.JsonMapper = new ServiceStackMapper();
+Jose.JWT.DefaultSettings.JsonMapper = new ServiceStackMapper();
+```
+
+### Customizing algorithm implementations
+The default implementations of any of the signing, encryption, key management, or compression algorithms can be overridden.
+
+#### Example of custom algorithm implementation
+```C#
+public class CustomKeyManagement : IKeyManagement
+{
+    public byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
+    {
+        // implement custom key unwrapping (e.g. using a key management service)
+    }
+
+    public byte[][] WrapNewKey(int cekSizeBits, object key, IDictionary<string, object> header)
+    {
+        // implement custom key wrapping (e.g. using a key management service)
+    }
+}
+
+...
+
+// set default RSA-OAEP key management to use custom implementation
+Jose.JWT.DefaultSettings.KeyAlgorithms[JweAlgorithm.RSA_OAEP] = new CustomKeyManagement();
 ```
 
 ## More examples
