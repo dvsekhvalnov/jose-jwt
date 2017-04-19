@@ -5,7 +5,7 @@ namespace Jose
     public interface IKeyManagement
     {
         /// <summary>
-        /// Generates anew Content Encryption Key (CEK) and wraps it via provided management key (Key-Encryption-Key)
+        /// Generates anew Content Jwe Key (CEK) and wraps it via provided management key (Key-Jwe-Key)
         /// </summary>
         /// <param name="cekSizeBits">Length of key to generate (CEK) (bits).</param>
         /// <param name="key">management key (KEK)</param>

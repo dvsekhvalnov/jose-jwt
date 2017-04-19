@@ -2316,227 +2316,121 @@ namespace UnitTests
                 Console.WriteLine(e);
             }
         }
-        
+
         [Fact]
-        public void Encode_IJsonMapper_Override()
+        public void DecodeSignedTokenValidationSuccess()
         {
-            //given
-            JWTSettings settings = new JWTSettings();
-            MockJsonMapper jsMapper = new MockJsonMapper();
-            settings.JsonMapper = jsMapper;
-            var payload = new
-            {
-                hello = "world"
-            };
-            //when
-            string token = Jose.JWT.Encode(payload, null, JwsAlgorithm.none, settings: settings);
+            // given
+            string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
 
-            Console.Out.WriteLine("Plaintext:" + token);
+            // when
+            string json = Jose.JWT.Decode(token, PubKey(), JwsAlgorithm.RS256);
 
-            //then
-            Assert.Equal(token, "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.");
-            Assert.True(jsMapper.SerializeCalled);
+            // then
+            Assert.Equal(json, @"{""hello"": ""world""}");
         }
 
         [Fact]
-        public void Decode_IJsonMapper_Override()
+        public void DecodeSignedTokenValidationFailure()
         {
-            //given
-            JWTSettings settings = new JWTSettings();
-            MockJsonMapper jsMapper = new MockJsonMapper();
-            settings.JsonMapper = jsMapper;
-            string token = "eyJhbGciOiJub25lIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.";
+            // given
+            string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
 
-            //when
-            var test = Jose.JWT.Decode<IDictionary<string, object>>(token, settings: settings);
+            // then
+            Assert.Throws<InvalidAlgorithmException>(()=>Jose.JWT.Decode(token, PubKey(), JwsAlgorithm.RS512));
+        }
 
-            //then
+        [Fact]
+        public void DecodeEncryptedTokenValidationSuccess()
+        {
+            // given
+            string json = @"{""hello"": ""world""}";
+            string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+
+            // when
+            string decodedToken = Jose.JWT.Decode(token, PrivKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+
+            // then
+            Assert.Equal(decodedToken, json);
+        }
+
+        [Fact]
+        public void DecodeEncryptedTokenValidationFailure()
+        {
+            // given
+            string json = @"{""hello"": ""world""}";
+            string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+
+            // then
+            Assert.Throws<InvalidAlgorithmException>(()=>Jose.JWT.Decode(token, PrivKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A192GCM));
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, PrivKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128CBC_HS256));
+        }
+
+        [Fact]
+        public void DecodeAndMapSignedTokenValidationSuccess()
+        {
+            // given
+            string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
+
+            // when
+            var test = Jose.JWT.Decode<IDictionary<string, object>>(token, PubKey(), JwsAlgorithm.RS256);
+
+            // then
             Assert.Equal(test, new Dictionary<string, object> { { "hello", "world" } });
-            Assert.True(jsMapper.ParseCalled);
         }
 
         [Fact]
-        public void Encode_IJwsAlgorithm_Override()
+        public void DecodeAndMapEncryptedTokenValidationSuccess()
         {
-            //given
-            JWTSettings settings = new JWTSettings();
-            MockJwsAlgorithm jwsAlg = new MockJwsAlgorithm();
-            settings.HashAlgorithms[JwsAlgorithm.none] = jwsAlg;
-            var payload = new
-            {
-                hello = "world"
-            };
+            // given
+            string json = @"{""hello"": ""world""}";
+            string token = Jose.JWT.Encode(json, PrivKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
 
-            //when
-            string token = Jose.JWT.Encode(payload, null, JwsAlgorithm.none, settings: settings);
+            // when
+            var test = Jose.JWT.Decode<IDictionary<string, object>>(token, PrivKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
 
-            Console.Out.WriteLine("Plaintext:" + token);
-
-            //then
-            Assert.Equal(token, "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.");
-            Assert.True(jwsAlg.SignCalled);
-        }
-
-        [Fact]
-        public void Decode_IJwsAlgorithm_Override()
-        {
-            //given
-            JWTSettings settings = new JWTSettings();
-            MockJwsAlgorithm jwsAlg = new MockJwsAlgorithm();
-            settings.HashAlgorithms[JwsAlgorithm.none] = jwsAlg;
-            string token = "eyJhbGciOiJub25lIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.";
-
-            //when
-            var test = Jose.JWT.Decode<IDictionary<string, object>>(token, settings: settings);
-
-            //then
+            // then
             Assert.Equal(test, new Dictionary<string, object> { { "hello", "world" } });
-            Assert.True(jwsAlg.VerifyCalled);
         }
 
         [Fact]
-        public void Encode_IJweAlgorithm_Override()
+        public void UnknownJwsAlg()
         {
-            //given
-            JWTSettings settings = new JWTSettings();
-            MockJweAlgorithm encAlg = new MockJweAlgorithm(128);
-            settings.EncAlgorithms[JweEncryption.A128GCM] = encAlg;
-            string json =
-                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
-
-            //when
-            string token = Jose.JWT.Encode(json, aes128Key, JweAlgorithm.DIR, JweEncryption.A128GCM, settings: settings);
+            //give
+            string token = "eyJhbGciOiJfUlMyNTYiLCJ0eXAiOiJKV1QifQ.eyJoZWxsbyI6ICJ3b3JsZCJ9.HhLwe11JpybXCXDqneSyG8V2pG38pZ2RzgPF3kT7CpHmYL-jmDfwn9ChNig7gmpWkhc4SZO7KNl2-dGOo8wfC7ITg9rZimjac6dMF5m7668Q8OyePiaICzGUCUPOVZ30ty6QSyH3aDVQgbh57jUTlbdXyE1-CmdhF2_b_2YA940Qm8YLeIXYP5pO-5OLKeWlzF2tXX9kEytWsa1WxrlUs4pHInMO1iA9GoE_NLa99p200L2kBwknsRlU3qzTzCs_ez_XvFhd0rq2AE9GhATNi4LZbNnkx0F3rD5ivskeFnO23AlTzjnV0wguRoNtweGyC-5tFHsVan3_1KFf7USZKg";
 
             //then
-            Console.Out.WriteLine("DIR_A128GCM = {0}", token);
+            Assert.Throws<InvalidAlgorithmException>(()=>Jose.JWT.Decode(token, PubKey()));
+        }
 
-            string[] parts = token.Split('.');
+        [Fact]        
+        public void UnknownJweAlg()
+        {
+            //given
+            string token = "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6Il9BMTI4Q0JDLUhTMjU2In0.TGpYspiN8racZSeOeulystfEPIMqmkuxCW_V4G43ojaD7fb-BOWSzyVYT-WppPGAg3o6HTFwqAEpO74yYUZsbc_qMMAcH37WiIc30_jSpumUk1Q2Xj-Me95Y3h_OHXyk_cxwUdFyRmpd1O1uEuU_jJKxb5Cv7bPL3kYvaIvGNSHuKdxQXPTsvym0i1jhH6hC9ez5noCrClUtWgkh2KledwCXiNnV8ommoLqIIauVFnP17lDBhSK_tgn3bB4Szi8zBMNJPpo12TTCvF41LzlMrUid1nya6MG05R4sxRF6HuCIHUxXUQHvBvuJH2KH8YB5X7q6iuPXHgjmbWKxqZAHag.E4-dl9u7rOUbvN15BFkTxA.qIktMYCzsiSWcZZNwMV7OKeVFhwhJ3MeYdcTdGELovY.Tr8C4KysH1TC2JeuXCftcQ";
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 0); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size, 96 bits
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
-
-            Assert.Equal(Jose.JWT.Decode(token, aes128Key), json);
-            Assert.True(encAlg.EncryptCalled);
+            //then
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, PrivKey()));
         }
 
         [Fact]
-        public void Decode_IJweAlgorithm_Override()
+        public void UnknownJwaAlg()
         {
             //given
-            JWTSettings settings = new JWTSettings();
-            MockJweAlgorithm encAlg = new MockJweAlgorithm(128);
-            settings.EncAlgorithms[JweEncryption.A128GCM] = encAlg;
-            string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..yVi-LdQQngN0C5WS.1McwSmhZzAtmmLp9y-OdnJwaJFo1nj_4ashmzl2LhubGf0Jl1OTEVJzsHZb7bkup7cGTkuxh6Vfv10ljHsjWf_URXoxP3stQqQeViVcuPV0y2Q_WHYzTNGZpmHGe-hM6gjDhyZyvu3yeXGFSvfPQmp9pWVOgDjI4RC0MQ83rzzn-rRdnZkznWjbmOPxwPrR72Qng0BISsEwbkPn4oO8-vlHkVmPpuDTaYzCT2ZR5K9JnIU8d8QdxEAGb7-s8GEJ1yqtd_w._umbK59DAKA3O89h15VoKQ";
-
-            //when
-            string json = Jose.JWT.Decode(token, aes128Key, settings: settings);
+            string token = "eyJhbGciOiJfUlNBLU9BRVAiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.M-f52MuUwEjWV0hRUGZFMxizdF9NThpMR9QeLjgNG0zT8pRShP7mVUs_bGO93zBNT1eBBQh6dC1MYd0G7AmZSoYJo1io8AwObEmpPgkhUkw9JuYkQcsgU31WzB0YjNiLGSqitqkk6NykUPUjv55LT1MjwEQpf0xhw_0TXCdQusWobB6FwRQ9Oh40o8CaMX3swqxIn9s_Gh2pW7A0VyEFThSVSLFPxdkSjX20wR1IeRC7oQZPiDZHhCbCaG7vXWJpkXDA69h2RT6Srd-y02R7EOUWyZKRHs4aERApAM_8NC6iK0evQaFWawFuRZ0ARbQey7MFFbYaXNpxAzyz4AbHuw.SbZWeVPaTE7yqKWRBVkm4g.kWrYezEX34WBwCWX44cuPBeN38keuj-unhP71gWapog.7d8rGC25BmB_YZTrrzcVVg";
 
             //then
-            Console.Out.WriteLine("json = {0}", json);
-
-            Assert.Equal(json, @"{""exp"":1392548520,""sub"":""alice"",""nbf"":1392547920,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0e659a67-1cd3-438b-8888-217e72951ec9"",""iat"":1392547920}");
-            Assert.True(encAlg.DecryptCalled);
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, PrivKey()));
         }
 
         [Fact]
-        public void Encode_IKeyManagement_Override()
+        public void UnknownCompressionAlg()
         {
             //given
-            JWTSettings settings = new JWTSettings();
-            MockKeyManagement keyMgmt = new MockKeyManagement();
-            settings.KeyAlgorithms[JweAlgorithm.DIR] = keyMgmt;
-            string json =
-                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+            string token = "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhDQkMtSFMyNTYiLCJ6aXAiOiJfREVGIn0.bCuMNHzToH8H2j9_1X9LE_eLvboqAP-dAOC7hVqCSAYo6drxtv2TlqBDe0ok99q74TIzhbVM-Au8Muup8HE-W5yXkPCTOv5InCLIntcV7-XyeLLiAST6LgtjparSZAt9_YBm22y5g0D1k6fJBKWvfWywHrrCPWQl4htmAQ-wDNl6uGbh8l2Ghf1zgPVsZSVCmrTtWsYxbSA2ixfDukyFfqtgKkPkgJ5RcvVx65LIg-KXXBL2bNsAxDv4wDdn-FyFQN-77WQwyFfHh_26ix_qrViasbQ4d5z-hQ2VhHSkPnxoBseOr-XMW33gl7ZWhgfZu5RMtQiJRJdYQsYxPOUn0Q.dGyF2RkxaDWBfdwSg0X9rw.wsM_h_I4_uqDcWPWo-nwTYYk8F2FCcn-RhAhWYDv4OA.0Qa2ydfzP7Wlc9gl6YKThA";
 
             //when
-            string token = Jose.JWT.Encode(json, aes128Key, JweAlgorithm.DIR, JweEncryption.A128GCM, settings: settings);
-
-            //then
-            Console.Out.WriteLine("DIR_A128GCM = {0}", token);
-
-            string[] parts = token.Split('.');
-
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 0); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size, 96 bits
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
-
-            Assert.Equal(Jose.JWT.Decode(token, aes128Key), json);
-
-            Assert.True(keyMgmt.WrapCalled);
-        }
-
-        [Fact]
-        public void Decode_IKeyManagement_Override()
-        {
-            //given
-            JWTSettings settings = new JWTSettings();
-            MockKeyManagement keyMgmt = new MockKeyManagement();
-            settings.KeyAlgorithms[JweAlgorithm.DIR] = keyMgmt;
-            string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..yVi-LdQQngN0C5WS.1McwSmhZzAtmmLp9y-OdnJwaJFo1nj_4ashmzl2LhubGf0Jl1OTEVJzsHZb7bkup7cGTkuxh6Vfv10ljHsjWf_URXoxP3stQqQeViVcuPV0y2Q_WHYzTNGZpmHGe-hM6gjDhyZyvu3yeXGFSvfPQmp9pWVOgDjI4RC0MQ83rzzn-rRdnZkznWjbmOPxwPrR72Qng0BISsEwbkPn4oO8-vlHkVmPpuDTaYzCT2ZR5K9JnIU8d8QdxEAGb7-s8GEJ1yqtd_w._umbK59DAKA3O89h15VoKQ";
-
-            //when
-            string json = Jose.JWT.Decode(token, aes128Key, settings: settings);
-
-            //then
-            Console.Out.WriteLine("json = {0}", json);
-
-            Assert.Equal(json, @"{""exp"":1392548520,""sub"":""alice"",""nbf"":1392547920,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0e659a67-1cd3-438b-8888-217e72951ec9"",""iat"":1392547920}");
-            Assert.True(keyMgmt.UnwrapCalled);
-        }
-
-        [Fact]
-        public void Encode_ICompression_Override()
-        {
-            //given
-            JWTSettings settings = new JWTSettings();
-            MockCompression compress = new MockCompression();
-            settings.CompressionAlgorithms[JweCompression.DEF] = compress;
-            string json =
-                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
-
-            //when
-            string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM, JweCompression.DEF, settings: settings);
-
-            //then
-            Console.Out.WriteLine("RSA-OAEP_A256GCM-DEFLATE = {0}", token);
-
-            string[] parts = token.Split('.');
-
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00iLCJ6aXAiOiJERUYifQ"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size, 96 bits
-            Assert.Equal(parts[4].Length, 22); //auth tag size
-
-            Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
-
-            Assert.True(compress.CompressCalled);
-        }
-
-        [Fact]
-        public void Decode_ICompression_Override()
-        {
-            //given
-            JWTSettings settings = new JWTSettings();
-            MockCompression compress = new MockCompression();
-            settings.CompressionAlgorithms[JweCompression.DEF] = compress;
-            string token = "eyJhbGciOiJSU0EtT0FFUCIsInppcCI6IkRFRiIsImVuYyI6IkExMjhDQkMtSFMyNTYifQ.nXSS9jDwE0dXkcGI7UquZBhn2nsB2P8u-YSWEuTAgEeuV54qNU4SlE76bToI1z4LUuABHmZOv9S24xkF45b7Mrap_Fu4JXH8euXrQgKQb9o_HL5FvE8m4zk5Ow13MKGPvHvWKOaNEBFriwYIfPi6QBYrpuqn0BaANc_aMyInV0Fn7e8EAgVmvoagmy7Hxic2sPUeLEIlRCDSGa82mpiGusjo7VMJxymkhnMdKufpGPh4wod7pvgb-jDWasUHpsUkHqSKZxlrDQxcy1-Pu1G37TAnImlWPa9NU7500IXc-W07IJccXhR3qhA5QaIyBbmHY0j1Dn3808oSFOYSF85A9w.uwbZhK-8iNzcjvKRb1a2Ig.jxj1GfH9Ndu1y0b7NRz_yfmjrvX2rXQczyK9ZJGWTWfeNPGR_PZdJmddiam15Qtz7R-pzIeyR4_qQoMzOISkq6fDEvEWVZdHnnTUHQzCoGX1dZoG9jXEwfAk2G1vXYT2vynEQZ72xk0V_OBtKhpIAUEFsXwCUeLAAgjFNY4OGWZl_Kmv9RTGhnePZfVbrbwg.WuV64jlV03OZm99qHMP9wQ";
-
-            //when
-            string json = Jose.JWT.Decode(token, PrivKey(), settings: settings);
-
-            //then
-            Console.Out.WriteLine("json = {0}", json);
-
-            Assert.Equal(json, @"{""exp"":1392963710,""sub"":""alice"",""nbf"":1392963110,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""9fa7a38a-28fd-421c-825c-8fab3bbf3fb4"",""iat"":1392963110}");
-            Assert.True(compress.DecompressCalled);
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, PrivKey()));
         }
 
         #region test utils
@@ -2553,19 +2447,19 @@ namespace UnitTests
 
         private X509Certificate2 X509()
         {
-            return new X509Certificate2("jwt-2048.p12", "1", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
+            return new X509Certificate2("jwt-2048.p12", "1");
         }
 
         private ECDsa ECDSa256Public()
         {
-            var x095 = new X509Certificate2("ecc256.p12", "12345", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
+            var x095 = new X509Certificate2("ecc256.p12", "12345");
 
             return x095.GetECDsaPublicKey();
         }
 
         private ECDsa ECDSa256Private()
         {
-            var x095 = new X509Certificate2("ecc256.p12", "12345", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
+            var x095 = new X509Certificate2("ecc256.p12", "12345");
 
             return x095.GetECDsaPrivateKey();
         }
@@ -2625,100 +2519,4 @@ namespace UnitTests
 
         #endregion
     }
-    
-#region mocks
-
-    class MockJsonMapper : JSSerializerMapper, IJsonMapper
-    {
-        public bool SerializeCalled { get; set; }
-        public bool ParseCalled { get; set; }
-
-        public new string Serialize(object obj)
-        {
-            SerializeCalled = true;
-            return base.Serialize(obj);
-        }
-
-        public new T Parse<T>(string json)
-        {
-            ParseCalled = true;
-            return base.Parse<T>(json);
-        }
-    }
-
-    class MockJwsAlgorithm : Plaintext, IJwsAlgorithm
-    {
-        public bool SignCalled { get; set; }
-        public bool VerifyCalled { get; set; }
-
-        public new byte[] Sign(byte[] securedInput, object key)
-        {
-            SignCalled = true;
-            return base.Sign(securedInput, key);
-        }
-
-        public new bool Verify(byte[] signature, byte[] securedInput, object key)
-        {
-            VerifyCalled = true;
-            return base.Verify(signature, securedInput, key);
-        }
-    }
-
-    class MockJweAlgorithm : AesGcmEncryption, IJweAlgorithm
-    {
-        public MockJweAlgorithm(int keyLength) : base(keyLength) { }
-
-        public bool DecryptCalled { get; set; }
-        public bool EncryptCalled { get; set; }
-
-        public new byte[] Decrypt(byte[] aad, byte[] cek, byte[] iv, byte[] cipherText, byte[] authTag)
-        {
-            DecryptCalled = true;
-            return base.Decrypt(aad, cek, iv, cipherText, authTag);
-        }
-
-        public new byte[][] Encrypt(byte[] aad, byte[] plainText, byte[] cek)
-        {
-            EncryptCalled = true;
-            return base.Encrypt(aad, plainText, cek);
-        }
-    }
-
-    class MockKeyManagement : DirectKeyManagement, IKeyManagement
-    {
-        public bool UnwrapCalled { get; set; }
-        public bool WrapCalled { get; set; }
-
-        public new byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
-        {
-            UnwrapCalled = true;
-            return base.Unwrap(encryptedCek, key, cekSizeBits, header);
-        }
-
-        public new byte[][] WrapNewKey(int cekSizeBits, object key, IDictionary<string, object> header)
-        {
-            WrapCalled = true;
-            return base.WrapNewKey(cekSizeBits, key, header);
-        }
-    }
-
-    class MockCompression : DeflateCompression, ICompression
-    {
-        public bool CompressCalled { get; set; }
-        public bool DecompressCalled { get; set; }
-
-        public new byte[] Compress(byte[] plainText)
-        {
-            CompressCalled = true;
-            return base.Compress(plainText);
-        }
-
-        public new byte[] Decompress(byte[] compressedText)
-        {
-            DecompressCalled = true;
-            return base.Decompress(compressedText);
-        }
-    }
-
-#endregion
 }

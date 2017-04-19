@@ -1,8 +1,5 @@
 ﻿using Jose.jwe;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Jose
 {
@@ -10,9 +7,9 @@ namespace Jose
     /// JWT settings object.  JWT has a global DefaultSettings instance that can be used to set global defaults.  Additionally,
     /// every method in JWT supports adding an optional settings parameter to override the default settings just for that call.
     /// </summary>
-    public class JWTSettings
+    public class JwtSettings
     {
-        private Dictionary<JwsAlgorithm, IJwsAlgorithm> hashAlgorithms = new Dictionary<JwsAlgorithm, IJwsAlgorithm>
+        private Dictionary<JwsAlgorithm, IJwsAlgorithm> jwsAlgorithms = new Dictionary<JwsAlgorithm, IJwsAlgorithm>
             {
                 { JwsAlgorithm.none, new Plaintext()},
                 { JwsAlgorithm.HS256, new HmacUsingSha("SHA256") },
@@ -78,33 +75,71 @@ namespace Jose
         private IJsonMapper jsMapper = new JSSerializerMapper();
 #elif NETSTANDARD1_4
         private IJsonMapper jsMapper = new NewtonsoftMapper();
-#endif
-
-
-        public Dictionary<JwsAlgorithm, IJwsAlgorithm> HashAlgorithms
+#endif       
+      
+        //Builder-style methods
+        public JwtSettings RegisterJwa(JweAlgorithm alg, IKeyManagement impl)
         {
-            get { return hashAlgorithms; }
+            keyAlgorithms[alg] = impl;
+            return this;
         }
 
-        public Dictionary<JweEncryption, IJweAlgorithm> EncAlgorithms
+        public JwtSettings RegisterJwe(JweEncryption alg, IJweAlgorithm impl)
         {
-            get { return encAlgorithms; }
+            encAlgorithms[alg] = impl;
+            return this;
         }
 
-        public Dictionary<JweAlgorithm, IKeyManagement> KeyAlgorithms
+        public JwtSettings RegisterCompression(JweCompression alg, ICompression impl)
         {
-            get { return keyAlgorithms; }
+            compressionAlgorithms[alg] = impl;
+            return this;
         }
 
-        public Dictionary<JweCompression, ICompression> CompressionAlgorithms
+        public JwtSettings RegisterJws(JwsAlgorithm alg, IJwsAlgorithm impl)
         {
-            get { return compressionAlgorithms; }
+            jwsAlgorithms[alg] = impl;
+
+            return this;
         }
 
+
+        public JwtSettings RegisterMapper(IJsonMapper mapper)
+        {
+            jsMapper = mapper;
+
+            return this;
+        }
+
+        //Properties
         public IJsonMapper JsonMapper
         {
             get { return jsMapper; }
             set { jsMapper = value; }
+        }
+
+        public IJwsAlgorithm Jws(JwsAlgorithm alg)
+        {
+            IJwsAlgorithm impl;
+            return jwsAlgorithms.TryGetValue(alg, out impl) ? impl : null;
+        }
+
+        public ICompression Compression(JweCompression alg)
+        {
+            ICompression impl;
+            return compressionAlgorithms.TryGetValue(alg, out impl) ? impl : null;
+        }
+
+        public IJweAlgorithm Jwe(JweEncryption alg)
+        {
+            IJweAlgorithm impl;
+            return encAlgorithms.TryGetValue(alg, out impl) ? impl : null; ;
+        }
+
+        public IKeyManagement Jwa(JweAlgorithm alg)
+        {
+            IKeyManagement impl;
+            return keyAlgorithms.TryGetValue(alg, out impl) ? impl : null;
         }
     }
 }

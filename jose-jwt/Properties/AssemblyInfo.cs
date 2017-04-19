@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyTitle("jose-jwt")]
-[assembly: AssemblyDescription("Ultimate Java Object Signing and Encryption implementation for .NET and .NETCORE")]
+[assembly: AssemblyDescription("Ultimate Java Object Signing and Jwe implementation for .NET and .NETCORE")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("dvsekhvalnov")]
 [assembly: AssemblyProduct("jose-jwt")]

@@ -70,7 +70,7 @@
     <Compile Include="jws\RsaPssUsingSha.cs" />
     <Compile Include="jws\RsaUsingSha.cs" />
     <Compile Include="JWT.cs" />
-    <Compile Include="JWTSettings.cs" />
+    <Compile Include="JwtSettings.cs" />
     <Compile Include="native\BCrypt.cs" />
     <Compile Include="native\NCrypt.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

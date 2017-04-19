@@ -3,7 +3,7 @@
     public interface IJweAlgorithm
     {
         /// <summary>
-        /// Encrypts given plain text with Content Encryption Key (KEY)
+        /// Encrypts given plain text with Content Jwe Key (KEY)
         /// </summary>
         /// <param name="aad">Additional Authnetication Data according to JWE/JWA specs</param>
         /// <param name="plainText"></param>
