@@ -554,7 +554,14 @@ string data=Jose.JWT.Encode(obj,secrectKey,JwsAlgorithm.HS256); //for object arg
 ```
 
 ## Settings
-Settings can be configured either globally or on a per-call basis using a `JWTSettings` object.  The `JWT.DefaultSettings` object can be modified to change global settings, or a `JWTSettings` instance can be passed to any public method on `JWT` to override the global settings for that method call.
+As of v2.3.0 settings can be configured either globally or on a per-call basis using a `JwtSettings` object.  The `JWT.DefaultSettings` object can be modified to change global settings, or a `JwtSettings` instance can be passed to any public method on `JWT` to override the global settings for particular method call.
+It is possible to provide custom implementations of:
+- specific signing `JwtSettings.RegisterJws(alg, impl)` 
+- encryption,      `JwtSettings.RegisterJwe(alg, impl)`
+- key management   `JwtSettings.RegisterJwa(alg, impl)`
+- or compression   `JwtSettings.RegisterCompression(alg, impl)`
+- json mapper      `JwtSettings.RegisterMapper(mapper)`
+
 
 ### Example of JWTSettings
 
@@ -563,12 +570,14 @@ Settings can be configured either globally or on a per-call basis using a `JWTSe
 Jose.JWT.DefaultSettings.JsonMapper = new Jose.NewtonsoftMapper();
 
 
-Jose.JWTSettings settings = new Jose.JWTSettings();
-settings.JsonMapper = new Jose.JSSerializerMapper();
+Jose.JWTSettings settings = new Jose.JwtSettings();
+settings.JsonMapper = new Jose.JSSerializerMapper(); 
 
 // override global settings for this call
 Jose.JWT.Decode(token, secretKey, settings: settings);
 
+//or simply
+Jose.JWT.Decode(token, secretKey, settings: new JwtSettings().RegisterMapper(new Jose.JSSerializerMapper()));
 ```
 
 ### Customizing json <-> object parsing & mapping
@@ -635,20 +644,35 @@ public class CustomKeyManagement : IKeyManagement
 {
     public byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
     {
-        // implement custom key unwrapping (e.g. using a key management service)
+        // implement custom key unwrapping (e.g. using Amazon KMS for instance)
     }
 
     public byte[][] WrapNewKey(int cekSizeBits, object key, IDictionary<string, object> header)
     {
-        // implement custom key wrapping (e.g. using a key management service)
+        // implement custom key wrapping (e.g. using Amazon KMS for instance)
     }
 }
 
 ...
 
 // set default RSA-OAEP key management to use custom implementation
-Jose.JWT.DefaultSettings.KeyAlgorithms[JweAlgorithm.RSA_OAEP] = new CustomKeyManagement();
+Jose.JWT.DefaultSettings.RegisterJwa(JweAlgorithm.RSA_OAEP, new CustomKeyManagement());
 ```
+
+Multiple calls can be chained for more convinience:
+
+```C#
+Jose.JWT.Decode(token, secretKey, settings: new JwtSettings()
+						.RegisterMapper(customMapper)
+						.RegisterJws(JwsAlgorithm.RS256, amazonKmsImpl)
+						.RegisterJws(JwsAlgorithm.RS384, amazonKmsImpl)
+						.RegisterJws(JwsAlgorithm.RS512, amazonKmsImpl)
+						.RegisterJwa(JweAlgorithm.RSA_OAEP_256, hsmImpl)						
+						.RegisterJwe(JweEncryption.A128GCM, linuxGcmImpl)						
+						.RegisterCompression(JweCompression.DEF, hardwareAcceleratedDeflate)
+);
+```
+
 
 ## More examples
 Checkout UnitTests\TestSuite.cs for more examples.
