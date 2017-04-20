@@ -1,5 +1,5 @@
 {
-  "version": "2.2.0-*",
+  "version": "2.3.0-*",
   "title": "Jose JWT",
   "authors": [ "Dmitry Vsekhvalnov" ],
   "owners": [ "Dmitry Vsekhvalnov" ],
@@ -7,9 +7,9 @@
   "projectUrl": "https://github.com/dvsekhvalnov/jose-jwt",
   "licenseUrl": "https://raw.github.com/dvsekhvalnov/jose-jwt/master/LICENSE",
   "language": "en-US",
-  "copyright": "Copyright dvsekhvalnov 2014-2016",
+  "copyright": "Copyright dvsekhvalnov 2014-2017",
   "requireLicenseAcceptance": false,
-  "releaseNotes": "Better key management for .NET 4.6. Enabled to work with X509Certificate2 keys extensions.",
+  "releaseNotes": "SDK Enhancements, ability to provide custom algorithm implementations for better cloud KMS integrations.",
   "summary": "Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET Core. Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms. Library for generating, decoding and encryption of JSON Web Tokens.",
   "description": "Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET \r\r
 
