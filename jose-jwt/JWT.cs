@@ -62,13 +62,9 @@ namespace Jose
     /// Provides methods for encoding and decoding JSON Web Tokens.
     /// </summary>
     public static class JWT
-    {        
-        private static Dictionary<JweAlgorithm, string> JweAlgorithms = new Dictionary<JweAlgorithm, string>();
-        private static Dictionary<JweEncryption, string> JweEncryptionMethods = new Dictionary<JweEncryption, string>();
+    {
+        
         private static Dictionary<JweCompression, string> JweCompressionMethods = new Dictionary<JweCompression, string>();
-        private static Dictionary<JwsAlgorithm, string> JwsAlgorithms = new Dictionary<JwsAlgorithm, string>();
-
-        private static Dictionary<string, JweEncryption> JweEncryptionMethodAliases = new Dictionary<string, JweEncryption>();
 
         private static JwtSettings defaultSettings;
 
@@ -89,45 +85,6 @@ namespace Jose
         static JWT()
         {
             defaultSettings = new JwtSettings();
-
-            JwsAlgorithms[JwsAlgorithm.none] = "none";
-            JwsAlgorithms[JwsAlgorithm.HS256] = "HS256";
-            JwsAlgorithms[JwsAlgorithm.HS384] = "HS384";
-            JwsAlgorithms[JwsAlgorithm.HS512] = "HS512";
-            JwsAlgorithms[JwsAlgorithm.RS256] = "RS256";
-            JwsAlgorithms[JwsAlgorithm.RS384] = "RS384";
-            JwsAlgorithms[JwsAlgorithm.RS512] = "RS512";
-            JwsAlgorithms[JwsAlgorithm.ES256] = "ES256";
-            JwsAlgorithms[JwsAlgorithm.ES384] = "ES384";
-            JwsAlgorithms[JwsAlgorithm.ES512] = "ES512";
-            JwsAlgorithms[JwsAlgorithm.PS256] = "PS256";
-            JwsAlgorithms[JwsAlgorithm.PS384] = "PS384";
-            JwsAlgorithms[JwsAlgorithm.PS512] = "PS512";
-
-            JweEncryptionMethods[JweEncryption.A128CBC_HS256] = "A128CBC-HS256";
-            JweEncryptionMethods[JweEncryption.A192CBC_HS384] = "A192CBC-HS384";
-            JweEncryptionMethods[JweEncryption.A256CBC_HS512] = "A256CBC-HS512";
-            JweEncryptionMethods[JweEncryption.A128GCM] = "A128GCM";
-            JweEncryptionMethods[JweEncryption.A192GCM] = "A192GCM";
-            JweEncryptionMethods[JweEncryption.A256GCM] = "A256GCM";
-
-            JweAlgorithms[JweAlgorithm.RSA1_5] = "RSA1_5";
-            JweAlgorithms[JweAlgorithm.RSA_OAEP] = "RSA-OAEP";
-            JweAlgorithms[JweAlgorithm.RSA_OAEP_256] = "RSA-OAEP-256";
-            JweAlgorithms[JweAlgorithm.DIR] = "dir";
-            JweAlgorithms[JweAlgorithm.A128KW] = "A128KW";
-            JweAlgorithms[JweAlgorithm.A192KW] = "A192KW";
-            JweAlgorithms[JweAlgorithm.A256KW] = "A256KW";
-            JweAlgorithms[JweAlgorithm.ECDH_ES] = "ECDH-ES";
-            JweAlgorithms[JweAlgorithm.ECDH_ES_A128KW] = "ECDH-ES+A128KW";
-            JweAlgorithms[JweAlgorithm.ECDH_ES_A192KW] = "ECDH-ES+A192KW";
-            JweAlgorithms[JweAlgorithm.ECDH_ES_A256KW] = "ECDH-ES+A256KW";
-            JweAlgorithms[JweAlgorithm.PBES2_HS256_A128KW] = "PBES2-HS256+A128KW";
-            JweAlgorithms[JweAlgorithm.PBES2_HS384_A192KW] = "PBES2-HS384+A192KW";
-            JweAlgorithms[JweAlgorithm.PBES2_HS512_A256KW] = "PBES2-HS512+A256KW";
-            JweAlgorithms[JweAlgorithm.A128GCMKW] = "A128GCMKW";
-            JweAlgorithms[JweAlgorithm.A192GCMKW] = "A192GCMKW";
-            JweAlgorithms[JweAlgorithm.A256GCMKW] = "A256GCMKW";
 
             JweCompressionMethods[JweCompression.DEF] = "DEF";
         }
@@ -258,9 +215,9 @@ namespace Jose
         {
             if (payload == null)
                 throw new ArgumentNullException(nameof(payload));
-
-            IKeyManagement keys = GetSettings(settings).Jwa(alg);
-            IJweAlgorithm _enc = GetSettings(settings).Jwe(enc);
+            JwtSettings jwtSettings = GetSettings(settings);
+            IKeyManagement keys = jwtSettings.Jwa(alg);
+            IJweAlgorithm _enc = jwtSettings.Jwe(enc);
 
             if (keys == null)
             {
@@ -272,7 +229,7 @@ namespace Jose
                 throw new JoseException(string.Format("Unsupported JWE algorithm requested: {0}", enc));
             }
 
-            IDictionary<string, object> jwtHeader = new Dictionary<string, object> { { "alg", JweAlgorithms[alg] }, { "enc", JweEncryptionMethods[enc] } };
+            IDictionary<string, object> jwtHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwaHeaderValue(alg)}, { "enc", jwtSettings.JweHeaderValue(enc) } };
 
             Dictionaries.Append(jwtHeader, extraHeaders);
 
@@ -283,10 +240,10 @@ namespace Jose
             if (compression.HasValue)
             {
                 jwtHeader["zip"] = JweCompressionMethods[compression.Value];
-                payload = GetSettings(settings).Compression(compression.Value).Compress(payload);
+                payload = jwtSettings.Compression(compression.Value).Compress(payload);
             }
 
-            byte[] header = Encoding.UTF8.GetBytes(GetSettings(settings).JsonMapper.Serialize(jwtHeader));
+            byte[] header = Encoding.UTF8.GetBytes(jwtSettings.JsonMapper.Serialize(jwtHeader));
             byte[] aad = Encoding.UTF8.GetBytes(Compact.Serialize(header));
             byte[][] encParts = _enc.Encrypt(aad, payload, cek);
 
@@ -338,16 +295,17 @@ namespace Jose
             {
                 extraHeaders = new Dictionary<string, object> { { "typ", "JWT" } };
             }
+            var jwtSettings = GetSettings(settings);
 
-            var jwtHeader = new Dictionary<string, object> { { "alg", JwsAlgorithms[algorithm] } };
+
+            var jwtHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwsHeaderValue(algorithm) } };
 
             Dictionaries.Append(jwtHeader, extraHeaders);
-
-            byte[] headerBytes = Encoding.UTF8.GetBytes(GetSettings(settings).JsonMapper.Serialize(jwtHeader));
+            byte[] headerBytes = Encoding.UTF8.GetBytes(jwtSettings.JsonMapper.Serialize(jwtHeader));
 
             var bytesToSign = Encoding.UTF8.GetBytes(Compact.Serialize(headerBytes, payload));
 
-            var jwsAlgorithm = GetSettings(settings).Jws(algorithm);
+            var jwsAlgorithm = jwtSettings.Jws(algorithm);
 
             if (jwsAlgorithm == null)
             {
@@ -534,23 +492,25 @@ namespace Jose
 
                 byte[] securedInput = Encoding.UTF8.GetBytes(Compact.Serialize(header, payload));
 
-                var headerData = GetSettings(settings).JsonMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(header));
-                var algorithm = (string)headerData["alg"];
+                var jwtSettings = GetSettings(settings);
 
-                if (expectedJwsAlg != null && (JwsAlgorithm) expectedJwsAlg != GetHashAlgorithm(algorithm))
+                var headerData = jwtSettings.JsonMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(header));
+                var algorithm = (string)headerData["alg"];
+                var jwsAlgorithm = jwtSettings.JwsAlgorithmFromHeader(algorithm);
+                if (expectedJwsAlg != null && expectedJwsAlg != jwsAlgorithm)
                 {
                     throw new InvalidAlgorithmException(
                         "The algorithm type passed to the Decode method did not match the algorithm type in the header.");
                 }
 
-                var jwsAlgorithm = GetSettings(settings).Jws(GetHashAlgorithm(algorithm));
+                var jwsAlgorithmImpl = jwtSettings.Jws(jwsAlgorithm);
 
-                if (jwsAlgorithm == null)
+                if (jwsAlgorithmImpl == null)
                 {
                     throw new JoseException(string.Format("Unsupported JWS algorithm requested: {0}", algorithm));
                 }
 
-                if (!jwsAlgorithm.Verify(signature, securedInput, key))
+                if (!jwsAlgorithmImpl.Verify(signature, securedInput, key))
                 {
                     throw new IntegrityException("Invalid signature.");
                 }
@@ -573,14 +533,14 @@ namespace Jose
             byte[] iv = parts[2];
             byte[] cipherText = parts[3];
             byte[] authTag = parts[4];
+            JwtSettings jwtSettings = GetSettings(settings);
+            IDictionary<string, object> jwtHeader = jwtSettings.JsonMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(header));
 
-            IDictionary<string, object> jwtHeader = GetSettings(settings).JsonMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(header));
+            JweAlgorithm headerAlg = jwtSettings.JwaAlgorithmFromHeader((string)jwtHeader["alg"]);
+            JweEncryption headerEnc = jwtSettings.JweAlgorithmFromHeader((string)jwtHeader["enc"]);
 
-            JweAlgorithm headerAlg = GetJweAlgorithm((string)jwtHeader["alg"]);
-            JweEncryption headerEnc = GetJweEncryption((string)jwtHeader["enc"]);
-
-            IKeyManagement keys = GetSettings(settings).Jwa(headerAlg);
-            IJweAlgorithm enc = GetSettings(settings).Jwe(headerEnc);
+            IKeyManagement keys = jwtSettings.Jwa(headerAlg);
+            IJweAlgorithm enc = jwtSettings.Jwe(headerEnc);
 
             if (keys == null)
             {
@@ -611,7 +571,7 @@ namespace Jose
             {
                 var alg = (string)jwtHeader["zip"];
 
-                var compression = GetSettings(settings).Compression(GetJweCompression(alg));
+                var compression = jwtSettings.Compression(GetJweCompression(alg));
 
                 if (compression == null)
                 {
@@ -627,41 +587,6 @@ namespace Jose
         private static JwtSettings GetSettings(JwtSettings settings)
         {
             return settings ?? defaultSettings;
-        }
-
-        private static JwsAlgorithm GetHashAlgorithm(string algorithm)
-        {
-            foreach (var pair in JwsAlgorithms)
-            {
-                if (pair.Value.Equals(algorithm)) return pair.Key;
-            }
-
-            throw new InvalidAlgorithmException(string.Format("JWS algorithm is not supported: {0}", algorithm));
-        }
-
-        private static JweAlgorithm GetJweAlgorithm(string algorithm)
-        {
-            foreach (var pair in JweAlgorithms)
-            {
-                if (pair.Value.Equals(algorithm)) return pair.Key;
-            }
-
-            throw new InvalidAlgorithmException(string.Format("JWA algorithm is not supported: {0}.", algorithm));
-        }
-
-        private static JweEncryption GetJweEncryption(string algorithm)
-        {
-            foreach (var pair in JweEncryptionMethods)
-            {
-                if (pair.Value.Equals(algorithm)) return pair.Key;
-            }
-            JweEncryption enc;
-            if (JweEncryptionMethodAliases.TryGetValue(algorithm, out enc))
-            {
-                return enc;
-            }
-
-            throw new InvalidAlgorithmException(string.Format("JWE algorithm is not supported: {0}.", algorithm));
         }
 
         private static JweCompression GetJweCompression(string algorithm)
