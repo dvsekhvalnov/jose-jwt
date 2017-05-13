@@ -114,13 +114,11 @@ namespace Jose
             if (expected.Length != actual.Length) 
                 return false;
 
-            bool equals = true;
-
+            byte result = 0;
             for (int i = 0; i < expected.Length; i++)
-                if (expected[i] != actual[i])
-                    equals = false;
+                result |= (byte)(expected[i] ^ actual[i]);
 
-            return equals;
+            return result == 0;
         }
 
         public static string Dump(byte[] arr, string label = "")
