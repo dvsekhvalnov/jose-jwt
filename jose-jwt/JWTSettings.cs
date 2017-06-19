@@ -121,9 +121,16 @@ namespace Jose
         private Dictionary<string, JweAlgorithm> keyAlgorithmsAliases = new Dictionary<string, JweAlgorithm>();
 
         private Dictionary<JweCompression, ICompression> compressionAlgorithms = new Dictionary<JweCompression, ICompression>
-            {
-                { JweCompression.DEF, new DeflateCompression() }
-            };
+        {
+            { JweCompression.DEF, new DeflateCompression() }
+        };
+
+        private Dictionary<JweCompression, string> jweCompressionHeaderValue = new Dictionary<JweCompression, string>
+        {
+            { JweCompression.DEF, "DEF" }
+        };
+
+        private Dictionary<string, JweCompression> compressionAlgorithmsAliases = new Dictionary<string, JweCompression>();
 
 #if NET40 || NET461
         private IJsonMapper jsMapper = new JSSerializerMapper();
@@ -137,6 +144,7 @@ namespace Jose
             keyAlgorithms[alg] = impl;
             return this;
         }
+
         /// <summary>
         /// Register an alias for the "alg" header that should point to a standard JWA key management algorithm
         /// </summary>
@@ -146,6 +154,9 @@ namespace Jose
             return this;
         }
 
+        /// <summary>
+        /// Register an alias for the "enc" header that should point to a standard JWE encryption algorithm
+        /// </summary>
         public JwtSettings RegisterJwe(JweEncryption alg, IJweAlgorithm impl)
         {
             encAlgorithms[alg] = impl;
@@ -167,6 +178,16 @@ namespace Jose
             return this;
         }
 
+        /// <summary>
+        /// Register an alias for the "zip" header that should point to a standard compression algorithm
+        /// </summary>
+        public JwtSettings RegisterCompressionAlias(string alias, JweCompression alg)
+        {
+            compressionAlgorithmsAliases[alias] = alg;
+            return this;
+        }
+
+
         public JwtSettings RegisterJws(JwsAlgorithm alg, IJwsAlgorithm impl)
         {
             jwsAlgorithms[alg] = impl;
@@ -183,7 +204,6 @@ namespace Jose
             return this;
         }
 
-
         public JwtSettings RegisterMapper(IJsonMapper mapper)
         {
             jsMapper = mapper;
@@ -198,6 +218,7 @@ namespace Jose
             set { jsMapper = value; }
         }
 
+        //JWS signing algorithm
         public IJwsAlgorithm Jws(JwsAlgorithm alg)
         {
             IJwsAlgorithm impl;
@@ -215,20 +236,18 @@ namespace Jose
             {
                 if (pair.Value.Equals(headerValue)) return pair.Key;
             }
+
+            //try alias
             JwsAlgorithm aliasMatch;
             if (jwsAlgorithmsAliases.TryGetValue(headerValue, out aliasMatch))
             {
                 return aliasMatch;
             }
+
             throw new InvalidAlgorithmException(string.Format("JWS algorithm is not supported: {0}", headerValue));
         }
 
-        public ICompression Compression(JweCompression alg)
-        {
-            ICompression impl;
-            return compressionAlgorithms.TryGetValue(alg, out impl) ? impl : null;
-        }
-
+        //JWE encryption algorithm
         public IJweAlgorithm Jwe(JweEncryption alg)
         {
             IJweAlgorithm impl;
@@ -246,7 +265,10 @@ namespace Jose
             {
                 if (pair.Value.Equals(headerValue)) return pair.Key;
             }
+
+            //try alias
             JweEncryption aliasMatch;
+
             if (encAlgorithmsAliases.TryGetValue(headerValue, out aliasMatch))
             {
                 return aliasMatch;
@@ -254,6 +276,7 @@ namespace Jose
             throw new InvalidAlgorithmException(string.Format("JWE algorithm is not supported: {0}", headerValue));
         }
 
+        //JWA algorithm
         public IKeyManagement Jwa(JweAlgorithm alg)
         {
             IKeyManagement impl;
@@ -271,6 +294,8 @@ namespace Jose
             {
                 if (pair.Value.Equals(headerValue)) return pair.Key;
             }
+
+            //try alias
             JweAlgorithm aliasMatch;
             if (keyAlgorithmsAliases.TryGetValue(headerValue, out aliasMatch))
             {
@@ -279,6 +304,39 @@ namespace Jose
             throw new InvalidAlgorithmException(string.Format("JWA algorithm is not supported: {0}.", headerValue));
         }
 
+        //Compression
+        public ICompression Compression(JweCompression alg)
+        {
+            ICompression impl;
+            return compressionAlgorithms.TryGetValue(alg, out impl) ? impl : null;
+        }
 
+        public ICompression Compression(string alg)
+        {
+            return Compression(CompressionAlgFromHeader(alg));
+        }
+
+        public string CompressionHeader(JweCompression value)
+        {
+            return jweCompressionHeaderValue[value];
+        }
+
+        public JweCompression CompressionAlgFromHeader(string header)
+        {
+            foreach (var pair in jweCompressionHeaderValue)
+            {
+                if (pair.Value.Equals(header)) return pair.Key;
+            }
+
+            //try alias
+            JweCompression aliasMatch;
+
+            if (compressionAlgorithmsAliases.TryGetValue(header, out aliasMatch))
+            {
+                return aliasMatch;
+            }
+
+            throw new InvalidAlgorithmException(string.Format("Compression algorithm is not supported: {0}.", header));
+        }
     }
 }

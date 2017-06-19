@@ -63,9 +63,6 @@ namespace Jose
     /// </summary>
     public static class JWT
     {
-        
-        private static Dictionary<JweCompression, string> JweCompressionMethods = new Dictionary<JweCompression, string>();
-
         private static JwtSettings defaultSettings;
 
         /// <summary>
@@ -84,9 +81,7 @@ namespace Jose
 
         static JWT()
         {
-            defaultSettings = new JwtSettings();
-
-            JweCompressionMethods[JweCompression.DEF] = "DEF";
+            defaultSettings = new JwtSettings();            
         }
 
         /// <summary>
@@ -239,7 +234,7 @@ namespace Jose
 
             if (compression.HasValue)
             {
-                jwtHeader["zip"] = JweCompressionMethods[compression.Value];
+                jwtHeader["zip"] = jwtSettings.CompressionHeader(compression.Value);
                 payload = jwtSettings.Compression(compression.Value).Compress(payload);
             }
 
@@ -569,14 +564,7 @@ namespace Jose
 
             if (jwtHeader.ContainsKey("zip"))
             {
-                var alg = (string)jwtHeader["zip"];
-
-                var compression = jwtSettings.Compression(GetJweCompression(alg));
-
-                if (compression == null)
-                {
-                    throw new JoseException(string.Format("Unsupported compressions algorithm requested: {0}", alg));
-                }
+                var compression = jwtSettings.Compression((string)jwtHeader["zip"]);               
 
                 plainText = compression.Decompress(plainText);
             }
@@ -587,17 +575,7 @@ namespace Jose
         private static JwtSettings GetSettings(JwtSettings settings)
         {
             return settings ?? defaultSettings;
-        }
-
-        private static JweCompression GetJweCompression(string algorithm)
-        {
-            foreach (var pair in JweCompressionMethods)
-            {
-                if (pair.Value.Equals(algorithm)) return pair.Key;
-            }
-
-            throw new InvalidAlgorithmException(string.Format("Compression algorithm is not supported: {0}.", algorithm));
-        }
+        }    
     }
 
     public class JoseException : Exception

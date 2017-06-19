@@ -205,6 +205,56 @@ namespace UnitTests
             Assert.True(compress.DecompressCalled);
         }
 
+        [Fact]
+        public void Decode_JwsAlgorithm_Alias()
+        {
+            string token = "eyJhbGciOiJOT05FLUFMSUFTIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.";
+
+            var test = Jose.JWT.Decode<IDictionary<string, object>>(token, settings: new JwtSettings().RegisterJwsAlias("NONE-ALIAS", JwsAlgorithm.none));
+
+            Assert.Equal(test, new Dictionary<string, object> { { "hello", "world" } });
+        }
+
+        [Fact]
+        public void Decode_JweAlgorithm_Alias()
+        {
+            //given
+            string token = "eyJhbGciOiJSU0ExXzVfQUxJQVMiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.dMCd2RbBtGBb9QwpJ0lYbJ0zv5Nagl5SPwRhrJTlXTDWJ6s-Ztz0-SEOi_gXx0SxXGA2iy5gY3x2uWbi-TSZvBuNyATYqoHlPLTCvNW47_INL8Gw46VcNu54urKadPh01Agk9WajBBlx9fnGgQMw5F9YNZbo8LfUNbGnZDYaxB3Vbyhn1Q9j3X8cT2MfzQ0uEhqr4FTx12oCd-6rZXXHhGnfdOKJGaihGLf10JVJcGXwBVY4AghEcAsii0JJrk35kLjBnzfsjlb2pB1r7k_tI6_1g06-5ubz_oEtlwGBM9OeqYnTk66A4a8vUSzqEC9e3bEQbWwz94Qv2qO5r9dy5Q.Axsj29AR41DivbI_MwHVtg.OMQpAiDkqJsZo53bSz9XmKwzqnLBqI7MR7mp0NazAqI.V_t4NP94yJyKAUmeTgrysQ";
+
+            //when
+            string json = Jose.JWT.Decode(token, PrivKey(), settings: new JwtSettings().RegisterJwaAlias("RSA1_5_ALIAS", JweAlgorithm.RSA1_5));
+            
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(json, @"{""hello"":""world""}");
+        }
+
+        [Fact]
+        public void Decode_JweEncryption_Alias()
+        {
+            //given
+            string token = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2X0FMSUFTIn0.O1GahcMJNBaTEgPeOPzjm-FistaXkzmdZMPB0YkJoI6X1KIc43HJjLH28njXLQ-mGKblEhJwyFar4yfyrV9bzRSxe9K7RNDuG31m83D9yo-A2Mx1FZtvSUwm5yT62Xk0-BuZOq6S3algXvgTQie1MGRuSED-a6xmRj5RcEpop5JdEXnnlwCrn4qZt9jQpT_Ag_URgkNyuBJG878MXjArxU9Ci5WS1a-tcOgCtd33JOiCvniIBQBPFdyoz7vGZi3Y7EGhY-6T6dxyeL-_MMbkl_60HlTPrd6exfZ3c_0ofwSgvua_gAdSEN4inJWxJjH2yXiR0Ylj_lXAq_la3xFAhA.R2kyFSctYUZgIYJrUTWl8Q.LS4PGAa0bE-OyshBxUh5XhFvquKffEsSmEVU_LxSRAQ.hDDEkppjnfWUv_jKUcA6DQ";
+
+            //when
+            string json = Jose.JWT.Decode(token, PrivKey(), settings: new JwtSettings().RegisterJweAlias("A128CBC-HS256_ALIAS", JweEncryption.A128CBC_HS256));
+
+            //then
+            Console.Out.WriteLine("json = {0}", token);
+
+            Assert.Equal(json, @"{""hello"":""world""}");
+        }
+
+        [Fact]
+        public void Decode_Compression_Alias()
+        {
+            string token = "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiemlwIjoiemlwIn0.PzQ3tGp6KqC_SBcFtHTJMdpPbGNlOJdIN-uFmwfaF6AU3Tb0mFHf4gcQnCMpB-_8HHUnllJPQJiMvbPS4z-tBgxuG8SlVmGA8dKGfYSrWh8kou1Mcs1WfL4PCNKna2bPr8sRSCIBzb5kWNjT-TuIHJA3_sL2MELdd8Mrny4Cua2i0UofMNvwsy7wpaCMZ03EI1_icZkzBmNUBSvv1W1vNBOfIRlXxDEgN6Zz9B-_Id4y8RK51wvXSb6kDQdC-pc8MCHZq-6GJ3S8CmTDVlBgbXyOOEH3Ke9EX4uJl1GTE6FtF2jJaWPy03HAJ615ZfRpe4hybl99XDPWzFhgBrYsOg.lYhsnbbRXx0ZSRK-A3Y1Iw.sw-VviW-zl-m7XBVVwOTDj5-YhSa-4NVLztAapzgDzk.VrZKYS2KKCgp4DaHijQx_w";
+
+            var test = Jose.JWT.Decode<IDictionary<string, object>>(token, PrivKey(), settings: new JwtSettings().RegisterCompressionAlias("zip", JweCompression.DEF));
+
+            Assert.Equal(test, new Dictionary<string, object> { { "hello", "world" } });
+        }
+
         #region test utils
 
         private RSA PrivKey()

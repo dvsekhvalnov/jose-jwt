@@ -244,6 +244,15 @@ namespace UnitTests
             Assert.Equal(json, @"{""hello"":""world""}");
         }
 
+        [Fact]
+        public void Decode_Compression_Alias()
+        {
+            string token = "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiemlwIjoiemlwIn0.PzQ3tGp6KqC_SBcFtHTJMdpPbGNlOJdIN-uFmwfaF6AU3Tb0mFHf4gcQnCMpB-_8HHUnllJPQJiMvbPS4z-tBgxuG8SlVmGA8dKGfYSrWh8kou1Mcs1WfL4PCNKna2bPr8sRSCIBzb5kWNjT-TuIHJA3_sL2MELdd8Mrny4Cua2i0UofMNvwsy7wpaCMZ03EI1_icZkzBmNUBSvv1W1vNBOfIRlXxDEgN6Zz9B-_Id4y8RK51wvXSb6kDQdC-pc8MCHZq-6GJ3S8CmTDVlBgbXyOOEH3Ke9EX4uJl1GTE6FtF2jJaWPy03HAJ615ZfRpe4hybl99XDPWzFhgBrYsOg.lYhsnbbRXx0ZSRK-A3Y1Iw.sw-VviW-zl-m7XBVVwOTDj5-YhSa-4NVLztAapzgDzk.VrZKYS2KKCgp4DaHijQx_w";
+
+            var test = Jose.JWT.Decode<IDictionary<string, object>>(token, PrivKey(), settings: new JwtSettings().RegisterCompressionAlias("zip", JweCompression.DEF));
+
+            Assert.Equal(test, new Dictionary<string, object> { { "hello", "world" } });
+        }
 
         #region test utils
 
