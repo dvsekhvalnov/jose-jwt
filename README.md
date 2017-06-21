@@ -562,6 +562,11 @@ It is possible to provide custom implementations of:
 - or compression   `JwtSettings.RegisterCompression(alg, impl)`
 - json mapper      `JwtSettings.RegisterMapper(mapper)`
 
+as well as specify aliases when decoding tokens from 3rd party libraries that do not comply exactly to spec:
+- signing `JwtSettings.RegisterJwsAlias(header, alg)`
+- encryption `JwtSettings.RegisterJweAlias(header, alg)`
+- key management `JwtSettings.RegisterJwaAlias(header, alg)`
+- compression `JwtSettings.RegisterCompressionAlias(header, alg)`
 
 ### Example of JWTSettings
 
@@ -659,6 +664,15 @@ public class CustomKeyManagement : IKeyManagement
 Jose.JWT.DefaultSettings.RegisterJwa(JweAlgorithm.RSA_OAEP, new CustomKeyManagement());
 ```
 
+### Providing aliases
+It is possible to add any number of aliases when decoding for signing, encryption, key management, or compression algorithms. For example if you are
+dealing with tokens produced from 3rd party library which you have no control over and by mistake it is using `RSA_OAEP_256` header value instead
+of `RSA-OAEP-256` it is possible to register alias:
+
+```C#
+   Jose.JWT.Decode(token, key, settings: new JwtSettings().RegisterJwaAlias("RSA_OAEP_256", JweAlgorithm.RSA_OAEP_256));
+```
+
 Multiple calls can be chained for more convinience:
 
 ```C#
@@ -669,6 +683,7 @@ Jose.JWT.Decode(token, secretKey, settings: new JwtSettings()
 						.RegisterJws(JwsAlgorithm.RS512, amazonKmsImpl)
 						.RegisterJwa(JweAlgorithm.RSA_OAEP_256, hsmImpl)						
 						.RegisterJwe(JweEncryption.A128GCM, linuxGcmImpl)						
+						.RegisterJwaAlias("RSA_OAEP_256", JweAlgorithm.RSA_OAEP_256)
 						.RegisterCompression(JweCompression.DEF, hardwareAcceleratedDeflate)
 );
 ```
