@@ -19,8 +19,7 @@ namespace Jose
 
         public byte[][] Encrypt(byte[] aad, byte[] plainText, byte[] cek)
         {
-        
-            Ensure.BitSize(cek, keyLength, string.Format("AES-CBC with HMAC algorithm expected key of size {0} bits, but was given {1} bits", keyLength, cek.Length * 8));
+            Ensure.BitSize(cek, keyLength, string.Format("AES-CBC with HMAC algorithm expected key of size {0} bits, but was given {1} bits", keyLength, cek.Length * 8L));
 
             byte[] hmacKey = Arrays.FirstHalf(cek);
             byte[] aesKey = Arrays.SecondHalf(cek);
@@ -31,7 +30,6 @@ namespace Jose
 
             try
             {
-
                 using (Aes aes = Aes.Create())
                 {
                     aes.Key = aesKey;
@@ -64,7 +62,7 @@ namespace Jose
 
         public byte[] Decrypt(byte[] aad, byte[] cek, byte[] iv, byte[] cipherText, byte[] authTag)
         {
-            Ensure.BitSize(cek, keyLength, string.Format("AES-CBC with HMAC algorithm expected key of size {0} bits, but was given {1} bits", keyLength, cek.Length * 8));
+            Ensure.BitSize(cek, keyLength, string.Format("AES-CBC with HMAC algorithm expected key of size {0} bits, but was given {1} bits", keyLength, cek.Length * 8L));
 
             byte[] hmacKey = Arrays.FirstHalf(cek);
             byte[] aesKey = Arrays.SecondHalf(cek);
@@ -112,7 +110,7 @@ namespace Jose
 
         private byte[] ComputeAuthTag(byte[] aad, byte[] iv, byte[] cipherText, byte[] hmacKey)
         {
-            byte[] al = Arrays.LongToBytes(aad.Length * 8);
+            byte[] al = Arrays.LongToBytes(aad.Length * 8L);
             byte[] hmacInput = Arrays.Concat(aad, iv, cipherText, al);
 
             byte[] hmac = hashAlgorithm.Sign(hmacInput, hmacKey);

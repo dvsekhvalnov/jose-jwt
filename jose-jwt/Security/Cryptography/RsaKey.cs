@@ -20,7 +20,7 @@ namespace Security.Cryptography
             bool pubOnly = (p == null) || (q == null);
 
             byte[] magic = pubOnly ? BCRYPT_RSAPUBLIC_MAGIC : BCRYPT_RSAPRIVATE_MAGIC;
-            byte[] bitLength = BitConverter.GetBytes(modulus.Length*8);
+            byte[] bitLength = BitConverter.GetBytes(modulus.Length * 8);
             byte[] expLength = BitConverter.GetBytes(exponent.Length);
             byte[] modLength = BitConverter.GetBytes(modulus.Length);
             byte[] prime1Length = pubOnly ? BitConverter.GetBytes(0x00000000) : BitConverter.GetBytes(p.Length);

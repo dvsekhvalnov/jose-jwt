@@ -57,5 +57,60 @@ namespace UnitTests
                 Console.WriteLine(e);
             }
         }
+
+        [Test]
+        [ExpectedException(typeof(Jose.IntegrityException))]
+        public void BitLengthIntegerOverflow()
+        {
+            //Borrowed test case from https://bitbucket.org/b_c/jose4j/commits/b79e67c13c23
+
+            byte[] cek =
+            {
+                57, 188, 52, 101, 199, 208, 135, 76, 159, 67, 65, 71, 196, 136, 137, 113, 227, 232, 28, 1, 61,
+                157, 73, 156, 68, 103, 67, 250, 215, 162, 181, 161
+            };
+
+            AesCbcHmacEncryption enc = new AesCbcHmacEncryption(new HmacUsingSha("SHA256"), 256);
+
+            byte[] aad = new byte[8];
+            byte[] plaintext = new byte[536870928];
+
+            //random plaintext
+            for (int i = 0; i < plaintext.Length; i = i + 8)
+            {                
+                byte[] bytes = Arrays.IntToBytes(i);
+                plaintext[i] = bytes[0];
+                plaintext[i + 1] = bytes[1];
+                plaintext[i + 2] = bytes[2];
+                plaintext[i + 3] = bytes[3];
+            }
+
+            var parts = enc.Encrypt(aad, plaintext, cek);
+
+            byte[] iv = parts[0];
+            byte[] ciphertext = parts[1];
+            byte[] authTag = parts[2];
+
+            // Now shift aad and ciphertext around so that HMAC doesn't change,
+            // but the plaintext will change.
+            byte[] buffer = Arrays.Concat(aad, iv, ciphertext);
+
+            int newAadSize = 536870920; // Note that due to integer overflow 536870920 * 8 = 64
+
+            byte[] newAad = new byte[newAadSize];
+            Buffer.BlockCopy(buffer, 0, newAad, 0, newAadSize);
+
+            byte[] newIv = new byte[16];
+            Buffer.BlockCopy(buffer, newAadSize, newIv, 0, 16);
+
+            byte[] newCiphertext = new byte[buffer.Length - newAadSize - 16];
+            Buffer.BlockCopy(buffer, newAadSize + 16, newCiphertext, 0, buffer.Length - newAadSize - 16);
+
+            //decrypt shifted binary, it should fail, since content is different now
+            var test = enc.Decrypt(newAad, cek, newIv, newCiphertext, authTag);
+
+            //if we reach that point HMAC check was bypassed although the decrypted data is different
+            Assert.Fail("JoseException should be raised.");
+        }
     }
 }

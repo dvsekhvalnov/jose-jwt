@@ -26,9 +26,9 @@ namespace Jose
                 throw new ArgumentException(msg);
         }
 
-        public static void BitSize(byte[] array, int expectedSize, string msg, params object[] args)
+        public static void BitSize(byte[] array, long expectedSize, string msg, params object[] args)
         {
-            if(expectedSize!=array.Length * 8)
+            if(expectedSize != array.Length * 8L)
                 throw new ArgumentException(string.Format(msg,args));
         }
 
@@ -50,7 +50,7 @@ namespace Jose
                 throw new ArgumentException(string.Format(msg,args));
         }
 
-        public static void MinValue(int arg, int min, string msg, params object[] args)
+        public static void MinValue(long arg, long min, string msg, params object[] args)
         {
             if(arg < min)
                 throw new ArgumentException(string.Format(msg,args));
@@ -62,9 +62,9 @@ namespace Jose
                 throw new ArgumentException(string.Format(msg,args));
         }
 
-        public static void MinBitSize(byte[] arr, int minBitSize, string msg, params object[] args)
+        public static void MinBitSize(byte[] arr, long minBitSize, string msg, params object[] args)
         {
-            MinValue(arr.Length * 8, minBitSize, msg, args);
+            MinValue(arr.Length * 8L, minBitSize, msg, args);
         }
 
         public static void Contains(IDictionary<string, object> dict, string[] keys, string msg, params  object[] args)

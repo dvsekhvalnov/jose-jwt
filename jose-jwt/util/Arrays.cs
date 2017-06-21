@@ -12,11 +12,6 @@ namespace Jose
 
         private static RandomNumberGenerator rng;
 
-        public static byte[] SixtyFourBitLength(byte[] aad)
-        {
-            return LongToBytes(aad.Length * 8);
-        }
-
         public static byte[] FirstHalf(byte[] arr)
         {
             Ensure.Divisible(arr.Length, 2, "Arrays.FirstHalf() expects even number of element in array.");

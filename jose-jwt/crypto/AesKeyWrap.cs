@@ -10,8 +10,8 @@ namespace Jose
 
         public static byte[] Wrap(byte[] cek, byte[] kek)
         {
-            Ensure.MinBitSize(cek, 128, "AesKeyWrap.Wrap() expects content length not less than 128 bits, but was {0}", cek.Length * 8);
-            Ensure.Divisible(cek.Length, 8, "AesKeyWrap.Wrap() expects content length to be divisable by 8, but was given a content of {0} bit size.", cek.Length * 8);
+            Ensure.MinBitSize(cek, 128, "AesKeyWrap.Wrap() expects content length not less than 128 bits, but was {0}", cek.Length * 8L);
+            Ensure.Divisible(cek.Length, 8, "AesKeyWrap.Wrap() expects content length to be divisable by 8, but was given a content of {0} bit size.", cek.Length * 8L);
 
             // 1) Initialize variables
             byte[] a = DefaultIV;                       // Set A = IV, an initial value
@@ -43,8 +43,8 @@ namespace Jose
 
         public static byte[] Unwrap(byte[] encryptedCek, byte[] kek)
         {
-            Ensure.MinBitSize(encryptedCek, 128, "AesKeyWrap.Unwrap() expects content length not less than 128 bits, but was {0}", encryptedCek.Length * 8);
-            Ensure.Divisible(encryptedCek.Length, 8, "AesKeyWrap.Unwrap() expects content length to be divisable by 8, but was given a content of {0} bit size.", encryptedCek.Length * 8);
+            Ensure.MinBitSize(encryptedCek, 128, "AesKeyWrap.Unwrap() expects content length not less than 128 bits, but was {0}", encryptedCek.Length * 8L);
+            Ensure.Divisible(encryptedCek.Length, 8, "AesKeyWrap.Unwrap() expects content length to be divisable by 8, but was given a content of {0} bit size.", encryptedCek.Length * 8L);
 
             // 1) Initialize variables
             byte[][] c = Arrays.Slice(encryptedCek, 8);

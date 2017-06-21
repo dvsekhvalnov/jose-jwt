@@ -1,3 +1,4 @@
+using System;
 using Jose;
 using NUnit.Framework;
 
