@@ -701,7 +701,7 @@ When you dealing with `RSACryptoServiceProvider` you can face `Invalid algorithm
 1. re-import RSAParameters:
 
   ```C#
-  public static FixCSP PrivKey(RSACryptoServiceProvider key)
+  public static RSACryptoServiceProvider FixCSP(RSACryptoServiceProvider key)
   {
       var privKey = key.PrivateKey;
 
@@ -716,13 +716,13 @@ When you dealing with `RSACryptoServiceProvider` you can face `Invalid algorithm
 
 1. Enforce correct CSP:
   ```C#
-  public static FixCSP PrivKey(RSACryptoServiceProvider key)
+  public static RSACryptoServiceProvider FixCSP(RSACryptoServiceProvider key)
   {
-    var privKey = key.PrivateKey;
-    var enhCsp = new RSACryptoServiceProvider().CspKeyContainerInfo;
-    var cspParams = new CspParameters(enhCsp.ProviderType, enhCsp.ProviderName, privKey.CspKeyContainerInfo.KeyContainerName);
+      var privKey = key.PrivateKey;
+      var enhCsp = new RSACryptoServiceProvider().CspKeyContainerInfo;
+      var cspParams = new CspParameters(enhCsp.ProviderType, enhCsp.ProviderName, privKey.CspKeyContainerInfo.KeyContainerName);
 
-    return new RSACryptoServiceProvider(cspParams);
+      return new RSACryptoServiceProvider(cspParams);
   }
   ```
 
