@@ -1,5 +1,5 @@
 {
-  "version": "2.3.0-*",
+  "version": "2.4.0-*",
   "title": "Jose JWT",
   "authors": [ "Dmitry Vsekhvalnov" ],
   "owners": [ "Dmitry Vsekhvalnov" ],
@@ -9,7 +9,7 @@
   "language": "en-US",
   "copyright": "Copyright dvsekhvalnov 2014-2017",
   "requireLicenseAcceptance": false,
-  "releaseNotes": "SDK Enhancements, ability to provide custom algorithm implementations for better cloud KMS integrations.",
+  "releaseNotes": "Security improvements. SDK Enhancements, ability to specifiy alg aliases for better interop.",
   "summary": "Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET Core. Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms. Library for generating, decoding and encryption of JSON Web Tokens.",
   "description": "Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET \r\r
 
