@@ -501,6 +501,29 @@ var key = FindKeyByIssuer(jwt.Iss);
 var payload = Jose.JWT.Decode<JwtToken>(token, key);
 ```
 
+```C#
+// Validate token with a public RSA key published by the IDP as a list of JSON Web Keys (JWK)
+// step 0: you've read the keys from the jwks_uri URL found in http://<IDP authority URL>/.well-known/openid-configuration endpoint
+Dictionary<string, ServiceStack.Text.JsonObject> keys = GetKeysFromIdp();
+
+// step 1a: get headers info
+var headers = Jose.JWT.Headers(token);
+
+// step 1b: lookup validation key based on header info
+var jwk = keys[headers["keyid"]];
+
+// step 1c: load the JWK data into an RSA key
+RSACryptoServiceProvider key = new RSACryptoServiceProvider();
+key.ImportParameters(new RSAParameters
+{
+    Modulus = Base64Url.Decode(jwk["n"]),
+    Exponent = Base64Url.Decode(jwk["e"])
+});
+
+// step 2: perform actual token validation
+var paylod = Jose.JWT.Decode(token, key);
+```
+
 ### Strict validation
 It is possible to use strict validation before decoding a token. This means that you will specify which algorithm and possibly encryption type you are expecting to receive in the header. If the received header doesn't match with the types that you have specified an exception will be thrown and the parsing will be stopped.
 
