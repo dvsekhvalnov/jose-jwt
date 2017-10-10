@@ -27,7 +27,7 @@ namespace Jose
                 return pkcs1.CreateSignature(sha.ComputeHash(securedInput));                    
             }
 
-#elif NETSTANDARD1_4 || NET461
+#elif NETSTANDARD1_4 || NET461 || NETSTANDARD2_0
             var privateKey = Ensure.Type<RSA>(key, "RsaUsingSha alg expects key to be of RSA type.");   
                          
             return privateKey.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pkcs1);
@@ -47,7 +47,7 @@ namespace Jose
 
                 return pkcs1.VerifySignature(hash, signature);
             }
-#elif NETSTANDARD1_4 || NET461
+#elif NETSTANDARD1_4 || NET461 || NETSTANDARD2_0
             var publicKey = Ensure.Type<RSA>(key, "RsaUsingSha alg expects key to be of RSA type.");   
                       
             return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pkcs1);
@@ -69,7 +69,7 @@ namespace Jose
         throw new ArgumentException("Unsupported hashing algorithm: '{0}'", hashMethod);
             }
         }
-#elif NETSTANDARD1_4 || NET461
+#elif NETSTANDARD1_4 || NET461 || NETSTANDARD2_0
         private HashAlgorithmName HashAlgorithm
         {
             get
