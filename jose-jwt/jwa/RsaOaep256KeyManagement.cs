@@ -30,7 +30,7 @@ namespace Jose
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey type.");
 
-        #elif NET461
+        #elif NET461 || NETSTANDARD2_0
             if (key is CngKey)
             {
                 var publicKey = (CngKey) key;
@@ -87,7 +87,7 @@ namespace Jose
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey type.");
 
-         #elif NET461
+         #elif NET461 || NETSTANDARD2_0
             if (key is CngKey)
             {
                 var privateKey = (CngKey) key;
