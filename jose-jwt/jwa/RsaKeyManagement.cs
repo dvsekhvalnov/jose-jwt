@@ -22,7 +22,7 @@ namespace Jose
             var publicKey = Ensure.Type<RSACryptoServiceProvider>(key, "RsaKeyManagement alg expects key to be of RSACryptoServiceProvider type.");
 
             return new[] { cek, publicKey.Encrypt(cek, useRsaOaepPadding) };
-#elif NET461
+#elif NET461 || NETSTANDARD2_0
             if (key is CngKey)
             {
                 var publicKey = new RSACng((CngKey) key);
@@ -68,7 +68,7 @@ namespace Jose
             var privateKey = Ensure.Type<RSACryptoServiceProvider>(key, "RsaKeyManagement alg expects key to be of RSACryptoServiceProvider type.");
 
             return privateKey.Decrypt(encryptedCek, useRsaOaepPadding);
-#elif NET461
+#elif NET461 || NETSTANDARD2_0
             if (key is CngKey)
             {
                 var privateKey = new RSACng((CngKey)key);
