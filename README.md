@@ -305,7 +305,7 @@ var payload = new Dictionary<string, object>()
     { "exp", 1300819380 }
 };  	
 
-string token = Jose.JWT.Encode(payload, "top secret", JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
+string token = Jose.JWT.Encode(payload, "top secret", JweAlgorithm.PBES2_HS256_A128KW, JweEncryption.A256CBC_HS512);
 ```
 
 #### Optional compressing payload before encrypting
