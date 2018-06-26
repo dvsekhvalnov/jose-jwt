@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
-using Security.Cryptography;
+using Jose.Security.Cryptography;
 
 namespace Jose
 {

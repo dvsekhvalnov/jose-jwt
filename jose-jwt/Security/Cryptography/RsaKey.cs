@@ -1,8 +1,7 @@
 using System;
 using System.Security.Cryptography;
-using Jose;
 
-namespace Security.Cryptography
+namespace Jose.Security.Cryptography
 {
     public class RsaKey
     {
