@@ -128,7 +128,7 @@ namespace Security.Cryptography
 
         public static EccKey Generate(CngKey recieverPubKey)
         {
-            CngKey cngKey = CngKey.Create(recieverPubKey.Algorithm, null, new CngKeyCreationParameters { ExportPolicy = CngExportPolicies.AllowPlaintextExport });
+            CngKey cngKey = CngKey.Create(receiverPubKey.Algorithm, null, new CngKeyCreationParameters { ExportPolicy = CngExportPolicies.AllowPlaintextExport });
 
             return new EccKey {key = cngKey};
         }
