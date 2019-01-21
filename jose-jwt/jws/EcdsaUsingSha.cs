@@ -63,7 +63,7 @@ namespace Jose
                     return CngAlgorithm.Sha256;
                 if (keySize == 384)
                     return CngAlgorithm.Sha384;
-                if (keySize == 521)
+                if (keySize == 512)
                     return CngAlgorithm.Sha512;
 
                 throw new ArgumentException(string.Format("Unsupported key size: '{0} bytes'", keySize));
