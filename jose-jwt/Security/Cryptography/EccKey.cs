@@ -126,9 +126,9 @@ namespace Security.Cryptography
             return CngKey.Import(blob, blobType);
         }
 
-        public static EccKey Generate(CngKey recieverPubKey)
+        public static EccKey Generate(CngKey receiverPubKey)
         {
-            CngKey cngKey = CngKey.Create(recieverPubKey.Algorithm, null, new CngKeyCreationParameters { ExportPolicy = CngExportPolicies.AllowPlaintextExport });
+            CngKey cngKey = CngKey.Create(receiverPubKey.Algorithm, null, new CngKeyCreationParameters { ExportPolicy = CngExportPolicies.AllowPlaintextExport });
 
             return new EccKey {key = cngKey};
         }
