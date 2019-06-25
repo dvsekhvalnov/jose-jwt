@@ -2300,6 +2300,17 @@ namespace UnitTests
         }
 
         [Fact]
+        public void PayloadFailure()
+        {
+            //given
+            string token = "null";
+
+            //then
+            var exception = Assert.Throws<JoseException>(() => Jose.JWT.Payload(token));
+            Assert.Equal("The given token doesn't follow JWT format and must contains at least three parts.", exception.Message);
+        }
+
+        [Fact]
         public void PayloadOfEncryptedTOken()
         {
             //given
