@@ -21,6 +21,9 @@ namespace Jose
 
         public static byte[][] Parse(string token)
         {
+            if (token == null)
+                throw new ArgumentNullException(nameof(token));
+
             string[] parts = token.Split('.');
 
             var result = new byte[parts.Length][];
