@@ -501,8 +501,14 @@ namespace Jose
                 byte[] header = parts[0];
                 byte[] payload = parts[1];
                 byte[] signature = parts[2];
+                string[] jwtSections = token.Split('.');
 
-                byte[] securedInput = Encoding.UTF8.GetBytes(Compact.Serialize(header, payload));
+                StringBuilder originalToken = new StringBuilder();
+                originalToken.Append(jwtSections[0]);
+                originalToken.Append(".");
+                originalToken.Append(jwtSections[1]);
+
+                byte[] securedInput = Encoding.UTF8.GetBytes(originalToken.ToString());
 
                 var jwtSettings = GetSettings(settings);
 
