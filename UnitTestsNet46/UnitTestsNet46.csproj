@@ -65,6 +65,7 @@
     <Compile Include="Base64UrlTest.cs" />
     <Compile Include="CompactTest.cs" />
     <Compile Include="ConcatKDFTest.cs" />
+    <Compile Include="DetachedPayloadTest.cs" />
     <Compile Include="DictionariesTest.cs" />
     <Compile Include="SecurityVulnerabilitiesTest.cs" />
     <Compile Include="SettingsTest.cs" />

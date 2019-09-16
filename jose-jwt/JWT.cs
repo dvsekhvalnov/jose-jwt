@@ -111,6 +111,7 @@ namespace Jose
             return GetSettings(settings).JsonMapper.Parse<T>(Encoding.UTF8.GetString(parts[0]));
         }
 
+
         /// <summary>
         /// Parses signed JWT token, extracts and returns payload part as string 
         /// This method is NOT supported for encrypted JWT tokens.
@@ -137,6 +138,8 @@ namespace Jose
         /// <exception cref="JoseException">if encrypted JWT token is provided</exception>        
         public static byte[] PayloadBytes(string token, JwtSettings settings = null)
         {
+            if (token == null)
+                throw new ArgumentNullException(nameof(token));
             byte[][] parts = Compact.Parse(token);
 
             if (parts.Length < 3)
@@ -311,11 +314,32 @@ namespace Jose
 
 
             var jwtHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwsHeaderValue(algorithm) } };
+            bool b64EncodePayload = true;
 
+            if (extraHeaders.ContainsKey("b64"))
+            {
+                var b64Header = extraHeaders["b64"];
+                if (b64Header != null && b64Header is bool)
+                {
+                    b64EncodePayload = (bool)b64Header;
+                }
+            }
             Dictionaries.Append(jwtHeader, extraHeaders);
             byte[] headerBytes = Encoding.UTF8.GetBytes(jwtSettings.JsonMapper.Serialize(jwtHeader));
 
-            var bytesToSign = Encoding.UTF8.GetBytes(Compact.Serialize(headerBytes, payload));
+
+            byte[] bytesToSign;
+            if (b64EncodePayload)
+            {
+                bytesToSign = Encoding.UTF8.GetBytes(Compact.Serialize(headerBytes, payload));
+            }
+            else
+            {
+                var tmpBytes = Encoding.UTF8.GetBytes(Compact.Serialize(headerBytes) + ".");
+                bytesToSign = new byte[tmpBytes.Length + payload.Length];
+                System.Buffer.BlockCopy(tmpBytes, 0, bytesToSign, 0, tmpBytes.Length);
+                System.Buffer.BlockCopy(payload, 0, bytesToSign, tmpBytes.Length, payload.Length);
+            }
 
             var jwsAlgorithm = jwtSettings.Jws(algorithm);
 
@@ -326,7 +350,15 @@ namespace Jose
 
             byte[] signature = jwsAlgorithm.Sign(bytesToSign, key);
 
-            return Compact.Serialize(headerBytes, payload, signature);
+            if (b64EncodePayload)
+            {
+                return Compact.Serialize(headerBytes, payload, signature);
+            }
+            else
+            {
+                return Base64Url.Encode(headerBytes) + ".." + Base64Url.Encode(signature);
+            }
+            
         }
 
         /// <summary>
@@ -484,26 +516,80 @@ namespace Jose
         {
             return GetSettings(settings).JsonMapper.Parse<T>(Decode(token, key, settings));
         }
+        public static IDictionary<string, object> Headers(byte[] headerBytes, JwtSettings settings = null)
+        {
+            return GetSettings(settings).JsonMapper.Parse<IDictionary<string, object>>(Encoding.UTF8.GetString(headerBytes));
+        }
 
+        private static bool GetBase64DecodeFlag(byte[] headerBytes, JwtSettings settings = null)
+        {
+            bool result = true;
+            var headers = Headers(headerBytes, settings);
+            if (headers.ContainsKey("b64"))
+            {
+                var b64Header = headers["b64"];
+                if (b64Header != null && b64Header is bool)
+                {
+                    result = (bool)b64Header;
+                }
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Decode detached payload JWS
+        /// </summary>
+        /// <param name="token">JWS token with empty payload</param>
+        /// <param name="payload">Raw payload to attach to the JWS to validate signature.</param>        
+        /// <param name="key">Key for decoding suitable for JWT algorithm used, can be null.</param>
+        /// <param name="settings">Optional settings to override global DefaultSettings</param>
+        /// <returns></returns>
+        public static string DecodeDetached(string token, byte[] payload, object key = null, JwtSettings settings = null)
+        {
+            Ensure.IsNotEmpty(token, "Incoming token expected to be in compact serialization form, not empty, whitespace or null.");
+            if (token.IndexOf("..") < 0)
+                throw new ArgumentException("JWS token must not include payload", nameof(token));
+            token = token.Replace("..", "." + Base64Url.Encode(payload) + ".");
+            return Decode(token, key, null, null, null, settings);
+        }
         private static byte[] DecodeBytes(string token, object key = null, JwsAlgorithm? expectedJwsAlg = null, JweAlgorithm? expectedJweAlg = null, JweEncryption? expectedJweEnc = null, JwtSettings settings = null)
         {
             Ensure.IsNotEmpty(token, "Incoming token expected to be in compact serialization form, not empty, whitespace or null.");
 
-            byte[][] parts = Compact.Parse(token);
+            if (token == null)
+                throw new ArgumentNullException(nameof(token));
 
-            if (parts.Length == 5) //encrypted JWT
+            string[] stringParts = token.Split('.');
+
+            if (stringParts.Length == 5) //encrypted JWT
             {
+                byte[][] parts = Compact.Parse(token);
                 return DecryptBytes(parts, key, expectedJweAlg, expectedJweEnc, settings);
             }
             else
             {
                 //signed or plain JWT
-                byte[] header = parts[0];
-                byte[] payload = parts[1];
-                byte[] signature = parts[2];
-
-                byte[] securedInput = Encoding.UTF8.GetBytes(Compact.Serialize(header, payload));
-
+                byte[] header = Base64Url.Decode(stringParts[0]);
+                byte[] payload;
+                byte[] signature = Base64Url.Decode(stringParts[2]);
+                bool base64DecodePayload = GetBase64DecodeFlag(header);
+              
+                //Always base 64 decode paylod, even in b64=false detached since we have already attached the payload and encoded it
+                payload = Base64Url.Decode(stringParts[1]);
+              
+                byte[] securedInput;
+                if (base64DecodePayload)
+                {
+                    securedInput = Encoding.UTF8.GetBytes(Compact.Serialize(header, payload));
+                }
+                else
+                {
+                    var tmpBytes = Encoding.UTF8.GetBytes(Compact.Serialize(header) + ".");
+                    securedInput = new byte[tmpBytes.Length + payload.Length];
+                    System.Buffer.BlockCopy(tmpBytes, 0, securedInput, 0, tmpBytes.Length);
+                    System.Buffer.BlockCopy(payload, 0, securedInput, tmpBytes.Length, payload.Length);
+                }
+                
                 var jwtSettings = GetSettings(settings);
 
                 var headerData = jwtSettings.JsonMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(header));
