@@ -1,6 +1,5 @@
 {
-  "locked": false,
-  "version": 2,
+  "version": 3,
   "targets": {
     ".NETFramework,Version=v4.6.1": {},
     ".NETFramework,Version=v4.6.1/win": {}
@@ -10,6 +9,34 @@
     "": [],
     ".NETFramework,Version=v4.6.1": []
   },
-  "tools": {},
-  "projectFileToolGroups": {}
+  "packageFolders": {
+    "C:\\Users\\chris\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "restore": {
+      "projectUniqueName": "D:\\Projects\\myjose-jwt\\jose-jwt\\jose-jwt\\jose-jwt.net46.csproj",
+      "projectName": "jose-jwt.net46",
+      "projectPath": "D:\\Projects\\myjose-jwt\\jose-jwt\\jose-jwt\\jose-jwt.net46.csproj",
+      "projectJsonPath": "D:\\Projects\\myjose-jwt\\jose-jwt\\jose-jwt\\jose-jwt.net46.project.json",
+      "packagesPath": "C:\\Users\\chris\\.nuget\\packages\\",
+      "outputPath": "D:\\Projects\\myjose-jwt\\jose-jwt\\jose-jwt\\obj\\",
+      "projectStyle": "ProjectJson",
+      "configFilePaths": [
+        "C:\\Users\\chris\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "sources": {
+        "D:\\Projects\\Finapivity.PG\\localnuget": {},
+        "https://api.nuget.org/v3/index.json": {}
+      }
+    },
+    "frameworks": {
+      "net461": {}
+    },
+    "runtimes": {
+      "win": {
+        "#import": []
+      }
+    }
+  }
 }
