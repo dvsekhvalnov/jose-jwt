@@ -7,11 +7,29 @@ using System.Text;
 using Jose;
 using Security.Cryptography;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace UnitTests
 {
     public class TestSuite
     {
+        private class console
+        {
+            private readonly ITestOutputHelper output;
+
+            public console(ITestOutputHelper output)
+            {
+                this.output = output;
+            }
+
+            public ITestOutputHelper Out
+            {
+                get { return output; }
+            } 
+        }
+
+        private console Console;
+
         private string key = "a0a2abd8-6162-41c3-83d6-1cf559b46afc";
         private byte[] aes128Key = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
         private byte[] aes192Key = new byte[] { 139, 156, 136, 148, 17, 147, 27, 233, 145, 80, 115, 197, 223, 11, 100, 221, 5, 50, 155, 226, 136, 222, 216, 14 };
@@ -21,6 +39,11 @@ namespace UnitTests
 
         // The binary payload is a blob consisting of all possible byte values.
         private byte[] BinaryPayload = Enumerable.Range(byte.MinValue, byte.MaxValue + 1).Select(i => (byte)i).ToArray();
+
+        public TestSuite(ITestOutputHelper output)
+        {
+            this.Console = new console(output);
+        }
 
         [Fact]
         public void DecodePlaintext()
@@ -2573,7 +2596,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void PayloadOfEncryptedTOken()
+        public void PayloadOfEncryptedToken()
         {
             //given
             string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0..ZD93XtD7TOa2WMbqSuaY9g.1J5BAuxNRMWaw43s7hR82gqLiaZOHBmfD3_B9k4I2VIDKzS9oEF_NS2o7UIBa6t_fWHU7vDm9lNAN4rqq7OvtCBHJpFk31dcruQHxwYKn5xNefG7YP-o6QtpyNioNWJpaSD5VRcRO5ufRrw2bu4_nOth00yJU5jjN3O3n9f-0ewrN2UXDJIbZM-NiSuEDEgOVHImQXoOtOQd0BuaDx6xTJydw_rW5-_wtiOH2k-3YGlibfOWNu51kApGarRsAhhqKIPetYf5Mgmpv1bkUo6HJw.nVpOmg3Sxri0rh6nQXaIx5X0fBtCt7Kscg6c66NugHY";
@@ -2586,9 +2609,62 @@ namespace UnitTests
             }
             catch (JoseException e)
             {
-                Console.WriteLine(e);
+                Console.Out.WriteLine(e.ToString());
             }
         }
+
+        [Fact]
+        public void EncodeWithDetachedContent()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256, options: new JwtOptions { DetachPayload = true });
+
+            //then
+            Console.Out.WriteLine("HS256 Detached = {0}", token);
+
+            Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..VleAUqv_-nc6dwZ9xQ8-4NiOpVRdSSrCCPCQl-7HQ2k");
+           //TODO: Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), json);
+        }
+
+
+        [Fact]
+        public void EncodeWithUnencodedPayload()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256, options: new JwtOptions { EncodePayload = false });
+
+            //then
+            Console.Out.WriteLine("HS256 Unencoded = {0}", token);
+
+            Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il0sInR5cCI6IkpXVCJ9.{\"hello\": \"world\"}.ueGnzTJermvKhFYga7Pc7W_6fXhBKHklIIJeTnMrp9M");
+           //TODO: Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), json);
+        }
+
+        [Fact]
+        public void EncodeWithUnencodedAndDetachedContent()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256, options: new JwtOptions { DetachPayload = true, EncodePayload = false});
+
+            //then
+            Console.Out.WriteLine("HS256 Unencoded & Detached = {0}", token);
+
+            Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il0sInR5cCI6IkpXVCJ9..ueGnzTJermvKhFYga7Pc7W_6fXhBKHklIIJeTnMrp9M");
+            //TODO: Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), json);
+        }
+
+
+
+
 
         [Fact]
         public void DecodeSignedTokenValidationSuccess()

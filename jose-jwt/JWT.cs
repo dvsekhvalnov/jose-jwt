@@ -265,10 +265,11 @@ namespace Jose
         /// <param name="algorithm">JWT algorithm to be used.</param>
         /// <param name="extraHeaders">optional extra headers to pass along with the payload.</param>
         /// <param name="settings">optional settings to override global DefaultSettings</param>
+        /// <param name="options">additional encoding options</param>
         /// <returns>JWT in compact serialization form, digitally signed.</returns>
-        public static string Encode(object payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
+        public static string Encode(object payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null, JwtOptions options = null)
         {
-            return Encode(GetSettings(settings).JsonMapper.Serialize(payload), key, algorithm, extraHeaders, settings);
+            return Encode(GetSettings(settings).JsonMapper.Serialize(payload), key, algorithm, extraHeaders, settings, options);
         }
 
         /// <summary>
@@ -279,14 +280,15 @@ namespace Jose
         /// <param name="algorithm">JWT algorithm to be used.</param>
         /// <param name="extraHeaders">optional extra headers to pass along with the payload.</param>
         /// <param name="settings">optional settings to override global DefaultSettings</param>
+        /// <param name="options">additional encoding options</param>
         /// <returns>JWT in compact serialization form, digitally signed.</returns>
-        public static string Encode(string payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
+        public static string Encode(string payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null, JwtOptions options = null)
         {
             Ensure.IsNotEmpty(payload, "Payload expected to be not empty, whitespace or null.");
 
             byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);
 
-            return EncodeBytes(payloadBytes, key, algorithm, extraHeaders, settings);
+            return EncodeBytes(payloadBytes, key, algorithm, extraHeaders, settings, options);
         }
 
         /// <summary>
@@ -297,25 +299,32 @@ namespace Jose
         /// <param name="algorithm">JWT algorithm to be used.</param>
         /// <param name="extraHeaders">optional extra headers to pass along with the payload.</param>
         /// <param name="settings">optional settings to override global DefaultSettings</param>
+        /// <param name="options">additional encoding options</param>
         /// <returns>JWT in compact serialization form, digitally signed.</returns>
-        public static string EncodeBytes(byte[] payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
+        public static string EncodeBytes(byte[] payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null, JwtOptions options=null)
         {
             if (payload == null)
                 throw new ArgumentNullException(nameof(payload));
 
-            if (extraHeaders == null) //allow overload, but keep backward compatible defaults
-            {
-                extraHeaders = new Dictionary<string, object> { { "typ", "JWT" } };
-            }
             var jwtSettings = GetSettings(settings);
-
+            var jwtOptions = options ?? JwtOptions.Default;
 
             var jwtHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwsHeaderValue(algorithm) } };
 
+            if (extraHeaders == null) //allow overload, but keep backward compatible defaults
+            {
+                extraHeaders = new Dictionary<string, object> { { "typ", "JWT" } };                
+            }
+
+
+            if (!jwtOptions.EncodePayload)
+            {
+                jwtHeader["b64"] = false;
+                jwtHeader["crit"] = new[] { "b64" };
+            }
+
             Dictionaries.Append(jwtHeader, extraHeaders);
             byte[] headerBytes = Encoding.UTF8.GetBytes(jwtSettings.JsonMapper.Serialize(jwtHeader));
-
-            var bytesToSign = Encoding.UTF8.GetBytes(Compact.Serialize(headerBytes, payload));
 
             var jwsAlgorithm = jwtSettings.Jws(algorithm);
 
@@ -324,9 +333,15 @@ namespace Jose
                 throw new JoseException(string.Format("Unsupported JWS algorithm requested: {0}", algorithm));
             }
 
-            byte[] signature = jwsAlgorithm.Sign(bytesToSign, key);
+            byte[] signature = jwsAlgorithm.Sign(securedInput(headerBytes, payload, jwtOptions.EncodePayload), key);
+            
+            
+            byte[] payloadBytes = jwtOptions.DetachPayload ? new byte[0] : payload;
 
-            return Compact.Serialize(headerBytes, payload, signature);
+
+            return jwtOptions.EncodePayload
+                ? Compact.Serialize(headerBytes, payloadBytes, signature)
+                : Compact.Serialize(headerBytes, Encoding.UTF8.GetString(payloadBytes), signature);
         }
 
         /// <summary>
@@ -502,6 +517,7 @@ namespace Jose
                 byte[] payload = parts[1];
                 byte[] signature = parts[2];
 
+                // TODO: b64 support
                 byte[] securedInput = Encoding.UTF8.GetBytes(Compact.Serialize(header, payload));
 
                 var jwtSettings = GetSettings(settings);
@@ -592,6 +608,15 @@ namespace Jose
         private static JwtSettings GetSettings(JwtSettings settings)
         {
             return settings ?? defaultSettings;
+        }
+
+        private static byte[] securedInput(byte[] header, byte[] payload, bool b64)
+        {
+            return b64
+                ? Encoding.UTF8.GetBytes(Compact.Serialize(header, payload))
+                : Arrays.Concat(Encoding.UTF8.GetBytes(Compact.Serialize(header)), 
+                                Encoding.UTF8.GetBytes("."), 
+                                payload);
         }
     }
 

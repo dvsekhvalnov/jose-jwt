@@ -19,6 +19,24 @@ namespace Jose
             return builder.ToString();
         }
 
+        public static string Serialize(byte[] header, string payload, params byte[][]other)
+        {
+            var builder=new StringBuilder()            
+                .Append(Base64Url.Encode(header))
+                .Append(".")
+                .Append(payload)
+                .Append(".");            
+
+            foreach (var part in other)
+            {
+                builder.Append(Base64Url.Encode(part)).Append(".");
+            }
+
+            builder.Remove(builder.Length - 1,1);
+
+            return builder.ToString();
+        }
+
         public static byte[][] Parse(string token)
         {
             if (token == null)
