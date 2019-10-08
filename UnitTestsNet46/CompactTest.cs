@@ -98,5 +98,20 @@ namespace UnitTests
             //then
             Assert.Equal(test, "eyJhbGciOiJIUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0..chIoYWrQMA8XL5nFz6oLDJyvgHk2KA4BrFGrKymjC8E");
         }
+
+        [Fact]
+        public void SerializeUnencodedMix()
+        {
+            //when
+            var test = Compact.Serialize(
+                new byte[] { 123, 34, 97, 108, 103, 34, 58, 34, 72, 83, 50, 53, 54, 34, 44, 34, 99, 116, 121, 34, 58, 34, 116, 101, 120, 116, 92, 47, 112, 108, 97, 105, 110, 34, 125 },
+                "not encoded middle part",
+                new byte[] { 114, 18, 40, 97, 106, 208, 48, 15, 23, 47, 153, 197, 207, 170, 11, 12, 156, 175, 128, 121, 54, 40, 14, 1, 172, 81, 171, 43, 41, 163, 11, 193 });
+
+            //then
+            Assert.Equal(test, "eyJhbGciOiJIUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.not encoded middle part.chIoYWrQMA8XL5nFz6oLDJyvgHk2KA4BrFGrKymjC8E");
+        }
+
+
     }
 }
