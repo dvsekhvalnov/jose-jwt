@@ -12,23 +12,8 @@ using Xunit.Abstractions;
 namespace UnitTests
 {
     public class TestSuite
-    {
-        private class console
-        {
-            private readonly ITestOutputHelper output;
-
-            public console(ITestOutputHelper output)
-            {
-                this.output = output;
-            }
-
-            public ITestOutputHelper Out
-            {
-                get { return output; }
-            } 
-        }
-
-        private console Console;
+    {       
+        private TestConsole Console;
 
         private string key = "a0a2abd8-6162-41c3-83d6-1cf559b46afc";
         private byte[] aes128Key = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
@@ -42,7 +27,7 @@ namespace UnitTests
 
         public TestSuite(ITestOutputHelper output)
         {
-            this.Console = new console(output);
+            this.Console = new TestConsole(output);
         }
 
         [Fact]
