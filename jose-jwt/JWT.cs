@@ -106,9 +106,9 @@ namespace Jose
         /// <returns>unmarshalled headers</returns>        
         public static T Headers<T>(string token, JwtSettings settings = null)
         {
-            byte[][] parts = Compact.Parse(token);
+            var parts = Compact.Iterate(token);
 
-            return GetSettings(settings).JsonMapper.Parse<T>(Encoding.UTF8.GetString(parts[0]));
+            return GetSettings(settings).JsonMapper.Parse<T>(Encoding.UTF8.GetString(parts.Next()));
         }
 
         /// <summary>
