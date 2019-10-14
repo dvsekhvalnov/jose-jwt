@@ -84,7 +84,7 @@ namespace Jose
             {
                 if (current < parts.Length)
                 {
-                    string  part =parts[current++];
+                    string  part = parts[current++];
 
                     return decode ? Base64Url.Decode(part) : Encoding.UTF8.GetBytes(part);
                 }

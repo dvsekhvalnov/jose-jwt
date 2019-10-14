@@ -117,12 +117,11 @@ namespace Jose
         /// This method is NOT performing integrity checking. 
         /// </summary>        
         /// <param name="token">signed JWT token</param>
-        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>unmarshalled payload</returns>
         /// <exception cref="JoseException">if encrypted JWT token is provided</exception>        
-        public static string Payload(string token, JwtSettings settings = null)
+        public static string Payload(string token, bool b64 = true)
         {
-            var bytes = PayloadBytes(token, settings);
+            var bytes = PayloadBytes(token, b64);
             return Encoding.UTF8.GetString(bytes);
         }
 
@@ -132,26 +131,26 @@ namespace Jose
         /// This method is NOT performing integrity checking. 
         /// </summary>        
         /// <param name="token">signed JWT token</param>
-        /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>unmarshalled payload</returns>
         /// <exception cref="JoseException">if encrypted JWT token is provided</exception>        
-        public static byte[] PayloadBytes(string token, JwtSettings settings = null)
+        public static byte[] PayloadBytes(string token, bool b64 = true)
         {
-            byte[][] parts = Compact.Parse(token);
+            var parts = Compact.Iterate(token);
 
-            if (parts.Length < 3)
+            if (parts.Count < 3)
             {
                 throw new JoseException(
                     "The given token doesn't follow JWT format and must contains at least three parts.");
             }
 
-            if (parts.Length > 3)
+            if (parts.Count > 3)
             {
                 throw new JoseException(
                     "Getting payload for encrypted tokens is not supported. Please use Jose.JWT.Decode() method instead.");
             }
 
-            return parts[1];
+            parts.Next(false); //skip header
+            return parts.Next(b64);
         }
 
         /// <summary>

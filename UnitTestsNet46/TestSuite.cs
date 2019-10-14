@@ -2581,6 +2581,34 @@ namespace UnitTests
         }
 
         [Fact]
+        public void PayloadBytes()
+        {
+            //given
+            string token =
+                "eyJhbGciOiJIUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.chIoYWrQMA8XL5nFz6oLDJyvgHk2KA4BrFGrKymjC8E";
+
+            //when
+            var test = Jose.JWT.PayloadBytes(token);
+
+            //then
+            Assert.Equal(test, new byte[] { 123, 34, 104, 101, 108, 108, 111, 34, 58, 32, 34, 119, 111, 114, 108, 100, 34, 125 });
+        }
+
+        [Fact]
+        public void PayloadBytesUnencoded()
+        {
+            //given
+            string token =
+                "eyJhbGciOiJIUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.chIoYWrQMA8XL5nFz6oLDJyvgHk2KA4BrFGrKymjC8E";
+
+            //when
+            var test = Jose.JWT.PayloadBytes(token, false);
+
+            //then
+            Assert.Equal(test, new byte[] { 101, 121, 74, 111, 90, 87, 120, 115, 98, 121, 73, 54, 73, 67, 74, 51, 98, 51, 74, 115, 90, 67, 74, 57 });
+        }
+
+        [Fact]
         public void PayloadOfEncryptedToken()
         {
             //given
