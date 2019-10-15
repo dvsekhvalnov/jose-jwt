@@ -2348,15 +2348,27 @@ namespace UnitTests
         {
             //given
             string token =
-                "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.AQIDBAMCAQ.n-yEkyHXbqD87wxayy0raX_hK1csnVT5qnBOXrabz2olndAH2nZf1W-w7xejFcqofZI4MwhUToWtME0AltD8yUZ5hO1hK4TDHe13Z8tdJ5LiNVZuIoUjJgn2eJ8NyuRSZgMf-_q9PnMmU-7r6W6sFdP7TfcBKC2AE6J5jfYGc8_KWrJNGvivR0e6M8aEJB75pkKceYFmT2rBD6OJtK1NWzkVB2QObOx95rQLpS8tBmiNbz48QQTNAsCZ47zwswy4v0LEnBOHlvVKyjRAnWfjPENr0yRJcpQ1hFgHoU3-afAI47A4P53oMo4tJ6pBfJ1_uNdOlZu-dDFe8UzzH3p9Ig";
+                "eyJhbGciOiJIUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.chIoYWrQMA8XL5nFz6oLDJyvgHk2KA4BrFGrKymjC8E";
 
             //when
             var test = Jose.JWT.PayloadBytes(token);
 
-            Console.Out.WriteLine("PayloadBytes = {0}", BitConverter.ToString(test));
+            //then
+            Assert.That(test, Is.EqualTo(new byte[] { 123, 34, 104, 101, 108, 108, 111, 34, 58, 32, 34, 119, 111, 114, 108, 100, 34, 125 }));
+        }
+
+        [Test]
+        public void PayloadBytesUnencoded()
+        {
+            //given
+            string token =
+                "eyJhbGciOiJIUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.chIoYWrQMA8XL5nFz6oLDJyvgHk2KA4BrFGrKymjC8E";
+
+            //when
+            var test = Jose.JWT.PayloadBytes(token, false);
 
             //then
-            Assert.That(test, Is.EquivalentTo(new byte[] { 1, 2, 3, 4, 3, 2, 1 }));
+            Assert.That(test, Is.EqualTo(new byte[] { 101, 121, 74, 111, 90, 87, 120, 115, 98, 121, 73, 54, 73, 67, 74, 51, 98, 51, 74, 115, 90, 67, 74, 57 }));
         }
 
         [Test]        
