@@ -63,6 +63,7 @@
     <Compile Include="AesKeyWrapTest.cs" />
     <Compile Include="ArraysTest.cs" />
     <Compile Include="Base64UrlTest.cs" />
+    <Compile Include="CollectionsTest.cs" />
     <Compile Include="CompactTest.cs" />
     <Compile Include="ConcatKDFTest.cs" />
     <Compile Include="DictionariesTest.cs" />

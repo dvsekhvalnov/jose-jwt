@@ -37,5 +37,17 @@ namespace UnitTests
             Assert.Equal(src["one"], "1");
             Assert.Equal(src["two"], "2");
         }
+
+        [Fact]
+        public void Get()
+        {
+            //given
+            var src = new Dictionary<string, string> { { "one", "1" }, { "two", "2" } };
+
+            //then
+            Assert.Equal(Dictionaries.Get(src, "one"), "1");
+            Assert.Equal(Dictionaries.Get(src, "two"), "2");
+            Assert.Null(Dictionaries.Get(src, "three"));
+        }
     }
 }

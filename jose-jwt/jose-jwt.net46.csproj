@@ -81,6 +81,7 @@
     <Compile Include="Security\Cryptography\RsaKey.cs" />
     <Compile Include="util\Arrays.cs" />
     <Compile Include="util\Base64Url.cs" />
+    <Compile Include="util\Collections.cs" />
     <Compile Include="util\Compact.cs" />
     <Compile Include="util\Dictionaries.cs" />
     <Compile Include="util\Ensure.cs" />

@@ -1,6 +1,7 @@
 using Jose.jwe;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Jose
@@ -319,7 +320,7 @@ namespace Jose
             if (!jwtOptions.EncodePayload)
             {
                 jwtHeader["b64"] = false;
-                jwtHeader["crit"] = new[] { "b64" };
+                jwtHeader["crit"] = Collections.Union(new[] {"b64"}, Dictionaries.Get(extraHeaders, "crit"));
             }
 
             Dictionaries.Append(jwtHeader, extraHeaders);

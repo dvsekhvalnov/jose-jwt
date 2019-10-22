@@ -20,5 +20,16 @@ namespace Jose
                 }
             }
         }
+
+        /// <summary>
+        /// Syntax sugar for IDictionary.TryGetValue() to lookup unknown keys.
+        /// </summary>
+        public static V Get<K, V>(IDictionary<K, V> src, K key)
+        {
+            V value;
+            src.TryGetValue(key, out value);
+
+            return value;
+        }
     }
 }
