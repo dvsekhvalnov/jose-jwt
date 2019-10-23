@@ -2439,6 +2439,38 @@ namespace UnitTests
         }
 
         [Test]
+        public void EncodeWithUnencodedDetachedExtraHeaders()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            var headers = new Dictionary<string, object>
+            {
+                { "exp", 1363284000 },
+                { "crit", new [] {"exp"} },
+            };
+
+            //when
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256,
+                extraHeaders: headers,
+                options: new JwtOptions { DetachPayload = true, EncodePayload = false });
+
+            //then
+            Console.Out.WriteLine("HS256 Unencoded & Detached & Extra headers = {0}", token);
+
+            Assert.That(token, Is.EqualTo("eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0IiwiZXhwIl0sImV4cCI6MTM2MzI4NDAwMH0..9nZCB1H_OMmoTRBe2p5qeq38cyzcjJ6FzUZ9SkeZ4TU"));
+            Assert.That(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key), payload: @"{""hello"": ""world""}"), Is.EqualTo(json));
+            var tokenHeaders = Jose.JWT.Headers(token);
+
+            Assert.That(tokenHeaders.Count(), Is.EqualTo(4));
+            Assert.That(tokenHeaders["alg"], Is.EqualTo("HS256"));
+            Assert.That(tokenHeaders["b64"], Is.False);
+            Assert.That(tokenHeaders["exp"], Is.EqualTo(1363284000));
+            Assert.That(tokenHeaders["crit"], Is.EqualTo(new[] { "b64", "exp" }));
+        }
+
+
+        [Test]
         public void DecodeUnencodedDetached()
         {
             //given
