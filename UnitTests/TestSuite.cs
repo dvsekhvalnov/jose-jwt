@@ -8,6 +8,7 @@ using Jose;
 using Security.Cryptography;
 using Xunit;
 using Jose.jwe;
+using Newtonsoft.Json.Linq;
 
 namespace UnitTests
 {
@@ -2403,6 +2404,35 @@ namespace UnitTests
 
             Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il0sInR5cCI6IkpXVCJ9..ueGnzTJermvKhFYga7Pc7W_6fXhBKHklIIJeTnMrp9M");
             Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key), payload: @"{""hello"": ""world""}"), json);
+        }
+
+        [Fact]
+        public void EncodeWithUnencodedDetachedExtraHeaders()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            var headers = new Dictionary<string, object>
+            {
+                { "exp", 1363284000 },
+                { "crit", new [] {"exp"} },
+            };
+                
+            //when
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256, 
+                extraHeaders: headers,
+                options: new JwtOptions { DetachPayload = true, EncodePayload = false});
+
+            //then
+            Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0IiwiZXhwIl0sImV4cCI6MTM2MzI4NDAwMH0..9nZCB1H_OMmoTRBe2p5qeq38cyzcjJ6FzUZ9SkeZ4TU");
+            Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key), payload: @"{""hello"": ""world""}"), json);
+            var tokenHeaders = Jose.JWT.Headers(token);
+	
+            Assert.Equal(tokenHeaders.Count(), 4);
+            Assert.Equal(tokenHeaders["alg"], "HS256");
+            Assert.Equal(tokenHeaders["b64"], false);
+            Assert.Equal(tokenHeaders["exp"], 1363284000L);
+            Assert.Equal(tokenHeaders["crit"], new JArray(new [] {"b64", "exp"}));
         }
 
         [Fact]
