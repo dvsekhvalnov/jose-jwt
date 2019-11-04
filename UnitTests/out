@@ -1,0 +1,307 @@
+Project jose-jwt (.NETStandard,Version=v1.4) was previously compiled. Skipping compilation.
+Project UnitTests (.NETCoreApp,Version=v1.0) will be compiled because inputs were modified
+Compiling UnitTests for .NETCoreApp,Version=v1.0
+
+Compilation succeeded.
+    4 Warning(s)
+    0 Error(s)
+
+Time elapsed 00:00:02.8849877
+ 
+
+xUnit.net .NET CLI test runner (64-bit .NET Core win7-x64)
+  Discovering: UnitTests
+  Discovered:  UnitTests
+  Starting:    UnitTests
+Internal.Cryptography.CryptoThrowHelper+WindowsCryptographicException: The parameter is incorrect
+   at System.Security.Cryptography.CngKey.Import(Byte[] keyBlob, String curveName, CngKeyBlobFormat format, CngProvider provider)
+   at System.Security.Cryptography.CngKey.Import(Byte[] keyBlob, CngKeyBlobFormat format)
+   at Security.Cryptography.EccKey.New(Byte[] x, Byte[] y, Byte[] d, CngKeyUsages usage)
+   at Jose.EcdhKeyManagement.Unwrap(Byte[] encryptedCek, Object key, Int32 cekSizeBits, IDictionary`2 header)
+   at Jose.EcdhKeyManagementWithAesKeyWrap.Unwrap(Byte[] encryptedCek, Object key, Int32 cekSizeBits, IDictionary`2 header)
+   at Jose.JWT.DecryptBytes(Iterator parts, Object key, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings)
+   at Jose.JWT.DecodeBytes(String token, Object key, Nullable`1 expectedJwsAlg, Nullable`1 expectedJweAlg, Nullable`1 expectedJweEnc, JwtSettings settings, Byte[] payload)
+   at Jose.JWT.Decode(String token, Object key, Nullable`1 jwsAlg, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings, String payload)
+   at Jose.JWT.Decode(String token, Object key, JwtSettings settings, String payload)
+   at UnitTests.SecurityVulnerabilitiesTest.InvalidCurveAttack()
+Internal.Cryptography.CryptoThrowHelper+WindowsCryptographicException: The parameter is incorrect
+   at System.Security.Cryptography.CngKey.Import(Byte[] keyBlob, String curveName, CngKeyBlobFormat format, CngProvider provider)
+   at System.Security.Cryptography.CngKey.Import(Byte[] keyBlob, CngKeyBlobFormat format)
+   at Security.Cryptography.EccKey.New(Byte[] x, Byte[] y, Byte[] d, CngKeyUsages usage)
+   at Jose.EcdhKeyManagement.Unwrap(Byte[] encryptedCek, Object key, Int32 cekSizeBits, IDictionary`2 header)
+   at Jose.EcdhKeyManagementWithAesKeyWrap.Unwrap(Byte[] encryptedCek, Object key, Int32 cekSizeBits, IDictionary`2 header)
+   at Jose.JWT.DecryptBytes(Iterator parts, Object key, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings)
+   at Jose.JWT.DecodeBytes(String token, Object key, Nullable`1 expectedJwsAlg, Nullable`1 expectedJweAlg, Nullable`1 expectedJweEnc, JwtSettings settings, Byte[] payload)
+   at Jose.JWT.Decode(String token, Object key, Nullable`1 jwsAlg, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings, String payload)
+   at Jose.JWT.Decode(String token, Object key, JwtSettings settings, String payload)
+   at UnitTests.SecurityVulnerabilitiesTest.InvalidCurveAttack()
+Jose.IntegrityException: Authentication tag do not match.
+   at Jose.AesCbcHmacEncryption.Decrypt(Byte[] aad, Byte[] cek, Byte[] iv, Byte[] cipherText, Byte[] authTag)
+   at UnitTests.SecurityVulnerabilitiesTest.BitLengthIntegerOverflow()
+json = {"exp":1392963710,"sub":"alice","nbf":1392963110,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"9fa7a38a-28fd-421c-825c-8fab3bbf3fb4","iat":1392963110}
+RSA-OAEP_A256GCM-DEFLATE = eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00iLCJ6aXAiOiJERUYifQ.grMmDnOZfPuZ5BnRvSc7RKG3fPuLCmzUX9CiEtb3UeuJQK9KPEgaK66vbAi9MJ6PSk4MR_yWJ81oeVavJEr0XrhBuKMq5YTMpFpAz34d308xV5SRbVspxhekgF8ZB4T1Nd1-3sBIwEKcioHyN7GSU2OA_g4rif6FM7HKbWSg-Z9q7UfcM1zt6urLDkZ9SssCcjgJZvcDUmr8TPl4So76_jEUlFGA2H2CAabHXQwDNaYywaJ09jEUJ57cX9I1FG5d2aYyqUdOmQ_KOAAn9Mcn0B284aGaDb_Puzfx2K3hmSsbv76azyMkVcaWX_hzZOflJvxDhHRK5U8OeTbyxAVrGw.4Y0qv6tEMChqrru6.FoLySmU-1agEHEcJkMxX2KR7a1-uuM3hls-w3ABXlXARK3pkAoUPcLbna8H5cbzW7GSl_OPfjONb9O_Z5rRFHv7NdZfKTPQQ9hEiA0F_jw24GKdf2FVBtJ9yRaSvn6RXqD7W5Ps-7yvTurke39LunUEDBGvc1XSgYPptY_IPfB90x0nyDFxvf00u2g.Am3xVOITbauh0y4YEczWxw
+Plaintext:eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.
+json = eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2X0FMSUFTIn0.O1GahcMJNBaTEgPeOPzjm-FistaXkzmdZMPB0YkJoI6X1KIc43HJjLH28njXLQ-mGKblEhJwyFar4yfyrV9bzRSxe9K7RNDuG31m83D9yo-A2Mx1FZtvSUwm5yT62Xk0-BuZOq6S3algXvgTQie1MGRuSED-a6xmRj5RcEpop5JdEXnnlwCrn4qZt9jQpT_Ag_URgkNyuBJG878MXjArxU9Ci5WS1a-tcOgCtd33JOiCvniIBQBPFdyoz7vGZi3Y7EGhY-6T6dxyeL-_MMbkl_60HlTPrd6exfZ3c_0ofwSgvua_gAdSEN4inJWxJjH2yXiR0Ylj_lXAq_la3xFAhA.R2kyFSctYUZgIYJrUTWl8Q.LS4PGAa0bE-OyshBxUh5XhFvquKffEsSmEVU_LxSRAQ.hDDEkppjnfWUv_jKUcA6DQ
+json = {"hello":"world"}
+DIR_A128GCM = eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..9YphruEjuXQh-Hpi.zfzm8xrRS4g1Me0z6KMmhB7aFLmUR16CG6lR9JELh5r-oAVH24rOK8DkJ9PxPPgJlh7REfr247tQZ4G3h1T_LrRdrkMrND-Ne5rlEn-K1uMAqHDJ2SK33UB78-O_H3ALRnpqXnB9sGENP3WqXifc-DOFyK0rgzdYm1-qGEjwsnQ3IYiaOgD-gvOYvYHEhMEtu5lI-lNj-yhRTJQsHs9XXOrZX3rr6mP8UcMmTifWraWFHhr7xQ46XAtTT8yKKhSRJ4Jx4Q.xN8YmXuMqzwypBiGlpalgg
+DIR_A128GCM = eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..fMzW-bUDb-BXrr6g.ZfNUV9J3yZdcLIoC8JiW4OzStFxoYlXFcRDdnjvN25CTWSVc3RErSS9UBSNUo7RFQALPel5tNlq7VhKxTSI-b_T0Cc2qXacess2y3VV3XEO86_uAxtfD-jxCFXcSl0rdr8HNzsExeZawXS678OYuQOq62XQYrXecA32r1Zh9lGgsVmxKu9_EOaRsc-2QQzKeknUTM_YVHho-fQgvBdt9Hn8pDlNm0SGa0x_Ge8cx5W6_50A9VmQhCQ9Qvj1n6up_qzUUcw.1OX7kOTLPqfEORHXvtszVg
+json = {"exp":1392548520,"sub":"alice","nbf":1392547920,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"0e659a67-1cd3-438b-8888-217e72951ec9","iat":1392547920}
+json = {"exp":1392548520,"sub":"alice","nbf":1392547920,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"0e659a67-1cd3-438b-8888-217e72951ec9","iat":1392547920}
+Plaintext:eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.
+json = {"exp":1392994388,"sub":"alice","nbf":1392993788,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"81b338eb-346e-4b04-a618-d3cbb2d64ec6","iat":1392993788}
+RSA1_5_A192GCM = eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTkyR0NNIn0.JAckZNmtzf21UjWfFFduOEUYHlzZSHioGx9YE6weQk4B53AKYkmzB6T7_F1us4fXEOi5i6yixD19FY6QmB9Vk_dybdegDT3-5KZjhKYVeo1uOlb8IDBnvcn2q4sO22Q7MEnqpU2GOqxQs3ECXchPIvzd3V4KQq1kP_t6xAC4Q4FZifjJ4D7pYw17a57bFk158futGGmIAoT9aZSDUoaE2MCy7xeIcypG_OJtBaumJsrleMvnkbe9jAjWlIJgUVkgRIRIXRDK0Rvirdjgnx_PeUPMcwsD-wDD2FL2dpNwLnVjrPLpyk0Rdd0De7BpbY1IfqGbnZY5MJjc6rbZCKrOYg.StIoP5vuHmsIymZx.zaPzWWmkgC50TSxPP_totwYRUinKqUWf-7bBpQvWiYZDps_o2H8rfVM-cbaY2Ifcxqf4mOeRpXo4DViXK09LE7KyoBEWxnNpWoT5EPPBqbXDyC8te6mUa3EusnDbNu19kGET0qKATQFDUSUUcYYQ5UUyhztT8AL0pUhWRAt1Dv-l0-Ks-uWLNq_qJU-UC0GeyoXyz68FumjRlEzZ2VUZDDl8LBUsCNiJG7InexJlN_Ur14zA8zyeq_d9iyiFzTNHPdTaXg.ZwJKYhtirhxMpahvRO6ECg
+RSA_OAEP_A192CBC_HS384 = eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExOTJDQkMtSFMzODQifQ.UXaZZyBQxdKpVtv40kWhUYAL7IGjwX4J_Gq0FFgncTKxK77sTNcqDByrwti8yc2OvgfS6XJmQiS7BSyN6SwgXfTxPPA0XCaycMAEwBfEo4mHbR039A8gyESugpCUc87RG2lWh_0s7JbvXlQwd9j2dikW-tEkGpfO6gqaUWQrbbmRlTZ3B4reDpGOR_auIGG3iVAgb0wu-YWRTNS4srbbgFQCA81fpt79Aq5pg3UeUltsxqWiiyQVKLzmObydpD2TonvdQaNSoXwNU7h_EYWYOZpUDR2ayWP9QVd2wQkGqwkhn6q6fbJ4HJziV7sD2Pps94H-_yWhQ_xYGIUAw62r6g.mVYGuR3p8qYwi0vq-a0d2g._sRQnIjpRF74nHFB4fYd-vG5HEfXDZ9YeFHyK7f8mZTUy6tlrpQAFieZRSlstinWXYey_snEnN1AD8ZRg_GoEE2af3L4D_UXTZIdfv3maXTLCdZuOa4J_aMA3coUVJdhgInUbnJx2pOgWEdGhPnGUoj9-ZTSTHENMWcZ4lhEe_NDsin89znArzzWNRf7kL7K6K5kAU-lOHM_D5CBrret9nSly6TJQuwghlL7zAPUjTzc4ixj-ADBJ2dZyAZv_M3en0tovPeE3ZlFlqX8UdKRrw.5CSAnNY9-8de-9E_uwFLqnRcfT9iYh8U
+json = {"exp":1392553211,"sub":"alice","nbf":1392552611,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"586dd129-a29f-49c8-9de7-454af1155e27","iat":1392552611}
+json = {"exp":1392963710,"sub":"alice","nbf":1392963110,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"9fa7a38a-28fd-421c-825c-8fab3bbf3fb4","iat":1392963110}
+      System.NotImplementedException : not yet
+      Stack Trace:
+           at Jose.ConcatKDF.DeriveKey(CngKey externalPubKey, CngKey privateKey, Int32 keyBitLength, Byte[] algorithmId, Byte[] partyVInfo, Byte[] partyUInfo, Byte[] suppPubInfo)
+           at Jose.EcdhKeyManagement.DeriveKey(IDictionary`2 header, Int32 cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
+           at Jose.EcdhKeyManagement.NewKey(Int32 keyLength, Object key, IDictionary`2 header)
+           at Jose.EcdhKeyManagement.WrapNewKey(Int32 cekSizeBits, Object key, IDictionary`2 header)
+           at Jose.JWT.EncodeBytes(Byte[] payload, Object key, JweAlgorithm alg, JweEncryption enc, Nullable`1 compression, IDictionary`2 extraHeaders, JwtSettings settings)
+           at Jose.JWT.Encode(String payload, Object key, JweAlgorithm alg, JweEncryption enc, Nullable`1 compression, IDictionary`2 extraHeaders, JwtSettings settings)
+           at UnitTests.TestSuite.Encrypt_ECDH_ES_A128CBC_HS256()
+      System.NotImplementedException : not yet
+      Stack Trace:
+           at Jose.ConcatKDF.DeriveKey(CngKey externalPubKey, CngKey privateKey, Int32 keyBitLength, Byte[] algorithmId, Byte[] partyVInfo, Byte[] partyUInfo, Byte[] suppPubInfo)
+           at Jose.EcdhKeyManagement.DeriveKey(IDictionary`2 header, Int32 cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
+           at Jose.EcdhKeyManagement.Unwrap(Byte[] encryptedCek, Object key, Int32 cekSizeBits, IDictionary`2 header)
+           at Jose.JWT.DecryptBytes(Iterator parts, Object key, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings)
+           at Jose.JWT.DecodeBytes(String token, Object key, Nullable`1 expectedJwsAlg, Nullable`1 expectedJweAlg, Nullable`1 expectedJweEnc, JwtSettings settings, Byte[] payload)
+           at Jose.JWT.Decode(String token, Object key, Nullable`1 jwsAlg, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings, String payload)
+           at Jose.JWT.Decode(String token, Object key, JwtSettings settings, String payload)
+           at UnitTests.TestSuite.Decrypt_ECDH_ES_A128GCM()
+      System.NotImplementedException : not yet
+      Stack Trace:
+           at Jose.ConcatKDF.DeriveKey(CngKey externalPubKey, CngKey privateKey, Int32 keyBitLength, Byte[] algorithmId, Byte[] partyVInfo, Byte[] partyUInfo, Byte[] suppPubInfo)
+           at Jose.EcdhKeyManagement.DeriveKey(IDictionary`2 header, Int32 cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
+           at Jose.EcdhKeyManagement.NewKey(Int32 keyLength, Object key, IDictionary`2 header)
+           at Jose.EcdhKeyManagement.WrapNewKey(Int32 cekSizeBits, Object key, IDictionary`2 header)
+           at Jose.JWT.EncodeBytes(Byte[] payload, Object key, JweAlgorithm alg, JweEncryption enc, Nullable`1 compression, IDictionary`2 extraHeaders, JwtSettings settings)
+           at Jose.JWT.Encode(String payload, Object key, JweAlgorithm alg, JweEncryption enc, Nullable`1 compression, IDictionary`2 extraHeaders, JwtSettings settings)
+           at UnitTests.TestSuite.Encrypt_ECDH_ES_A192GCM()
+json = {"hello": "world"}
+ES384 = eyJhbGciOiJFUzM4NCIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.2EtEzEqS1JB6JQFJdAFxI56Q5DQZY2EYpFbI4cADLc69kH2dpUl9HBOyG7xTU1XgaAbz5d3Y_nVwstbRdSZ92HVoClGx820u0r70J03V0cdad7R9MQJ5wM5GKN24alDh
+DIR_A128GCM = eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..7tCLxDfl8RndJks3.qIZW9qM8kmN2uCIpSO9MlWTH_-7SNnJDnd7V7PNT73VAxHDBUSl1M5dBMfMDOUl2tLDMbPQ7XQCvmX_PKSQZpMX3o4gTwb1cQskxg6qqVkdXJStZvgPprp1WRvl_Ev8L9avUBYf3BuH2w1YQ2w7hxftqTrpdXYxJZt84eXDBEGE71xAn1rQo1j9H5SoKTZf-TlN36Y3-ploGxivS-uOu2dJz_kXs0mOIUG-R5DVa0XOyxJ8i4jI1MjScUdTgl1MSWcZwdw.I_-TdGBn8EbPi-d5zca2Zw
+json = {"hello": "world"}
+json = {"exp":1392553211,"sub":"alice","nbf":1392552611,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"586dd129-a29f-49c8-9de7-454af1155e27","iat":1392552611}
+A128GCMKW_A256CBC_HS512 = eyJhbGciOiJBMTI4R0NNS1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiaXYiOiJ6eVE0RnFILXFVUFJoWDVWIiwidGFnIjoiSmJNeHFxN3pOSUowaXVGS25oX0NaZyJ9.F3XrJV7x_wXuIOrEg_fDLBeiXA6YHL39WY6QntUMeCXTyoD6e8ThzApehbO0A8gsKIGy0ezPy_wALaTmH9EwOg.G_yqwSmtyodxayKYXTRTHA.vArcnleWBsa63DhZQyfitA6hsFa4nyQkHRPaFPouuCZAsJnhNm2XRPVT1htEf-bBG9mTQhyEG-aceSLR5k-DwsaXw-nVp42_X3P1Ua6dvvHjTdJASNID6qSjCvhKZW9sDW6ZyQnJ4UOjT5LJ4WxUyUwL_OVaoF0AgpISHBS2HtfSCfCXvlbjkMzzHrNsF7JaQjLQFCSYUDQcyIB2xUZVZV84ksdzhAv3U71q_QMxvXKbL5HTltrP0NcSzhjEtnaxtEy8cPPJomHlUI2rAoPeHw.Y4oujdf6ZWbx_J6J3SycgnBg35XWcdATElSC7qjN2Xk
+json = {"exp":1391711482,"sub":"alice","nbf":1391710882,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"7488a8fc-345a-42c2-971e-a286c14fc5af","iat":1391710882}
+PS384 = eyJhbGciOiJQUzM4NCIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.oO-8iO2zUZ-7efPY2Lq-F0jNfEhQE9wf-9OpI_HNaMz1r-ok1WXQ2cvK6zmPdK8wFoplXE5Gef0ahCzPHIwC00VSZLbxFn6Oncvg5wVl0T7d658TDPO8WpLWTAAwsm4HAYSX4qz7aWL3lwIJYpkMMbLMfZUMdd_Yjz7zhr9yiVOEAewHePcAjaoCSgoam_ZshsQgf4u1HtnuNQJrnCVXgVXUhnJMARNZOvKWYPCXEuke7p-3HssFBzyp1bUxVKw-BfDxkCvxtmamO-KbU56xipOqlfdgu7NyE5znsP9XzF3ItpiBfLrSUr_EQ8BFQ6gMF7rAHmkGG8NP78NEzzT-2g
+json = {"hello": "world"}
+Jose.JoseException: Getting payload for encrypted tokens is not supported. Please use Jose.JWT.Decode() method instead.
+   at Jose.JWT.PayloadBytes(String token, Boolean b64)
+   at Jose.JWT.Payload(String token, Boolean b64)
+   at UnitTests.TestSuite.PayloadOfEncryptedTOken()
+      System.NotImplementedException : not yet
+      Stack Trace:
+           at Jose.ConcatKDF.DeriveKey(CngKey externalPubKey, CngKey privateKey, Int32 keyBitLength, Byte[] algorithmId, Byte[] partyVInfo, Byte[] partyUInfo, Byte[] suppPubInfo)
+           at Jose.EcdhKeyManagement.DeriveKey(IDictionary`2 header, Int32 cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
+           at Jose.EcdhKeyManagement.Unwrap(Byte[] encryptedCek, Object key, Int32 cekSizeBits, IDictionary`2 header)
+           at Jose.EcdhKeyManagementWithAesKeyWrap.Unwrap(Byte[] encryptedCek, Object key, Int32 cekSizeBits, IDictionary`2 header)
+           at Jose.JWT.DecryptBytes(Iterator parts, Object key, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings)
+           at Jose.JWT.DecodeBytes(String token, Object key, Nullable`1 expectedJwsAlg, Nullable`1 expectedJweAlg, Nullable`1 expectedJweEnc, JwtSettings settings, Byte[] payload)
+           at Jose.JWT.Decode(String token, Object key, Nullable`1 jwsAlg, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings, String payload)
+           at Jose.JWT.Decode(String token, Object key, JwtSettings settings, String payload)
+           at UnitTests.TestSuite.Decrypt_ECDH_ES_A128KW_A128GCM()
+token = {"hello": "world"}
+json = {"exp":1392553211,"sub":"alice","nbf":1392552611,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"586dd129-a29f-49c8-9de7-454af1155e27","iat":1392552611}
+DIR_A256CBC_HS512-DEFLATE = eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiemlwIjoiREVGIn0..n3hK0oQITFk_a8I-srq-FQ.3T8Cx0tsi-iJM7-jNXj-cxiEkHhI3PMnJwcKukZDYSUvPbOl9hn5W-ejjFQKAwDYDOPwCtftyvoZUaWVcvjvstOpFoQUWZvSPUSRelHMhsBGfiLZuCYWctERdPNYbr1Zi7VSyTUNZwUnWtWpoPWGRw-nRtr9AbSCgJzWUTqJ81E4SnnfErTy0D-86mLz302G.difJsJd_YrKm4QobosH-MQOKLJLQE6bL6V9aIro4Nz8
+RSA-OAEP_A256GCM-DEFLATE = eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00iLCJ6aXAiOiJERUYifQ.DsBVRAVOP45Zy6ZiiLbch3nPbrHiqQ6ivKrR1wyX8x7TYAZYNYoqsje40K2YPRAIcMo5qh6raS9NWa_iBIhwfRQBimt8GqqkBmpI_Sx5Js3AwqZ04yl9xh1S8jF7HDdUofCkTQWMQB8XMQ1S8ENiHoGG4ZOJjCUkuTa6wBHyWn6RM1dXSM37R4D-mgwAQxGyXjHz93YUxxhGUd6W8g2dUDVaAsp2XmDbtVRNjpszOgrcPmi5K1kjag_ZYozXFaviH_IzbaV5ZPHkK5aOxzk3ZmNUrC1gSDn24Dp7tlVGxpxDVaI-Z6snFqk6WBLGRFNk-M-1oVnD4c04aEK4a5Eupw.XtBEPz_UIDHwwB-W.hlsTfblmkwMl_UV2YbwDeLwtpRcRL_dVc3bDJNk9CFBCcW4BGQrBJi960Thq5eeCNmVlcvz3qNAySzInZje8PCS7tG1EjCk6DQdm3jvZzDFOEz6RSDFwGyuKbTtjcmSE4229uRpDrxhJTRmfEwE4C2i_fgB56k7ca593pWLAf6_qvI3A5mAAYMfiIQ.6t-4M8Wj9d4NR2p02XCcdw
+A192GCMKW_A192CBC_HS384 = eyJhbGciOiJBMTkyR0NNS1ciLCJlbmMiOiJBMTkyQ0JDLUhTMzg0IiwiaXYiOiIzUzgydWk1THZ3LW1xcHA5IiwidGFnIjoiSW12aU1rT01TQ0Fsa1RnU01Yc0VEdyJ9.ADMY7FXi0EijFhoUWMcyYreQcIekDr5qO0NEIF1nt0ceri8-BI7jKmElYG2Krz_W.vkAsS99BSgiWwVD5JhRf5Q.ouVFE8PHqBwp9AjaF-wT4ErOBBfTNOjsuLTYobPISVsvGwl0gbAvt1TiwI93Mpoq9tZdtERskJA0Pf1gh8kJmXJ-YJ045PqE5cTt-tvbsg9s2UeywSPjyC4EP0GcxcsqFBXR4UHBkl8mAAZud4DojZmf5TNMV4IDXC1tyvXJCVuwuW1xvANWmYygTsHaQPsO_ptlLgYftWUvC6UoMsMDWsE7_uhj0XNoUgZpsxQSobNq5jpVuhgVwxIB8PHPLAXzhwcFtdrnLrnEfZWlhfrYpA.6blfyAx65pItKmwc5ec2HxGXiPUIeGa9
+      System.NotImplementedException : not yet
+      Stack Trace:
+           at Jose.ConcatKDF.DeriveKey(CngKey externalPubKey, CngKey privateKey, Int32 keyBitLength, Byte[] algorithmId, Byte[] partyVInfo, Byte[] partyUInfo, Byte[] suppPubInfo)
+           at Jose.EcdhKeyManagement.DeriveKey(IDictionary`2 header, Int32 cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
+           at Jose.EcdhKeyManagement.Unwrap(Byte[] encryptedCek, Object key, Int32 cekSizeBits, IDictionary`2 header)
+           at Jose.EcdhKeyManagementWithAesKeyWrap.Unwrap(Byte[] encryptedCek, Object key, Int32 cekSizeBits, IDictionary`2 header)
+           at Jose.JWT.DecryptBytes(Iterator parts, Object key, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings)
+           at Jose.JWT.DecodeBytes(String token, Object key, Nullable`1 expectedJwsAlg, Nullable`1 expectedJweAlg, Nullable`1 expectedJweEnc, JwtSettings settings, Byte[] payload)
+           at Jose.JWT.Decode(String token, Object key, Nullable`1 jwsAlg, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings, String payload)
+           at Jose.JWT.Decode(String token, Object key, JwtSettings settings, String payload)
+           at UnitTests.TestSuite.Decrypt_ECDH_ES_A192KW_A192GCM()
+DIR_A128CBC_HS256 = eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0..mIZNSBUr3uHy3AwkYZvfOw.5qf4UXQfsus6DOkQu0O5-EyGn1ZRhAssIT2HS_ndo7E2G7mufsJ8LKFRPQWHIJm4wasmT1DLVQX1CaiTDOi8r0nvrm-n9IZGyvYY4_dBUoQsrFbuaQds-QorX8UqBxRc5PHA7YBD5kbmrUIZfazdEOJNrgXJLhn21UibxY4JFFsswYMDCGhEiHhQce9R58cOnAWsZUdycPfKbjOurGuTc2lG2xCQgnxxbWao1ATd_LzlDM6bq1CRV87UEkFhYYQ1WEQNuf62ZuEEyJbPICqgZQ.vZrGyM3XIq-TxFxDv_AzLQ
+EncryptAndDecryptBytes_RSA1_5_A256GCM: eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMjU2R0NNIn0.m8Twc9jiLahRJqhBzqsiKm9hGxTGReTVygaGrB-fKbB2jo9jpii-npO0lIsQ_ffOLQujKkR9EbkqxmQPbVGyIRlvh7MHy3FeaWWfiqvBSft0Qj5EwmZDIzmyptYV7NMhERjuLNcTTwpahkPv1Zm1ChHkZQWYxtq5HR_WV1bBljqHJ6l89ECC9QpGcToI8GKZRp1gCJ66wFgREXgeT5LpT1ZfKQ5Ik5ycShWtZ9DkNUUHd7IRQ1RuoU8edAalHQA6zrkHmMVWhvbXHynEI8C45oWT-e66q_bg9BIfXwl0GBf6tS_FinkDWN1waxXG97We1seH5SuupwUQb43R-4l2tg.Q-OycGeIsL99p7P8.kDFQ79u1yd67rIjwLzckLwu9t5S1xt_cTtTtnBrAFPqcJjaZ-eqz4cqOpEwS701wOnXaQb-WHQDD5siwLmxPQyDsBTCaQC1JXgnrf44bYftND6sLqs4OtTKn5OLSOrT2u8a8nk575LYbbtmCCbJsf65dNnrZGelyMAufeDW6fODHISMp0HwaRT7m6NQQf_ITLFJ7fV1vlbZxepO3UT4239Dshz0B9EbIhCtbtv7rZ0ned2goBqKRUWnvdkd0xi__6LEnfTXHbGv2pY0KrwoKqWw0MDaKuAw8xc6gAGwEECkJfEBiTm8eSIWAhD6eNuS-N6dYhWCHqvju2ouX0mZH3A.7RADqodIn5tumIim-p26XA
+json = {"exp":1391196668,"sub":"alice","nbf":1391196068,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"03ac026e-55aa-4475-a806-f09e83048922","iat":1391196068}
+json = {"exp":1392553211,"sub":"alice","nbf":1392552611,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"586dd129-a29f-49c8-9de7-454af1155e27","iat":1392552611}
+      System.NotImplementedException : not yet
+      Stack Trace:
+           at Jose.ConcatKDF.DeriveKey(CngKey externalPubKey, CngKey privateKey, Int32 keyBitLength, Byte[] algorithmId, Byte[] partyVInfo, Byte[] partyUInfo, Byte[] suppPubInfo)
+           at Jose.EcdhKeyManagement.DeriveKey(IDictionary`2 header, Int32 cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
+           at Jose.EcdhKeyManagement.NewKey(Int32 keyLength, Object key, IDictionary`2 header)
+           at Jose.EcdhKeyManagement.WrapNewKey(Int32 cekSizeBits, Object key, IDictionary`2 header)
+           at Jose.EcdhKeyManagementWithAesKeyWrap.WrapNewKey(Int32 cekSizeBits, Object key, IDictionary`2 header)
+           at Jose.JWT.EncodeBytes(Byte[] payload, Object key, JweAlgorithm alg, JweEncryption enc, Nullable`1 compression, IDictionary`2 extraHeaders, JwtSettings settings)
+           at Jose.JWT.Encode(String payload, Object key, JweAlgorithm alg, JweEncryption enc, Nullable`1 compression, IDictionary`2 extraHeaders, JwtSettings settings)
+           at UnitTests.TestSuite.Encrypt_ECDH_ES_A256KW_A256GCM()
+PS256 = eyJhbGciOiJQUzI1NiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.PZiy8k4l5QPeAlwa6R0m7ntPxdXwjvUkZSEsUNXA_y0Njis0rTu7m1PGWMgZ_pC0vaIy2YvDr-_wv8Y-mKWQE0lkg-LNteYnXoPQvPGVYWg5OIAjUAtNDE8qTZw-n_8rTXVf6v3rMvA84aK6_oXtfn4EkQkLbcd0IRAvmZHSVmtVrH_krJx-2AI6ZjzBdZm0ooKTx29dha6v-j_PFDb22HW9nSGUpFizvtWVLWYMVFbNVh3rlo5eXWrnQkR_3Qi4JcscPIwME4QIdFGW79I_r2ukwpYEEboiPjyCKU2RrrAwwX8_Fhn-bZtf13Rydjs_uaMUwpFMeq4gt0XnM_kh1w
+RSA_OAEP_A128GCM + extra headers=eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhHQ00iLCJjdHkiOiJKV1QiLCJrZXlpZCI6IjEyMy00NTYifQ.kFi7gjkSV6wfTrMRgq5LFUMe1mH7CX-CJ5-AB3PhfFfU9Z1atCrZjuYF7JV1ZKrdWWDTqXn6qsAjEgajHzrTguVf2J5dHjdwXytFJHL8aa2SAm6v44lxKGkazZZOAyy6GBXwZ1xmy0wzu0kD07j8-yJPF8BmtKbnlfDMBZQpxnEwioxaEHE_-znL8BPq8mSIVi7sXbyoyCYRPOeRsVLAbhQBrust6q6b7-KBoocG5Ur8gIxdbnkiAgM-aTgrniaABJzmgQVjbMOnUK7lf-vO7A2dH3eD8KebFr6FPoISPxhdeDLco2-S-We3y1XXtCPfMxAGhJApxQ9e9kKczeuRrg.8RmY53fw3Rp3BtiQ.z74kAZkp4RKEStdBx5R9S1sE.h03rBfuAfTHU0PjYt_BZUw
+DecodeBytesHS512: 00-01-02-03-04-05-06-07-08-09-0A-0B-0C-0D-0E-0F-10-11-12-13-14-15-16-17-18-19-1A-1B-1C-1D-1E-1F-20-21-22-23-24-25-26-27-28-29-2A-2B-2C-2D-2E-2F-30-31-32-33-34-35-36-37-38-39-3A-3B-3C-3D-3E-3F-40-41-42-43-44-45-46-47-48-49-4A-4B-4C-4D-4E-4F-50-51-52-53-54-55-56-57-58-59-5A-5B-5C-5D-5E-5F-60-61-62-63-64-65-66-67-68-69-6A-6B-6C-6D-6E-6F-70-71-72-73-74-75-76-77-78-79-7A-7B-7C-7D-7E-7F-80-81-82-83-84-85-86-87-88-89-8A-8B-8C-8D-8E-8F-90-91-92-93-94-95-96-97-98-99-9A-9B-9C-9D-9E-9F-A0-A1-A2-A3-A4-A5-A6-A7-A8-A9-AA-AB-AC-AD-AE-AF-B0-B1-B2-B3-B4-B5-B6-B7-B8-B9-BA-BB-BC-BD-BE-BF-C0-C1-C2-C3-C4-C5-C6-C7-C8-C9-CA-CB-CC-CD-CE-CF-D0-D1-D2-D3-D4-D5-D6-D7-D8-D9-DA-DB-DC-DD-DE-DF-E0-E1-E2-E3-E4-E5-E6-E7-E8-E9-EA-EB-EC-ED-EE-EF-F0-F1-F2-F3-F4-F5-F6-F7-F8-F9-FA-FB-FC-FD-FE-FF
+DIR_A256GCM = eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..HE5mUMURZN8pTKo_.imLLn_b8-t5r5YntPfhBa0xI0LCBkI8YeaRnOuEuNnC05gKuHVmbRVVToVDBZCFR7k9d2nLnnFOVCIFpIwgEsRmPpKT-yzGveSFdfYOYXc1KNaXC3WgyhwIHJua3bCqz5vXWWcE0_jg9dWf4YDnU51D_xm5zYnP7GylMqZH81-T921mzHfbbMgjfpwVcc3oy3ILQnPYrWGmWUPASR_WsiEJQhwa-I9UINFfxNhJly_KtgJtffTP9ni-XyXicKEK6KSL-Jg.KFwhz1kJuA_TNWlMUZpk1Q
+json = {"exp":1392553617,"sub":"alice","nbf":1392553017,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"029ea059-b8aa-44eb-a5ad-59458de678f8","iat":1392553017}
+      System.NotImplementedException : not yet
+      Stack Trace:
+json = {"hello": "world"}
+json = {"exp":1392552631,"sub":"alice","nbf":1392552031,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"a3fea096-2e96-4d8b-b7cd-070e08b533fb","iat":1392552031}
+           at Jose.ConcatKDF.DeriveKey(CngKey externalPubKey, CngKey privateKey, Int32 keyBitLength, Byte[] algorithmId, Byte[] partyVInfo, Byte[] partyUInfo, Byte[] suppPubInfo)
+           at Jose.EcdhKeyManagement.DeriveKey(IDictionary`2 header, Int32 cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
+           at Jose.EcdhKeyManagement.NewKey(Int32 keyLength, Object key, IDictionary`2 header)
+           at Jose.EcdhKeyManagement.WrapNewKey(Int32 cekSizeBits, Object key, IDictionary`2 header)
+           at Jose.JWT.EncodeBytes(Byte[] payload, Object key, JweAlgorithm alg, JweEncryption enc, Nullable`1 compression, IDictionary`2 extraHeaders, JwtSettings settings)
+           at Jose.JWT.Encode(String payload, Object key, JweAlgorithm alg, JweEncryption enc, Nullable`1 compression, IDictionary`2 extraHeaders, JwtSettings settings)
+           at UnitTests.TestSuite.Encrypt_ECDH_ES_A256GCM()
+RSA-OAEP_A128GCM = eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhHQ00ifQ.jCWnLQc4xGIJig0kWolzm9jkNV1-WMjwM-PslruTOmS5oiU-Edf9ByM-ien85xJrWTHtV25LRV9Ie7-zGGWxQfMtSarzmHc6qsdI0lGd-dDJeWP8cJT8w5ZQWO_ThNOBl2DBe6OmDMfo32RhiVUJVYk2mk2AIFsJ9iM4dCN5ydsvr1IpMWjUaswpf1FhMAvA5ghXf7JQNAzsEHHnLiKi694NM4OWg2Fgd7BVhVYpNlvi0nBHYM3KzWjcnSFaSaYuC847-TWjPJQJuz5rWUyo-AlHhs6IrMTbVcwABmhMXXB1RH2MLrSabcwx5tlpd2ja5ZZ7XEuy1zQqnz3RbUJ6uQ.aTpWmJRzg-VulMEM.oJP-sTPfxstsJgp0jgFlF8Yt5WOKbeoMUvkBvak8ay3eP-bx0V11rYAmtPQNxfwqu6zP5IjWO4LmiHc1sO0Sl-fe_WDXcEC71yLSbl0W0iZprr4KtX4A48O72dM514z6WxtrAeuRXqnrdQ4l8J9EOU_Ziy-6vCQKyJJY56zceJL6nBdt2Hu-gOcdgY8XwEAg6Kq1IWa2Q26qB4Z4hz5DGidT32Q9i7WA0ZvaRFkgsXO2KDseyjrlmPpS21YGjcQvkXAsVA.MxaJvrGPN6su_4KbMIGmZw
+RS512 = eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.EkP4VYlDO9a0ycFt6e_vSFwfI5MICvDqLCNFI779lodbs92EwBtxgzoYdgqz8E8H1ZtWEnyULsc7TkwgV-1xj_wbWVLDvQxjZ4wQfGaQBjD5yO9RTxwReWab3mtfixh7pPKi7lpmuO65sWBVnco2p1RXGsM7KtHjToRIFxu9ncA7YYdQ7i-YL1HcUHjjOc95NJzDyfqkwnaD10Wq7GM4XAixZFYYNDaz2nP7Gt8DwvEvFhtP2iPxeK3_AqhQ4T3B2GgcIDnNCjhETtx4oal-gZzujMEbrMx7ea_jdS5QpKv0EEiA2Ppv0-_4dDKELCwhmBuYzHZIGbSJUFMC_fKVqw
+json = {"exp":1391196668,"sub":"alice","nbf":1391196068,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"7efcdbc6-b2b5-4480-985d-bdf741b376bb","iat":1391196068}
+RSA_OAEP_256_A256GCM=eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIn0.dqu2wRNEPl71eL4al1yMDtJqat90yzbggPRxDJ26NhFy8_kkhBz7FyTMUkytNza_ZyN0ucXOOQdk7RX3kBO69t6vnVBIt78hvmz0VGrLj7pPttuOou4pLDdLblnesc6FJloFcn3Gxa7KDVaLGQ4GZ_unDiGiIy_PVTOLkhhoT9YW3jL9OrH50fkHMcu4XLRREV1NSzckJBM-8ZT3EOb8idY4SG_R46no906PTPhXdhuhvFWQu8mPhlLQe-linN9Ah5HxohVvcHKWLTBDNq3UNw5nvE8xdDEopuBYUV0PHRb2Z5SA89MULrggpLG0dKNPuCyja07E37Wv-nAzky_11A.kF07xab51tiHDoZ_.jU2av5WFWrHPRKKOnsRTELy4.9XIv65TXZFh41VKkbF2luA
+json = {"exp":1392548520,"sub":"alice","nbf":1392547920,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"0e659a67-1cd3-438b-8888-217e72951ec9","iat":1392547920}
+ES512 = eyJhbGciOiJFUzUxMiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.AaNSgXb8kRB5pT7UzbJKwTCJzLfD7wfS_2yqometu0jpe3rnLOi_ZriqeicMKYNyycUB1ZbQMXTCwhjn2TmOJNA_AIG7UviG22dIztc4dLcokotVVfGn9vMzS-3iqn6xaKbVWdWpusreH75Am8hFb0eLCr1FZT-KXA-eBFykaP7Fcng7
+json = {"exp":1392553211,"sub":"alice","nbf":1392552611,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"586dd129-a29f-49c8-9de7-454af1155e27","iat":1392552611}
+json = {"exp":1392553211,"sub":"alice","nbf":1392552611,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"586dd129-a29f-49c8-9de7-454af1155e27","iat":1392552611}
+RSA_OAEP_A128CBC_HS256 = eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhDQkMtSFMyNTYifQ.I34qa40GyfOkbeDQSJanBdZ5T6Ksbes4y1duvqUlCuJJ68rgzcOARkXVl6hskxeBj0kuTQ36yCFixpRC15ZcRFU7TE7XZpqkoJVD8lLTtC4T3eRcAULXoDfhTiwbfgvB0-g7B70-Ou1GPWRo5ILZ0ZFK6gPzHrhQbYUI8b6kOevnw1_V900CvaaZxirShWbdYgfRiCGHwvtJdHuHxTfv_ODGTFk5_EsRdUKmYFcFGeJdAzwx0X8T2KBZlsA2gQBwU4rG5B-BCJtQYEtaSCl6916-pzE-yrx_pOmDU2yeKzCG9x3Cu8BjhdctEt70wGTcX14y3IkhTYcdmtquvWX2Eg.vy8aMVPU_nFwdKLpQ0hsIA.BdYwtZO3FFtyljqc4p3SX1_rEOtHj5E07g0cLMATJ0b1AQeYgBGHtHrCTo_K30NuIFLAn3YiZxn3LYrBB01Cq_KEKlRoGcqJLlRwG4pYRCQoe5H9FDBL4DSEnHtj1bTrPjPwwG2-97VeNDTRyWzSTj_2AgVHgaC9d87yaBDF6lkAjprQ9m9_46Dy7W34Sm6138t_8mw-dOyZwQmHV4Kj4HI03fZhViQuCzFlu1tb1uDYGH9Zzp6uIOB00UX3TAcp8mqVslUgZi7LQUn6-vdGQA.H9zUpzmYrZWMlLdH_fgWbA
+ES256 = eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.MmwbbonxhuSnxmeZr-2lnr_0oHQsRVLSl20aPLGl9UH1D00Ot98mm3mMEPr7S8e0cPjdER6DtofIwls5Jq4rqA
+Plaintext:eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.
+json = {"hello": "world"}
+json = {"exp":1391196668,"sub":"alice","nbf":1391196068,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"59f54c91-5224-4484-9c3a-e57b87b6f212","iat":1391196068}
+RSA_OAEP_256_A192GCM=eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTkyR0NNIn0.EwO-8g0X3DR3O4eV2pFORT3Y3cEsZ_HpjfsW3d3d2rzQ4x6JBa81weNJnezgr2Gf78HTflzAy-0sb3LreLM1uVlum9YKBvMpxf8Kox4oVPx-pP4NDMzJKw-MNON5jkv7CNoZ_YdmL4Pj7Q2tJGOT0Ce7WajaroiLDDTgmYqwQ49YwCVI-BojBYSBYMczWiPsXKX4mGCzLeVRnDmiIom614X5G5y6zkMBZZ0X0XYYZdDXoUb8qF-pAWow8GNbK5nSI3wRf7FgJKtm6ekmfwaqemCXdTnvluhwAckUDmrkVpn0jzlHc8W-v2L6KJ5l4MiIIeeC62XLq2Qxmj1KCK8aCg.-YUjWN43p9bcA0q9.jJGqFeVb0-X04qWz0l7GQdDs.37DPYQ1BtqzjjnveX88fpw
+json = {"exp":1392553211,"sub":"alice","nbf":1392552611,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"586dd129-a29f-49c8-9de7-454af1155e27","iat":1392552611}
+json = {"exp":1392553211,"sub":"alice","nbf":1392552611,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"586dd129-a29f-49c8-9de7-454af1155e27","iat":1392552611}
+      System.NotImplementedException : not yet
+      Stack Trace:
+           at Jose.ConcatKDF.DeriveKey(CngKey externalPubKey, CngKey privateKey, Int32 keyBitLength, Byte[] algorithmId, Byte[] partyVInfo, Byte[] partyUInfo, Byte[] suppPubInfo)
+           at Jose.EcdhKeyManagement.DeriveKey(IDictionary`2 header, Int32 cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
+           at Jose.EcdhKeyManagement.Unwrap(Byte[] encryptedCek, Object key, Int32 cekSizeBits, IDictionary`2 header)
+           at Jose.JWT.DecryptBytes(Iterator parts, Object key, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings)
+           at Jose.JWT.DecodeBytes(String token, Object key, Nullable`1 expectedJwsAlg, Nullable`1 expectedJweAlg, Nullable`1 expectedJweEnc, JwtSettings settings, Byte[] payload)
+           at Jose.JWT.Decode(String token, Object key, Nullable`1 jwsAlg, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings, String payload)
+           at Jose.JWT.Decode(String token, Object key, JwtSettings settings, String payload)
+           at UnitTests.TestSuite.Decrypt_ECDH_ES_A256GCM()
+json = {"exp":1392553211,"sub":"alice","nbf":1392552611,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"586dd129-a29f-49c8-9de7-454af1155e27","iat":1392552611}
+json = {"hello": "world"}
+json = {"exp":1391710647,"sub":"alice","nbf":1391710047,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"0b0f3b1b-8f36-4ee2-b463-54263b4af8b7","iat":1391710047}
+json = {"exp":1392552841,"sub":"alice","nbf":1392552241,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"efdfc02f-945e-4e1f-85a6-9f240f6cf153","iat":1392552241}
+json = {"hello": "world"}
+ES256 (ECDsa key) = eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.gMOYIBhI9Wr6DArCv4Q1a7VKQ6WmEKvuhS3qsU0a-E2-xg2f60RGAA-9lAloW06-F1ExbCCVYhvlp9n45pzrNg
+RS384 = eyJhbGciOiJSUzM4NCIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.UW4uZuwV8UCFieKAX0IansM0u4-mYfarpim9JKD792an-HcSaq7inyI9GLt-iYflG0M_DmovC8QrjU4mP2FtWYR-Jnu4Ms467TreeDM4KOHSpPYOmdTG2N78L3JsXVZYEibHt5GHBzWUXqEnSthvSq-RHJsOXNjNVJACK2IWXc_PKvIbTVhoukZX_ejfA4B5ynEPax7Bt5mlyf9tSadfIGh1g29sm0hslPcZ9OKbwjvxWb17CdFy4gLq1bqvf7XnroeJGerYSXvbiOjulYizRXWBeDg5VKiEZWyyNt1rc9w_GNIIpY8B17jx6I0_hh_gjSMTTQoKqOp6Q2FWg7ZgLg
+RSA-OAEP_A256GCM = eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ.gvgFS7cZnV9CedszQWQLHRFOmeCBOLZD3YbRC45vzQhXH_7aFa-Te5xfqZXI2Zkq9K1lKoH1d8Ul7Vcb3lOnpAd7UqurAr60ewj8QLHJHMbl2duD8eYTLBnbpXFg_fYIB2vwC80op7KWVWOywMkXjC596p9GjyCN9OTMp7-3FvjPjebeOYWAYtKQr6oblg_W5k_nLZqUD0HTBIBdNEELUj8EbnmuoYUGUhME9nv-J6F4yT7R21wxNp8faAdF7cLNMBNKgzF9Hme_H9_5VDOTd8zcA0F4QM_c55-n1WKeekB8FFy_YmaIH9jNf9FneOkNnD_Kcras1kV8b5S-2UHVDg.eWiQmGkoIiTAHJrc.1hMCKmno6pfltrfzoyf2Xl_ztD2iElHZfI6pBMBRwRPIYe5TJubQkZbRxoCg1_n1hrm_cYtoF0cuJQs3-pDUT2fjAc-QlNwua2lhdvCu2C_G73go4glowu3Bt8ipLjQPJYJUVsosppFc1AUsYhfzcfJNcaqFvts7SqYLL_jO837miwVsDsGTPT_Cyyl4VSgiXDPUXXeTXsDnXphlC54VzTZSFj4fBLiLBYU4lcNDO4K2jPtsGpreOcp1Cc8kzS_nXeOsPw.FWuE3nePKU1Ni0ZV6q8RRA
+json = {"exp":1391196668,"sub":"alice","nbf":1391196068,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"19539b79-e5cf-4f99-a66e-00a980e1b0a9","iat":1391196068}
+      System.NotImplementedException : not yet
+      Stack Trace:
+           at Jose.ConcatKDF.DeriveKey(CngKey externalPubKey, CngKey privateKey, Int32 keyBitLength, Byte[] algorithmId, Byte[] partyVInfo, Byte[] partyUInfo, Byte[] suppPubInfo)
+           at Jose.EcdhKeyManagement.DeriveKey(IDictionary`2 header, Int32 cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
+           at Jose.EcdhKeyManagement.NewKey(Int32 keyLength, Object key, IDictionary`2 header)
+           at Jose.EcdhKeyManagement.WrapNewKey(Int32 cekSizeBits, Object key, IDictionary`2 header)
+           at Jose.JWT.EncodeBytes(Byte[] payload, Object key, JweAlgorithm alg, JweEncryption enc, Nullable`1 compression, IDictionary`2 extraHeaders, JwtSettings settings)
+           at Jose.JWT.Encode(String payload, Object key, JweAlgorithm alg, JweEncryption enc, Nullable`1 compression, IDictionary`2 extraHeaders, JwtSettings settings)
+           at UnitTests.TestSuite.Encrypt_ECDH_ES_A128GCM()
+RSA1_5_A256GCM = eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMjU2R0NNIn0.hirkHF6vd5ecLNfycsXWcdr9fokJls_AQYioI1cwaqnhiRLuP00Fi8yMqrqRp1EwNisA_N9r_-8sNv4xYihoGl-n44zxx37xhNhut-aWJVnISaw4IN1MTPN0o18-wMmJ_HTnmEEClCrT73KbcFENw2U9dQEHIwqWmAfMa707vL_y8YQ8GZomEmxLl7EWNAw3EWe6mQaOv8NE61gg_63geQEY2bquqaNneavCeQMJgv03fDuLCAEj7W101VPQZbUVOB03nk3hs9bFw8BfrmVEgMkOwJaPBeVEhfg1zsWV0GX8uzJKWt0nYLIIGgU4fOSwJOt-D1VOA5u9T6iYxm3j8g.7_PXdDpPs73Ux1Yh.Ax0poQXRqKX1OHGiAGd9Qipf1hJU4FM5q2W_5SD4LzppQG0cPG3-cOR3n1blfrhE9Z41q5HKQhs2i8xyNi9sHLlUpc5RXD4mxMo_NrRlUgdAxEHKOT6RXvWzeIf5tn-u_8jDzjwiisRN1g8dzWXi06w_wg-1MKC8Ywui5uLsync9XI_e8tP4heDExqGVUJhaUtVq-Y18wuCTE4cXdj41g_ooNnKqI_nJVHoErWL-jlXJtPVA1O8z1olBNXZgnwasdfnXpQ.RxQ537RET3P7vt6Ms5EZTA
+json = {"exp":1391705293,"sub":"alice","nbf":1391704693,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"2f3b5379-a851-4202-ac9a-85baae41459e","iat":1391704693}
+json = {"exp":1392553211,"sub":"alice","nbf":1392552611,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"586dd129-a29f-49c8-9de7-454af1155e27","iat":1392552611}
+      System.NotImplementedException : not yet
+      Stack Trace:
+           at Jose.ConcatKDF.DeriveKey(CngKey externalPubKey, CngKey privateKey, Int32 keyBitLength, Byte[] algorithmId, Byte[] partyVInfo, Byte[] partyUInfo, Byte[] suppPubInfo)
+           at Jose.EcdhKeyManagement.DeriveKey(IDictionary`2 header, Int32 cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
+           at Jose.EcdhKeyManagement.NewKey(Int32 keyLength, Object key, IDictionary`2 header)
+           at Jose.EcdhKeyManagement.WrapNewKey(Int32 cekSizeBits, Object key, IDictionary`2 header)
+           at Jose.EcdhKeyManagementWithAesKeyWrap.WrapNewKey(Int32 cekSizeBits, Object key, IDictionary`2 header)
+           at Jose.JWT.EncodeBytes(Byte[] payload, Object key, JweAlgorithm alg, JweEncryption enc, Nullable`1 compression, IDictionary`2 extraHeaders, JwtSettings settings)
+           at Jose.JWT.Encode(String payload, Object key, JweAlgorithm alg, JweEncryption enc, Nullable`1 compression, IDictionary`2 extraHeaders, JwtSettings settings)
+           at UnitTests.TestSuite.Encrypt_ECDH_ES_A128KW_A128CBC_HS256()
+RSA1_5_A128CBC_HS256 = eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.RsZq6s_hJVQERgGewiCAHi1j09WsVY-3mXIAXyK7bfEpHmG7KvIvhugLJYpfooU8UdojJkmc0-8w6WgH9jUOdurQEUIc-JQ7xMRvW1mbT1Kp-vyp6jHzZ7u7P9Il4DC1XyE4ptDv6n_UfnzJiouELMkgjdJbzpZ2cr0PTf1_Nb3W7gDPxatdicfyy_1G9gzyVXxB1ejre7uW7iBgvp08bqkF41VO7NPcbWbxOMhbTta4htf_5wHgOlhEfMZAjXRXq6y08NVZ_pylUtno_2iIbnG2lTvd3qIh-Yk0mnjmu0dnKjpdjdpdjBGHH-ij8v1iwMzvRKYElLQNOPVSIpDvWA.aYWyLlOVW_Oj_9QWIlAVeg.X1vUrIyAfLjDe-vKscbNtFykIyOHHlxy1vl59QKoaysK_e5Bib7_EjWcZ3jIJnUGBLDUjTbKKI1UPt0RI18ZO60d0ph0uBO3tdNdalvJLtAbi3KqMBsI5n2N_B1MYpcML8rCoV_ppJRntfj8c_DwyeZREhegLzcoNGIt-g6BEgfe16Q-TwrLr5ygXWiQM6v-EM9PYhm9z3Tf9BFJmpwbu5lakomAljQJ6hFvmvhVghO653aawPVa-U2f92R0hSNrFNbRtE1pWJ5y4oxuqEVV5Q.wptMWAXaGVv97eLX9z7-9w
+RSA1_5_A192CBC_HS384 = eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTkyQ0JDLUhTMzg0In0.GoP1XKsRZ2R1t_n4-V2Llq1JtBOabSTqgM2We733vi29Kat_2AFwn5MYzA2bWv17mFfTQv3UirddAo-rmLazEB0d87plgkdjwnBACV0aZMD9Y0SRjkFBUP8ccA89hwIHGD_Etms1CIygslzCTb4nLmGedEKvGTlb0Clr-cQ5iUYIIcwWp02MqZrWyRRbk2EJA47SCrP2KLNYNgqCMCDwsx0AhtUolJCOd20TKga2wPs-Y5_0ngEqAHrtvG36iRCZ5x3SnrZsYcm7JtCQBmjCuCG_3UL1mwZ6W28bD05Nbf4UkZQoEoAswFQWaqTc-28rLJujH-4VAUJzkOY0Kwe4qg.Whcn9YWJzJW9Clsn7RbECg.n0jxkKcu5ATqPb-5HmbQbFkCnfrlAH7ty-TqGomDXdQAac8IDd2uRPYqR5IQHi3I9-InBv0rx4uQeYffEbfywi3gqKzP3F9CcwroeY0yBtL6J3nO9X-EO9ouvqb_2kuZRTl7-Af602rNdLDeA-9czoV-13txr6w_rtaUeq3AEErmW9gUphdkqRqNeEvKnP8mL2GxTWrLamdLjplVKS0J4ODwCpBHE4UFqwsBaWmMWpJiMBF1UV0ze79X4IiwguSCIGTSwmo6jliga6_eDyHLOw.SRH3NGt09jT7lJ30vOLRQwqoxH-LZgnF
+json = {"hello": "world"}
+PBES2-HS256+A128KW A128CBC_HS256 = eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwicDJjIjo4MTkyLCJwMnMiOiI1MUVvLV9zQ1pqamhNalR0In0.J5wv4_5z6GwzPSi9SbvmTS_uVjWkcXYdDZ5lc001X1HqhVmMyATBAQ.ey21Ry3FEnxsw_UQTMyDaw.VFXphP4GjvtrwbxwpRn_8cw4h9BHLbHDAGY1nMe65IRACSyeLHz45ibErhVKoySjpmIp7_zWTB0iwAX3srPnwUFy2bwmdxhzDTYV4bMWfVW4FFqKebFdbbZgua0puqB3qj1RI080wsTOwRMF0GW0PhwrCsS6Avshxm6WOlAWkYtHfxSCMPLVwEcqHpL7fYF2Ze9NvtKFebxhdGOA-ynmDyPv-PdBPk5ST_PT2uXoSTTS4d-9_lKbbYNw6iFSDdSGsUqYS69j_sUyRs8sVy2N_w.bWiX8T6Qolnv-QC4pH71Vw
+RS512 (extra headers) = eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCIsImtleWlkIjoiMTExLTIyMi0zMzMifQ.eyJoZWxsbyI6ICJ3b3JsZCJ9.Ca6ESMOSM2O45xJtwmZqMACihVTKk0GJQA4tCP3GUIu3r7kZzhZzqwPQ369-e8N0QKfvrjJ5ZpIlHGoeut44FMYFGVNtv4M7CbzPWyIdCeubwH2vkJwBaPs-ztA9aVng4kH3BjdckBtMGRmNKkk9IWjlEMi0RboPOuCpUHcTZ8Z99jocQ6GSKii-vT0YT0wa3U6weSqIojq_h0saMb2XzzTRnXzN2YmsJiiuNksRgaL8BKva2Qxk6fbYqdXXBeTsFZUtdZ30-wYciAbUvT29Z21RZSDCiDzCJtYTOv08zAqyAN3v6ZwpJ53VM4e_ANZtjyeog4xtoUXTg9FGhbuy_g
+A192KW_A192CBC_HS384 = eyJhbGciOiJBMTkyS1ciLCJlbmMiOiJBMTkyQ0JDLUhTMzg0In0.UXyiwxWwrrI4xn0H8yQXCFvLemDsDVeZR4H6PYUmRX5LXJ4RkxNKVJRnEzOfthx6P9rWGgE4dIQ.p6FxyR__XgtvHreuCRiVng.IRyq3Eevl4Zxt32mR7k1XcvRdil4y6LoPNfMnrjItmwPULfAVC2KjUyT7dW4810qH7VqXnjDqEEig1LijGZkV_Tcd0wRUUGfJnLuqPtB0F9G06GJM81sFcoc5dqNl4HSBgvfwdmi_W549NoqdLS4wRD1og_yr9d8O0jqLy2flWXzVcrwQQ6Kl-siSMgsDdctMWhXl-1tlen1_49vn-8TMnFFrDx3SHhCHtzYlSl77FBnmTzb0OS7P_U4L5iXMJRblwrgemr4qxTxhxb4LpQEmQ.SlsLstVfi_wofWO1QxLtd8dXMoTQ88FH
+RSA_OAEP_A256CBC_HS512 = eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZDQkMtSFM1MTIifQ.RVbqc8ncFYw3pWNIET6bA5osT5mtADwPtEe9oYPgAkoPNpwGVmqntR8D-DN4WebdJ2-4u6VuFeIo64l1U4X36P6P2md0KWRq1L6263cmgGpEy3QXotSZyl2HgDvvv1qRzqA2TBTrFTDOnTlvXXCffn9YpPTqof7VbvnrCMON3ZPP_dhlq8868-duCRbiCQcgB3znmar3cjVvd45I-k1RmiDxdMGqeNOQgiG39SD5865dJK_HQYrEarpSAYZhJLj4uI_cMlv1Hg2aNNkp0NfPXxqpPaEBdEif4zigiX2NUPslFHtb2nqnRLNVZkbzGw_yQIjrlCqKvIPaDv3tEXYYuw.UTKNJp0xF0sU0sNyRC-ZNA.pMrSHifx-2NqQhoqYg0AMET3KLZrHtxcz7o7Q2UI7sdF44mhTR56UWJ7NWReuBRL7_my3dqVrWVD_HFvw7bJdzAwtELbJASVgIiseMsYNUe5dMJMctex9S1YTs0u4xKfzHxIY57cPJVpr7x84n1Z51FJNy3ttY4HgJ1QXZVxVp6zbrHkkbxn45da-hHJ6-49XYrOPf1YBduu1y7GpQ9IJ2U6cv2QNIFLd1NPxSL2k2UCwGU-v0x0ZYYfAJE7Oh5HxvkbDQJN-aZ9cwcpVr1IEA._Eu8EtQ83Z2reS1JNZMWPn29xVElRM-r-8NxuxBKcQQ
+json = {"exp":1391711317,"sub":"alice","nbf":1391710717,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"cadf3d33-a109-4829-a869-94a4bfbb4cbf","iat":1391710717}
+PS512 = eyJhbGciOiJQUzUxMiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.ZH6blWiYBFc2aNLyHCX1FByBO8Q4MD36TxVqBl6U-Vov1RIJbIBZM84zX4dIYhfYom52UQ8eD9rNBp1hHYLUQoVd9jr8k9xsu4omk7TCUk0ohDRT3wJfImvVcPolUTOZpj_vf7vYCi11jKwGGlEvO30pLQ2NWYfGhSv0Rg9Xf8bsIvMRXnsWMEsU7762BqIbIBtkP8zAd7WHPBU2P8WEkpEoMzoYiSVcLnGMoRR79F4vryHM-E41UW_zxDxmRwgomdP-EQ6Ba0CrJQnyf27dL2W2SmM157sI-8nqUY_xOCAM2awXQiMXvXSMtDKVtWdMAuyQ0-jrUTqJnjsNsu7nhw
+json = {"hello": "world"}
+RSA_OAEP_256_A128GCM=eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTI4R0NNIn0.JfLXRl5rUHNtwWxv2w1HmTXxbLxFo2ctEThY-bMOfZxzidXu1hIuAndSHDQVZpa8JHCco5pTltdNcVB4FwDP-CPntQ7qqoBRtTZKW4kWoUOv5XAe118edWEDfV8zPyNSPteUsAObwIobjEWbeRWkJnW0Nmrpbdp1c-bmRci8cs8ktKlebnBG8nLjOeF2Q96XQ_dk-0UKij4k9mBRFIktbsiNLIcaTSK_na5iRn73PTXnpyKm4lii6Gt9DBoGxEUjFxIE60JJTtRQauNN6U_-jeSd9AqAUJOUkCoMQyaYo9xVoOirvW-iKgk8JmG8_ZpUQJj1bjaVMsyeRApwPtbeiw.xp4GWe9TWUPLAwnw.o6-6BR4Wp7MS6ZS1CUOcJbEn.W507z0VxaEvQv6vMJ27fPQ
+      System.NotImplementedException : not yet
+      Stack Trace:
+           at Jose.ConcatKDF.DeriveKey(CngKey externalPubKey, CngKey privateKey, Int32 keyBitLength, Byte[] algorithmId, Byte[] partyVInfo, Byte[] partyUInfo, Byte[] suppPubInfo)
+           at Jose.EcdhKeyManagement.DeriveKey(IDictionary`2 header, Int32 cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
+           at Jose.EcdhKeyManagement.NewKey(Int32 keyLength, Object key, IDictionary`2 header)
+           at Jose.EcdhKeyManagement.WrapNewKey(Int32 cekSizeBits, Object key, IDictionary`2 header)
+           at Jose.EcdhKeyManagementWithAesKeyWrap.WrapNewKey(Int32 cekSizeBits, Object key, IDictionary`2 header)
+           at Jose.JWT.EncodeBytes(Byte[] payload, Object key, JweAlgorithm alg, JweEncryption enc, Nullable`1 compression, IDictionary`2 extraHeaders, JwtSettings settings)
+           at Jose.JWT.Encode(String payload, Object key, JweAlgorithm alg, JweEncryption enc, Nullable`1 compression, IDictionary`2 extraHeaders, JwtSettings settings)
+           at UnitTests.TestSuite.Encrypt_ECDH_ES_A192KW_A192GCM()
+json = {"exp":1392553211,"sub":"alice","nbf":1392552611,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"586dd129-a29f-49c8-9de7-454af1155e27","iat":1392552611}
+A256KW_A256CBC_HS512 = eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0.Q3kwctvO0HKx4cYa8YQ7YTqsnYOkwlL7t1I8s2kZ7Rp_McHva-IQYPN6Xd6XLPD_wpRj71q0XzXJ5tHoRlCBoD6aAtNYFmTR.CITKYRbOYI_U1SkqZJwnjA.eIKhF_FoOmFtBABpE_73P8bL4gC8r05FJXWaRM3lorolFmThERdZawB5NwFAqLeyyNeeU2x8a6RodfI0ccbCM151YffCJvt_NhQwRA68L9ZojnXU7Zdix8aHMTFJX2un1PLUTpyiCP6vmK0hLNuKeM2MgoCbdF12TfLF23v3r2Zw-c1mgsP0VssxDz7soGM_JcD197qO08V_9BRoPxA4booBriyL35xtr8VOk1rMEKoCN4oeZaTQd3mRL24XyV54rJJzp1ryD5gFanqDboVWUA.Mug5OuLeVWAASKyDdflyvtmkEPn05Gs2XCsxks3imWE
+HS256 = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.VleAUqv_-nc6dwZ9xQ8-4NiOpVRdSSrCCPCQl-7HQ2k
+PBES2-HS256+A128KW A256GCM = eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJlbmMiOiJBMjU2R0NNIiwicDJjIjo4MTkyLCJwMnMiOiJLaF9DWjh4YWVITkF0ekpNIn0.YyxIysw6M3-uIY1_ImgI24Bd4v3UtZZsLjMy9UgsRwdWK1tMUpJ00w.o8PX6neKPrLf1dof.7FfSLw-9z3nX6jvOGgqpocyr7MuLBPm8qF7znX9LIUH1-JDi_D5iWvOhil_ZT53WZc8pAnULCw4yo3Yg0zDvGtzZKvRRNeY1Xt-1ijKUhcLetFxG0tvFDiz_ENtbS7Ljzl1zlK-pee2eaUy33p26DzEfWtLxSoKFEBP_jEP0mmH9PcTosu2EEFsX8JSO1-1-1EVMKexyPJEyB687M-pRYjdolWrCh2uomlq3qvhzZqVgSsvEs87nR_Utu-HACwLk1Kc0bQ.Q93SsewjewUkNzz3oNu4fA
+HS256 Unencoded = eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il0sInR5cCI6IkpXVCJ9.{"hello": "world"}.ueGnzTJermvKhFYga7Pc7W_6fXhBKHklIIJeTnMrp9M
+RSA-OAEP_A192GCM = eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExOTJHQ00ifQ.l9NcMk06cDioqxmtiusfKOWTuTcAaPA7069tNwJaYYc0BCyNPR3i4Fxq1Y0T7bwNWIFUN30kGaESZG1tUmwb7XAfKNk6ic6XiSlNsyfzksa1fVZSAmTnLe350Z6YXvLMzUDgbE1uAjtg9rriNMJzniJmu3tnpDN-UVU48u2CPVivCeH4LgzUCCDgKlhRdPYyCmTqzKezQioPn0mruAyz4oQncS_AZ58cdwANmGf-RiHED4Nx75pm7H3P51_kohHimJzZRvElVxn6LmkENoneiYXQaUfOeC22004iYr-oehelDwgAdupVt8RuOzhM3nwmnecpHlP_HppIdMrYKDOlmQ.p4ebOYigYDqyx0s_.ie8-dZt8PFDQPTKFwYiu9KbKgJukZ8cIiE32yR0u3HCNx1Tbv-PWWhwC79_yyCTozON7yhe5M5mU1P8KwMyCzleGFrqZHazAYPeH6Erx_HbrQx4daw_89W4EfA1jP-0QoIWW6LihcOCoaGq5LBSvy4JCWnAYFonbKmHrMhdlUe_N7-zPAWSW2k-uc120S5pQip8GkvQFTJQMAGLw2nPOB8005kQpJk5_6doj_kWP2eowf9aOoZiC_wKQDF2Af07fFDRgow.pzqH7LKLioGvSjor6iLwEg
+HS384 = eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.VjsBP04wkLVQ9SXqN0qe-J7FHQPGhnMAXnQvVEUdDh8wsvWNEN4wVlSkGuWIIk-b
+json = {"exp":1391710436,"sub":"alice","nbf":1391709836,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"6b646d08-2871-4e0d-bfa8-48a9e1bd6de5","iat":1391709836}
+EncodeBytesHS512: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w.3_-H4HJiNi8--Ss-VAMM1Dg0JtTGEXNvMo1LAHEnQ7bZpQiblqAu5tt-G9p8KFnSlSYOG6l64pIqmqu5p5RvuQ
+json = {"hello": "world"}
+token = {"hello": "world"}
+A128GCMKW_A128CBC_HS256 = eyJhbGciOiJBMTI4R0NNS1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiaXYiOiJ0MTgtaE9SR1k2Z1N2UGk1IiwidGFnIjoieFBiVzRNWWlMaTl5OHl4Snl1STU4USJ9.WaZTj1YeOjEfrpOG-dv4IL_o1QPsF7t-UEGoBMPvqmE.OjsijVmRCDNzXI1KZBUVmQ.-2561YpfcC21roHfs8LpWTf8JzWcIWt3bDe9tAv_ElDnLvdqf-xyF8U-O-hvxv7NYNM9tlXHhejmiPlM1EJWKTvHjIhRwStxxNb-AQyX6oXzs5xVCbAo8LWcHE5UBs0j3khnBQhsSRxIF_noN9zDH5ywCVsft96k55-AOUw5WgLkTWm5NJuEG9jN4im6nUtQiwtPuyJD5y39MkJ3FtcjL9eD26rEg5vgZh-JtC_IE_lR4JBRftj-hsvrIdQ_m_itrM5C1eJk6tJVyEs-5HgmMQ.tBZMa9ONAs8GOHHjMQlvMA
+HS256 Unencoded & Detached & Extra headers = eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0IiwiZXhwIl0sImV4cCI6MTM2MzI4NDAwMH0..9nZCB1H_OMmoTRBe2p5qeq38cyzcjJ6FzUZ9SkeZ4TU
+tokenHeaders = System.Collections.Generic.Dictionary`2[System.String,System.Object]
+exp = System.Int64
+exp = 1363284000
+A256GCMKW_A256CBC_HS512 = eyJhbGciOiJBMjU2R0NNS1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiaXYiOiJGNlBxbXF1VUlCSkxWRTdnIiwidGFnIjoiNk9SNkhuYmVDaXhVakJISkdrbFdFUSJ9.0E6zTgLp7WMVqj1gJGXaAOv2iycUjG4A3TJAwV7wJ15qmvWf4ps_l8Z6buA1rL-sITfNsP6HIZ2JyyqJF-2_1w.w2usHAX6aeL7c-qQm_TV2A.Z5asEg0o7EmAmSatqgQSCSL9VABU3W_MR7kwwrE3XzCjcDr5IJgtyil5iD9DUi_ax-fTHlWsXC7Oxtiu2bkJ6fTLRzEIEkxZB1fDJM6oAmKIahSOaZNmU1lmzQ0ngGku2xK37z69Lin5mW96GNYtkFfJIDSHJrLFVX2OC4fu9HwTnJ_pmZGwrBlikDjVJb1FkFNXxeRDOBsYJ6Bn29Od5Wef24UBu4kh0MvrBxVGy6iNdld-kSx2K_ZvreFpgVKkw6ckzV9zdCZXVFtgjJGI2A.nATicMQTZAOPHud0DVSDI8sBX6u7FaCEVUGO0LwYqBA
+PBES2-HS512+256KW A256CBC_HS512 = eyJhbGciOiJQQkVTMi1IUzUxMitBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwicDJjIjo4MTkyLCJwMnMiOiJ1b2xDeDhvUTBFR2hzWUdtIn0.wkhJhUWTjTcy0fmd83nlgpxdIJ4NJRwu5yE6MOWMq5Lk9NyLLLTxufhqjPBAa2iXYCFg9qlNNbV4Q2lE04j4CZJfSfLoFkyD.S--EbuK6VRm4uYkkEI3rJQ.OU6fA0KTEz3NIzK7GuQZ6NOFt0PbqRD5sc6Sjyo4scFQJgbm_0qMzESTLKJxkdE_KYAjxywJgPpYNwOpxggr5K91lS945HlFnO2C-JA4dcN2yLi0fuFUEms1MbAvkyz7Z9dNHwyMrSGAorlx0nsWX4Jggw8YpgFfgzatBgmm6irMxncT6fMU5fDDND1VIEVxRlKDe7LoL6nuSUT-5GwNYql63fuBCvhd2WppqnNsagaIgY7cWbskQZTaa_EuewLsHAMx-cP4zCm9-RBMpyv5PQ.aNvPa--8052zDGiciFPgzZxbbOK1RBz62pKXKRSvJ6k
+RSA1_5_A256CBC_HS512 = eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0.UZbY17ykN-WESHKCtf-KI2myEk6ZWkTdm-Kg6D4xif84IbyzWoca7WMNZUsTKXwk11esWgIIhH4FkLy5_8tK-3u3j9ORercEm-yY4skBaONMWsf3qp_amRms9wLSyIyFPqPbKY37aep-7TiL30KTshqzppWGbUpj7VvyScUL809u-GopGmf3YUfa2fpC5UosXnary9ev56wYQ4QIB4n3dBGtBaAjRFzFDivC7XL7h6F4T9YIJr106UK-bt3A3nM0VCaR4inrtyBecm-ADMjZ635b4ZcZxPn1qCTtfK3VtpgdP1TwqB4m1Owd6xqHSREy-J0o0QQSZFmkb6bdXqGshA.SAcbnw-12bpZQ900IpPobg.uUqQyKOxHIzsDYgFp6mhVJ-R221zkqIS8J5r1vMgpPBUv81Z-iQ9JLvFXSM5S-N_SEq4E5Irt7RmsDBsWhYQeRG7qDlGb0oEsQ-dQg5aqbc6w1vnSfZ6G_qBOpggtxiVuRS-PZuqAOOQwChKmnWaFIgty3C9e2DBN3zwIP3nleyGZXNSWjx9N87Mrv9YDoXq7JJAVVwmVSxf-e1inNvJWoAs-_jnr8_ij3oaXlr7w7jAPX6J1mGvbQJb6VHLpC39Vh2wWEtT-KW7vKE72hfgZQ.hELoyOpISgVTtkZer8xempfDwSiH88mggrEbdqKidvg
+json = {"exp":1392553211,"sub":"alice","nbf":1392552611,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"586dd129-a29f-49c8-9de7-454af1155e27","iat":1392552611}
+json = {"exp":1392553211,"sub":"alice","nbf":1392552611,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"586dd129-a29f-49c8-9de7-454af1155e27","iat":1392552611}
+      System.NotImplementedException : not yet
+      Stack Trace:
+RS256 = eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.AzXfyb6BuwLgNUqVkfiKeQRctG25u3-5DJIsGyDnFxOGTet74SjW6Aabm3LSXZ2HgQ5yp8_tCfqA12oDmPiviq4muhgc0LKujTpGtFlf0fcSJQJpxSTMGQZdZnxdKpz7dCSlQNvW6j1tGy1UWkXod-kf4FZckoDkGEbnRAVVVL7xRupFtLneUJGoWZCiMz5oYAoYMUY1bVil1S6lIwUJLtgsvrQMoVIcjlivjZ8fzF3tjQdInxCjYeOKD3WQ2-n3APg-1GEJT-l_2y-scbE55TPSxo9fpHoDn7G0Kcgl8wpjY4j3KR9dEa4unJN3necd83yCMOUzs6vmFncEMTrRZw
+           at Jose.ConcatKDF.DeriveKey(CngKey externalPubKey, CngKey privateKey, Int32 keyBitLength, Byte[] algorithmId, Byte[] partyVInfo, Byte[] partyUInfo, Byte[] suppPubInfo)
+           at Jose.EcdhKeyManagement.DeriveKey(IDictionary`2 header, Int32 cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
+           at Jose.EcdhKeyManagement.Unwrap(Byte[] encryptedCek, Object key, Int32 cekSizeBits, IDictionary`2 header)
+           at Jose.JWT.DecryptBytes(Iterator parts, Object key, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings)
+           at Jose.JWT.DecodeBytes(String token, Object key, Nullable`1 expectedJwsAlg, Nullable`1 expectedJweAlg, Nullable`1 expectedJweEnc, JwtSettings settings, Byte[] payload)
+           at Jose.JWT.Decode(String token, Object key, Nullable`1 jwsAlg, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings, String payload)
+           at Jose.JWT.Decode(String token, Object key, JwtSettings settings, String payload)
+           at UnitTests.TestSuite.Decrypt_ECDH_ES_A192GCM()
+A128KW_A128CBC_HS256 = eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.UXA0OYvScZSzIItCGHCq3Lk0WzfhAFIrgKm_kvpPcIjdGJlLhYoNjA.iIhOBjHUWp5B4bcfbjILLA.gLmworo9-YBjuGSWnWDEeUsODeBaUS7ePRS7kPpvqNzYlscA_njnF_jJEWKdWr5qFFmSM-dcy-pb1b6ZpczQ8x3wVtQRG6MesosqCsXOtIMKD6yC_s8C_kagZ2_xFrHB-Bgr8XxxiDgnFgL98bpDou57EA4KEnetg2OClg-V3f1ff4VfHH1OavTwMwG4zy8uCRuux8egwNp04ggeEqsV1Z4coUstcoFxU0yOkYtm4auFpUERPnPMEZnf77KEVGtPUN6n44mnOxXfUHauuL2lWw.DB-Dt_HK_8Dn4wFohyaToQ
+json = {"exp":1391196668,"sub":"alice","nbf":1391196068,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"3814fff3-db66-45d9-a29a-d2cc2407bdcf","iat":1391196068}
+RSA1_5_A128GCM = eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4R0NNIn0.WklB2eRosvrscPlUMCZRISTo8qOOzj8-WofayWyCaWVj7-prPHRobhVRcpkyPjiYU1geTmGHDl5xUFyyparQzmpREzU1kbXdqaUKq6ux5WlACwfWg90MuQoIBFo75lXB18l2N9BmpQ-j3_oGHjoynYiebtdNITxo3s2OUc-j1X3KiVBK6L_Cv5MaBPh3GWmibPZszUIDGAHMlwF_nkl1Ya7Y9f8pzZVYkKJnMkx-BNDAK_ut5iuGsy_BGqIdcQTudnO3MC-2ehBAtcfzSQx8RCAKTTzfYpfH4HabHYxzz8eOBkeFgBzXMNN37EMRA4oV02iWlZl70fyQBJBt5UGSsg.PYmJrE3pfeOK-qhg.B2QNrY8DykHAM2Ug9RLaJBTpsYOT2zgQUel66g5zhtfUtXNX5WDOWwGgybDviw6KMrkBMENJnJf4y8jAX-MjHaPdTUCrJ9tkkTNGvgBBl5ZCTeBR1zvY2f5Rk7CKg0k4JcVw1Zzfao3MWGfc8XPIKxvFfa__9pNHnJZuMUaEKN3nhCfkr7LFe6d2esFt3MNhaP8ySRR47czLS5P7a_JNiwXYz_Gf8xc34pm0ZryDno8h494clzRnMD1YOEgDlhPsvtbeHg.S3miYJf_KmkBN22LUwZlLw
+json = {"exp":1392553211,"sub":"alice","nbf":1392552611,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"586dd129-a29f-49c8-9de7-454af1155e27","iat":1392552611}
+      System.NotImplementedException : not yet
+      Stack Trace:
+           at Jose.ConcatKDF.DeriveKey(CngKey externalPubKey, CngKey privateKey, Int32 keyBitLength, Byte[] algorithmId, Byte[] partyVInfo, Byte[] partyUInfo, Byte[] suppPubInfo)
+           at Jose.EcdhKeyManagement.DeriveKey(IDictionary`2 header, Int32 cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
+           at Jose.EcdhKeyManagement.Unwrap(Byte[] encryptedCek, Object key, Int32 cekSizeBits, IDictionary`2 header)
+           at Jose.JWT.DecryptBytes(Iterator parts, Object key, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings)
+           at Jose.JWT.DecodeBytes(String token, Object key, Nullable`1 expectedJwsAlg, Nullable`1 expectedJweAlg, Nullable`1 expectedJweEnc, JwtSettings settings, Byte[] payload)
+           at Jose.JWT.Decode(String token, Object key, Nullable`1 jwsAlg, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings, String payload)
+           at Jose.JWT.Decode(String token, Object key, JwtSettings settings, String payload)
+           at UnitTests.TestSuite.Decrypt_ECDH_ES_A128CBC_HS256()
+HS512 = eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.IIif-Hyd8cS2_oqRb_3PzL7IwoIcPUVl_BVvOr6QbJT_x15RyNy2m_tFfUcm6lriqfAnOudqpyN-yylAXu1eFw
+json = {"exp":1391196668,"sub":"alice","nbf":1391196068,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"c9d44ff8-ff1e-4490-8454-941e45766152","iat":1391196068}
+HS256 Detached = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..VleAUqv_-nc6dwZ9xQ8-4NiOpVRdSSrCCPCQl-7HQ2k
+json = {"exp":1392553372,"sub":"alice","nbf":1392552772,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"f81648e9-e9b3-4e37-a655-fcfacace0ef0","iat":1392552772}
+token = {"hello": "world"}
+json = {"exp":1392553211,"sub":"alice","nbf":1392552611,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"586dd129-a29f-49c8-9de7-454af1155e27","iat":1392552611}
+PBES2-HS384+A192KW A192GCM = eyJhbGciOiJQQkVTMi1IUzM4NCtBMTkyS1ciLCJlbmMiOiJBMTkyR0NNIiwicDJjIjo4MTkyLCJwMnMiOiJoZnZGbC1naGVvQm9zZW1FIn0.XskkSt9eZNgUTNEYMFs6FbHoy9nxD47wWAr7-2tC8PY.WDn_6HmKGa5JyKfr.OSM0pC7o_Yex_viw_ErYLJZIaHn6zbq3_RLszyxXBXwuPqoKBpq6M7LzUew5p9V0AuI0n2LF7rAD_3pj7yYVsn7bptRUY9PXmmrwxss59Vx1FYcmR0HCepOsAmFlntvACQfQb8H5GeOCY8HZOo1cE9iHGCaZP7ZB88XUtCLSJDIJzRnj2peLbN9X1HHE-0zMgDJ6499iUJssFr7JWG5Xq2BzUjyWKQVewGauZE_vlWO52dmbjXRt9eVJd1D5UZ5bcZXhvA.Bw7mpBkAB2dWCO5wVJXkpw
+json = {"exp":1391711482,"sub":"alice","nbf":1391710882,"aud":["https:\/\/app-one.com","https:\/\/app-two.com"],"iss":"https:\/\/openid.net","jti":"77a31aed-f546-4b1d-ba77-9455a2e0a3d5","iat":1391710882}
+DIR_A192CBC_HS384 = eyJhbGciOiJkaXIiLCJlbmMiOiJBMTkyQ0JDLUhTMzg0In0..0SXLaY58T3oLuNZYiOQ1aA.2ofiJdA_HzSllWd-JVWYOrfIsQuUbJLVKprIsSzaJF_rHqh_jd3txlAvUnKaI41hq76L4BlRlNy68P6d4kF5IL5do2OUrYWFu1_kFX_aaurbZaXVZIC29n47Ta7m0eLSkbAwTPcot6vowMHeMlnjIwo_9f5jfO8hC805TCu-m39oq1k3O_ArcExxxyomIdUTmJ5fOVzL7euPtv0FdEEXPhknydcsE0nFbo5EskxEFANpT68nLSw6ccJZP91RvAM0XhbZ79n0gUelzv2Azke1wQ.CBaOIQ3fQvoM2KaAv-ifacZOpsGXPmrI
+      System.NotImplementedException : not yet
+      Stack Trace:
+           at Jose.ConcatKDF.DeriveKey(CngKey externalPubKey, CngKey privateKey, Int32 keyBitLength, Byte[] algorithmId, Byte[] partyVInfo, Byte[] partyUInfo, Byte[] suppPubInfo)
+           at Jose.EcdhKeyManagement.DeriveKey(IDictionary`2 header, Int32 cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
+           at Jose.EcdhKeyManagement.Unwrap(Byte[] encryptedCek, Object key, Int32 cekSizeBits, IDictionary`2 header)
+           at Jose.EcdhKeyManagementWithAesKeyWrap.Unwrap(Byte[] encryptedCek, Object key, Int32 cekSizeBits, IDictionary`2 header)
+           at Jose.JWT.DecryptBytes(Iterator parts, Object key, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings)
+           at Jose.JWT.DecodeBytes(String token, Object key, Nullable`1 expectedJwsAlg, Nullable`1 expectedJweAlg, Nullable`1 expectedJweEnc, JwtSettings settings, Byte[] payload)
+           at Jose.JWT.Decode(String token, Object key, Nullable`1 jwsAlg, Nullable`1 jweAlg, Nullable`1 jweEnc, JwtSettings settings, String payload)
+           at Jose.JWT.Decode(String token, Object key, JwtSettings settings, String payload)
+           at UnitTests.TestSuite.Decrypt_ECDH_ES_A256KW_A256GCM()
+DIR_A192GCM = eyJhbGciOiJkaXIiLCJlbmMiOiJBMTkyR0NNIn0..WNRtosYHKbJQwOnD.cxWzus9OxkhRkL4WK3XqGgCV9wVugME0z7NOnTAXdaY-o1NW-I_2rQIYwVKHZWxl1d9SZP0TXnOJbgAUNO2lUGYQjJFE8HFFQFwMRbiZNnzPc-gWjLF2OU5yqKg6d0FE1aJSsO7gdBNmp-R9YeMXn973lzblPR8CE1gqsAc7gksHDBd_uveXuBkG38_q7slnhFoXmbQ7_rmSTOJpRMTV4SYih4aWislSHsWTVjBRlNvPeT6vMqfGC2tAeN7JXLmPuf6lgQ.QnO9KkY-c0WPGH29m0hMRw
+HS256 Unencoded & Detached = eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il0sInR5cCI6IkpXVCJ9..ueGnzTJermvKhFYga7Pc7W_6fXhBKHklIIJeTnMrp9M
+DIR_A256CBC_HS512 = eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0..O2tU0Xg8JsevnrjO69Rdlg.N884gci7ISu-3bziJ4vY2CRJkSDBo_NBwWmv4aBJVmojpDYvZrn5_im-ZHy7KZDk6LmoNb8ef3BBKEI3spaTTzoeYzd0lFENAxMe8qWqsV674gShiJ9bhf6-jqIbdDbVBk6V9RQKbuwH88pfqVb_9ro7rToJRwMB0WvFSejzNcgso0JTbgsCY6FlGFAydz0R2Qh-JaIuCpWyXGKIvsmNRdWag_RMCkGKx8lZPexo_4LIZ-kU1RcVe6TSdjlofMVQotumXQRVsOWM05I_DRm1gQ.5VfV_UVxVlmPkfVutKv9B2GKzOG_GbmRiquqI1O1OO4
+      System.NotImplementedException : not yet
+      Stack Trace:
+           at Jose.ConcatKDF.DeriveKey(CngKey externalPubKey, CngKey privateKey, Int32 keyBitLength, Byte[] algorithmId, Byte[] partyVInfo, Byte[] partyUInfo, Byte[] suppPubInfo)
+           at UnitTests.ConcatKDFTest.Derive128BitKey()
+  Finished:    UnitTests
+=== TEST EXECUTION SUMMARY ===
+   UnitTests  Total: 204, Errors: 0, Failed: 15, Skipped: 0, Time: 20.413s

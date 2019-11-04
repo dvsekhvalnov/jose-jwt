@@ -7,11 +7,14 @@ using System.Text;
 using Jose;
 using Security.Cryptography;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace UnitTests
 {
     public class TestSuite
-    {
+    {       
+        private TestConsole Console;
+
         private string key = "a0a2abd8-6162-41c3-83d6-1cf559b46afc";
         private byte[] aes128Key = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
         private byte[] aes192Key = new byte[] { 139, 156, 136, 148, 17, 147, 27, 233, 145, 80, 115, 197, 223, 11, 100, 221, 5, 50, 155, 226, 136, 222, 216, 14 };
@@ -21,6 +24,11 @@ namespace UnitTests
 
         // The binary payload is a blob consisting of all possible byte values.
         private byte[] BinaryPayload = Enumerable.Range(byte.MinValue, byte.MaxValue + 1).Select(i => (byte)i).ToArray();
+
+        public TestSuite(ITestOutputHelper output)
+        {
+            this.Console = new TestConsole(output);
+        }
 
         [Fact]
         public void DecodePlaintext()
@@ -2573,7 +2581,35 @@ namespace UnitTests
         }
 
         [Fact]
-        public void PayloadOfEncryptedTOken()
+        public void PayloadBytes()
+        {
+            //given
+            string token =
+                "eyJhbGciOiJIUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.chIoYWrQMA8XL5nFz6oLDJyvgHk2KA4BrFGrKymjC8E";
+
+            //when
+            var test = Jose.JWT.PayloadBytes(token);
+
+            //then
+            Assert.Equal(test, new byte[] { 123, 34, 104, 101, 108, 108, 111, 34, 58, 32, 34, 119, 111, 114, 108, 100, 34, 125 });
+        }
+
+        [Fact]
+        public void PayloadBytesUnencoded()
+        {
+            //given
+            string token =
+                "eyJhbGciOiJIUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.chIoYWrQMA8XL5nFz6oLDJyvgHk2KA4BrFGrKymjC8E";
+
+            //when
+            var test = Jose.JWT.PayloadBytes(token, false);
+
+            //then
+            Assert.Equal(test, new byte[] { 101, 121, 74, 111, 90, 87, 120, 115, 98, 121, 73, 54, 73, 67, 74, 51, 98, 51, 74, 115, 90, 67, 74, 57 });
+        }
+
+        [Fact]
+        public void PayloadOfEncryptedToken()
         {
             //given
             string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0..ZD93XtD7TOa2WMbqSuaY9g.1J5BAuxNRMWaw43s7hR82gqLiaZOHBmfD3_B9k4I2VIDKzS9oEF_NS2o7UIBa6t_fWHU7vDm9lNAN4rqq7OvtCBHJpFk31dcruQHxwYKn5xNefG7YP-o6QtpyNioNWJpaSD5VRcRO5ufRrw2bu4_nOth00yJU5jjN3O3n9f-0ewrN2UXDJIbZM-NiSuEDEgOVHImQXoOtOQd0BuaDx6xTJydw_rW5-_wtiOH2k-3YGlibfOWNu51kApGarRsAhhqKIPetYf5Mgmpv1bkUo6HJw.nVpOmg3Sxri0rh6nQXaIx5X0fBtCt7Kscg6c66NugHY";
@@ -2586,8 +2622,115 @@ namespace UnitTests
             }
             catch (JoseException e)
             {
-                Console.WriteLine(e);
+                Console.Out.WriteLine(e.ToString());
             }
+        }
+
+        [Fact]
+        public void EncodeWithDetachedContent()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256, options: new JwtOptions { DetachPayload = true });
+
+            //then
+            Console.Out.WriteLine("HS256 Detached = {0}", token);
+
+           Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..VleAUqv_-nc6dwZ9xQ8-4NiOpVRdSSrCCPCQl-7HQ2k");
+           Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key), payload: @"{""hello"": ""world""}"), json);
+        }
+
+
+        [Fact]
+        public void EncodeWithUnencodedPayload()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256, options: new JwtOptions { EncodePayload = false });
+
+            //then
+            Console.Out.WriteLine("HS256 Unencoded = {0}", token);
+
+            Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il0sInR5cCI6IkpXVCJ9.{\"hello\": \"world\"}.ueGnzTJermvKhFYga7Pc7W_6fXhBKHklIIJeTnMrp9M");
+            Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), json);
+        }
+
+        [Fact]
+        public void EncodeWithUnencodedAndDetachedContent()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256, options: new JwtOptions { DetachPayload = true, EncodePayload = false});
+
+            //then
+            Console.Out.WriteLine("HS256 Unencoded & Detached = {0}", token);
+
+            Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il0sInR5cCI6IkpXVCJ9..ueGnzTJermvKhFYga7Pc7W_6fXhBKHklIIJeTnMrp9M");
+            Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key), payload: @"{""hello"": ""world""}"), json);
+        }
+
+        [Fact]
+        public void EncodeWithUnencodedDetachedExtraHeaders()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            var headers = new Dictionary<string, object>
+            {
+                { "exp", 1363284000 },
+                { "crit", new [] {"exp"} },
+            };
+                
+            //when
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256, 
+                extraHeaders: headers,
+                options: new JwtOptions { DetachPayload = true, EncodePayload = false});
+
+            //then
+            Console.Out.WriteLine("HS256 Unencoded & Detached & Extra headers = {0}", token);
+
+            Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0IiwiZXhwIl0sImV4cCI6MTM2MzI4NDAwMH0..9nZCB1H_OMmoTRBe2p5qeq38cyzcjJ6FzUZ9SkeZ4TU");
+            Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key), payload: @"{""hello"": ""world""}"), json);
+            var tokenHeaders = Jose.JWT.Headers(token);
+            
+            Assert.Equal(tokenHeaders.Count(), 4);
+            Assert.Equal(tokenHeaders["alg"], "HS256");
+            Assert.Equal(tokenHeaders["b64"], false);
+            Assert.Equal(tokenHeaders["exp"], 1363284000);
+            Assert.Equal(tokenHeaders["crit"], new [] {"b64", "exp"});
+        }
+
+        [Fact]
+        public void DecodeUnencodedDetached()
+        {
+            //given
+            string token =
+                "eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJSUzI1NiJ9..iyormYw6b0zKjx4K-fpeZO8xrLghkeUFMb2l4alz03CRLVdlXkdeKVG7N5lBbS-kXB4-8hH1ELFA5fUJzN2QYR6ZZIWjDF77HYTw7lsyjTJDNABjBFn-BIXlWatjNdgtRi2BZg2q_Wos87ZQT6Sl-h5hvxsFEsR0kGPMQ4Fjp-sxOyfnls8jAlziqmkpN-K6I3tK2vCLCQgnaN9sYrsIcrzuEA30YeXsgUe3m44yxLCXczXWKE3kgGiZ0MRpVvKOZt4B2DZLcRmNArhxjhWWd1nKZvv8c7kN0TqOjcNEUGWzwDs4ikCSz1aYKaLPXgjzpKnzbajUM117F3aCAaWH9g";
+
+            //when
+            string json = Jose.JWT.Decode(token, PubKey(), payload: @"{""hello"": ""world""}");
+
+            //then
+            Assert.Equal(json, @"{""hello"": ""world""}");
+        }
+
+        [Fact]
+        public void DecodeBytesUnencodedDetached()
+        {            
+            //given
+            string token = "eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJSUzI1NiJ9..ToCewDcERVLuqImwDkOd9iSxvTC8vzh-HrhuohOIjWMrGpTZi2FdzVN4Ll3fb2Iz3s_hj-Lno_c6m_7VcmOHfRLC9sPjSu2q9dbNkKo8Zc2FQmsCBdQi06XGAEJZW2M9380pxoYKiJ51a4EbGl4Ag7lX3hXeTPYRMVifacgdlpg2SYZzDPZQbWvibgtXFsBsIqPd-8i6ucE2eMdaNeWMLsHv-b5s7uWn8hN2nMKHj000Qce5rSbpK58l2LNeWw4IR6wNOqSZfbeerMxq1u0p-ZKIQxP24MltaPjZtqMdD4AzjrP4UCEf7VaLSkSuNVSf6ZmLmE_OYgQuQe7adFdoPg";
+
+            //when
+            byte[] test = Jose.JWT.DecodeBytes(token, PubKey(), payload:BinaryPayload);
+
+            //then
+            Assert.Equal(test, BinaryPayload);
         }
 
         [Fact]

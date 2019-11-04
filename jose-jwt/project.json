@@ -1,20 +1,20 @@
 {
-  "version": "2.4.0-*",
+  "version": "2.5.0-*",
   "title": "Jose JWT",
   "authors": [ "Dmitry Vsekhvalnov" ],
   "owners": [ "Dmitry Vsekhvalnov" ],
-  "tags": [ "jose", "jwt", "json", "jwa", "jwe", "jws", "aes", "cbc", "gcm", "rsa", "hmac", "sha", "rsassa", "pss", "rsaes", "oaep", "pkcs1-v1_5", "es", "elliptic", "curve", "diffe", "hellman", "agreement", "ecdsa", "key wrap", "kw", "ecdh", "pbes", "pbes2", "pbkdf", "pbkdf2", "password based encryption", "javascript object signing", "two phase validation", "netcore", "clr", "coreclr", "portable", "fips", "compliant"],
+  "tags": [ "jose", "jwt", "json", "jwa", "jwe", "jws", "aes", "cbc", "gcm", "rsa", "hmac", "sha", "rsassa", "pss", "rsaes", "oaep", "pkcs1-v1_5", "es", "elliptic", "curve", "diffe", "hellman", "agreement", "ecdsa", "key wrap", "kw", "ecdh", "pbes", "pbes2", "pbkdf", "pbkdf2", "password based encryption", "javascript object signing", "two phase validation", "netcore", "clr", "coreclr", "portable", "fips", "compliant", "open", "banking", "detached content", "unencoded payload"],
   "projectUrl": "https://github.com/dvsekhvalnov/jose-jwt",
   "licenseUrl": "https://raw.github.com/dvsekhvalnov/jose-jwt/master/LICENSE",
   "language": "en-US",
   "copyright": "Copyright dvsekhvalnov 2014-2017",
   "requireLicenseAcceptance": false,
-  "releaseNotes": "Security improvements. SDK Enhancements, ability to specifiy alg aliases for better interop.",
+  "releaseNotes": "RFC 7797 support. Unencoded payload and detached content for encoding and decoding.",
   "summary": "Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET Core. Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms. Library for generating, decoding and encryption of JSON Web Tokens.",
   "description": "Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET \r\r
 
 Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET. Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms. \r
-Supports generating, decoding, encryption and compression of JSON Web Tokens. JSON parsing agnostic. Supports two-phase validation. FIPS compliant. \r\r
+Supports generating, decoding, encryption and compression of JSON Web Tokens. JSON parsing agnostic. Supports two-phase validation. FIPS compliant. Unencoded payload and detached content support (RFC 7797). \r\r
 
 CLR supported algorithms \r\r
 
@@ -42,6 +42,12 @@ Compression: \r\r
 
 - DEFLATE compression\r\r\r
 
+RFC 7797: \r\r
+
+- Unencoded payload\r\r
+- Detached content\r\r\r
+
+
 CORECLR supported algorithms \r\r
 
 Signing: \r\r
@@ -60,7 +66,12 @@ Encryption: \r\r
 
 Compression: \r\r
 
-- DEFLATE compression\r\r\r",
+- DEFLATE compression\r\r\r
+
+RFC 7797: \r\r
+
+- Unencoded payload\r\r
+- Detached content\r\r\r",
   "frameworks": {
     "net4": {
       "frameworkAssemblies": {

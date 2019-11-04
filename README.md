@@ -420,6 +420,44 @@ string json = Jose.JWT.Decode(token, "top secret");
 
 ## Additional utilities
 
+### Unencoded and detached content (aka [RFC 7797](https://tools.ietf.org/html/rfc7797))
+As of v2.5.0 library support `b64` header to control payload decoding and encoding and optional content detaching.
+
+Encoding can be controlled with optional `JwtOptions` parameter, that support:
+* `DetachPayload` - whether we'd like to omit payload part in token produced (`false` by default)
+* `EncodePayload` - whether to apply base64url encoding to payload part (`true` by default)
+
+Options can be mixed in any combinations. To match RFC 7797:
+
+```C#
+string token = Jose.JWT.Encode(json, secretKey, JwsAlgorithm.HS256, options: new JwtOptions { DetachPayload = true, EncodePayload = false});
+```
+
+or just skip payload for instance:
+
+```C#
+string token = Jose.JWT.Encode(json, secretKey, JwsAlgorithm.HS256, options: new JwtOptions { DetachPayload = true });
+```
+
+Decoding automatically respect `b64` header if present. In case of detached payload one can provide optional `payload` param:
+
+```C#
+string token = "eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJSUzI1NiJ9..iyormYw6b0zKjx4K-fpeZO8xrLghkeUFMb2l4alz03CRLVdlXkdeKVG7N5lBbS-kXB4-8hH1ELFA5fUJzN2QYR6ZZIWjDF77HYTw7lsyjTJDNABjBFn-BIXlWatjNdgtRi2BZg2q_Wos87ZQT6Sl-h5hvxsFEsR0kGPMQ4Fjp-sxOyfnls8jAlziqmkpN-K6I3tK2vCLCQgnaN9sYrsIcrzuEA30YeXsgUe3m44yxLCXczXWKE3kgGiZ0MRpVvKOZt4B2DZLcRmNArhxjhWWd1nKZvv8c7kN0TqOjcNEUGWzwDs4ikCSz1aYKaLPXgjzpKnzbajUM117F3aCAaWH9g";
+
+// will echo provided payload back as return value, for consistency
+string json = Jose.JWT.Decode(token, PubKey(), payload: @"{""hello"": ""world""}");
+```
+
+also works with binary payloads:
+
+```C#
+string token = "eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJSUzI1NiJ9..ToCewDcERVLuqImwDkOd9iSxvTC8vzh-HrhuohOIjWMrGpTZi2FdzVN4Ll3fb2Iz3s_hj-Lno_c6m_7VcmOHfRLC9sPjSu2q9dbNkKo8Zc2FQmsCBdQi06XGAEJZW2M9380pxoYKiJ51a4EbGl4Ag7lX3hXeTPYRMVifacgdlpg2SYZzDPZQbWvibgtXFsBsIqPd-8i6ucE2eMdaNeWMLsHv-b5s7uWn8hN2nMKHj000Qce5rSbpK58l2LNeWw4IR6wNOqSZfbeerMxq1u0p-ZKIQxP24MltaPjZtqMdD4AzjrP4UCEf7VaLSkSuNVSf6ZmLmE_OYgQuQe7adFdoPg";
+
+// will echo provided payload back as return value, for consistency
+byte[] payload = Jose.JWT.DecodeBytes(token, PubKey(), payload: BinaryPayload);
+```
+
+
 ### Adding extra headers
 jose-jwt allows to pass extra headers when encoding token to overide deafault values<sup>\*</sup>. `extraHeaders:` named param can be used, it accepts `IDictionary<string, object>` type.
 jose-jwt is NOT allow to override `alg` and `enc` headers .
