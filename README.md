@@ -103,6 +103,8 @@ var payload = new Dictionary<string, object>()
 string token = Jose.JWT.Encode(payload, null, JwsAlgorithm.none);
 ```
 
+**Warning:** When using a `class` as the data structure of the payload, always use nullable data types for its properties. [details](#potential-security-risk)
+
 ### Creating signed Tokens
 #### HS-\* family
 HS256, HS384, HS512 signatures require `byte[]` array key of corresponding length
@@ -417,6 +419,34 @@ string token = "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2
 
 string json = Jose.JWT.Decode(token, "top secret");
 ```
+
+### Potential security risk
+
+While deserializing a token, if a field is not provided in token (may due to payload schema changes), the field will remain its default value. This is Newtonsoft.Json's behavior. This hehavior is quite dangerous, which could give attacker chances.
+
+Suppose the payload class is `Payload`.
+
+``` cs
+class Payload
+{
+    public int UserId { get; set; }
+}
+```
+
+Later the `Payload` class is changed to:
+
+```cs
+class Payload
+{
+    public int Id { get; set; } // UserId -> Id
+}
+```
+Now, if the library deserializes a token issued before the change of `Payload` class, proterty `Id` is not provided in the token and will remain its default value `0`. The payload data will be: `{Id = 0}`.
+
+The user will get someone else's identity (id: 0) .
+
+So developers should always use [nullable data types](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/nullable-value-types) for payload class properties. 
+
 
 ## Additional utilities
 
