@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD1_4
+﻿#if NETSTANDARD2_1
 using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;

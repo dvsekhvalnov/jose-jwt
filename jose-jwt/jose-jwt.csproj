@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <RootNamespace>jose_jwt</RootNamespace>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AssemblyTitle>jose-jwt</AssemblyTitle>
+    <Company>dvsekhvalnov</Company>
+    <Product>jose-jwt</Product>
+    <Copyright>dvsekhvalnov</Copyright>
+    <VersionPrefix>2.4.0</VersionPrefix>
+    <FileVersion>2.4.0.0</FileVersion>
+    <VersionSuffix>streevafork</VersionSuffix>
+    <PackageDescription>This package is a (temporary) fork of jose-jwt</PackageDescription>
+    <RepositoryUrl>https://github.com/streeva/streeva-core</RepositoryUrl>
+    <AssemblyName>jose-jwt-streevafork</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Security.Cryptography.Cng" Version="4.7.0" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+</Project>

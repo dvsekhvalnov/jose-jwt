@@ -11,7 +11,7 @@ namespace Jose
         {
             var cek = Arrays.Random(cekSizeBits);
 
-        #if NET40
+#if NET40
             if (key is CngKey)
             {
                 var publicKey = Ensure.Type<CngKey>(key, "RsaOaep256KeyManagement alg expects key to be of CngKey type.");
@@ -30,7 +30,7 @@ namespace Jose
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey type.");
 
-        #elif NET461
+#elif NET461
             if (key is CngKey)
             {
                 var publicKey = (CngKey) key;
@@ -57,7 +57,7 @@ namespace Jose
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of either CngKey or RSA types.");
 
 
-#elif NETSTANDARD1_4
+#elif NETSTANDARD2_1
             var publicKey = Ensure.Type<RSA>(key, "RsaKeyManagement algorithm expects key to be of RSA type.");
 
             return new[] { cek, publicKey.Encrypt(cek, RSAEncryptionPadding.OaepSHA256) };
@@ -67,7 +67,7 @@ namespace Jose
 
         public byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
         {
-        #if NET40
+#if NET40
             if(key is RSACryptoServiceProvider)
             {
                 //This is for backward compatibility only with 2.x 
@@ -87,7 +87,7 @@ namespace Jose
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey type.");
 
-         #elif NET461
+#elif NET461
             if (key is CngKey)
             {
                 var privateKey = (CngKey) key;
@@ -113,7 +113,7 @@ namespace Jose
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of either CngKey or RSA types.");
 
-        #elif NETSTANDARD1_4
+#elif NETSTANDARD2_1
             var privateKey = Ensure.Type<RSA>(key, "RsaKeyManagement algorithm expects key to be of RSA type.");
 
             return privateKey.Decrypt(encryptedCek, RSAEncryptionPadding.OaepSHA256);

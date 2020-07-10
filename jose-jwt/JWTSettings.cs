@@ -28,7 +28,7 @@ namespace Jose
                 { JwsAlgorithm.ES256, new EcdsaUsingSha(256) },
                 { JwsAlgorithm.ES384, new EcdsaUsingSha(384) },
                 { JwsAlgorithm.ES512, new EcdsaUsingSha(521) }
-#elif NETSTANDARD1_4 || NET461
+#elif NETSTANDARD2_1 || NET461
                 { JwsAlgorithm.ES256, new Jose.netstandard1_4.EcdsaUsingSha(256) },
                 { JwsAlgorithm.ES384, new Jose.netstandard1_4.EcdsaUsingSha(384) },
                 { JwsAlgorithm.ES512, new Jose.netstandard1_4.EcdsaUsingSha(521) }
@@ -134,7 +134,7 @@ namespace Jose
 
 #if NET40 || NET461
         private IJsonMapper jsMapper = new JSSerializerMapper();
-#elif NETSTANDARD1_4
+#elif NETSTANDARD2_1
         private IJsonMapper jsMapper = new NewtonsoftMapper();
 #endif       
       

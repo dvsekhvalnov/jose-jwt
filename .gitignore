@@ -17,3 +17,5 @@ artifacts/
 .vs
 .vscode
 packages
+
+nuget.config

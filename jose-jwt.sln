@@ -1,19 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29926.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "UnitTests", "UnitTests\UnitTests.xproj", "{594D3BE3-8464-424D-B434-0BF35BB709B4}"
-	ProjectSection(ProjectDependencies) = postProject
-		{E449D0E1-AEFE-4610-B506-72815C4D3570} = {E449D0E1-AEFE-4610-B506-72815C4D3570}
-	EndProjectSection
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "jose-jwt", "jose-jwt\jose-jwt.csproj", "{A382F1DB-C463-4665-822B-1061FD6D5107}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0E33B96D-ADDA-46F8-8A73-323CC6A507D5}"
-	ProjectSection(SolutionItems) = preProject
-		JWT\global.json = JWT\global.json
-	EndProjectSection
-EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "jose-jwt", "jose-jwt\jose-jwt.xproj", "{E449D0E1-AEFE-4610-B506-72815C4D3570}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{E306F252-7A97-47AF-B948-D3CE0DD16CD6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,16 +13,18 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{594D3BE3-8464-424D-B434-0BF35BB709B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{594D3BE3-8464-424D-B434-0BF35BB709B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{594D3BE3-8464-424D-B434-0BF35BB709B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{594D3BE3-8464-424D-B434-0BF35BB709B4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E449D0E1-AEFE-4610-B506-72815C4D3570}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E449D0E1-AEFE-4610-B506-72815C4D3570}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E449D0E1-AEFE-4610-B506-72815C4D3570}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E449D0E1-AEFE-4610-B506-72815C4D3570}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A382F1DB-C463-4665-822B-1061FD6D5107}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A382F1DB-C463-4665-822B-1061FD6D5107}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A382F1DB-C463-4665-822B-1061FD6D5107}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A382F1DB-C463-4665-822B-1061FD6D5107}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E306F252-7A97-47AF-B948-D3CE0DD16CD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E306F252-7A97-47AF-B948-D3CE0DD16CD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E306F252-7A97-47AF-B948-D3CE0DD16CD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {519148DB-598F-438D-BE18-3350F33F8F6A}
 	EndGlobalSection
 EndGlobal
