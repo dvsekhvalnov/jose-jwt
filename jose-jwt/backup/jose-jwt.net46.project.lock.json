@@ -1,23 +1,23 @@
 {
   "version": 3,
   "targets": {
-    ".NETFramework,Version=v4.0": {},
-    ".NETFramework,Version=v4.0/win": {}
+    ".NETFramework,Version=v4.6.1": {},
+    ".NETFramework,Version=v4.6.1/win": {}
   },
   "libraries": {},
   "projectFileDependencyGroups": {
     "": [],
-    ".NETFramework,Version=v4.0": []
+    ".NETFramework,Version=v4.6.1": []
   },
   "packageFolders": {
     "C:\\Users\\dv\\.nuget\\packages\\": {}
   },
   "project": {
     "restore": {
-      "projectUniqueName": "C:\\projects\\jose-jwt\\jose-jwt\\jose-jwt.net40.csproj",
-      "projectName": "jose-jwt.net40",
-      "projectPath": "C:\\projects\\jose-jwt\\jose-jwt\\jose-jwt.net40.csproj",
-      "projectJsonPath": "C:\\projects\\jose-jwt\\jose-jwt\\jose-jwt.net40.project.json",
+      "projectUniqueName": "C:\\projects\\jose-jwt\\jose-jwt\\jose-jwt.net46.csproj",
+      "projectName": "jose-jwt.net46",
+      "projectPath": "C:\\projects\\jose-jwt\\jose-jwt\\jose-jwt.net46.csproj",
+      "projectJsonPath": "C:\\projects\\jose-jwt\\jose-jwt\\jose-jwt.net46.project.json",
       "packagesPath": "C:\\Users\\dv\\.nuget\\packages\\",
       "outputPath": "C:\\projects\\jose-jwt\\jose-jwt\\obj\\",
       "projectStyle": "ProjectJson",
@@ -31,7 +31,7 @@
       }
     },
     "frameworks": {
-      "net40": {}
+      "net461": {}
     },
     "runtimes": {
       "win": {

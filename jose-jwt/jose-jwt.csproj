@@ -1,0 +1,110 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET 
+
+Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET. Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms. 
+Supports generating, decoding, encryption and compression of JSON Web Tokens. JSON parsing agnostic. Supports two-phase validation. FIPS compliant. Unencoded payload and detached content support (RFC 7797). 
+
+CLR supported algorithms 
+
+Signing: 
+
+- HMAC signatures with HS256, HS384 and HS512. 
+- ECDSA signatures with ES256, ES384 and ES512. 
+- RSASSA-PKCS1-V1_5 signatures with RS256, RS384 and RS512. 
+- RSASSA-PSS signatures (probabilistic signature scheme with appendix) with PS256, PS384 and PS512. 
+- NONE (unprotected) plain text algorithm without integrity protection 
+
+Encryption: 
+
+- RSAES OAEP 256 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
+- RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
+- RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
+- Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM 
+- A128KW, A192KW, A256KW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM 
+- A128GCMKW, A192GCMKW, A256GCMKW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM 
+- ECDH-ES encryption with A128CBC-HS256, A128GCM, A192GCM, A256GCM 
+- ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW encryption with A128CBC-HS256, A128GCM, A192GCM, A256GCM 
+- PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
+
+Compression: 
+
+- DEFLATE compression
+
+RFC 7797: 
+
+- Unencoded payload
+- Detached content
+
+
+CORECLR supported algorithms 
+
+Signing: 
+
+- HMAC signatures with HS256, HS384 and HS512. 
+- ECDSA signatures with ES256, ES384 and ES512. 
+- RSASSA-PKCS1-V1_5 signatures with RS256, RS384 and RS512. 
+- NONE (unprotected) plain text algorithm without integrity protection 
+
+Encryption: 
+
+- RSAES OAEP 256 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
+- RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
+- RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
+- Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM 
+
+Compression: 
+
+- DEFLATE compression
+
+RFC 7797: 
+
+- Unencoded payload
+- Detached content</Description>
+    <Copyright>Copyright dvsekhvalnov 2014-2020</Copyright>
+    <AssemblyTitle>Jose JWT</AssemblyTitle>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <VersionPrefix>2.5.1-beta.1</VersionPrefix>
+    <Authors>Dmitry Vsekhvalnov</Authors>
+    <TargetFrameworks>net40;net461;netstandard1.4</TargetFrameworks>
+    <AssemblyName>jose-jwt</AssemblyName>
+    <PackageId>jose-jwt</PackageId>
+    <PackageTags>jose;jwt;json;jwa;jwe;jws;aes;cbc;gcm;rsa;hmac;sha;rsassa;pss;rsaes;oaep;pkcs1-v1_5;es;elliptic;curve;diffe;hellman;agreement;ecdsa;key wrap;kw;ecdh;pbes;pbes2;pbkdf;pbkdf2;password based encryption;javascript object signing;two phase validation;netcore;clr;coreclr;portable;fips;compliant;open;banking;detached content;unencoded payload</PackageTags>
+    <PackageReleaseNotes>RFC 7797 support. Unencoded payload and detached content for encoding and decoding.</PackageReleaseNotes>
+    <PackageProjectUrl>https://github.com/dvsekhvalnov/jose-jwt</PackageProjectUrl>
+    <PackageLicenseUrl>https://raw.github.com/dvsekhvalnov/jose-jwt/master/LICENSE</PackageLicenseUrl>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">
+    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0" />
+    <PackageReference Include="System.IO.Compression" Version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.Csp" Version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.Cng" Version="4.3.0" />
+    <PackageReference Include="System.Security.Cryptography.X509Certificates" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Serialization.Primitives" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>
