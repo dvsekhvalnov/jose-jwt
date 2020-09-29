@@ -17,3 +17,4 @@ artifacts/
 .vs
 .vscode
 packages
+*.lock.json
