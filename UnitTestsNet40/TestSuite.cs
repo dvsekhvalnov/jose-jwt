@@ -2651,7 +2651,76 @@ namespace UnitTests
 
             //when
             Jose.JWT.Decode(token, PrivKey());
-        }             
+        }
+
+        [Test]
+        public void EncodeEmptyHS256()
+        {
+            //when
+            string token = Jose.JWT.Encode("", Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256);
+
+            //then
+            Console.Out.WriteLine("Empty HS256 = {0}", token);
+
+            Assert.That(token, Is.EqualTo("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..Ys7EjNHsGtyVcZB1Ph7Yj1CUN1j_WFbDOelXiKc2UTs"));
+            Assert.That(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), Is.EqualTo(""));
+        }
+
+        [Test]
+        public void EncryptEmpty_A128KW_A128CBC_HS256()
+        {
+            //when
+            string token = Jose.JWT.Encode("", aes128Key, JweAlgorithm.A128KW, JweEncryption.A128CBC_HS256);
+
+            //then
+            Console.Out.WriteLine("Empty A128KW_A128CBC_HS256 = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5)); //Make sure 5 parts
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0")); //Header is non-encrypted and static text
+            Assert.That(parts[1].Length, Is.EqualTo(54)); //CEK size
+            Assert.That(parts[2].Length, Is.EqualTo(22)); //IV size
+            Assert.That(parts[3].Length, Is.EqualTo(22)); //cipher text size
+            Assert.That(parts[4].Length, Is.EqualTo(22)); //auth tag size
+
+            Assert.That(Jose.JWT.Decode(token, aes128Key), Is.EqualTo(""));
+        }
+
+        [Test]
+        public void EncodeEmptyBytesHS256()
+        {
+            //when
+            string token = Jose.JWT.EncodeBytes(new byte[0], Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256);
+
+            //then
+            Console.Out.WriteLine("Empty bytes HS256 = {0}", token);
+
+            Assert.That(token, Is.EqualTo("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..Ys7EjNHsGtyVcZB1Ph7Yj1CUN1j_WFbDOelXiKc2UTs"));
+            Assert.That(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), Is.EqualTo(""));
+        }
+
+        [Test]
+        public void EncryptEmptyBytes_A128KW_A128CBC_HS256()
+        {
+            //when
+            string token = Jose.JWT.EncodeBytes(new byte[0], aes128Key, JweAlgorithm.A128KW, JweEncryption.A128CBC_HS256);
+
+            //then
+            Console.Out.WriteLine("Empty bytes A128KW_A128CBC_HS256 = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5)); //Make sure 5 parts
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0")); //Header is non-encrypted and static text
+            Assert.That(parts[1].Length, Is.EqualTo(54)); //CEK size
+            Assert.That(parts[2].Length, Is.EqualTo(22)); //IV size
+            Assert.That(parts[3].Length, Is.EqualTo(22)); //cipher text size
+            Assert.That(parts[4].Length, Is.EqualTo(22)); //auth tag size
+
+            Assert.That(Jose.JWT.Decode(token, aes128Key), Is.EqualTo(""));
+        }
+
 
         #region test utils
 
