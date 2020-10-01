@@ -65,13 +65,13 @@ RFC 7797:
     <Copyright>Copyright dvsekhvalnov 2014-2020</Copyright>
     <AssemblyTitle>Jose JWT</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <VersionPrefix>2.5.0</VersionPrefix>
+    <VersionPrefix>2.6.0</VersionPrefix>
     <Authors>Dmitry Vsekhvalnov</Authors>
     <TargetFrameworks>net40;net461;netstandard1.4</TargetFrameworks>
     <AssemblyName>jose-jwt</AssemblyName>
     <PackageId>jose-jwt</PackageId>
     <PackageTags>jose;jwt;json;jwa;jwe;jws;aes;cbc;gcm;rsa;hmac;sha;rsassa;pss;rsaes;oaep;pkcs1-v1_5;es;elliptic;curve;diffe;hellman;agreement;ecdsa;key wrap;kw;ecdh;pbes;pbes2;pbkdf;pbkdf2;password based encryption;javascript object signing;two phase validation;netcore;clr;coreclr;portable;fips;compliant;open;banking;detached content;unencoded payload</PackageTags>
-    <PackageReleaseNotes>RFC 7797 support. Unencoded payload and detached content for encoding and decoding.</PackageReleaseNotes>
+    <PackageReleaseNotes>Bugfix release, allow empty payload.</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/dvsekhvalnov/jose-jwt</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.github.com/dvsekhvalnov/jose-jwt/master/LICENSE</PackageLicenseUrl>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>

@@ -199,8 +199,6 @@ namespace Jose
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
         public static string Encode(string payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
         {
-            Ensure.IsNotEmpty(payload, "Payload expected to be not empty, whitespace or null.");
-
             byte[] plainText = Encoding.UTF8.GetBytes(payload);
 
             return EncodeBytes(plainText, key, alg, enc, compression, extraHeaders, settings);
@@ -220,7 +218,10 @@ namespace Jose
         public static string EncodeBytes(byte[] payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
         {
             if (payload == null)
+            {
                 throw new ArgumentNullException(nameof(payload));
+            }
+
             JwtSettings jwtSettings = GetSettings(settings);
             IKeyManagement keys = jwtSettings.Jwa(alg);
             IJweAlgorithm _enc = jwtSettings.Jwe(enc);
@@ -284,8 +285,6 @@ namespace Jose
         /// <returns>JWT in compact serialization form, digitally signed.</returns>
         public static string Encode(string payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null, JwtOptions options = null)
         {
-            Ensure.IsNotEmpty(payload, "Payload expected to be not empty, whitespace or null.");
-
             byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);
 
             return EncodeBytes(payloadBytes, key, algorithm, extraHeaders, settings, options);
