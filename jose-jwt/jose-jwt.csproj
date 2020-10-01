@@ -65,7 +65,7 @@ RFC 7797:
     <Copyright>Copyright dvsekhvalnov 2014-2020</Copyright>
     <AssemblyTitle>Jose JWT</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <VersionPrefix>2.5.0</VersionPrefix>
+    <VersionPrefix>2.6.0</VersionPrefix>
     <Authors>Dmitry Vsekhvalnov</Authors>
     <TargetFrameworks>net40;net461;netstandard1.4</TargetFrameworks>
     <AssemblyName>jose-jwt</AssemblyName>

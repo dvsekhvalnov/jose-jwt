@@ -27,7 +27,7 @@
         }
     },
   "dependencies": {
-    "jose-jwt": "2.5.0",
+    "jose-jwt": "2.6.0",
     "Microsoft.NETCore.App": "1.0.0",
     "xunit": "2.1.0"
   },
