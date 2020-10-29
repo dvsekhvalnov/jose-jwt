@@ -24,18 +24,15 @@ namespace Jose
             byte[] sharedKey = Encoding.UTF8.GetBytes(sharedPassphrase);
             byte[] algId = Encoding.UTF8.GetBytes((string)header["alg"]);
 
-            int iterationCount;
+            int iterationCount = 8192;
             if (header.TryGetValue("p2c", out var iterationCountObj))
             {
                 iterationCount = Ensure.Type<int>(iterationCountObj, "Pbse2HmacShaKeyManagementWithAesKeyWrap management algorithm expectes p2c to be int.");
             }
-            else
-            {
-                iterationCount = 8192;
-                header["p2c"] = iterationCount;
-            }
+
             byte[] saltInput = Arrays.Random(96); //12 bytes
 
+            header["p2c"] = iterationCount;
             header["p2s"] = Base64Url.Encode(saltInput);
 
             byte[] salt = Arrays.Concat(algId, Arrays.Zero, saltInput);
