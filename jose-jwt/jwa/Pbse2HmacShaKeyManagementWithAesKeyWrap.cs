@@ -25,6 +25,11 @@ namespace Jose
             byte[] algId = Encoding.UTF8.GetBytes((string)header["alg"]);
 
             int iterationCount = 8192;
+            if (header.TryGetValue("p2c", out var iterationCountObj))
+            {
+                iterationCount = Ensure.Type<int>(iterationCountObj, "Pbse2HmacShaKeyManagementWithAesKeyWrap management algorithm expectes p2c to be int.");
+            }
+
             byte[] saltInput = Arrays.Random(96); //12 bytes
 
             header["p2c"] = iterationCount;
