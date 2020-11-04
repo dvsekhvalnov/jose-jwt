@@ -11,19 +11,19 @@ namespace Jose.native
 
         public static readonly byte[] BCRYPT_KEY_DATA_BLOB_MAGIC = BitConverter.GetBytes(0x4d42444b);
 
-        public static readonly string BCRYPT_OBJECT_LENGTH = "ObjectLength";        
-        public static readonly string BCRYPT_CHAIN_MODE_GCM = "ChainingModeGCM";
-        public static readonly string BCRYPT_AUTH_TAG_LENGTH = "AuthTagLength";
-        public static readonly string BCRYPT_CHAINING_MODE = "ChainingMode";
-        public static readonly string BCRYPT_KEY_DATA_BLOB = "KeyDataBlob";
-        public static readonly string BCRYPT_AES_ALGORITHM = "AES";
-        
-        public static readonly string MS_PRIMITIVE_PROVIDER = "Microsoft Primitive Provider";
+        public const string BCRYPT_OBJECT_LENGTH = "ObjectLength";
+        public const string BCRYPT_CHAIN_MODE_GCM = "ChainingModeGCM";
+        public const string BCRYPT_AUTH_TAG_LENGTH = "AuthTagLength";
+        public const string BCRYPT_CHAINING_MODE = "ChainingMode";
+        public const string BCRYPT_KEY_DATA_BLOB = "KeyDataBlob";
+        public const string BCRYPT_AES_ALGORITHM = "AES";
 
-        public static readonly int BCRYPT_AUTH_MODE_CHAIN_CALLS_FLAG = 0x00000001;
-        public static readonly int BCRYPT_INIT_AUTH_MODE_INFO_VERSION = 0x00000001;
+        public const string MS_PRIMITIVE_PROVIDER = "Microsoft Primitive Provider";
 
-        public static readonly uint STATUS_AUTH_TAG_MISMATCH = 0xC000A002;
+        public const int BCRYPT_AUTH_MODE_CHAIN_CALLS_FLAG = 0x00000001;
+        public const int BCRYPT_INIT_AUTH_MODE_INFO_VERSION = 0x00000001;
+
+        public const uint STATUS_AUTH_TAG_MISMATCH = 0xC000A002;
 
         [StructLayout(LayoutKind.Sequential)]
         public struct BCRYPT_PSS_PADDING_INFO
@@ -39,7 +39,7 @@ namespace Jose.native
             public int cbSalt;
         }
 
-        [StructLayout(LayoutKind.Sequential)]        
+        [StructLayout(LayoutKind.Sequential)]
         public struct BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO : IDisposable
         {
             public int cbSize;
@@ -77,7 +77,7 @@ namespace Jose.native
 
                 if (tag != null)
                 {
-                    cbTag = tag.Length; 
+                    cbTag = tag.Length;
                     pbTag = Marshal.AllocHGlobal(cbTag);
                     Marshal.Copy(tag, 0, pbTag, cbTag);
 
@@ -106,7 +106,7 @@ namespace Jose.native
         [StructLayout(LayoutKind.Sequential)]
         public struct BCRYPT_OAEP_PADDING_INFO
         {
-            public BCRYPT_OAEP_PADDING_INFO(string alg) 
+            public BCRYPT_OAEP_PADDING_INFO(string alg)
             {
                 pszAlgId = alg;
                 pbLabel=IntPtr.Zero;
@@ -121,8 +121,8 @@ namespace Jose.native
 
         [DllImport("bcrypt.dll")]
         public static extern uint BCryptOpenAlgorithmProvider(out IntPtr phAlgorithm,
-                                                              [MarshalAs(UnmanagedType.LPWStr)] string pszAlgId, 
-                                                              [MarshalAs(UnmanagedType.LPWStr)] string pszImplementation, 
+                                                              [MarshalAs(UnmanagedType.LPWStr)] string pszAlgId,
+                                                              [MarshalAs(UnmanagedType.LPWStr)] string pszImplementation,
                                                               uint dwFlags);
 
         [DllImport("bcrypt.dll")]
@@ -140,7 +140,7 @@ namespace Jose.native
                                                          IntPtr hImportKey,
                                                          [MarshalAs(UnmanagedType.LPWStr)] string pszBlobType,
                                                          out IntPtr phKey,
-                                                         IntPtr pbKeyObject,          
+                                                         IntPtr pbKeyObject,
                                                          int cbKeyObject,
                                                          byte[] pbInput, //blob of type BCRYPT_KEY_DATA_BLOB + raw key data = (dwMagic (4 bytes) | uint dwVersion (4 bytes) | cbKeyData (4 bytes) | data)
                                                          int cbInput,
@@ -150,10 +150,10 @@ namespace Jose.native
         public static extern uint BCryptDestroyKey(IntPtr hKey);
 
         [DllImport("bcrypt.dll")]
-        public static extern uint BCryptEncrypt(IntPtr hKey, 
-                                                byte[] pbInput, 
+        public static extern uint BCryptEncrypt(IntPtr hKey,
+                                                byte[] pbInput,
                                                 int cbInput,
-                                                ref BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO pPaddingInfo, 
+                                                ref BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO pPaddingInfo,
                                                 byte[] pbIV, int cbIV,
                                                 byte[] pbOutput,
                                                 int cbOutput,
