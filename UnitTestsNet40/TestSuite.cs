@@ -1553,6 +1553,22 @@ namespace UnitTests
         }
 
         [Test]
+        public void Decrypt_PBSE2_HS512_A256KW_A256CBC_HS512_Custom_p2c()
+        {
+            //given
+            string token = "eyJhbGciOiJQQkVTMi1IUzUxMitBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwicDJjIjoxMDAwMCwicDJzIjoidnU4dUNFaVpUYkJmbG53eiJ9.GTHMXvDtBkmSOPSFovh8kNEZWIhC-hUu-cMmBjNnvXTCrDHb9XVoof0OpECvriBbZV2ZFG4WpqWGHkMO9paUSzByLT1JUPA0.Qyzt0Vk5MVDsEdC4A4CqdA.oFKbuvKh4b2NIm8tdeinOFdAoWldJOumkiXyGhz6J8NNDO7CiuTJ2SwZv2i-_MaleMbtEJJf_76qPdBjeO0zfKlG8qibGJCtSJ1YW1FAya1wJTUtw0sltW7uE5OSBnpvm2IMM6OPq7dQATZz_hTBEhGiwUKGegFlfP2CAXMVmiRxd05BVJ-njw98av2bnzbi1HFxNGVgupe7SlvXhZSLNLCnx_zsHGJ1UoeBWICYAlmerAFc2aWmwAyy_N09NkTcEDZrVjgQhfg8ay0PweN0qQ.CWE0y1NJzgpybh5KwdN-GfDxZ6aBKy5QpiE_K6ZqV94";
+
+            //when
+            string json = Jose.JWT.Decode(token, "top secret");
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.That(json, Is.EqualTo(@"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}"));
+        }
+
+
+        [Test]
         public void Decrypt_A128GCMKW_A128CBC_HS256()
         {
             //given
@@ -1755,6 +1771,45 @@ namespace UnitTests
             Assert.That(parts[4].Length, Is.EqualTo(43), "auth tag size");
 
             Assert.That(Jose.JWT.Decode(token, "top secret"), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+        }
+
+        [Test]
+        public void Encrypt_PBES2_HS512_A256KW_A256CBC_HS512_Custom_p2c()
+        {
+            //given
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            var p2c = 10000;
+            string token =
+                Jose.JWT.Encode(
+                    json,
+                    "top secret",
+                    JweAlgorithm.PBES2_HS512_A256KW,
+                    JweEncryption.A256CBC_HS512,
+                    extraHeaders:
+                        new Dictionary<string, object>
+                        {
+                            { "p2c", p2c }
+                        });
+
+            //then
+            Console.Out.WriteLine("PBES2-HS512+256KW A256CBC_HS512_Custom_p2c = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5)); //Make sure 5 parts
+            Assert.That(parts[0].Length, Is.EqualTo(116)); //Header size
+            Assert.That(parts[1].Length, Is.EqualTo(96)); //CEK size
+            Assert.That(parts[2].Length, Is.EqualTo(22)); //IV size
+            Assert.That(parts[3].Length, Is.EqualTo(278)); //cipher text size
+            Assert.That(parts[4].Length, Is.EqualTo(43)); //auth tag size
+
+            var headers = JWT.Headers(token);
+            Assert.That(headers["p2c"], Is.EqualTo(10000));            
+
+            Assert.That(Jose.JWT.Decode(token, "top secret"), Is.EqualTo(json));
         }
 
         [Test]
