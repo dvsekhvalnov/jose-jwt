@@ -310,7 +310,7 @@ var payload = new Dictionary<string, object>()
 string token = Jose.JWT.Encode(payload, "top secret", JweAlgorithm.PBES2_HS256_A128KW, JweEncryption.A256CBC_HS512);
 ```
 
-Iteration counts can be controlled with settings `p2c` header value:
+Iteration counts can be controlled by setting `p2c` header value:
 ```c#
 var headers = new Dictionary<string, object> 
 {
