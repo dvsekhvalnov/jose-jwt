@@ -72,7 +72,7 @@ namespace Jose
             
             throw new ArgumentException(string.Format("RsaPss expects hash function to be SHA256, SHA384 or SHA512, but was given:{0}",hash));
             
-        #elif NETSTANDARD1_4
+        #elif NETSTANDARD
             throw new NotImplementedException("not yet");
         #endif
         }

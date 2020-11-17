@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>UnitTests Class Library</Description>
     <Authors>Administrator</Authors>
-    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>UnitTests</AssemblyName>
     <PackageId>UnitTests</PackageId>
   </PropertyGroup>
@@ -26,6 +26,4 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
-
 </Project>
