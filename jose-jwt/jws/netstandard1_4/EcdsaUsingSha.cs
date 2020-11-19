@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD1_4 || NET461
+﻿#if NETSTANDARD || NET461
 
 using System;
 using System.Security.Cryptography;

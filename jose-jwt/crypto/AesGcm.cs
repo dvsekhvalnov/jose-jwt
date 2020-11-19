@@ -1,3 +1,4 @@
+#if !NETSTANDARD2_1
 using System;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
@@ -165,3 +166,4 @@ namespace Jose
         }
     }
 }
+#endif

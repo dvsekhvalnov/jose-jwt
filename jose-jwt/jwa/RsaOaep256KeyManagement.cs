@@ -57,7 +57,7 @@ namespace Jose
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of either CngKey or RSA types.");
 
 
-#elif NETSTANDARD1_4
+#elif NETSTANDARD
             var publicKey = Ensure.Type<RSA>(key, "RsaKeyManagement algorithm expects key to be of RSA type.");
 
             return new[] { cek, publicKey.Encrypt(cek, RSAEncryptionPadding.OaepSHA256) };
@@ -113,7 +113,7 @@ namespace Jose
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of either CngKey or RSA types.");
 
-        #elif NETSTANDARD1_4
+        #elif NETSTANDARD
             var privateKey = Ensure.Type<RSA>(key, "RsaKeyManagement algorithm expects key to be of RSA type.");
 
             return privateKey.Decrypt(encryptedCek, RSAEncryptionPadding.OaepSHA256);

@@ -100,7 +100,7 @@ namespace Jose
                     }
                 }
             }
-        #elif NETSTANDARD1_4
+        #elif NETSTANDARD
             using (Aes aes = System.Security.Cryptography.Aes.Create())
             {
                 aes.Key = sharedKey;
@@ -147,7 +147,7 @@ namespace Jose
                     }
                 }
             }
-        #elif NETSTANDARD1_4
+        #elif NETSTANDARD
             using (Aes aes = System.Security.Cryptography.Aes.Create())
             {
                 aes.Key = sharedKey;
