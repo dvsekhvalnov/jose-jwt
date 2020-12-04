@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Security.Cryptography;
 using Jose;
-using Security.Cryptography;
+using Jose.keys;
 using Xunit;
 
 namespace UnitTests

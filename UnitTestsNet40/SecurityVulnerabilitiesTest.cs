@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using Jose;
 using NUnit.Framework;
-using Security.Cryptography;
+using Jose.keys;
 
 namespace UnitTests
 {

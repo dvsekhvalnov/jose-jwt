@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using Security.Cryptography;
+using Jose.keys;
 using Jose;
 using Jose.jwe;
 using Xunit;

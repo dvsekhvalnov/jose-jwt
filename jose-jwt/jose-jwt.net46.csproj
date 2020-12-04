@@ -77,8 +77,8 @@
     <Compile Include="native\BCrypt.cs" />
     <Compile Include="native\NCrypt.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Security\Cryptography\EccKey.cs" />
-    <Compile Include="Security\Cryptography\RsaKey.cs" />
+    <Compile Include="keys\EccKey.cs" />
+    <Compile Include="keys\RsaKey.cs" />
     <Compile Include="util\Arrays.cs" />
     <Compile Include="util\Base64Url.cs" />
     <Compile Include="util\Collections.cs" />

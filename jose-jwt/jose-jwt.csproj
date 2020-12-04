@@ -139,4 +139,9 @@ RFC 7797:
         <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="EccKey.cs" />
+      <Compile Remove="RsaKey.cs" />
+    </ItemGroup>
+
 </Project>

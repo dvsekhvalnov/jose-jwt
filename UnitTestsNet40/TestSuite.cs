@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Jose;
-using Security.Cryptography;
+using Jose.keys;
 using NUnit.Framework;
 using System.Linq;
 using Jose.jwe;

@@ -5,7 +5,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using Jose;
-using Security.Cryptography;
+using Jose.keys;
 using Xunit;
 using Xunit.Abstractions;
 
