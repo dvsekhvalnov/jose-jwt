@@ -8,7 +8,7 @@ Extensively tested for compatibility with [jose.4.j](https://bitbucket.org/b_c/j
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
-- v3.0 and above additionally targets `netstandard2.1` to leverage better .net crypto support on \*nix system and enable more supported algorithms.
+- v3.0 and above additionally targets `netstandard2.1` to leverage better .net crypto support on *\*nix* systems and enable more supported algorithms.
 All new features will most likely appear based on given version. 
 
 - v2.1 and above added extra features support for .NET461+ and coming with 3 version of binaries (`NET4`, `NET461` and `netstandard1.4`).
@@ -22,7 +22,8 @@ All new features will most likely appear based on given version.
 - PCLCrypto based experimental project living up here: [jose-pcl](https://github.com/dvsekhvalnov/jose-pcl).
 
 ## Important upgrading notes
-> :warning: **v2 -> v3 update**: Moved: 
+> :warning: **v2 -> v3 update public sdk changes** 
+> Moved: 
 > - `Security.Cryptography.EccKey` to `Jose.keys.EccKey` 
 > - `Security.Cryptography.RsaKey` to `Jose.keys.RsaKey` 
 
