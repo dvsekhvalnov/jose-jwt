@@ -23,6 +23,7 @@ All new features will most likely appear based on given version.
 
 ## Important upgrading notes
 > :warning: **v2 -> v3 update public sdk changes** 
+>
 > Moved: 
 > - `Security.Cryptography.EccKey` to `Jose.keys.EccKey` 
 > - `Security.Cryptography.RsaKey` to `Jose.keys.RsaKey` 
