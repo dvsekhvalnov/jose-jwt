@@ -21,7 +21,7 @@ All new features will most likely appear based on given version.
 
 - PCLCrypto based experimental project living up here: [jose-pcl](https://github.com/dvsekhvalnov/jose-pcl).
 
-## Important upgrading notes
+## Important upgrade notes
 > :warning: **v2 -> v3 update public sdk changes** 
 >
 > Moved: 
