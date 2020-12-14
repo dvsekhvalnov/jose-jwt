@@ -19,6 +19,13 @@ namespace Jose
 
         public byte[][] WrapNewKey(int cekSizeBits, object key, IDictionary<string, object> header)
         {
+            var cek = Arrays.Random(cekSizeBits);
+
+            return new byte[][] { cek, this.WrapKey(cek, key, header) };
+        }
+
+        public byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header)
+        {
             var sharedPassphrase = Ensure.Type<string>(key, "Pbse2HmacShaKeyManagementWithAesKeyWrap management algorithm expectes key to be string.");
 
             byte[] sharedKey = Encoding.UTF8.GetBytes(sharedPassphrase);
@@ -44,7 +51,7 @@ namespace Jose
                 kek = PBKDF2.DeriveKey(sharedKey, salt, iterationCount, keyLengthBits, prf);
             }
 
-            return aesKW.WrapNewKey(cekSizeBits, kek, header);
+            return aesKW.WrapKey(cek, kek, header);
         }
 
         public byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)

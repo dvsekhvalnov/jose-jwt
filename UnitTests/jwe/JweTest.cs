@@ -20,7 +20,7 @@ namespace UnitTests.Jwe
             byte[] payload = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
             var recipients = new JweRecipient[]
             {
-                recipientAes256KW,
+                recipientAes256KW1,
             };
             var sharedProtectedHeaders = new Dictionary<string, object>
             {
@@ -35,30 +35,29 @@ namespace UnitTests.Jwe
                 mode: mode,
                 extraHeaders: sharedProtectedHeaders);
 
-            var decrypted = Jwe.Decrypt(jwe, aes256KWKey, mode: mode);
+            var decrypted = Jwe.Decrypt(jwe, aes256KWKey1, mode: mode);
 
             //then
             Assert.Equal(payload, decrypted.Plaintext);
         }
 
-        public static IEnumerable<object[]> RecipientTestData =>
+        public static IEnumerable<object[]> TestDataModeGeneralJsonRoundTripMultipleRecipients =>
             new List<object[]>
             {
-                new object[] { aes256KWKey, null },
-                new object[] { aes128KWKey, null },
-                new object[] { aes128KWKey2, "Could not decrypt JWE." },
+                new object[] { aes256KWKey1 },
+                new object[] { aes256KWKey2 },
             };
             
-        [Theory(Skip = "TODO - multi recipient round trip not yet working")]
-        [MemberData(nameof(RecipientTestData))]
-        public void EncryptDecrypt_ModeGeneralJsonRoundTripMultipleRecipients_AllRecipientsCanDecrypt(object decryptKey, string expectedError)
+        [Theory]
+        [MemberData(nameof(TestDataModeGeneralJsonRoundTripMultipleRecipients))]
+        public void EncryptDecrypt_ModeGeneralJsonRoundTripMultipleRecipients_ValidRecipientsCanDecrypt(object decryptKey)
         {
             //given
             byte[] payload = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
             var recipients = new JweRecipient[]
             {
-                recipientAes256KW,
-                recipientAes128KW,
+                recipientAes256KW1,
+                recipientAes256KW2,
             };
             var sharedProtectedHeaders = new Dictionary<string, object>
             {
@@ -79,19 +78,47 @@ namespace UnitTests.Jwe
             Assert.Equal(payload, decrypted.Plaintext);
         }
 
+        [Fact]
+        public void EncryptDecrypt_ModeGeneralJsonRoundTripMultipleRecipients_NonValidRecipientCannotDecrypt()
+        {
+            //given
+            byte[] payload = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+            var recipients = new JweRecipient[]
+            {
+                recipientAes256KW1,
+                recipientAes256KW2,
+            };
+            var sharedProtectedHeaders = new Dictionary<string, object>
+            {
+                { "cty", "application/octet-string"},
+            };
+
+            //when
+            var jwe = Jwe.Encrypt(
+                plaintext: payload,
+                recipients: recipients,
+                JweEncryption.A256GCM,
+                mode: SerializationMode.smGeneralJson,
+                extraHeaders: sharedProtectedHeaders);
+
+            Action act = () => { Jwe.Decrypt(jwe, aes256KWKey3, mode: SerializationMode.smGeneralJson); };
+
+            //then
+            var exception = Assert.Throws<JoseException>(act);
+            Assert.Equal("No recipients able to decrypt.", exception.Message);            
+        }
 
         [Theory]
         [InlineData(SerializationMode.smCompact, "Only one recipient is supported by the JWE Compact Serialization.")]
         [InlineData(SerializationMode.smFlattenedJson, "Only one recipient is supported by the Flattened JWE JSON Serialization.")]
-        [InlineData(SerializationMode.smGeneralJson, "Multi-recipient encrypt still in-progress")]
         public void Encrypt_WithMoreThanOneRecipient_Throws(SerializationMode mode, string expectedMessage)
         {
             //given
             byte[] plaintext = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
             var recipients = new JweRecipient[]
             {
-                recipientAes256KW,
-                recipientAes128KW,
+                recipientAes256KW1,
+                recipientAes256KW2,
             };
 
             //when
@@ -207,6 +234,39 @@ namespace UnitTests.Jwe
             Assert.Equal(new byte[0], Jwe.Decrypt(jwe, aes128KWKey, mode: SerializationMode.smFlattenedJson).Plaintext);
         }
 
+        public static IEnumerable<object[]> TestDataMultipleRecipientDirectEncryption =>
+            new List<object[]>
+            {
+                new object[] { new JweRecipient[] { recipientDirectEncyption1 }, null },
+                new object[] { new JweRecipient[] { recipientDirectEncyption1, recipientDirectEncyption2 }, "Should throw." },
+            };
+
+        [Theory()]
+        [MemberData(nameof(TestDataMultipleRecipientDirectEncryption))]
+        public void Encrypt_MultipleRecipientDirectEncryption_Throws(JweRecipient[] recipients, string expectedError)
+        {
+            //when
+            byte[] plaintext = { };
+
+            //when
+            Func<string> act = () => Jwe.Encrypt(
+                plaintext: plaintext,
+                recipients: recipients,
+                JweEncryption.A128CBC_HS256,
+                mode: SerializationMode.smGeneralJson);
+            
+            //then
+            if (expectedError == null)
+            {
+                act();
+            }
+            else
+            {
+                var exception = Assert.Throws<JoseException>(act);
+                Assert.Equal("Direct Encryption not supported for multi-recipient JWE.", exception.Message);
+            }            
+        }
+        
         [Fact(Skip = "TODO - see https://tools.ietf.org/html/rfc7516#section-4")]
         void Encrypt_WithNonUniqueHeaderParameterNames_Throws()
         {
@@ -219,14 +279,24 @@ namespace UnitTests.Jwe
 
         }
         
-        private static readonly byte[] aes256KWKey = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133, 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133, };
+        private static readonly byte[] aes256KWKey1 = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133, 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133, };
+
+        private static readonly byte[] aes256KWKey2 = new byte[] { 94, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133, 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133, };
+
+        private static readonly byte[] aes256KWKey3 = new byte[] { 4, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133, 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133, };
 
         private static byte[] aes128KWKey = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
 
         private static byte[] aes128KWKey2 = new byte[] { 94, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
 
-        private static JweRecipient recipientAes256KW => new JweRecipient(JweAlgorithm.A256KW, aes256KWKey);
+        private static JweRecipient recipientAes256KW1 => new JweRecipient(JweAlgorithm.A256KW, aes256KWKey1);
+
+        private static JweRecipient recipientAes256KW2 => new JweRecipient(JweAlgorithm.A256KW, aes256KWKey2);
 
         private static JweRecipient recipientAes128KW => new JweRecipient(JweAlgorithm.A128KW, aes128KWKey);
+
+        private static JweRecipient recipientDirectEncyption1 => new JweRecipient(JweAlgorithm.DIR, aes256KWKey1);
+
+        private static JweRecipient recipientDirectEncyption2 => new JweRecipient(JweAlgorithm.DIR, aes256KWKey2);
     };
 }

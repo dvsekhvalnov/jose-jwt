@@ -14,6 +14,15 @@ namespace Jose
         byte[][] WrapNewKey(int cekSizeBits, object key, IDictionary<string, object> header);
 
         /// <summary>
+        /// Wraps supplied CEK via provided management key (Key-Jwe-Key)
+        /// </summary>
+        /// <param name="cek">CEK to wrap. Already created e.g. for multi-recipient JWE.</param>
+        /// <param name="key">management key (KEK)</param>
+        /// <param name="header">JWT headers, dictionary can be mutated as part of call (e.g. keys added, e.t.c)</param>
+        /// <returns>byte[] array: encrypted CEK</returns>
+        byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header);
+
+        /// <summary>
         /// Unwraps protected CEK using provided management key
         /// </summary>
         /// <param name="encryptedCek">wrapped (encrypted) CEK</param>

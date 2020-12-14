@@ -23,6 +23,11 @@ namespace Jose
             return new[] {cek, encryptedCek};
         }
 
+        public virtual byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header)
+        {
+            throw new JoseException("Multiple recipient JWE not supported for (non-key wrapped) ECDH-ES key management");
+        }
+
         private byte[] NewKey(int keyLength, object key, IDictionary<string, object> header)
         {
             var recieverPubKey = Ensure.Type<CngKey>(key, "EcdhKeyManagement alg expects key to be of CngKey type.");

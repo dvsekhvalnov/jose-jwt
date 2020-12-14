@@ -76,9 +76,18 @@ namespace Jose.jwe
 
                 IDictionary<string, object> recipientHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwaHeaderValue(recipient.Alg) } };
 
-                byte[][] contentKeys = keys.WrapNewKey(_enc.KeySize, recipient.Key, recipientHeader);
-                cek = contentKeys[0];
-                byte[] encryptedCek = contentKeys[1];
+                byte[] encryptedCek;
+                if(cek == null)
+                {
+                    byte[][] contentKeys = keys.WrapNewKey(_enc.KeySize, recipient.Key, recipientHeader);
+                    cek = contentKeys[0];
+                    encryptedCek = contentKeys[1];
+                }
+                else
+                {
+                    encryptedCek = keys.WrapKey(cek, recipient.Key, recipientHeader);
+                }
+                 
                 recipientsOut.Add((EncryptedKey: encryptedCek, Header: recipientHeader));
             }
 
@@ -105,30 +114,7 @@ namespace Jose.jwe
 
                         return Compact.Serialize(header, recipientsOut[0].EncryptedKey, encParts[0], encParts[1], encParts[2]);
                     }
-                case SerializationMode.smGeneralJson:
-                    {
-                        if (recipientsOut.Count != 1)
-                        {
-                            throw new JoseException("Multi-recipient encrypt still in-progress");
-                        }
-
-                        var protectedHeaderBytes = Encoding.UTF8.GetBytes(jwtSettings.JsonMapper.Serialize(joseProtectedHeader));
-                        byte[] aad = Encoding.ASCII.GetBytes(Base64Url.Encode(protectedHeaderBytes));
-                        byte[][] encParts = _enc.Encrypt(aad, plaintext, cek);
-
-                        return jwtSettings.JsonMapper.Serialize(new
-                        {
-                            @protected = Base64Url.Encode(protectedHeaderBytes),
-                            recipients = recipientsOut.Select(r => new
-                            {
-                                header = r.Header,
-                                encrypted_key = Base64Url.Encode(r.EncryptedKey),
-                            }),
-                            iv = Base64Url.Encode(encParts[0]),
-                            ciphertext = Base64Url.Encode(encParts[1]),
-                            tag = Base64Url.Encode(encParts[2]),
-                        });
-                    }
+                
                 case SerializationMode.smFlattenedJson:
                     {
                         if (recipientsOut.Count != 1)
@@ -150,6 +136,27 @@ namespace Jose.jwe
                             tag = Base64Url.Encode(encParts[2]),
                         });
                     }
+                
+                case SerializationMode.smGeneralJson:
+                    {
+                        var protectedHeaderBytes = Encoding.UTF8.GetBytes(jwtSettings.JsonMapper.Serialize(joseProtectedHeader));
+                        byte[] aad = Encoding.ASCII.GetBytes(Base64Url.Encode(protectedHeaderBytes));
+                        byte[][] encParts = _enc.Encrypt(aad, plaintext, cek);
+
+                        return jwtSettings.JsonMapper.Serialize(new
+                        {
+                            @protected = Base64Url.Encode(protectedHeaderBytes),
+                            recipients = recipientsOut.Select(r => new
+                            {
+                                header = r.Header,
+                                encrypted_key = Base64Url.Encode(r.EncryptedKey),
+                            }),
+                            iv = Base64Url.Encode(encParts[0]),
+                            ciphertext = Base64Url.Encode(encParts[1]),
+                            tag = Base64Url.Encode(encParts[2]),
+                        });
+                    }
+                
                 default:
                     throw new JoseException($"Unsupported serializtion mode: {mode}.");
             }
@@ -274,6 +281,8 @@ namespace Jose.jwe
                 throw new InvalidAlgorithmException("The algorithm type passed to the Decrypt method did not match the algorithm type in the header.");
             }
 
+            var exceptions = new List<IntegrityException>();
+
             foreach (var recipient in algMatchingRecipients)
             {
                 IKeyManagement keys = jwtSettings.Jwa(recipient.HeaderAlg);
@@ -283,21 +292,28 @@ namespace Jose.jwe
                     throw new JoseException(string.Format("Unsupported JWA algorithm requested: {0}", recipient.HeaderAlg));
                 }
 
-                byte[] cek = keys.Unwrap(recipient.EncryptedCek, key, enc.KeySize, protectedHeader);
-                byte[] aad = Encoding.ASCII.GetBytes(Base64Url.Encode(protectedHeaderBytes));
-
-                byte[] plaintext = enc.Decrypt(aad, cek, iv, ciphertext, authTag);
-
-                if (recipient.JoseHeader.TryGetValue("zip", out var compressionAlg))
+                try
                 {
-                    var compression = jwtSettings.Compression((string)compressionAlg);
+                    byte[] cek = keys.Unwrap(recipient.EncryptedCek, key, enc.KeySize, protectedHeader);
+                    byte[] aad = Encoding.ASCII.GetBytes(Base64Url.Encode(protectedHeaderBytes));
 
-                    plaintext = compression.Decompress(plaintext);
+                    byte[] plaintext = enc.Decrypt(aad, cek, iv, ciphertext, authTag);
+
+                    if (recipient.JoseHeader.TryGetValue("zip", out var compressionAlg))
+                    {
+                        var compression = jwtSettings.Compression((string)compressionAlg);
+
+                        plaintext = compression.Decompress(plaintext);
+                    }
+                    return (Plaintext: plaintext, JoseHeaders: null);
                 }
-                return (Plaintext: plaintext, JoseHeaders: null);
+                catch (IntegrityException ex)
+                {
+                    exceptions.Add(ex);
+                }
             }
 
-            throw new JoseException("Unable to decrypt. TODO - improve message / make same in compact case as current.");
+            throw new JoseException($"No recipients able to decrypt.", new AggregateException(exceptions));
         }
 
         private static IDictionary<string, object> MergeHeaders(IDictionary<string, object> dest, IDictionary<string, object> source)

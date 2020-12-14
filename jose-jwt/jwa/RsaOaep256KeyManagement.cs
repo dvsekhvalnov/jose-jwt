@@ -11,6 +11,11 @@ namespace Jose
         {
             var cek = Arrays.Random(cekSizeBits);
 
+            return new byte[][] { cek, this.WrapKey(cek, key, header) };
+        }
+        
+        public byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header)
+        {            
         #if NET40
             if (key is CngKey)
             {
@@ -60,7 +65,7 @@ namespace Jose
 #elif NETSTANDARD
             var publicKey = Ensure.Type<RSA>(key, "RsaKeyManagement algorithm expects key to be of RSA type.");
 
-            return new[] { cek, publicKey.Encrypt(cek, RSAEncryptionPadding.OaepSHA256) };
+            return publicKey.Encrypt(cek, RSAEncryptionPadding.OaepSHA256);
 #endif
 
         }

@@ -9,6 +9,11 @@ namespace Jose
             return new []{Ensure.Type<byte[]>(key, "DirectKeyManagement alg expectes key to be byte[] array."), Arrays.Empty};
         }
 
+        public byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header)
+        {
+            throw new JoseException("Direct Encryption not supported for multi-recipient JWE.");
+        }
+
         public byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
         {
             Ensure.IsEmpty(encryptedCek, "DirectKeyManagement expects empty content encryption key.");
