@@ -3,6 +3,7 @@ namespace UnitTests.Jwe
     using Jose;
     using Jose.jwe;
     using Jose.keys;
+    using Microsoft.IdentityModel.Tokens;
     using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Generic;
@@ -100,8 +101,6 @@ namespace UnitTests.Jwe
             {
                 { "cty", "application/octet-string"},
             };
-
-            //when
             var jwe = Jwe.Encrypt(
                 plaintext: payload,
                 recipients: recipients,
@@ -109,10 +108,12 @@ namespace UnitTests.Jwe
                 mode: SerializationMode.smGeneralJson,
                 extraHeaders: sharedProtectedHeaders);
 
-            Action act = () => Jwe.Decrypt(jwe, aes256KWKey2, expectedJweAlg, expectedJweEnc, mode: SerializationMode.smGeneralJson);
+
+            //when
+            var exception = Record.Exception(() => Jwe.Decrypt(jwe, aes256KWKey2, expectedJweAlg, expectedJweEnc, mode: SerializationMode.smGeneralJson));
 
             //then
-            var exception = Assert.Throws<InvalidAlgorithmException>(act);
+            Assert.IsType<InvalidAlgorithmException>(exception);
             Assert.Equal(expectedMessage, exception.Message);
         }
 
@@ -120,7 +121,7 @@ namespace UnitTests.Jwe
         /// Attempting to decrypt with a private key not matching any of the recipients.
         /// </summary>
         [Fact]
-        public void EncryptDecrypt_ModeGeneralJsonRoundTripMultipleRecipients_NonValidRecipientCannotDecrypt()
+        public void Decrypt_NoMatchingRecipient_Throws()
         {
             //given
             byte[] payload = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
@@ -133,8 +134,6 @@ namespace UnitTests.Jwe
             {
                 { "cty", "application/octet-string"},
             };
-
-            //when
             var jwe = Jwe.Encrypt(
                 plaintext: payload,
                 recipients: recipients,
@@ -142,10 +141,11 @@ namespace UnitTests.Jwe
                 mode: SerializationMode.smGeneralJson,
                 extraHeaders: sharedProtectedHeaders);
 
-            Action act = () => { Jwe.Decrypt(jwe, aes256KWKey3, mode: SerializationMode.smGeneralJson); };
+            //when
+            var exception = Record.Exception(() => { Jwe.Decrypt(jwe, aes256KWKey3, mode: SerializationMode.smGeneralJson); });
 
             //then
-            var exception = Assert.Throws<IntegrityException>(act);
+            Assert.IsType<IntegrityException>(exception);
             Assert.Equal("AesKeyWrap integrity check failed.", exception.Message);            
         }
 
@@ -163,21 +163,21 @@ namespace UnitTests.Jwe
             };
 
             //when
-            Func<string> act = () => Jwe.Encrypt(
+            var exception = Record.Exception(() => Jwe.Encrypt(
                 plaintext: plaintext,
                 recipients: recipients,
                 JweEncryption.A256GCM,
-                mode: mode);
+                mode: mode));
 
             //then
-            var exception = Assert.Throws<JoseException>(act);
+            Assert.IsType<JoseException>(exception);
             Assert.Equal(expectedMessage, exception.Message);
         }
 
         [Fact]
         public void Encrypt_ModeCompactWithEmptyBytesA128KW_A128CBC_HS256_ExpectedResults()
         {
-            //when
+            //given
             byte[] plaintext = { };
 
             //when
@@ -207,7 +207,7 @@ namespace UnitTests.Jwe
         [Fact]
         public void Encrypt_ModeGeneralJsonWithEmptyBytesA128KW_A128CBC_HS256_ExpectedResults()
         {
-            //when
+            //given
             byte[] plaintext = { };
 
             //when
@@ -245,7 +245,7 @@ namespace UnitTests.Jwe
         [Fact]
         public void Encrypt_ModeFlattenedJsonWithEmptyBytesA128KW_A128CBC_HS256_ExpectedResults()
         {
-            //when
+            //given
             byte[] plaintext = { };
 
             //when
@@ -258,7 +258,6 @@ namespace UnitTests.Jwe
             //then
             Console.Out.WriteLine("Empty bytes A128KW_A128CBC_HS256 (Flattened Json Serialization) = {0}", jwe);
 
-            //dynamic deserialized = JsonConvert.DeserializeObject(jwe);
             JObject deserialized = JObject.Parse(jwe);
 
             Assert.Equal("{\"enc\":\"A128CBC-HS256\"}",
@@ -275,6 +274,52 @@ namespace UnitTests.Jwe
             Assert.Equal(new byte[0], Jwe.Decrypt(jwe, aes128KWKey, mode: SerializationMode.smFlattenedJson).Plaintext);
         }
 
+        [Fact]
+        public void Decrypt_Rfc7516AppendixA23DecryptWithFirstRecipient_ExpectedResults()
+        {
+            //given
+            var key = GetKeyFromJwk(Rfc7516_A_2_3_ExampleJwk);
+
+            //when
+            var decrypted = Jwe.Decrypt(
+                Rfc7516_A_4_7_ExampleJwe,
+                key,
+                mode: SerializationMode.smGeneralJson);
+
+            //then
+            Assert.Equal("Live long and prosper.", UTF8Encoding.UTF8.GetString(decrypted.Plaintext));
+
+            Assert.Equal(4, decrypted.JoseHeaders.Count);
+
+            Assert.Equal("RSA1_5", decrypted.JoseHeaders["alg"]);
+            Assert.Equal("2011-04-29", decrypted.JoseHeaders["kid"]);
+            Assert.Equal("A128CBC-HS256", decrypted.JoseHeaders["enc"]);
+            Assert.Equal("https://server.example.com/keys.jwks", decrypted.JoseHeaders["jku"]);
+        }
+
+        [Fact]
+        public void Decrypt_Rfc7516AppendixA23DecryptWithSecondRecipient_ExpectedResults()
+        {
+            //given
+            var key = GetKeyFromJwk(Rfc7516_A_3_3_ExampleJwk);
+
+            //when
+            var decrypted = Jwe.Decrypt(
+                Rfc7516_A_4_7_ExampleJwe,
+                key,
+                mode: SerializationMode.smGeneralJson);
+
+            //then
+            Assert.Equal("Live long and prosper.", UTF8Encoding.UTF8.GetString(decrypted.Plaintext));
+
+            Assert.Equal(4, decrypted.JoseHeaders.Count);
+
+            Assert.Equal("A128KW", decrypted.JoseHeaders["alg"]);
+            Assert.Equal("7", decrypted.JoseHeaders["kid"]);
+            Assert.Equal("A128CBC-HS256", decrypted.JoseHeaders["enc"]);
+            Assert.Equal("https://server.example.com/keys.jwks", decrypted.JoseHeaders["jku"]);
+        }
+
         public static IEnumerable<object[]> TestDataMultipleRecipientDirectEncryption =>
             new List<object[]>
             {
@@ -289,7 +334,7 @@ namespace UnitTests.Jwe
         [MemberData(nameof(TestDataMultipleRecipientDirectEncryption))]
         public void Encrypt_MultipleRecipient_SpecialCasesHandled(JweRecipient[] recipients, string expectedError)
         {
-            //when
+            //given
             byte[] plaintext = { };
 
             //when
@@ -310,17 +355,115 @@ namespace UnitTests.Jwe
                 Assert.Equal(expectedError, exception.Message);
             }            
         }
-        
-        [Fact(Skip = "TODO - see https://tools.ietf.org/html/rfc7516#section-4")]
-        void Encrypt_WithNonUniqueHeaderParameterNames_Throws()
-        {
 
+        /// <summary>
+        /// Enforce uniquness of header names - as per https://tools.ietf.org/html/rfc7516#section-4
+        /// Here passed into extraHeaders
+        /// </summary>
+        [Theory]
+        [InlineData("example.com:extra_recipient_header")]
+        [InlineData("alg")]
+        [InlineData("enc")]
+        public void Encrypt_WithNonUniqueHeaderParameterNamesInExtraHeaders_Throws(string injectedHeaderName)
+        {
+            //given
+            byte[] plaintext = { };
+
+            //when
+            var exception = Record.Exception(() => Jwe.Encrypt(
+                plaintext: plaintext,
+                recipients: new JweRecipient[]
+                {
+                    new JweRecipient(
+                        JweAlgorithm.A256KW,
+                        aes256KWKey1,
+                        new Dictionary<string, object>
+                        {
+                            { "kid", "my_key_reference" },
+                            { "example.com:extra_recipient_header", "value1" },
+                        })
+                },
+                JweEncryption.A128CBC_HS256,
+                mode: SerializationMode.smFlattenedJson,
+                extraHeaders: new Dictionary<string, object>
+                {
+                    { "cty", "text/plain" },
+                    { "example.com:extra_header", "another value" },
+                    { injectedHeaderName, string.Empty },
+                }));
+
+            //then
+            Assert.NotNull(exception);
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal($"An item with the same key has already been added. Key: {injectedHeaderName}", exception.Message);
         }
 
-        [Fact(Skip = "TODO - see https://tools.ietf.org/html/rfc7516#section-4")]
-        void Decrypt_WithNonUniqueHeaderParameterNames_Throws()
+        /// <summary>
+        /// Enforce uniquness of header names - as per https://tools.ietf.org/html/rfc7516#section-4
+        /// Here passed into recipient's headers
+        /// </summary>
+        [Theory]
+        [InlineData("example.com:extra_header")]
+        [InlineData("alg")]
+        [InlineData("enc")]
+        void Encrypt_WithNonUniqueHeaderParameterNamesInRecipientHeaders_Throws(string injectedHeaderName)
         {
+            //given
+            byte[] plaintext = { };
 
+            //when
+            var exception = Record.Exception(() => Jwe.Encrypt(
+                plaintext: plaintext,
+                recipients: new JweRecipient[]
+                {
+                    new JweRecipient(
+                        JweAlgorithm.A256KW,
+                        aes256KWKey1,
+                        new Dictionary<string, object>
+                        {
+                            { "kid", "my_key_reference" },
+                            { "example.com:extra_recipient_header", "value1" },
+                            { injectedHeaderName, string.Empty },
+                        })
+                },
+                JweEncryption.A128CBC_HS256,
+                mode: SerializationMode.smFlattenedJson,
+                extraHeaders: new Dictionary<string, object>
+                {
+                    { "cty", "text/plain" },
+                    { "example.com:extra_header", "another value" },                    
+                }));
+
+            //then
+            Assert.NotNull(exception);
+            Assert.IsType<ArgumentException>(exception);
+            Assert.Equal($"An item with the same key has already been added. Key: {injectedHeaderName}", exception.Message);
+        }
+
+        private static object GetKeyFromJwk(string serializedJwk)
+        {
+            var jwk = new JsonWebKey(serializedJwk);
+            switch (jwk.Kty)
+            {
+                case "RSA":
+                    return RSA.Create(new RSAParameters()
+                    {
+                        Modulus = Base64Url.Decode(jwk.N),
+                        Exponent = Base64Url.Decode(jwk.E),
+                        D = Base64Url.Decode(jwk.D),
+                        P = Base64Url.Decode(jwk.P),
+                        Q = Base64Url.Decode(jwk.Q),
+                        DP = Base64Url.Decode(jwk.DP),
+                        DQ = Base64Url.Decode(jwk.DQ),
+                        InverseQ = Base64Url.Decode(jwk.QI),
+                    });
+
+                case "oct":
+                    return Base64Url.Decode(jwk.K);
+
+                default:
+                    throw new NotImplementedException($"Key type not implemented: {jwk.Kty}");
+            }
         }
 
         private static RSA PrivKey()
@@ -354,8 +497,6 @@ namespace UnitTests.Jwe
 
         private static byte[] aes128KWKey = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
 
-        private static byte[] aes128KWKey2 = new byte[] { 94, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
-
         private static JweRecipient recipientEcdhEs1 => new JweRecipient(JweAlgorithm.ECDH_ES, Ecc256Public(CngKeyUsages.KeyAgreement));
 
         private static JweRecipient recipientAes256KW1 => new JweRecipient(JweAlgorithm.A256KW, aes256KWKey1);
@@ -366,8 +507,47 @@ namespace UnitTests.Jwe
 
         private static JweRecipient recipientDirectEncyption1 => new JweRecipient(JweAlgorithm.DIR, aes256KWKey1);
 
-        private static JweRecipient recipientDirectEncyption2 => new JweRecipient(JweAlgorithm.DIR, aes256KWKey2);
-
         private static JweRecipient recipientRsa1 => new JweRecipient(JweAlgorithm.RSA1_5, PubKey());
+
+        private static string Rfc7516_A_4_7_ExampleJwe = @"
+        {
+        ""protected"":
+            ""eyJlbmMiOiJBMTI4Q0JDLUhTMjU2In0"",
+        ""unprotected"":
+            { ""jku"":""https://server.example.com/keys.jwks""},
+        ""recipients"":[
+            {""header"":
+                { ""alg"":""RSA1_5"",""kid"":""2011-04-29""},
+            ""encrypted_key"":
+                ""UGhIOguC7IuEvf_NPVaXsGMoLOmwvc1GyqlIKOK1nN94nHPoltGRhWhw7Zx0-kFm1NJn8LE9XShH59_i8J0PH5ZZyNfGy2xGdULU7sHNF6Gp2vPLgNZ__deLKxGHZ7PcHALUzoOegEI-8E66jX2E4zyJKx-YxzZIItRzC5hlRirb6Y5Cl_p-ko3YvkkysZIFNPccxRU7qve1WYPxqbb2Yw8kZqa2rMWI5ng8OtvzlV7elprCbuPhcCdZ6XDP0_F8rkXds2vE4X-ncOIM8hAYHHi29NX0mcKiRaD0-D-ljQTP-cFPgwCp6X-nZZd9OHBv-B3oWh2TbqmScqXMR4gp_A""},
+            {""header"":
+                { ""alg"":""A128KW"",""kid"":""7""},
+            ""encrypted_key"":
+                ""6KB707dM9YTIgHtLvtgWQ8mKwboJW3of9locizkDTHzBC2IlrT1oOQ""}],
+        ""iv"":
+            ""AxY8DCtDaGlsbGljb3RoZQ"",
+        ""ciphertext"":
+            ""KDlTtXchhZTGufMYmOYGS4HffxPSUrfmqCHXaI9wOGY"",
+        ""tag"":
+            ""Mz-VPPyU4RlcuYv1IwIvzw""
+        }";
+
+
+        private static string Rfc7516_A_2_3_ExampleJwk = @" 
+            {""kty"":""RSA"",
+                ""n"":""sXchDaQebHnPiGvyDOAT4saGEUetSyo9MKLOoWFsueri23bOdgWp4Dy1WlUzewbgBHod5pcM9H95GQRV3JDXboIRROSBigeC5yjU1hGzHHyXss8UDprecbAYxknTcQkhslANGRUZmdTOQ5qTRsLAt6BTYuyvVRdhS8exSZEy_c4gs_7svlJJQ4H9_NxsiIoLwAEk7-Q3UXERGYw_75IDrGA84-lA_-Ct4eTlXHBIY2EaV7t7LjJaynVJCpkv4LKjTTAumiGUIuQhrNhZLuF_RJLqHpM2kgWFLU7-VTdL1VbC2tejvcI2BlMkEpk1BzBZI0KQB0GaDWFLN-aEAw3vRw"",
+                ""e"":""AQAB"",
+                ""d"":""VFCWOqXr8nvZNyaaJLXdnNPXZKRaWCjkU5Q2egQQpTBMwhprMzWzpR8Sxq1OPThh_J6MUD8Z35wky9b8eEO0pwNS8xlh1lOFRRBoNqDIKVOku0aZb-rynq8cxjDTLZQ6Fz7jSjR1Klop-YKaUHc9GsEofQqYruPhzSA-QgajZGPbE_0ZaVDJHfyd7UUBUKunFMScbflYAAOYJqVIVwaYR5zWEEceUjNnTNo_CVSj-VvXLO5VZfCUAVLgW4dpf1SrtZjSt34YLsRarSb127reG_DUwg9Ch-KyvjT1SkHgUWRVGcyly7uvVGRSDwsXypdrNinPA4jlhoNdizK2zF2CWQ"",
+                ""p"":""9gY2w6I6S6L0juEKsbeDAwpd9WMfgqFoeA9vEyEUuk4kLwBKcoe1x4HG68ik918hdDSE9vDQSccA3xXHOAFOPJ8R9EeIAbTi1VwBYnbTp87X-xcPWlEPkrdoUKW60tgs1aNd_Nnc9LEVVPMS390zbFxt8TN_biaBgelNgbC95sM"",
+                ""q"":""uKlCKvKv_ZJMVcdIs5vVSU_6cPtYI1ljWytExV_skstvRSNi9r66jdd9-yBhVfuG4shsp2j7rGnIio901RBeHo6TPKWVVykPu1iYhQXw1jIABfw-MVsN-3bQ76WLdt2SDxsHs7q7zPyUyHXmps7ycZ5c72wGkUwNOjYelmkiNS0"",
+                ""dp"":""w0kZbV63cVRvVX6yk3C8cMxo2qCM4Y8nsq1lmMSYhG4EcL6FWbX5h9yuvngs4iLEFk6eALoUS4vIWEwcL4txw9LsWH_zKI-hwoReoP77cOdSL4AVcraHawlkpyd2TWjE5evgbhWtOxnZee3cXJBkAi64Ik6jZxbvk-RR3pEhnCs"",
+                ""dq"":""o_8V14SezckO6CNLKs_btPdFiO9_kC1DsuUTd2LAfIIVeMZ7jn1Gus_Ff7B7IVx3p5KuBGOVF8L-qifLb6nQnLysgHDh132NDioZkhH7mI7hPG-PYE_odApKdnqECHWw0J-F0JWnUd6D2B_1TvF9mXA2Qx-iGYn8OVV1Bsmp6qU"",
+                ""qi"":""eNho5yRBEBxhGBtQRww9QirZsB66TrfFReG_CcteI1aCneT0ELGhYlRlCtUkTRclIfuEPmNsNDPbLoLqqCVznFbvdB7x-Tl-m0l_eFTj2KiqwGqE9PZB9nNTwMVvH3VRRSLWACvPnSiwP8N5Usy-WRXS-V7TbpxIhvepTfE0NNo""
+            }";
+
+        private static string Rfc7516_A_3_3_ExampleJwk = @"
+            {""kty"":""oct"",
+            ""k"":""GawgguFyGrWKav7AX4VKUg""
+            }";
     };
 }

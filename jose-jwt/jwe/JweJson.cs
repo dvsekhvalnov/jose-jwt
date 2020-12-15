@@ -9,7 +9,7 @@
         internal string Protected { get; set; }
 
         [JsonProperty("unprotected")]
-        internal string Unprotected { get; set; }
+        internal IDictionary<string, object> Unprotected { get; set; }
 
         [JsonProperty("iv")]
         internal string Iv { get; set; }

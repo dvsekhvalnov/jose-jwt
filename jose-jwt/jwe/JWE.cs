@@ -14,15 +14,18 @@ namespace Jose.jwe
         /// </summary
         /// <param name="alg">algorithm to be used to encrypt the CEK (Content Encryption Key).</param>
         /// <param name="key">key for encrypting CEK (Content Encryption Key). Cannot be null.</param>
-        public JweRecipient(JweAlgorithm alg, object key)
+        public JweRecipient(JweAlgorithm alg, object key, IDictionary<string, object> perRecipientHeaders = null)
         {
             this.Alg = alg;
             this.Key = key ?? throw new ArgumentNullException(nameof(key));
+            this.PerRecipientHeaders = perRecipientHeaders;
         }
 
         public JweAlgorithm Alg { get; set; }
 
         public object Key { get; set; }
+
+        internal IDictionary<string, object> PerRecipientHeaders { get; }
     }
 
     public enum SerializationMode
@@ -45,7 +48,7 @@ namespace Jose.jwe
         /// <param name="enc">encryption algorithm to be used to encrypt the plaintext.</param>
         /// <param name="mode">serialization mode to use. Note only one recipient can be specified for compact and flattened json serialization.</param>
         /// <param name="compression">optional compression type to use.</param>
-        /// <param name="extraHeaders">optional extra headers to pass along with the payload.</param>
+        /// <param name="extraHeaders">optional extra headers to put in the JoseProtectedHeader.</param>
         /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
         public static string Encrypt(byte[] plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, SerializationMode mode = SerializationMode.smCompact, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
@@ -63,8 +66,9 @@ namespace Jose.jwe
                 throw new JoseException(string.Format("Unsupported JWE enc requested: {0}", enc));
             }
 
-            IDictionary<string, object> joseProtectedHeader = new Dictionary<string, object> { { "enc", jwtSettings.JweHeaderValue(enc) } };
-            Dictionaries.Append(joseProtectedHeader, extraHeaders);
+            IDictionary<string, object> joseProtectedHeader = MergeHeaders(
+                new Dictionary<string, object> { { "enc", jwtSettings.JweHeaderValue(enc) } },            
+                extraHeaders);
 
             byte[] cek = null;
 
@@ -81,7 +85,10 @@ namespace Jose.jwe
                 // joseHeader - is merge of headers 
                 // - key management will read from (e.g. enc,apv,apu - ECDH-ES) 
                 // - key management will write to (e.g. iv, tag - AesGcmKW)
-                IDictionary<string, object> joseHeader = MergeHeaders(joseProtectedHeader, new Dictionary<string, object> { { "alg", jwtSettings.JwaHeaderValue(recipient.Alg) } });                
+                IDictionary<string, object> joseHeader = MergeHeaders(
+                    joseProtectedHeader,
+                    new Dictionary<string, object> { { "alg", jwtSettings.JwaHeaderValue(recipient.Alg) } },
+                    recipient.PerRecipientHeaders);
 
                 byte[] encryptedCek;
                 if(cek == null)
@@ -193,6 +200,7 @@ namespace Jose.jwe
             JwtSettings jwtSettings = GetSettings(settings);
 
             IDictionary<string, object> protectedHeader;
+            IDictionary<string, object> unprotectedHeader = null;
             byte[] protectedHeaderBytes;
             byte[] iv;
             byte[] ciphertext;
@@ -233,7 +241,8 @@ namespace Jose.jwe
                         recipients.Add((EncryptedCek: encryptedCek, Header: jweJson.Header));                        
                         
                         protectedHeader = jwtSettings.JsonMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(protectedHeaderBytes));
-                        
+                        unprotectedHeader = jweJson.Unprotected;
+
                         break;
                     }
 
@@ -254,6 +263,7 @@ namespace Jose.jwe
                         }
 
                         protectedHeader = jwtSettings.JsonMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(protectedHeaderBytes));
+                        unprotectedHeader = jweJson.Unprotected;
 
                         break;
                     }
@@ -277,7 +287,7 @@ namespace Jose.jwe
 
             var algMatchingRecipients = recipients.Select(r =>
             {
-                var joseHeader = MergeHeaders(protectedHeader, r.Header);
+                var joseHeader = MergeHeaders(protectedHeader, unprotectedHeader, r.Header);
                 return new
                 {
                     JoseHeader = joseHeader,
@@ -316,7 +326,7 @@ namespace Jose.jwe
 
                         plaintext = compression.Decompress(plaintext);
                     }
-                    return (Plaintext: plaintext, JoseHeaders: null);
+                    return (Plaintext: plaintext, JoseHeaders: recipient.JoseHeader);
                 }
                 catch (ArgumentException ex)
                 {
@@ -339,9 +349,11 @@ namespace Jose.jwe
             }
         }
 
-        private static IDictionary<string, object> MergeHeaders(IDictionary<string, object> dest, IDictionary<string, object> source)
+        private static IDictionary<string, object> MergeHeaders(params IDictionary<string, object>[] dicts)
         {
-            return new IDictionary<string, object>[] { dest, source }.SelectMany(x => x)
+            return dicts
+                .Where(dict => dict != null)
+                .SelectMany(x => x)
                 .ToDictionary(k => k.Key, k => k.Value);
         }
 

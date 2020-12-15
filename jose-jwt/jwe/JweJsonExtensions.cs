@@ -3,9 +3,7 @@
     internal static class JweJsonExtensions
     {
         internal static byte[] ProtectedHeaderBytes(this JweJson jwe) => Base64Url.Decode(jwe.Protected);
-
-        internal static byte[] UnprotectedHeaderBytes(this JweJson jwe) => Base64Url.Decode(jwe.Unprotected);
-
+        
         internal static byte[] IvBytes(this JweJson jwe) => Base64Url.Decode(jwe.Iv);
 
         internal static byte[] AadBytes(this JweJson jwe) => Base64Url.Decode(jwe.Aad);
