@@ -25,7 +25,7 @@ namespace Jose
 
         public virtual byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header)
         {
-            throw new JoseException("Multiple recipient JWE not supported for (non-key wrapped) ECDH-ES key management");
+            throw new JoseException("(Direct) ECDH-ES key management cannot use existing CEK.");
         }
 
         private byte[] NewKey(int keyLength, object key, IDictionary<string, object> header)

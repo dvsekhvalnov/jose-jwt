@@ -32,12 +32,16 @@ namespace Jose.jwe
         smFlattenedJson,
     };
 
+    /// <summary>
+    /// Provides methods for encrypting and decrypting using JSON Web Encryption (JWE).
+    /// </summary>
     public class Jwe
     {
         /// <summary>
-        /// Encodes given binary data to JWT token and applies requested encryption/compression algorithms.
+        /// Encrypts given plaintext using JWE and applies requested encryption/compression algorithms.
         /// </summary>
         /// <param name="plaintext">Binary data to encrypt (not null)</param>        
+        /// <param name="recipients">The details of who to encrypt the plaintext (or rather the CEK) to.</param>
         /// <param name="enc">encryption algorithm to be used to encrypt the plaintext.</param>
         /// <param name="mode">serialization mode to use. Note only one recipient can be specified for compact and flattened json serialization.</param>
         /// <param name="compression">optional compression type to use.</param>
@@ -74,20 +78,27 @@ namespace Jose.jwe
                     throw new JoseException(string.Format("Unsupported JWE alg requested: {0}", recipient.Alg));
                 }
 
-                IDictionary<string, object> recipientHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwaHeaderValue(recipient.Alg) } };
+                // joseHeader - is merge of headers 
+                // - key management will read from (e.g. enc,apv,apu - ECDH-ES) 
+                // - key management will write to (e.g. iv, tag - AesGcmKW)
+                IDictionary<string, object> joseHeader = MergeHeaders(joseProtectedHeader, new Dictionary<string, object> { { "alg", jwtSettings.JwaHeaderValue(recipient.Alg) } });                
 
                 byte[] encryptedCek;
                 if(cek == null)
                 {
-                    byte[][] contentKeys = keys.WrapNewKey(_enc.KeySize, recipient.Key, recipientHeader);
+                    byte[][] contentKeys = keys.WrapNewKey(_enc.KeySize, recipient.Key, joseHeader);
                     cek = contentKeys[0];
                     encryptedCek = contentKeys[1];
                 }
                 else
                 {
-                    encryptedCek = keys.WrapKey(cek, recipient.Key, recipientHeader);
+                    encryptedCek = keys.WrapKey(cek, recipient.Key, joseHeader);
                 }
-                 
+
+                // For the per-receipient header we want the headers from the result of IKeyManagements key wrapping.. but without the
+                // protected headers that were merged in
+                IDictionary<string, object> recipientHeader = new Dictionary<string, object>(joseHeader.Except(joseProtectedHeader));
+
                 recipientsOut.Add((EncryptedKey: encryptedCek, Header: recipientHeader));
             }
 
@@ -281,7 +292,7 @@ namespace Jose.jwe
                 throw new InvalidAlgorithmException("The algorithm type passed to the Decrypt method did not match the algorithm type in the header.");
             }
 
-            var exceptions = new List<IntegrityException>();
+            var exceptions = new List<Exception>();
 
             foreach (var recipient in algMatchingRecipients)
             {
@@ -307,13 +318,25 @@ namespace Jose.jwe
                     }
                     return (Plaintext: plaintext, JoseHeaders: null);
                 }
-                catch (IntegrityException ex)
+                catch (ArgumentException ex)
+                {
+                    exceptions.Add(ex);
+                }
+                catch (JoseException ex)
                 {
                     exceptions.Add(ex);
                 }
             }
 
-            throw new JoseException($"No recipients able to decrypt.", new AggregateException(exceptions));
+            if (exceptions.Select(e => (e.GetType(), e.Message)).Distinct().Count() == 1)
+            {
+                // throw the first
+                throw exceptions[0];
+            }
+            else
+            {
+                throw new JoseException($"No recipients able to decrypt.", new AggregateException(exceptions));
+            }
         }
 
         private static IDictionary<string, object> MergeHeaders(IDictionary<string, object> dest, IDictionary<string, object> source)
