@@ -331,6 +331,7 @@ namespace UnitTests.Jwe
                 new object[] { new JweRecipient[] { recipientAes256KW1, recipientDirectEncyption1 }, "Direct Encryption not supported for multi-recipient JWE.", }, // (Direct recipient in multi not supported)
             };
 
+
             // ECDH-ES not currently working on Linux...
             // Error Message:
             // System.PlatformNotSupportedException : Windows Cryptography Next Generation (CNG) is not supported on this platform.
@@ -338,14 +339,18 @@ namespace UnitTests.Jwe
             // at System.Security.Cryptography.CngKeyBlobFormat.get_EccPublicBlob()
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
-                ret.Add(new object[]
+                // ConcatKDF DeriveKey currently not implemented on NETSTANDARD1_4
+#if NETCOREAPP3_1
+                ret.AddRange(new List<object[]>
                 {
                     new object[] { new JweRecipient[] { recipientEcdhEs1, recipientAes256KW1 }, null, }, // (EcdhEs is ok as first recipient of a multi)"
                     new object[] { new JweRecipient[] { recipientAes256KW1, recipientEcdhEs1 }, "(Direct) ECDH-ES key management cannot use existing CEK.", }, // (EcdhEs can not re-use a cek, e.g not be 2nd or later recipient)
                 });
+#endif //NETCOREAPP3_1
             }
             return ret;
         }
+
 
         [Theory()]
         [MemberData(nameof(TestDataMultipleRecipientDirectEncryption))]
