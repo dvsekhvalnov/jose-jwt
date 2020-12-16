@@ -36,5 +36,5 @@ jobs:
 
     - name: Run unit tests
       run: |
-        dotnet test jose-jwt.sln --framework {{ matrix.framework }}
+        dotnet test jose-jwt.sln --framework ${{ matrix.framework }}
 
