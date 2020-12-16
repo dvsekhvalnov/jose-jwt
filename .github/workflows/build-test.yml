@@ -1,0 +1,47 @@
+name: BuildAndTestFunctions
+on:
+  push:
+
+  pull_request:
+    branches:
+    - master
+
+jobs:
+
+  build-test-linux:
+    name: Build and test .NET Standard / Core
+
+    runs-on: ubuntu-18.04
+    steps:
+
+    - name: Check out code onto host
+      uses: actions/checkout@v1
+
+    - name: Setup .Net
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.300' # SDK Version to use.
+
+    - name: Run unit tests
+      run: |
+        dotnet test jose-jwt.sln
+
+  build-test-linux:
+    name: Build and test .NET Standard / Core
+
+    runs-on: windows-2019
+    steps:
+
+    - name: Check out code onto host
+      uses: actions/checkout@v1
+
+    - name: Setup .Net
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.300' # SDK Version to use.
+
+    - name: Run unit tests
+      run: |
+        dotnet test jose-jwt.sln
+
+
