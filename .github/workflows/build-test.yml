@@ -9,9 +9,13 @@ on:
 jobs:
 
   build-test-linux:
-    name: Build and test .NET Standard / Core
+    name: Build and test
 
-    runs-on: ubuntu-18.04
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-2019, ubuntu-18.04]
+        dotnet: ['2.1.230', '3.1.300']
     steps:
 
     - name: Check out code onto host
@@ -20,28 +24,9 @@ jobs:
     - name: Setup .Net
       uses: actions/setup-dotnet@v1
       with:
-        dotnet-version: '3.1.300' # SDK Version to use.
+        dotnet-version: ${{ matrix.dotnet }} # SDK Version to use.
 
     - name: Run unit tests
       run: |
         dotnet test jose-jwt.sln
-
-  build-test-windows:
-    name: Build and test .NET Standard / Core
-
-    runs-on: windows-2019
-    steps:
-
-    - name: Check out code onto host
-      uses: actions/checkout@v1
-
-    - name: Setup .Net
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '3.1.300' # SDK Version to use.
-
-    - name: Run unit tests
-      run: |
-        dotnet test jose-jwt.sln
-
 
