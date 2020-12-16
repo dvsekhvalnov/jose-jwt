@@ -4,7 +4,7 @@ namespace Jose.jwe
     using Newtonsoft.Json;
     using System.Collections.Generic;
 
-    internal abstract class JweJson
+    internal class JweJson
     {
         [JsonProperty("protected")]
         internal string Protected { get; set; }
@@ -23,17 +23,10 @@ namespace Jose.jwe
 
         [JsonProperty("tag")]
         internal string Tag { get; set; }
-    }
-
-    internal class GeneralJweJson : JweJson
-    {
-
+  
         [JsonProperty("recipients")]
-        internal IEnumerable<JweRecipientDto> Recipients { get; set; }
-    }
-
-    internal class FlattenedJweJson : JweJson
-    {
+        internal IEnumerable<JweRecipientJson> Recipients { get; set; }
+  
         [JsonProperty("encrypted_key")]
         internal string EncryptedKey { get; set; }
 
@@ -41,7 +34,7 @@ namespace Jose.jwe
         internal IDictionary<string, object> Header { get; set; }
     }
 
-    internal class JweRecipientDto
+    internal class JweRecipientJson
     {
         [JsonProperty("encrypted_key")]
         internal string EncryptedKey { get; set; }

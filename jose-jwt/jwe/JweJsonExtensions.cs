@@ -12,16 +12,13 @@ namespace Jose.jwe
         internal static byte[] CiphertextBytes(this JweJson jwe) => Base64Url.Decode(jwe.Ciphertext);
 
         internal static byte[] TagBytes(this JweJson jwe) => Base64Url.Decode(jwe.Tag);
+
+        internal static byte[] EncryptedKeyBytes(this JweJson r) => Base64Url.Decode(r.EncryptedKey);
     }
 
-    internal static class JweRecipientDtoExtensions
+    internal static class JweRecipientJsonExtensions
     {
-        internal static byte[] EncryptedKeyBytes(this JweRecipientDto r) => Base64Url.Decode(r.EncryptedKey);
-    }
-
-    internal static class FlattenedJweJsonExtensions
-    {
-        internal static byte[] EncryptedKeyBytes(this FlattenedJweJson r) => Base64Url.Decode(r.EncryptedKey);       
-    }
+        internal static byte[] EncryptedKeyBytes(this JweRecipientJson r) => Base64Url.Decode(r.EncryptedKey);
+    }   
 }
 #endif //NETSTANDARD2_1

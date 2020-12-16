@@ -18,8 +18,7 @@ namespace UnitTests.Jwe
     {
         [Theory]
         [InlineData(SerializationMode.smCompact)]
-        [InlineData(SerializationMode.smGeneralJson)]
-        [InlineData(SerializationMode.smFlattenedJson)]
+        [InlineData(SerializationMode.smJson)]
         public void EncryptDecrypt_RoundTripOneRecipient_PlaintextSurvives(SerializationMode mode)
         {
             //given
@@ -77,10 +76,10 @@ namespace UnitTests.Jwe
                 plaintext: payload,
                 recipients: recipients,
                 JweEncryption.A256GCM,
-                mode: SerializationMode.smGeneralJson,
+                mode: SerializationMode.smJson,
                 extraHeaders: sharedProtectedHeaders);
 
-            var decrypted = Jwe.Decrypt(jwe, decryptKey, mode: SerializationMode.smGeneralJson);
+            var decrypted = Jwe.Decrypt(jwe, decryptKey, mode: SerializationMode.smJson);
 
             //then
             Assert.Equal(payload, decrypted.Plaintext);
@@ -107,12 +106,12 @@ namespace UnitTests.Jwe
                 plaintext: payload,
                 recipients: recipients,
                 JweEncryption.A256GCM,
-                mode: SerializationMode.smGeneralJson,
+                mode: SerializationMode.smJson,
                 extraHeaders: sharedProtectedHeaders);
 
 
             //when
-            var exception = Record.Exception(() => Jwe.Decrypt(jwe, aes256KWKey2, expectedJweAlg, expectedJweEnc, mode: SerializationMode.smGeneralJson));
+            var exception = Record.Exception(() => Jwe.Decrypt(jwe, aes256KWKey2, expectedJweAlg, expectedJweEnc, mode: SerializationMode.smJson));
 
             //then
             Assert.IsType<InvalidAlgorithmException>(exception);
@@ -140,11 +139,11 @@ namespace UnitTests.Jwe
                 plaintext: payload,
                 recipients: recipients,
                 JweEncryption.A256GCM,
-                mode: SerializationMode.smGeneralJson,
+                mode: SerializationMode.smJson,
                 extraHeaders: sharedProtectedHeaders);
 
             //when
-            var exception = Record.Exception(() => { Jwe.Decrypt(jwe, aes256KWKey3, mode: SerializationMode.smGeneralJson); });
+            var exception = Record.Exception(() => { Jwe.Decrypt(jwe, aes256KWKey3, mode: SerializationMode.smJson); });
 
             //then
             Assert.IsType<IntegrityException>(exception);
@@ -153,7 +152,6 @@ namespace UnitTests.Jwe
 
         [Theory]
         [InlineData(SerializationMode.smCompact, "Only one recipient is supported by the JWE Compact Serialization.")]
-        [InlineData(SerializationMode.smFlattenedJson, "Only one recipient is supported by the Flattened JWE JSON Serialization.")]
         public void Encrypt_WithMoreThanOneRecipient_Throws(SerializationMode mode, string expectedMessage)
         {
             //given
@@ -196,7 +194,7 @@ namespace UnitTests.Jwe
             Assert.Equal(5, parts.Length); //Make sure 5 parts
             Assert.Equal("{\"alg\":\"A128KW\",\"enc\":\"A128CBC-HS256\"}",
                 UTF8Encoding.UTF8.GetString(Base64Url.Decode(parts[0])));
-            Assert.Equal(parts[0], "eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0"); //Header is non-encrypted and static text
+            Assert.Equal("eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0", parts[0]); //Header is non-encrypted and static text
             Assert.Equal(54, parts[1].Length); //CEK size
             Assert.Equal(22, parts[2].Length); //IV size
             Assert.Equal(22, parts[3].Length); //cipher text size
@@ -206,7 +204,7 @@ namespace UnitTests.Jwe
         }
 
         [Fact]
-        public void Encrypt_ModeGeneralJsonWithEmptyBytesA128KW_A128CBC_HS256_ExpectedResults()
+        public void Encrypt_ModeJsonTwoRecipientsWithEmptyBytesA128KW_A128CBC_HS256_ExpectedResults()
         {
             //given
             byte[] plaintext = { };
@@ -214,9 +212,9 @@ namespace UnitTests.Jwe
             //when
             var jwe = Jwe.Encrypt(
                 plaintext: plaintext,
-                recipients: new JweRecipient[] { recipientAes128KW },
+                recipients: new JweRecipient[] { recipientAes128KW, recipientAes128KW },
                 JweEncryption.A128CBC_HS256,
-                mode: SerializationMode.smGeneralJson);
+                mode: SerializationMode.smJson);
 
             //then
             Console.Out.WriteLine("Empty bytes A128KW_A128CBC_HS256 (General Json Serialization) = {0}", jwe);
@@ -228,7 +226,7 @@ namespace UnitTests.Jwe
                  UTF8Encoding.UTF8.GetString(Base64Url.Decode((string)deserialized["protected"])));
 
             Assert.True(deserialized["recipients"] is JArray);
-            Assert.Single(((JArray)deserialized["recipients"]));
+            Assert.Equal(2, ((JArray)deserialized["recipients"]).Count);
 
             var recipient0 = ((JArray)deserialized["recipients"])[0];
 
@@ -240,11 +238,11 @@ namespace UnitTests.Jwe
             Assert.Equal(22, ((string)deserialized["ciphertext"]).Length); //cipher text size
             Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
 
-            Assert.Equal(new byte[0], Jwe.Decrypt(jwe, aes128KWKey, mode: SerializationMode.smGeneralJson).Plaintext);
+            Assert.Equal(new byte[0], Jwe.Decrypt(jwe, aes128KWKey, mode: SerializationMode.smJson).Plaintext);
         }
 
         [Fact]
-        public void Encrypt_ModeFlattenedJsonWithEmptyBytesA128KW_A128CBC_HS256_ExpectedResults()
+        public void Encrypt_ModeJsonOneRecipientWithEmptyBytesA128KW_A128CBC_HS256_ExpectedResults()
         {
             //given
             byte[] plaintext = { };
@@ -254,7 +252,7 @@ namespace UnitTests.Jwe
                 plaintext: plaintext,
                 recipients: new JweRecipient[] { recipientAes128KW },
                 JweEncryption.A128CBC_HS256,
-                mode: SerializationMode.smFlattenedJson);
+                mode: SerializationMode.smJson);
 
             //then
             Console.Out.WriteLine("Empty bytes A128KW_A128CBC_HS256 (Flattened Json Serialization) = {0}", jwe);
@@ -272,7 +270,7 @@ namespace UnitTests.Jwe
             Assert.Equal(22, ((string)deserialized["ciphertext"]).Length); //cipher text size
             Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
 
-            Assert.Equal(new byte[0], Jwe.Decrypt(jwe, aes128KWKey, mode: SerializationMode.smFlattenedJson).Plaintext);
+            Assert.Equal(new byte[0], Jwe.Decrypt(jwe, aes128KWKey, mode: SerializationMode.smJson).Plaintext);
         }
 
         [Fact]
@@ -285,7 +283,7 @@ namespace UnitTests.Jwe
             var decrypted = Jwe.Decrypt(
                 Rfc7516_A_4_7_ExampleJwe,
                 key,
-                mode: SerializationMode.smGeneralJson);
+                mode: SerializationMode.smJson);
 
             //then
             Assert.Equal("Live long and prosper.", UTF8Encoding.UTF8.GetString(decrypted.Plaintext));
@@ -308,7 +306,7 @@ namespace UnitTests.Jwe
             var decrypted = Jwe.Decrypt(
                 Rfc7516_A_4_7_ExampleJwe,
                 key,
-                mode: SerializationMode.smGeneralJson);
+                mode: SerializationMode.smJson);
 
             //then
             Assert.Equal("Live long and prosper.", UTF8Encoding.UTF8.GetString(decrypted.Plaintext));
@@ -363,7 +361,7 @@ namespace UnitTests.Jwe
                 plaintext: plaintext,
                 recipients: recipients,
                 JweEncryption.A128CBC_HS256,
-                mode: SerializationMode.smGeneralJson));
+                mode: SerializationMode.smJson));
 
             //then
             if (expectedError == null)
@@ -405,7 +403,7 @@ namespace UnitTests.Jwe
                         })
                 },
                 JweEncryption.A128CBC_HS256,
-                mode: SerializationMode.smFlattenedJson,
+                mode: SerializationMode.smJson,
                 extraHeaders: new Dictionary<string, object>
                 {
                     { "cty", "text/plain" },
@@ -448,7 +446,7 @@ namespace UnitTests.Jwe
                         })
                 },
                 JweEncryption.A128CBC_HS256,
-                mode: SerializationMode.smFlattenedJson,
+                mode: SerializationMode.smJson,
                 extraHeaders: new Dictionary<string, object>
                 {
                     { "cty", "text/plain" },

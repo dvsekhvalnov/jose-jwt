@@ -31,8 +31,7 @@ namespace Jose.jwe
     public enum SerializationMode
     {
         smCompact,
-        smGeneralJson,
-        smFlattenedJson,
+        smJson,
     };
 
     /// <summary>
@@ -133,46 +132,39 @@ namespace Jose.jwe
                         return Compact.Serialize(header, recipientsOut[0].EncryptedKey, encParts[0], encParts[1], encParts[2]);
                     }
 
-                case SerializationMode.smFlattenedJson:
-                    {
-                        if (recipientsOut.Count != 1)
-                        {
-                            throw new JoseException("Only one recipient is supported by the Flattened JWE JSON Serialization.");
-                        }
-
-                        var protectedHeaderBytes = Encoding.UTF8.GetBytes(jwtSettings.JsonMapper.Serialize(joseProtectedHeader));
-                        byte[] aad = Encoding.ASCII.GetBytes(Base64Url.Encode(protectedHeaderBytes));
-                        byte[][] encParts = _enc.Encrypt(aad, plaintext, cek);
-
-                        return jwtSettings.JsonMapper.Serialize(new
-                        {
-                            @protected = Base64Url.Encode(protectedHeaderBytes),
-                            header = recipientsOut.Select(r => r.Header).First(),
-                            encrypted_key = recipientsOut.Select(r => Base64Url.Encode(r.EncryptedKey)).First(),
-                            iv = Base64Url.Encode(encParts[0]),
-                            ciphertext = Base64Url.Encode(encParts[1]),
-                            tag = Base64Url.Encode(encParts[2]),
-                        });
-                    }
-
-                case SerializationMode.smGeneralJson:
+                case SerializationMode.smJson:
                     {
                         var protectedHeaderBytes = Encoding.UTF8.GetBytes(jwtSettings.JsonMapper.Serialize(joseProtectedHeader));
                         byte[] aad = Encoding.ASCII.GetBytes(Base64Url.Encode(protectedHeaderBytes));
                         byte[][] encParts = _enc.Encrypt(aad, plaintext, cek);
 
-                        return jwtSettings.JsonMapper.Serialize(new
+                        if (recipientsOut.Count == 1)
                         {
-                            @protected = Base64Url.Encode(protectedHeaderBytes),
-                            recipients = recipientsOut.Select(r => new
+                            return jwtSettings.JsonMapper.Serialize(new
                             {
-                                header = r.Header,
-                                encrypted_key = Base64Url.Encode(r.EncryptedKey),
-                            }),
-                            iv = Base64Url.Encode(encParts[0]),
-                            ciphertext = Base64Url.Encode(encParts[1]),
-                            tag = Base64Url.Encode(encParts[2]),
-                        });
+                                @protected = Base64Url.Encode(protectedHeaderBytes),
+                                header = recipientsOut.Select(r => r.Header).First(),
+                                encrypted_key = recipientsOut.Select(r => Base64Url.Encode(r.EncryptedKey)).First(),
+                                iv = Base64Url.Encode(encParts[0]),
+                                ciphertext = Base64Url.Encode(encParts[1]),
+                                tag = Base64Url.Encode(encParts[2]),
+                            });
+                        }
+                        else
+                        {
+                            return jwtSettings.JsonMapper.Serialize(new
+                            {
+                                @protected = Base64Url.Encode(protectedHeaderBytes),
+                                recipients = recipientsOut.Select(r => new
+                                {
+                                    header = r.Header,
+                                    encrypted_key = Base64Url.Encode(r.EncryptedKey),
+                                }),
+                                iv = Base64Url.Encode(encParts[0]),
+                                ciphertext = Base64Url.Encode(encParts[1]),
+                                tag = Base64Url.Encode(encParts[2]),
+                            });
+                        }
                     }
 
                 default:
@@ -225,39 +217,28 @@ namespace Jose.jwe
                         break;
                     }
 
-                case SerializationMode.smFlattenedJson:
+                case SerializationMode.smJson:
                     {
                         // TODO - do we want the entire object deserialized using the custom JsonMapper?
-                        var jweJson = jwtSettings.JsonMapper.Parse<FlattenedJweJson>(jwe);
+                        var jweJson = jwtSettings.JsonMapper.Parse<JweJson>(jwe);
 
                         protectedHeaderBytes = jweJson.ProtectedHeaderBytes();
                         iv = jweJson.IvBytes();
                         ciphertext = jweJson.CiphertextBytes();
                         authTag = jweJson.TagBytes();
 
-                        byte[] encryptedCek = jweJson.EncryptedKeyBytes();
-                        recipients.Add((EncryptedCek: encryptedCek, Header: jweJson.Header));
-
-                        protectedHeader = jwtSettings.JsonMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(protectedHeaderBytes));
-                        unprotectedHeader = jweJson.Unprotected;
-
-                        break;
-                    }
-
-                case SerializationMode.smGeneralJson:
-                    {
-                        // TODO - do we want the entire object deserialized using the custom JsonMapper?
-                        var jweJson = jwtSettings.JsonMapper.Parse<GeneralJweJson>(jwe);
-
-                        protectedHeaderBytes = jweJson.ProtectedHeaderBytes();
-                        iv = jweJson.IvBytes();
-                        ciphertext = jweJson.CiphertextBytes();
-                        authTag = jweJson.TagBytes();
-
-                        foreach (var recipient in jweJson.Recipients)
+                        if (jweJson.Recipients?.Count() > 0)
                         {
-                            byte[] encryptedCek = recipient.EncryptedKeyBytes();
-                            recipients.Add((EncryptedCek: encryptedCek, Header: recipient.Header));
+                            foreach (var recipient in jweJson.Recipients)
+                            {
+                                byte[] encryptedCek = recipient.EncryptedKeyBytes();
+                                recipients.Add((EncryptedCek: encryptedCek, Header: recipient.Header));
+                            }
+                        }
+                        else
+                        {
+                            byte[] encryptedCek = jweJson.EncryptedKeyBytes();
+                            recipients.Add((EncryptedCek: encryptedCek, Header: jweJson.Header));
                         }
 
                         protectedHeader = jwtSettings.JsonMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(protectedHeaderBytes));
