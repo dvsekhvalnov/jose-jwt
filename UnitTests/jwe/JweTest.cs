@@ -194,10 +194,9 @@ namespace UnitTests.Jwe
             string[] parts = jwe.Split('.');
 
             Assert.Equal(5, parts.Length); //Make sure 5 parts
-            // Note the order of enc and alg is swapped compared to TestSuite.EncryptEmptyBytes_A128KW_A128CBC_HS256
-            // however the order of keys in a json dictionary doesn't matter and not actually defined for C# dictionary
-            Assert.Equal("{\"enc\":\"A128CBC-HS256\",\"alg\":\"A128KW\"}",
-                UTF8Encoding.UTF8.GetString(Base64Url.Decode(parts[0]))); //Header is non-encrypted and static text
+            Assert.Equal("{\"alg\":\"A128KW\",\"enc\":\"A128CBC-HS256\"}",
+                UTF8Encoding.UTF8.GetString(Base64Url.Decode(parts[0])));
+            Assert.Equal(parts[0], "eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0"); //Header is non-encrypted and static text
             Assert.Equal(54, parts[1].Length); //CEK size
             Assert.Equal(22, parts[2].Length); //IV size
             Assert.Equal(22, parts[3].Length); //cipher text size
