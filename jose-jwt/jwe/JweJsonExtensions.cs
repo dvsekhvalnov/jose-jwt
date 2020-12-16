@@ -1,4 +1,5 @@
-﻿namespace Jose.jwe
+﻿#if NETSTANDARD
+namespace Jose.jwe
 {
     internal static class JweJsonExtensions
     {
@@ -11,14 +12,6 @@
         internal static byte[] CiphertextBytes(this JweJson jwe) => Base64Url.Decode(jwe.Ciphertext);
 
         internal static byte[] TagBytes(this JweJson jwe) => Base64Url.Decode(jwe.Tag);
-
-        internal static void Validate(this JweJson j)
-        {
-            if (string.IsNullOrEmpty(j.Ciphertext))
-            {
-                throw new JoseException("'ciphertext' member must be present.");
-            }
-        }
     }
 
     internal static class JweRecipientDtoExtensions
@@ -28,11 +21,7 @@
 
     internal static class FlattenedJweJsonExtensions
     {
-        internal static byte[] EncryptedKeyBytes(this FlattenedJweJson r) => Base64Url.Decode(r.EncryptedKey);
-
-        internal static void Validate(this FlattenedJweJson j)
-        {
-            ((JweJson)j).Validate();
-        }
+        internal static byte[] EncryptedKeyBytes(this FlattenedJweJson r) => Base64Url.Decode(r.EncryptedKey);       
     }
 }
+#endif //NETSTANDARD2_1

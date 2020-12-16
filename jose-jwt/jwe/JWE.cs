@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD2_1
+﻿#if NETSTANDARD
 namespace Jose.jwe
 {
     using Newtonsoft.Json;
@@ -104,8 +104,8 @@ namespace Jose.jwe
 
                 // For the per-receipient header we want the headers from the result of IKeyManagements key wrapping.. but without the
                 // protected headers that were merged in
-                IDictionary<string, object> recipientHeader = new Dictionary<string, object>(joseHeader.Except(joseProtectedHeader));
-
+                IDictionary<string, object> recipientHeader = joseHeader.Except(joseProtectedHeader).ToDictionary(x => x.Key, v => v.Value);
+                
                 recipientsOut.Add((EncryptedKey: encryptedCek, Header: recipientHeader));
             }
 
@@ -229,8 +229,6 @@ namespace Jose.jwe
                     {
                         // TODO - do we want the entire object deserialized using the custom JsonMapper?
                         var jweJson = jwtSettings.JsonMapper.Parse<FlattenedJweJson>(jwe);
-
-                        jweJson.Validate();
 
                         protectedHeaderBytes = jweJson.ProtectedHeaderBytes();
                         iv = jweJson.IvBytes();

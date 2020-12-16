@@ -1,3 +1,4 @@
+#if NETCOREAPP
 namespace UnitTests.Jwe
 {
     using Jose;
@@ -7,6 +8,7 @@ namespace UnitTests.Jwe
     using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Generic;
+    using System.Runtime.InteropServices;
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
     using System.Text;
@@ -52,7 +54,7 @@ namespace UnitTests.Jwe
                 new object[] { aes256KWKey2 },
                 new object[] { PrivKey() },
             };
-            
+
         [Theory]
         [MemberData(nameof(TestDataModeGeneralJsonRoundTripMultipleRecipients))]
         public void EncryptDecrypt_ModeGeneralJsonRoundTripMultipleRecipients_ValidRecipientsCanDecrypt(object decryptKey)
@@ -86,7 +88,7 @@ namespace UnitTests.Jwe
 
         [Theory]
         [InlineData(JweEncryption.A256GCM, JweAlgorithm.ECDH_ES_A256KW, "The algorithm type passed to the Decrypt method did not match the algorithm type in the header.")]
-        [InlineData(JweEncryption.A192GCM, JweAlgorithm.A256KW, "The encryption type passed to the Decrypt method did not match the encryption type in the header.")]        
+        [InlineData(JweEncryption.A192GCM, JweAlgorithm.A256KW, "The encryption type passed to the Decrypt method did not match the encryption type in the header.")]
         public void Decrypt_MultipleRecipients_MismatchEncOrAlgThrows(JweEncryption expectedJweEnc, JweAlgorithm expectedJweAlg, string expectedMessage)
         {
             //given
@@ -146,7 +148,7 @@ namespace UnitTests.Jwe
 
             //then
             Assert.IsType<IntegrityException>(exception);
-            Assert.Equal("AesKeyWrap integrity check failed.", exception.Message);            
+            Assert.Equal("AesKeyWrap integrity check failed.", exception.Message);
         }
 
         [Theory]
@@ -195,7 +197,7 @@ namespace UnitTests.Jwe
             // Note the order of enc and alg is swapped compared to TestSuite.EncryptEmptyBytes_A128KW_A128CBC_HS256
             // however the order of keys in a json dictionary doesn't matter and not actually defined for C# dictionary
             Assert.Equal("{\"enc\":\"A128CBC-HS256\",\"alg\":\"A128KW\"}",
-                UTF8Encoding.UTF8.GetString(Base64Url.Decode(parts[0]))); //Header is non-encrypted and static text            
+                UTF8Encoding.UTF8.GetString(Base64Url.Decode(parts[0]))); //Header is non-encrypted and static text
             Assert.Equal(54, parts[1].Length); //CEK size
             Assert.Equal(22, parts[2].Length); //IV size
             Assert.Equal(22, parts[3].Length); //cipher text size
@@ -231,7 +233,7 @@ namespace UnitTests.Jwe
 
             var recipient0 = ((JArray)deserialized["recipients"])[0];
 
-            Assert.True(recipient0["header"] is JObject); 
+            Assert.True(recipient0["header"] is JObject);
             Assert.Equal("{\"alg\":\"A128KW\"}", recipient0["header"].ToString(Newtonsoft.Json.Formatting.None));
             Assert.Equal("A128KW", recipient0["header"]["alg"]);
             Assert.Equal(54, ((string)recipient0["encrypted_key"]).Length); //CEK size
@@ -320,15 +322,30 @@ namespace UnitTests.Jwe
             Assert.Equal("https://server.example.com/keys.jwks", decrypted.JoseHeaders["jku"]);
         }
 
-        public static IEnumerable<object[]> TestDataMultipleRecipientDirectEncryption =>
-            new List<object[]>
+        public static IEnumerable<object[]> TestDataMultipleRecipientDirectEncryption()
+        {
+            var ret = new List<object[]>
             {
                 new object[] { new JweRecipient[] { recipientDirectEncyption1 }, null }, // (Single direct encryption is ok)
                 new object[] { new JweRecipient[] { recipientDirectEncyption1, recipientAes256KW1 }, null }, // (Direct recipient currently allowed as first receipient)
-                new object[] { new JweRecipient[] { recipientAes256KW1, recipientDirectEncyption1 }, "Direct Encryption not supported for multi-recipient JWE.", }, // (Direct recipient in multi not supported)                
-                new object[] { new JweRecipient[] { recipientEcdhEs1, recipientAes256KW1 }, null, }, // (EcdhEs is ok as first recipient of a multi)"
-                new object[] { new JweRecipient[] { recipientAes256KW1, recipientEcdhEs1 }, "(Direct) ECDH-ES key management cannot use existing CEK.", }, // (EcdhEs can not re-use a cek, e.g not be 2nd or later recipient)
+                new object[] { new JweRecipient[] { recipientAes256KW1, recipientDirectEncyption1 }, "Direct Encryption not supported for multi-recipient JWE.", }, // (Direct recipient in multi not supported)
             };
+
+            // ECDH-ES not currently working on Linux...
+            // Error Message:
+            // System.PlatformNotSupportedException : Windows Cryptography Next Generation (CNG) is not supported on this platform.
+            // Stack Trace:
+            // at System.Security.Cryptography.CngKeyBlobFormat.get_EccPublicBlob()
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+            {
+                ret.Add(new object[]
+                {
+                    new object[] { new JweRecipient[] { recipientEcdhEs1, recipientAes256KW1 }, null, }, // (EcdhEs is ok as first recipient of a multi)"
+                    new object[] { new JweRecipient[] { recipientAes256KW1, recipientEcdhEs1 }, "(Direct) ECDH-ES key management cannot use existing CEK.", }, // (EcdhEs can not re-use a cek, e.g not be 2nd or later recipient)
+                });
+            }
+            return ret;
+        }
 
         [Theory()]
         [MemberData(nameof(TestDataMultipleRecipientDirectEncryption))]
@@ -353,7 +370,7 @@ namespace UnitTests.Jwe
             {
                 Assert.IsType<JoseException>(exception);
                 Assert.Equal(expectedError, exception.Message);
-            }            
+            }
         }
 
         /// <summary>
@@ -431,7 +448,7 @@ namespace UnitTests.Jwe
                 extraHeaders: new Dictionary<string, object>
                 {
                     { "cty", "text/plain" },
-                    { "example.com:extra_header", "another value" },                    
+                    { "example.com:extra_header", "another value" },
                 }));
 
             //then
@@ -533,7 +550,7 @@ namespace UnitTests.Jwe
         }";
 
 
-        private static string Rfc7516_A_2_3_ExampleJwk = @" 
+        private static string Rfc7516_A_2_3_ExampleJwk = @"
             {""kty"":""RSA"",
                 ""n"":""sXchDaQebHnPiGvyDOAT4saGEUetSyo9MKLOoWFsueri23bOdgWp4Dy1WlUzewbgBHod5pcM9H95GQRV3JDXboIRROSBigeC5yjU1hGzHHyXss8UDprecbAYxknTcQkhslANGRUZmdTOQ5qTRsLAt6BTYuyvVRdhS8exSZEy_c4gs_7svlJJQ4H9_NxsiIoLwAEk7-Q3UXERGYw_75IDrGA84-lA_-Ct4eTlXHBIY2EaV7t7LjJaynVJCpkv4LKjTTAumiGUIuQhrNhZLuF_RJLqHpM2kgWFLU7-VTdL1VbC2tejvcI2BlMkEpk1BzBZI0KQB0GaDWFLN-aEAw3vRw"",
                 ""e"":""AQAB"",
@@ -551,3 +568,4 @@ namespace UnitTests.Jwe
             }";
     };
 }
+#endif //NETSTANDARD2_1

@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>UnitTests Class Library</Description>
     <Authors>Administrator</Authors>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <TargetFrameworks>netcoreapp2.1;netcoreapp3.1</TargetFrameworks>
     <AssemblyName>UnitTests</AssemblyName>
     <PackageId>UnitTests</PackageId>
   </PropertyGroup>

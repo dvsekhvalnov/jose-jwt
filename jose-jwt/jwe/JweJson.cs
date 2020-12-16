@@ -1,4 +1,5 @@
-﻿namespace Jose.jwe
+﻿#if NETSTANDARD
+namespace Jose.jwe
 {
     using Newtonsoft.Json;
     using System.Collections.Generic;
@@ -49,3 +50,4 @@
         internal IDictionary<string, object> Header { get; set; }
     }
 }
+#endif //NETSTANDARD2_1

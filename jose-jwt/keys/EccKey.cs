@@ -11,7 +11,7 @@ namespace Jose.keys
         public static readonly byte[] BCRYPT_ECDSA_PUBLIC_P384_MAGIC = BitConverter.GetBytes(0x33534345);
         public static readonly byte[] BCRYPT_ECDSA_PRIVATE_P384_MAGIC = BitConverter.GetBytes(0x34534345);
         public static readonly byte[] BCRYPT_ECDSA_PUBLIC_P521_MAGIC = BitConverter.GetBytes(0x35534345);
-        public static readonly byte[] BCRYPT_ECDSA_PRIVATE_P521_MAGIC = BitConverter.GetBytes(0x36534345);           
+        public static readonly byte[] BCRYPT_ECDSA_PRIVATE_P521_MAGIC = BitConverter.GetBytes(0x36534345);
 
         public static readonly byte[] BCRYPT_ECDH_PUBLIC_P256_MAGIC  = BitConverter.GetBytes(0x314B4345);
         public static readonly byte[] BCRYPT_ECDH_PRIVATE_P256_MAGIC = BitConverter.GetBytes(0x324B4345);
@@ -38,21 +38,21 @@ namespace Jose.keys
 
         public byte[] Y
         {
-            get 
-            { 
+            get
+            {
                 if(y==null) ExportKey();
 
-                return y; 
+                return y;
             }
         }
 
         public byte[] D
         {
-            get 
-            { 
+            get
+            {
                 if(d==null) ExportKey();
 
-                return d; 
+                return d;
             }
         }
 
@@ -62,7 +62,7 @@ namespace Jose.keys
         }
 
         /// <summary>
-        /// Creates CngKey Elliptic Curve Key from given (x,y) curve point - public part 
+        /// Creates CngKey Elliptic Curve Key from given (x,y) curve point - public part
         /// and optional d - private part
         /// </summary>
         /// <param name="x">x coordinate of curve point</param>
@@ -82,7 +82,7 @@ namespace Jose.keys
 
             bool signing = usage == CngKeyUsages.Signing;
 
-            int partSize = x.Length; 
+            int partSize = x.Length;
 
             byte[] magic;
 
@@ -111,15 +111,15 @@ namespace Jose.keys
 
             CngKeyBlobFormat blobType;
             byte[] blob;
-            
+
             if(d==null)
             {
-                blob = Arrays.Concat(magic, partLength, x, y);    
+                blob = Arrays.Concat(magic, partLength, x, y);
                 blobType = CngKeyBlobFormat.EccPublicBlob;
             }
             else
             {
-                blob = Arrays.Concat(magic, partLength, x, y, d);    
+                blob = Arrays.Concat(magic, partLength, x, y, d);
                 blobType = CngKeyBlobFormat.EccPrivateBlob;               ;
             }
 

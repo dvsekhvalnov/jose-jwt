@@ -30,7 +30,7 @@ namespace Jose
                 //To be removed in 3.x 
                 var publicKey = RsaKey.New(((RSACryptoServiceProvider)key).ExportParameters(false));
 
-                return new[] { cek, RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256) };
+                return RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256);
             }
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey type.");
@@ -40,7 +40,7 @@ namespace Jose
             {
                 var publicKey = (CngKey) key;
 
-                return new[] {cek, RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256)};
+                return RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256);
             }
 
             if (key is RSACryptoServiceProvider)
@@ -49,14 +49,14 @@ namespace Jose
                 //To be removed in 3.x 
                 var publicKey = RsaKey.New(((RSACryptoServiceProvider) key).ExportParameters(false));
 
-                return new[] {cek, RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256)};
+                return RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256);
             }
 
             if (key is RSA)
             {
 	            var publicKey = (RSA) key;
 
-                return new[] { cek, publicKey.Encrypt(cek, RSAEncryptionPadding.OaepSHA256) };
+                return publicKey.Encrypt(cek, RSAEncryptionPadding.OaepSHA256);
             }
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of either CngKey or RSA types.");
