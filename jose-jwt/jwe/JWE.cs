@@ -50,7 +50,7 @@ namespace Jose.jwe
         /// <param name="extraHeaders">optional extra headers to put in the JoseProtectedHeader.</param>
         /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
-        public static string Encrypt(byte[] plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, SerializationMode mode = SerializationMode.smCompact, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
+        public static string Encrypt(byte[] plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.smCompact, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
         {
             if (plaintext == null)
             {
@@ -123,10 +123,15 @@ namespace Jose.jwe
                             throw new JoseException("Only one recipient is supported by the JWE Compact Serialization.");
                         }
 
+                        if (aad != null)
+                        {
+                            throw new JoseException("JWE AAD value is not valid for JWE Compact Serialization.");
+                        }
+
                         joseProtectedHeader = MergeHeaders(recipientsOut[0].Header, joseProtectedHeader);
 
                         byte[] header = Encoding.UTF8.GetBytes(settings.JsonMapper.Serialize(joseProtectedHeader));
-                        byte[] aad = Encoding.UTF8.GetBytes(Compact.Serialize(header));
+                        aad = Encoding.UTF8.GetBytes(Compact.Serialize(header));
                         byte[][] encParts = _enc.Encrypt(aad, plaintext, cek);
 
                         return Compact.Serialize(header, recipientsOut[0].EncryptedKey, encParts[0], encParts[1], encParts[2]);
@@ -134,37 +139,38 @@ namespace Jose.jwe
 
                 case SerializationMode.smJson:
                     {
-                        var protectedHeaderBytes = Encoding.UTF8.GetBytes(settings.JsonMapper.Serialize(joseProtectedHeader));
-                        byte[] aad = Encoding.ASCII.GetBytes(Base64Url.Encode(protectedHeaderBytes));
-                        byte[][] encParts = _enc.Encrypt(aad, plaintext, cek);
+                        var protectedHeaderBytes = Encoding.UTF8.GetBytes(settings.JsonMapper.Serialize(joseProtectedHeader));                        
+                        byte[] asciiEncodedProtectedHeader = Encoding.ASCII.GetBytes(Base64Url.Encode(protectedHeaderBytes));
+                        var aadToEncrypt = aad == null ? asciiEncodedProtectedHeader : asciiEncodedProtectedHeader.Concat(new byte[] { 0x2E }).Concat(aad).ToArray();
 
+                        byte[][] encParts = _enc.Encrypt(aadToEncrypt, plaintext, cek);
+
+                        var toSerialize = new Dictionary<string, object>
+                        {
+                            { "protected", Base64Url.Encode(protectedHeaderBytes) },
+                            { "iv", Base64Url.Encode(encParts[0]) },                            
+                            { "ciphertext", Base64Url.Encode(encParts[1]) },
+                            { "tag" , Base64Url.Encode(encParts[2]) },
+                        };
+                        if (aad != null)
+                        {
+                            toSerialize["aad"] = Base64Url.Encode(aad);
+                        }
+                        
                         if (recipientsOut.Count == 1)
                         {
-                            return settings.JsonMapper.Serialize(new
-                            {
-                                @protected = Base64Url.Encode(protectedHeaderBytes),
-                                header = recipientsOut.Select(r => r.Header).First(),
-                                encrypted_key = recipientsOut.Select(r => Base64Url.Encode(r.EncryptedKey)).First(),
-                                iv = Base64Url.Encode(encParts[0]),
-                                ciphertext = Base64Url.Encode(encParts[1]),
-                                tag = Base64Url.Encode(encParts[2]),
-                            });
+                            toSerialize["header"] = recipientsOut.Select(r => r.Header).First();
+                            toSerialize["encrypted_key"] = recipientsOut.Select(r => Base64Url.Encode(r.EncryptedKey)).First();                            
                         }
                         else
                         {
-                            return settings.JsonMapper.Serialize(new
+                            toSerialize["recipients"] = recipientsOut.Select(r => new
                             {
-                                @protected = Base64Url.Encode(protectedHeaderBytes),
-                                recipients = recipientsOut.Select(r => new
-                                {
-                                    header = r.Header,
-                                    encrypted_key = Base64Url.Encode(r.EncryptedKey),
-                                }),
-                                iv = Base64Url.Encode(encParts[0]),
-                                ciphertext = Base64Url.Encode(encParts[1]),
-                                tag = Base64Url.Encode(encParts[2]),
+                                header = r.Header,
+                                encrypted_key = Base64Url.Encode(r.EncryptedKey),
                             });
                         }
+                        return settings.JsonMapper.Serialize(toSerialize);
                     }
 
                 default:
@@ -185,7 +191,7 @@ namespace Jose.jwe
         /// <exception cref="IntegrityException">if AEAD operation validation failed</exception>
         /// <exception cref="EncryptionException">if JWE can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if encryption or compression algorithm is not supported</exception>
-        public static (byte[] Plaintext, IDictionary<string, object> JoseHeaders) Decrypt(string jwe, object key, JweAlgorithm? expectedJweAlg = null, JweEncryption? expectedJweEnc = null, SerializationMode mode = SerializationMode.smCompact, JwtSettings settings = null)
+        public static (byte[] Plaintext, IDictionary<string, object> JoseHeaders, byte[] Aad) Decrypt(string jwe, object key, JweAlgorithm? expectedJweAlg = null, JweEncryption? expectedJweEnc = null, SerializationMode mode = SerializationMode.smCompact, JwtSettings settings = null)
         {
             Ensure.IsNotEmpty(jwe, "Incoming jwe expected to be in a valid serialization form, not empty, whitespace or null.");
 
@@ -240,7 +246,12 @@ namespace Jose.jwe
                 try
                 {
                     byte[] cek = keys.Unwrap(recipient.EncryptedCek, key, enc.KeySize, protectedHeader);
-                    byte[] aad = Encoding.ASCII.GetBytes(Base64Url.Encode(parsedJwe.ProtectedHeaderBytes));
+                    byte[] asciiEncodedProtectedHeader = Encoding.ASCII.GetBytes(Base64Url.Encode(parsedJwe.ProtectedHeaderBytes));
+
+                    byte[] aad = parsedJwe.Aad == null ? 
+                        Encoding.ASCII.GetBytes(Base64Url.Encode(parsedJwe.ProtectedHeaderBytes)) 
+                        :
+                        Encoding.ASCII.GetBytes(string.Concat(Base64Url.Encode(parsedJwe.ProtectedHeaderBytes), ".", Base64Url.Encode(parsedJwe.Aad)));
 
                     byte[] plaintext = enc.Decrypt(aad, cek, parsedJwe.Iv, parsedJwe.Ciphertext, parsedJwe.AuthTag);
 
@@ -250,7 +261,7 @@ namespace Jose.jwe
 
                         plaintext = compression.Decompress(plaintext);
                     }
-                    return (Plaintext: plaintext, JoseHeaders: recipient.JoseHeader);
+                    return (Plaintext: plaintext, JoseHeaders: recipient.JoseHeader, Aad: parsedJwe.Aad);
                 }
                 catch (ArgumentException ex)
                 {

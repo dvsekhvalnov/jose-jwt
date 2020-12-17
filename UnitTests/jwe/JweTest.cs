@@ -8,6 +8,7 @@ namespace UnitTests.Jwe
     using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.InteropServices;
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
@@ -272,12 +273,12 @@ namespace UnitTests.Jwe
 
             Assert.Equal(new byte[0], Jwe.Decrypt(jwe, aes128KWKey, mode: SerializationMode.smJson).Plaintext);
         }
-
+        
         [Fact]
         public void Decrypt_Rfc7516AppendixA23DecryptWithFirstRecipient_ExpectedResults()
         {
             //given
-            var key = GetKeyFromJwk(Rfc7516_A_2_3_ExampleJwk);
+            var key = GetLegacyKeyObjectFromJwk(new JsonWebKey(Rfc7516_A_2_3_ExampleJwk));
 
             //when
             var decrypted = Jwe.Decrypt(
@@ -300,7 +301,7 @@ namespace UnitTests.Jwe
         public void Decrypt_Rfc7516AppendixA23DecryptWithSecondRecipient_ExpectedResults()
         {
             //given
-            var key = GetKeyFromJwk(Rfc7516_A_3_3_ExampleJwk);
+            var key = GetLegacyKeyObjectFromJwk(new JsonWebKey(Rfc7516_A_3_3_ExampleJwk));
 
             //when
             var decrypted = Jwe.Decrypt(
@@ -317,6 +318,98 @@ namespace UnitTests.Jwe
             Assert.Equal("7", decrypted.JoseHeaders["kid"]);
             Assert.Equal("A128CBC-HS256", decrypted.JoseHeaders["enc"]);
             Assert.Equal("https://server.example.com/keys.jwks", decrypted.JoseHeaders["jku"]);
+
+            Assert.Null(decrypted.Aad);
+        }
+
+        [Fact]
+        public void Encrypt_WithAdditionalAuthenticatedData_PopulatesAad()
+        {
+            //given
+            var key = GetLegacyKeyObjectFromJwk(new JsonWebKey(Rfc7520_5_8_1_Figure151_ExampleJwk));
+            var plaintext = Rfc7520_Figure72_ExamplePlaintext;            
+
+            //when
+            var jwe = Jwe.Encrypt(
+                UTF8Encoding.UTF8.GetBytes(Rfc7520_Figure72_ExamplePlaintext),                
+                new JweRecipient[] { new JweRecipient(JweAlgorithm.A128KW, key) },
+                JweEncryption.A128CBC_HS256,
+                aad: Base64Url.Decode(Rfc7520_Figure176_ExampleBase64UrlEncodedAad),
+                mode: SerializationMode.smJson);
+
+            //then
+            JObject deserialized = JObject.Parse(jwe);
+
+            var base64UrlAad = (string)deserialized["aad"];
+            Assert.NotNull(base64UrlAad);
+            Assert.Equal(Rfc7520_Figure176_ExampleBase64UrlEncodedAad, base64UrlAad);
+        }
+
+        [Fact]
+        public void EncryptDecrypt_WithAdditionalAuthenticatedData_RoundtripOk()
+        {
+            //given
+            var key = GetLegacyKeyObjectFromJwk(new JsonWebKey(Rfc7520_5_8_1_Figure151_ExampleJwk));
+            var plaintext = Rfc7520_Figure72_ExamplePlaintext;
+
+            //when
+            var jwe = Jwe.Encrypt(
+                UTF8Encoding.UTF8.GetBytes(Rfc7520_Figure72_ExamplePlaintext),
+                new JweRecipient[] { new JweRecipient(JweAlgorithm.A128KW, key) },
+                JweEncryption.A128CBC_HS256,
+                mode: SerializationMode.smJson);
+
+            //then
+            var decrypted = Jwe.Decrypt(
+                jwe,
+                key,
+                mode: SerializationMode.smJson);
+
+            Assert.Equal(plaintext, UTF8Encoding.UTF8.GetString(decrypted.Plaintext));
+        }
+
+        [Fact]
+        public void Decrypt_WithAdditionalAuthenticatedDataOk_ReturnsExpectedResults()
+        {
+            //given
+            var jwk = new JsonWebKey(Rfc7520_5_8_1_Figure151_ExampleJwk);
+            var key = GetLegacyKeyObjectFromJwk(jwk);
+            var kid = jwk.Kid;
+
+            //when
+            var decrypted = Jwe.Decrypt(
+                Rfc7520_5_10_ExampleJwe,
+                key,
+                mode: SerializationMode.smJson);
+
+            //then
+            Assert.Equal(Rfc7520_Figure72_ExamplePlaintext, UTF8Encoding.UTF8.GetString(decrypted.Plaintext));
+
+            Assert.Equal(3, decrypted.JoseHeaders.Count);
+
+            Assert.Equal(jwk.Alg, decrypted.JoseHeaders["alg"]);
+            Assert.Equal(jwk.Kid, decrypted.JoseHeaders["kid"]);
+            Assert.Equal("A128GCM", decrypted.JoseHeaders["enc"]);
+            
+            Assert.Equal(Rfc7520_5_10_1_ExampleAadString, UTF8Encoding.UTF8.GetString(decrypted.Aad));
+        }
+
+        [Fact]
+        public void Decrypt_WithAdditionalAuthenticatedDataTampered_Throws()
+        {
+            //given
+            var key = GetLegacyKeyObjectFromJwk(new JsonWebKey(Rfc7520_5_8_1_Figure151_ExampleJwk));
+            var tamperedJwe = Rfc7520_5_10_ExampleJwe.Replace("aad\": \"W", "aad\": \"V");
+
+            //when
+            var exception = Record.Exception(() => Jwe.Decrypt(
+                tamperedJwe,
+                key,
+                mode: SerializationMode.smJson));
+
+            //then
+            Assert.IsType<EncryptionException>(exception);
+            Assert.Equal("Unable to decrypt content or authentication tag do not match.", exception.Message);
         }
 
         public static IEnumerable<object[]> TestDataMultipleRecipientDirectEncryption()
@@ -459,9 +552,57 @@ namespace UnitTests.Jwe
             Assert.Equal($"An item with the same key has already been added. Key: {injectedHeaderName}", exception.Message);
         }
 
-        private static object GetKeyFromJwk(string serializedJwk)
+        [Fact]
+        public void UnsafeJoseHeaders_ModeCompactWithEmptyBytesA128KW_A128CBC_HS256_ExpectedResults()
         {
-            var jwk = new JsonWebKey(serializedJwk);
+            //given
+            byte[] plaintext = { };
+            var jwe = Jwe.Encrypt(
+                plaintext: plaintext,
+                recipients: new JweRecipient[] { recipientAes128KW },
+                JweEncryption.A128CBC_HS256);
+
+            //when
+            var headers = Jwe.UnsafeJoseHeaders(
+                jwe,
+                mode: SerializationMode.smCompact);
+
+            //then
+            Assert.Equal(1, headers.Count());
+
+            Assert.Equal(2, headers.ElementAt(0).Count());
+            Assert.Equal("A128CBC-HS256", headers.ElementAt(0)["enc"]);
+            Assert.Equal("A128KW", headers.ElementAt(0)["alg"]);
+        }
+
+        [Fact]
+        public void UnsafeJoseHeaders_Rfc7516AppendixA23_ExpectedResults()
+        {
+            //given
+
+            //when
+            var headers = Jwe.UnsafeJoseHeaders(
+                Rfc7516_A_4_7_ExampleJwe,
+                mode: SerializationMode.smJson);
+
+            //then
+            Assert.Equal(2, headers.Count());
+
+            Assert.Equal(4, headers.ElementAt(0).Count());
+            Assert.Equal("A128CBC-HS256", headers.ElementAt(0)["enc"]);
+            Assert.Equal("https://server.example.com/keys.jwks", headers.ElementAt(0)["jku"]);
+            Assert.Equal("RSA1_5", headers.ElementAt(0)["alg"]);
+            Assert.Equal("2011-04-29", headers.ElementAt(0)["kid"]);
+
+            Assert.Equal(4, headers.ElementAt(1).Count());
+            Assert.Equal("A128CBC-HS256", headers.ElementAt(0)["enc"]);
+            Assert.Equal("https://server.example.com/keys.jwks", headers.ElementAt(1)["jku"]);
+            Assert.Equal("A128KW", headers.ElementAt(1)["alg"]);
+            Assert.Equal("7", headers.ElementAt(1)["kid"]);
+        }
+
+        private static object GetLegacyKeyObjectFromJwk(JsonWebKey jwk)
+        {
             switch (jwk.Kty)
             {
                 case "RSA":
@@ -568,6 +709,46 @@ namespace UnitTests.Jwe
             {""kty"":""oct"",
             ""k"":""GawgguFyGrWKav7AX4VKUg""
             }";
+
+        private static string Rfc7520_5_10_ExampleJwe = @"
+            {
+             ""recipients"": [
+               {
+                 ""encrypted_key"": ""4YiiQ_ZzH76TaIkJmYfRFgOV9MIpnx4X""
+               }
+             ],
+             ""protected"": ""eyJhbGciOiJBMTI4S1ciLCJraWQiOiI4MWIyMDk2NS04MzMyLTQzZDktYTQ2OC04MjE2MGFkOTFhYzgiLCJlbmMiOiJBMTI4R0NNIn0"",
+             ""iv"": ""veCx9ece2orS7c_N"",
+             ""aad"": ""WyJ2Y2FyZCIsW1sidmVyc2lvbiIse30sInRleHQiLCI0LjAiXSxbImZuIix7fSwidGV4dCIsIk1lcmlhZG9jIEJyYW5keWJ1Y2siXSxbIm4iLHt9LCJ0ZXh0IixbIkJyYW5keWJ1Y2siLCJNZXJpYWRvYyIsIk1yLiIsIiJdXSxbImJkYXkiLHt9LCJ0ZXh0IiwiVEEgMjk4MiJdLFsiZ2VuZGVyIix7fSwidGV4dCIsIk0iXV1d"",
+             ""ciphertext"": ""Z_3cbr0k3bVM6N3oSNmHz7Lyf3iPppGf3Pj17wNZqteJ0Ui8p74SchQP8xygM1oFRWCNzeIa6s6BcEtp8qEFiqTUEyiNkOWDNoF14T_4NFqF-p2Mx8zkbKxI7oPK8KNarFbyxIDvICNqBLba-v3uzXBdB89fzOI-Lv4PjOFAQGHrgv1rjXAmKbgkft9cB4WeyZw8MldbBhc-V_KWZslrsLNygon_JJWd_ek6LQn5NRehvApqf9ZrxB4aq3FXBxOxCys35PhCdaggy2kfUfl2OkwKnWUbgXVD1C6HxLIlqHhCwXDG59weHrRDQeHyMRoBljoV3X_bUTJDnKBFOod7nLz-cj48JMx3SnCZTpbQAkFV"",
+             ""tag"": ""vOaH_Rajnpy_3hOtqvZHRA""
+           }";
+
+        private static string Rfc7520_5_8_1_Figure151_ExampleJwk = @"
+            {
+             ""kty"": ""oct"",
+             ""kid"": ""81b20965-8332-43d9-a468-82160ad91ac8"",
+             ""use"": ""enc"",
+             ""alg"": ""A128KW"",
+             ""k"": ""GZy6sIZ6wl9NJOKB-jnmVQ""
+            }";
+
+        private static string Rfc7520_Figure72_ExamplePlaintext = 
+               "You can trust us to stick with you through thick and "
+               + "thin\x2013to the bitter end. And you can trust us to "
+               + "keep any secret of yours\x2013closer than you keep it "
+               + "yourself. But you cannot trust us to let you face trouble "
+               + "alone, and go off without a word. We are your friends, Frodo.";
+
+
+        private static string Rfc7520_Figure176_ExampleBase64UrlEncodedAad =
+            "WyJ2Y2FyZCIsW1sidmVyc2lvbiIse30sInRleHQiLCI0LjAiXSxbImZuIix7fS"
+               + "widGV4dCIsIk1lcmlhZG9jIEJyYW5keWJ1Y2siXSxbIm4iLHt9LCJ0ZXh0Iixb"
+               + "IkJyYW5keWJ1Y2siLCJNZXJpYWRvYyIsIk1yLiIsIiJdXSxbImJkYXkiLHt9LC"
+               + "J0ZXh0IiwiVEEgMjk4MiJdLFsiZ2VuZGVyIix7fSwidGV4dCIsIk0iXV1d";
+
+        private static string Rfc7520_5_10_1_ExampleAadString =
+            "[\"vcard\",[[\"version\",{},\"text\",\"4.0\"],[\"fn\",{},\"text\",\"Meriadoc Brandybuck\"],[\"n\",{},\"text\",[\"Brandybuck\",\"Meriadoc\",\"Mr.\",\"\"]],[\"bday\",{},\"text\",\"TA 2982\"],[\"gender\",{},\"text\",\"M\"]]]";
     };
 }
 #endif //NETSTANDARD2_1
