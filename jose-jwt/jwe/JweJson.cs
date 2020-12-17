@@ -4,6 +4,9 @@ namespace Jose.jwe
     using Newtonsoft.Json;
     using System.Collections.Generic;
 
+    /// <summary>
+    /// Internal class used as helper deserialize Json Serialized JWE
+    /// </summary>
     internal class JweJson
     {
         [JsonProperty("protected")]
