@@ -101,23 +101,6 @@ namespace UnitTests
         }
 
         [Fact]
-        public void EncryptAndDecryptBytes_RSA1_5_A256GCM_In_A128GCM_Out_Throws_InvalidAlgorithmException()
-        {
-            // This test encodes a payload consisting of arbitrary binary data. 
-            // Then attemptsw to decode but asserting a differnt JweEncryption algorithm should be present.
-            // In this case we expect an exception.
-
-            string token = Jose.JWT.EncodeBytes(BinaryPayload, PubKey(), JweAlgorithm.RSA1_5, JweEncryption.A256GCM);
-
-            Console.Out.WriteLine("EncryptAndDecryptBytes_RSA1_5_A256GCM: " + token);
-
-            Action act = () => Jose.JWT.DecodeBytes(token, PrivKey(), JweAlgorithm.RSA1_5, JweEncryption.A128GCM);
-
-            var exception = Assert.Throws<InvalidAlgorithmException>(act);
-            Assert.Equal("The encryption type passed to the Decrypt method did not match the encryption type in the header.", exception.Message);
-        }
-
-        [Fact]
         public void DecodeHS256()
         {
             //given
