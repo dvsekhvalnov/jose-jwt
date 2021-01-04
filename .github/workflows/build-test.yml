@@ -34,6 +34,12 @@ jobs:
         dotnet-version: '3.1.300' # SDK Version to use.
       if: matrix.framework == 'netcoreapp3.1'
 
+    - name: Clear nuget cache
+    # Workarounf https://github.com/actions/setup-dotnet/issues/155
+      run: |
+        dotnet clean jose-jwt.sln
+        dotnet nuget locals all --clear
+
     - name: Run unit tests
       run: |
         dotnet test jose-jwt.sln --framework ${{ matrix.framework }}
