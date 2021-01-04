@@ -217,44 +217,7 @@ namespace Jose
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
         public static string EncodeBytes(byte[] payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
         {
-            if (payload == null)
-            {
-                throw new ArgumentNullException(nameof(payload));
-            }
-
-            JwtSettings jwtSettings = GetSettings(settings);
-            IKeyManagement keys = jwtSettings.Jwa(alg);
-            IJweAlgorithm _enc = jwtSettings.Jwe(enc);
-
-            if (keys == null)
-            {
-                throw new JoseException(string.Format("Unsupported JWA algorithm requested: {0}", alg));
-            }
-
-            if (_enc == null)
-            {
-                throw new JoseException(string.Format("Unsupported JWE algorithm requested: {0}", enc));
-            }
-
-            IDictionary<string, object> jwtHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwaHeaderValue(alg) }, { "enc", jwtSettings.JweHeaderValue(enc) } };
-
-            Dictionaries.Append(jwtHeader, extraHeaders);
-
-            byte[][] contentKeys = keys.WrapNewKey(_enc.KeySize, key, jwtHeader);
-            byte[] cek = contentKeys[0];
-            byte[] encryptedCek = contentKeys[1];
-
-            if (compression.HasValue)
-            {
-                jwtHeader["zip"] = jwtSettings.CompressionHeader(compression.Value);
-                payload = jwtSettings.Compression(compression.Value).Compress(payload);
-            }
-
-            byte[] header = Encoding.UTF8.GetBytes(jwtSettings.JsonMapper.Serialize(jwtHeader));
-            byte[] aad = Encoding.UTF8.GetBytes(Compact.Serialize(header));
-            byte[][] encParts = _enc.Encrypt(aad, payload, cek);
-
-            return Compact.Serialize(header, encryptedCek, encParts[0], encParts[1], encParts[2]);
+            return JWE.Encrypt(payload, new Recipient[] { new Recipient(alg, key) }, enc, aad: null, SerializationMode.smCompact, compression, extraHeaders, settings);                
         }
 
         /// <summary>
@@ -511,7 +474,7 @@ namespace Jose
 
             if (parts.Count == 5) //encrypted JWT
             {
-                return DecryptBytes(parts, key, expectedJweAlg, expectedJweEnc, settings);
+                return JWE.Decrypt(token, key, expectedJweAlg, expectedJweEnc, SerializationMode.smCompact, settings).Plaintext;
             }
             else
             {
