@@ -1,5 +1,5 @@
 ﻿#if NETSTANDARD
-namespace Jose.jwe
+namespace Jose.Jwe
 {
     using Newtonsoft.Json;
     using System.Collections.Generic;

@@ -2,7 +2,7 @@
 namespace UnitTests.Jwe
 {
     using Jose;
-    using Jose.jwe;
+    using Jose.Jwe;
     using Jose.keys;
     using Microsoft.IdentityModel.Tokens;
     using Newtonsoft.Json.Linq;

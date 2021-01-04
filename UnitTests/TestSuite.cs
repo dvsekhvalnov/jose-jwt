@@ -7,7 +7,7 @@ using System.Text;
 using Jose;
 using Jose.keys;
 using Xunit;
-using Jose.jwe;
+using Jose.Jwe;
 using Newtonsoft.Json.Linq;
 
 namespace UnitTests
