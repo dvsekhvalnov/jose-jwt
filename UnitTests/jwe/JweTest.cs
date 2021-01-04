@@ -24,7 +24,7 @@ namespace UnitTests.Jwe
         {
             //given
             byte[] payload = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
-            var recipients = new JweRecipient[]
+            var recipients = new Recipient[]
             {
                 recipientAes256KW1,
             };
@@ -61,7 +61,7 @@ namespace UnitTests.Jwe
         {
             //given
             byte[] payload = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
-            var recipients = new JweRecipient[]
+            var recipients = new Recipient[]
             {
                 recipientAes256KW1,
                 recipientAes256KW2,
@@ -93,7 +93,7 @@ namespace UnitTests.Jwe
         {
             //given
             byte[] payload = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
-            var recipients = new JweRecipient[]
+            var recipients = new Recipient[]
             {
                 recipientAes256KW1,
                 recipientAes256KW2,
@@ -127,7 +127,7 @@ namespace UnitTests.Jwe
         {
             //given
             byte[] payload = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
-            var recipients = new JweRecipient[]
+            var recipients = new Recipient[]
             {
                 recipientAes256KW1,
                 recipientAes256KW2,
@@ -157,7 +157,7 @@ namespace UnitTests.Jwe
         {
             //given
             byte[] plaintext = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
-            var recipients = new JweRecipient[]
+            var recipients = new Recipient[]
             {
                 recipientAes256KW1,
                 recipientAes256KW2,
@@ -184,7 +184,7 @@ namespace UnitTests.Jwe
             //when
             var jwe = Jwe.Encrypt(
                 plaintext: plaintext,
-                recipients: new JweRecipient[] { recipientAes128KW },
+                recipients: new Recipient[] { recipientAes128KW },
                 JweEncryption.A128CBC_HS256);
 
             //then
@@ -213,7 +213,7 @@ namespace UnitTests.Jwe
             //when
             var jwe = Jwe.Encrypt(
                 plaintext: plaintext,
-                recipients: new JweRecipient[] { recipientAes128KW, recipientAes128KW },
+                recipients: new Recipient[] { recipientAes128KW, recipientAes128KW },
                 JweEncryption.A128CBC_HS256,
                 mode: SerializationMode.smJson);
 
@@ -251,7 +251,7 @@ namespace UnitTests.Jwe
             //when
             var jwe = Jwe.Encrypt(
                 plaintext: plaintext,
-                recipients: new JweRecipient[] { recipientAes128KW },
+                recipients: new Recipient[] { recipientAes128KW },
                 JweEncryption.A128CBC_HS256,
                 mode: SerializationMode.smJson);
 
@@ -332,7 +332,7 @@ namespace UnitTests.Jwe
             //when
             var jwe = Jwe.Encrypt(
                 UTF8Encoding.UTF8.GetBytes(Rfc7520_Figure72_ExamplePlaintext),                
-                new JweRecipient[] { new JweRecipient(JweAlgorithm.A128KW, key) },
+                new Recipient[] { new Recipient(JweAlgorithm.A128KW, key) },
                 JweEncryption.A128CBC_HS256,
                 aad: Base64Url.Decode(Rfc7520_Figure176_ExampleBase64UrlEncodedAad),
                 mode: SerializationMode.smJson);
@@ -355,7 +355,7 @@ namespace UnitTests.Jwe
             //when
             var jwe = Jwe.Encrypt(
                 UTF8Encoding.UTF8.GetBytes(Rfc7520_Figure72_ExamplePlaintext),
-                new JweRecipient[] { new JweRecipient(JweAlgorithm.A128KW, key) },
+                new Recipient[] { new Recipient(JweAlgorithm.A128KW, key) },
                 JweEncryption.A128CBC_HS256,
                 mode: SerializationMode.smJson);
 
@@ -416,9 +416,9 @@ namespace UnitTests.Jwe
         {
             var ret = new List<object[]>
             {
-                new object[] { new JweRecipient[] { recipientDirectEncyption1 }, null }, // (Single direct encryption is ok)
-                new object[] { new JweRecipient[] { recipientDirectEncyption1, recipientAes256KW1 }, null }, // (Direct recipient currently allowed as first receipient)
-                new object[] { new JweRecipient[] { recipientAes256KW1, recipientDirectEncyption1 }, "Direct Encryption not supported for multi-recipient JWE.", }, // (Direct recipient in multi not supported)
+                new object[] { new Recipient[] { recipientDirectEncyption1 }, null }, // (Single direct encryption is ok)
+                new object[] { new Recipient[] { recipientDirectEncyption1, recipientAes256KW1 }, null }, // (Direct recipient currently allowed as first receipient)
+                new object[] { new Recipient[] { recipientAes256KW1, recipientDirectEncyption1 }, "Direct Encryption not supported for multi-recipient JWE.", }, // (Direct recipient in multi not supported)
             };
 
 
@@ -433,8 +433,8 @@ namespace UnitTests.Jwe
 #if NETCOREAPP3_1
                 ret.AddRange(new List<object[]>
                 {
-                    new object[] { new JweRecipient[] { recipientEcdhEs1, recipientAes256KW1 }, null, }, // (EcdhEs is ok as first recipient of a multi)"
-                    new object[] { new JweRecipient[] { recipientAes256KW1, recipientEcdhEs1 }, "(Direct) ECDH-ES key management cannot use existing CEK.", }, // (EcdhEs can not re-use a cek, e.g not be 2nd or later recipient)
+                    new object[] { new Recipient[] { recipientEcdhEs1, recipientAes256KW1 }, null, }, // (EcdhEs is ok as first recipient of a multi)"
+                    new object[] { new Recipient[] { recipientAes256KW1, recipientEcdhEs1 }, "(Direct) ECDH-ES key management cannot use existing CEK.", }, // (EcdhEs can not re-use a cek, e.g not be 2nd or later recipient)
                 });
 #endif //NETCOREAPP3_1
             }
@@ -444,7 +444,7 @@ namespace UnitTests.Jwe
 
         [Theory()]
         [MemberData(nameof(TestDataMultipleRecipientDirectEncryption))]
-        public void Encrypt_MultipleRecipient_SpecialCasesHandled(JweRecipient[] recipients, string expectedError)
+        public void Encrypt_MultipleRecipient_SpecialCasesHandled(Recipient[] recipients, string expectedError)
         {
             //given
             byte[] plaintext = { };
@@ -484,9 +484,9 @@ namespace UnitTests.Jwe
             //when
             var exception = Record.Exception(() => Jwe.Encrypt(
                 plaintext: plaintext,
-                recipients: new JweRecipient[]
+                recipients: new Recipient[]
                 {
-                    new JweRecipient(
+                    new Recipient(
                         JweAlgorithm.A256KW,
                         aes256KWKey1,
                         new Dictionary<string, object>
@@ -526,9 +526,9 @@ namespace UnitTests.Jwe
             //when
             var exception = Record.Exception(() => Jwe.Encrypt(
                 plaintext: plaintext,
-                recipients: new JweRecipient[]
+                recipients: new Recipient[]
                 {
-                    new JweRecipient(
+                    new Recipient(
                         JweAlgorithm.A256KW,
                         aes256KWKey1,
                         new Dictionary<string, object>
@@ -559,7 +559,7 @@ namespace UnitTests.Jwe
             byte[] plaintext = { };
             var jwe = Jwe.Encrypt(
                 plaintext: plaintext,
-                recipients: new JweRecipient[] { recipientAes128KW },
+                recipients: new Recipient[] { recipientAes128KW },
                 JweEncryption.A128CBC_HS256);
 
             //when
@@ -657,17 +657,17 @@ namespace UnitTests.Jwe
 
         private static byte[] aes128KWKey = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
 
-        private static JweRecipient recipientEcdhEs1 => new JweRecipient(JweAlgorithm.ECDH_ES, Ecc256Public(CngKeyUsages.KeyAgreement));
+        private static Recipient recipientEcdhEs1 => new Recipient(JweAlgorithm.ECDH_ES, Ecc256Public(CngKeyUsages.KeyAgreement));
 
-        private static JweRecipient recipientAes256KW1 => new JweRecipient(JweAlgorithm.A256KW, aes256KWKey1);
+        private static Recipient recipientAes256KW1 => new Recipient(JweAlgorithm.A256KW, aes256KWKey1);
 
-        private static JweRecipient recipientAes256KW2 => new JweRecipient(JweAlgorithm.A256KW, aes256KWKey2);
+        private static Recipient recipientAes256KW2 => new Recipient(JweAlgorithm.A256KW, aes256KWKey2);
 
-        private static JweRecipient recipientAes128KW => new JweRecipient(JweAlgorithm.A128KW, aes128KWKey);
+        private static Recipient recipientAes128KW => new Recipient(JweAlgorithm.A128KW, aes128KWKey);
 
-        private static JweRecipient recipientDirectEncyption1 => new JweRecipient(JweAlgorithm.DIR, aes256KWKey1);
+        private static Recipient recipientDirectEncyption1 => new Recipient(JweAlgorithm.DIR, aes256KWKey1);
 
-        private static JweRecipient recipientRsa1 => new JweRecipient(JweAlgorithm.RSA1_5, PubKey());
+        private static Recipient recipientRsa1 => new Recipient(JweAlgorithm.RSA1_5, PubKey());
 
         private static string Rfc7516_A_4_7_ExampleJwe = @"
         {

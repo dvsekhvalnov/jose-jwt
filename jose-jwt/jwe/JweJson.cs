@@ -28,7 +28,7 @@ namespace Jose.Jwe
         internal string Tag { get; set; }
   
         [JsonProperty("recipients")]
-        internal IEnumerable<JweRecipientJson> Recipients { get; set; }
+        internal IEnumerable<RecipientJson> Recipients { get; set; }
   
         [JsonProperty("encrypted_key")]
         internal string EncryptedKey { get; set; }
@@ -37,7 +37,7 @@ namespace Jose.Jwe
         internal IDictionary<string, object> Header { get; set; }
     }
 
-    internal class JweRecipientJson
+    internal class RecipientJson
     {
         [JsonProperty("encrypted_key")]
         internal string EncryptedKey { get; set; }

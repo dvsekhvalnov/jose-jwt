@@ -7,14 +7,14 @@ namespace Jose.Jwe
     using System.Linq;
     using System.Text;
 
-    public class JweRecipient
+    public class Recipient
     {
         /// <summary
         /// A recipient for a Jwe
         /// </summary
         /// <param name="alg">algorithm to be used to encrypt the CEK (Content Encryption Key).</param>
         /// <param name="key">key for encrypting CEK (Content Encryption Key). Cannot be null.</param>
-        public JweRecipient(JweAlgorithm alg, object key, IDictionary<string, object> perRecipientHeaders = null)
+        public Recipient(JweAlgorithm alg, object key, IDictionary<string, object> perRecipientHeaders = null)
         {
             this.Alg = alg;
             this.Key = key ?? throw new ArgumentNullException(nameof(key));
@@ -50,7 +50,7 @@ namespace Jose.Jwe
         /// <param name="extraHeaders">optional extra headers to put in the JoseProtectedHeader.</param>
         /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
-        public static string Encrypt(byte[] plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.smCompact, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
+        public static string Encrypt(byte[] plaintext, IEnumerable<Recipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.smCompact, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
         {
             if (plaintext == null)
             {
