@@ -37,7 +37,7 @@ namespace Jose.Jwe
     /// <summary>
     /// Provides methods for encrypting and decrypting using JSON Web Encryption (JWE).
     /// </summary>
-    public class Jwe
+    public class JWE
     {
         /// <summary>
         /// Encrypts given plaintext using JWE and applies requested encryption/compression algorithms.

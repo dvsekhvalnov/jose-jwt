@@ -34,14 +34,14 @@ namespace UnitTests.Jwe
             };
 
             //when
-            var jwe = Jwe.Encrypt(
+            var jwe = JWE.Encrypt(
                 plaintext: payload,
                 recipients: recipients,
                 JweEncryption.A256GCM,
                 mode: mode,
                 extraHeaders: sharedProtectedHeaders);
 
-            var decrypted = Jwe.Decrypt(jwe, aes256KWKey1, mode: mode);
+            var decrypted = JWE.Decrypt(jwe, aes256KWKey1, mode: mode);
 
             //then
             Assert.Equal(payload, decrypted.Plaintext);
@@ -73,14 +73,14 @@ namespace UnitTests.Jwe
             };
 
             //when
-            var jwe = Jwe.Encrypt(
+            var jwe = JWE.Encrypt(
                 plaintext: payload,
                 recipients: recipients,
                 JweEncryption.A256GCM,
                 mode: SerializationMode.smJson,
                 extraHeaders: sharedProtectedHeaders);
 
-            var decrypted = Jwe.Decrypt(jwe, decryptKey, mode: SerializationMode.smJson);
+            var decrypted = JWE.Decrypt(jwe, decryptKey, mode: SerializationMode.smJson);
 
             //then
             Assert.Equal(payload, decrypted.Plaintext);
@@ -103,7 +103,7 @@ namespace UnitTests.Jwe
             {
                 { "cty", "application/octet-string"},
             };
-            var jwe = Jwe.Encrypt(
+            var jwe = JWE.Encrypt(
                 plaintext: payload,
                 recipients: recipients,
                 JweEncryption.A256GCM,
@@ -112,7 +112,7 @@ namespace UnitTests.Jwe
 
 
             //when
-            var exception = Record.Exception(() => Jwe.Decrypt(jwe, aes256KWKey2, expectedJweAlg, expectedJweEnc, mode: SerializationMode.smJson));
+            var exception = Record.Exception(() => JWE.Decrypt(jwe, aes256KWKey2, expectedJweAlg, expectedJweEnc, mode: SerializationMode.smJson));
 
             //then
             Assert.IsType<InvalidAlgorithmException>(exception);
@@ -136,7 +136,7 @@ namespace UnitTests.Jwe
             {
                 { "cty", "application/octet-string"},
             };
-            var jwe = Jwe.Encrypt(
+            var jwe = JWE.Encrypt(
                 plaintext: payload,
                 recipients: recipients,
                 JweEncryption.A256GCM,
@@ -144,7 +144,7 @@ namespace UnitTests.Jwe
                 extraHeaders: sharedProtectedHeaders);
 
             //when
-            var exception = Record.Exception(() => { Jwe.Decrypt(jwe, aes256KWKey3, mode: SerializationMode.smJson); });
+            var exception = Record.Exception(() => { JWE.Decrypt(jwe, aes256KWKey3, mode: SerializationMode.smJson); });
 
             //then
             Assert.IsType<IntegrityException>(exception);
@@ -164,7 +164,7 @@ namespace UnitTests.Jwe
             };
 
             //when
-            var exception = Record.Exception(() => Jwe.Encrypt(
+            var exception = Record.Exception(() => JWE.Encrypt(
                 plaintext: plaintext,
                 recipients: recipients,
                 JweEncryption.A256GCM,
@@ -182,7 +182,7 @@ namespace UnitTests.Jwe
             byte[] plaintext = { };
 
             //when
-            var jwe = Jwe.Encrypt(
+            var jwe = JWE.Encrypt(
                 plaintext: plaintext,
                 recipients: new Recipient[] { recipientAes128KW },
                 JweEncryption.A128CBC_HS256);
@@ -201,7 +201,7 @@ namespace UnitTests.Jwe
             Assert.Equal(22, parts[3].Length); //cipher text size
             Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(new byte[0], Jwe.Decrypt(jwe, aes128KWKey).Plaintext);
+            Assert.Equal(new byte[0], JWE.Decrypt(jwe, aes128KWKey).Plaintext);
         }
 
         [Fact]
@@ -211,7 +211,7 @@ namespace UnitTests.Jwe
             byte[] plaintext = { };
 
             //when
-            var jwe = Jwe.Encrypt(
+            var jwe = JWE.Encrypt(
                 plaintext: plaintext,
                 recipients: new Recipient[] { recipientAes128KW, recipientAes128KW },
                 JweEncryption.A128CBC_HS256,
@@ -239,7 +239,7 @@ namespace UnitTests.Jwe
             Assert.Equal(22, ((string)deserialized["ciphertext"]).Length); //cipher text size
             Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
 
-            Assert.Equal(new byte[0], Jwe.Decrypt(jwe, aes128KWKey, mode: SerializationMode.smJson).Plaintext);
+            Assert.Equal(new byte[0], JWE.Decrypt(jwe, aes128KWKey, mode: SerializationMode.smJson).Plaintext);
         }
 
         [Fact]
@@ -249,7 +249,7 @@ namespace UnitTests.Jwe
             byte[] plaintext = { };
 
             //when
-            var jwe = Jwe.Encrypt(
+            var jwe = JWE.Encrypt(
                 plaintext: plaintext,
                 recipients: new Recipient[] { recipientAes128KW },
                 JweEncryption.A128CBC_HS256,
@@ -271,9 +271,9 @@ namespace UnitTests.Jwe
             Assert.Equal(22, ((string)deserialized["ciphertext"]).Length); //cipher text size
             Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
 
-            Assert.Equal(new byte[0], Jwe.Decrypt(jwe, aes128KWKey, mode: SerializationMode.smJson).Plaintext);
+            Assert.Equal(new byte[0], JWE.Decrypt(jwe, aes128KWKey, mode: SerializationMode.smJson).Plaintext);
         }
-        
+
         [Fact]
         public void Decrypt_Rfc7516AppendixA23DecryptWithFirstRecipient_ExpectedResults()
         {
@@ -281,7 +281,7 @@ namespace UnitTests.Jwe
             var key = GetLegacyKeyObjectFromJwk(new JsonWebKey(Rfc7516_A_2_3_ExampleJwk));
 
             //when
-            var decrypted = Jwe.Decrypt(
+            var decrypted = JWE.Decrypt(
                 Rfc7516_A_4_7_ExampleJwe,
                 key,
                 mode: SerializationMode.smJson);
@@ -304,7 +304,7 @@ namespace UnitTests.Jwe
             var key = GetLegacyKeyObjectFromJwk(new JsonWebKey(Rfc7516_A_3_3_ExampleJwk));
 
             //when
-            var decrypted = Jwe.Decrypt(
+            var decrypted = JWE.Decrypt(
                 Rfc7516_A_4_7_ExampleJwe,
                 key,
                 mode: SerializationMode.smJson);
@@ -327,11 +327,11 @@ namespace UnitTests.Jwe
         {
             //given
             var key = GetLegacyKeyObjectFromJwk(new JsonWebKey(Rfc7520_5_8_1_Figure151_ExampleJwk));
-            var plaintext = Rfc7520_Figure72_ExamplePlaintext;            
+            var plaintext = Rfc7520_Figure72_ExamplePlaintext;
 
             //when
-            var jwe = Jwe.Encrypt(
-                UTF8Encoding.UTF8.GetBytes(Rfc7520_Figure72_ExamplePlaintext),                
+            var jwe = JWE.Encrypt(
+                UTF8Encoding.UTF8.GetBytes(Rfc7520_Figure72_ExamplePlaintext),
                 new Recipient[] { new Recipient(JweAlgorithm.A128KW, key) },
                 JweEncryption.A128CBC_HS256,
                 aad: Base64Url.Decode(Rfc7520_Figure176_ExampleBase64UrlEncodedAad),
@@ -353,14 +353,14 @@ namespace UnitTests.Jwe
             var plaintext = Rfc7520_Figure72_ExamplePlaintext;
 
             //when
-            var jwe = Jwe.Encrypt(
+            var jwe = JWE.Encrypt(
                 UTF8Encoding.UTF8.GetBytes(Rfc7520_Figure72_ExamplePlaintext),
                 new Recipient[] { new Recipient(JweAlgorithm.A128KW, key) },
                 JweEncryption.A128CBC_HS256,
                 mode: SerializationMode.smJson);
 
             //then
-            var decrypted = Jwe.Decrypt(
+            var decrypted = JWE.Decrypt(
                 jwe,
                 key,
                 mode: SerializationMode.smJson);
@@ -377,7 +377,7 @@ namespace UnitTests.Jwe
             var kid = jwk.Kid;
 
             //when
-            var decrypted = Jwe.Decrypt(
+            var decrypted = JWE.Decrypt(
                 Rfc7520_5_10_ExampleJwe,
                 key,
                 mode: SerializationMode.smJson);
@@ -390,7 +390,7 @@ namespace UnitTests.Jwe
             Assert.Equal(jwk.Alg, decrypted.JoseHeaders["alg"]);
             Assert.Equal(jwk.Kid, decrypted.JoseHeaders["kid"]);
             Assert.Equal("A128GCM", decrypted.JoseHeaders["enc"]);
-            
+
             Assert.Equal(Rfc7520_5_10_1_ExampleAadString, UTF8Encoding.UTF8.GetString(decrypted.Aad));
         }
 
@@ -402,7 +402,7 @@ namespace UnitTests.Jwe
             var tamperedJwe = Rfc7520_5_10_ExampleJwe.Replace("aad\": \"W", "aad\": \"V");
 
             //when
-            var exception = Record.Exception(() => Jwe.Decrypt(
+            var exception = Record.Exception(() => JWE.Decrypt(
                 tamperedJwe,
                 key,
                 mode: SerializationMode.smJson));
@@ -450,7 +450,7 @@ namespace UnitTests.Jwe
             byte[] plaintext = { };
 
             //when
-            var exception = Record.Exception(() => Jwe.Encrypt(
+            var exception = Record.Exception(() => JWE.Encrypt(
                 plaintext: plaintext,
                 recipients: recipients,
                 JweEncryption.A128CBC_HS256,
@@ -482,7 +482,7 @@ namespace UnitTests.Jwe
             byte[] plaintext = { };
 
             //when
-            var exception = Record.Exception(() => Jwe.Encrypt(
+            var exception = Record.Exception(() => JWE.Encrypt(
                 plaintext: plaintext,
                 recipients: new Recipient[]
                 {
@@ -524,7 +524,7 @@ namespace UnitTests.Jwe
             byte[] plaintext = { };
 
             //when
-            var exception = Record.Exception(() => Jwe.Encrypt(
+            var exception = Record.Exception(() => JWE.Encrypt(
                 plaintext: plaintext,
                 recipients: new Recipient[]
                 {
@@ -557,13 +557,13 @@ namespace UnitTests.Jwe
         {
             //given
             byte[] plaintext = { };
-            var jwe = Jwe.Encrypt(
+            var jwe = JWE.Encrypt(
                 plaintext: plaintext,
                 recipients: new Recipient[] { recipientAes128KW },
                 JweEncryption.A128CBC_HS256);
 
             //when
-            var headers = Jwe.UnsafeJoseHeaders(
+            var headers = JWE.UnsafeJoseHeaders(
                 jwe,
                 mode: SerializationMode.smCompact);
 
@@ -581,7 +581,7 @@ namespace UnitTests.Jwe
             //given
 
             //when
-            var headers = Jwe.UnsafeJoseHeaders(
+            var headers = JWE.UnsafeJoseHeaders(
                 Rfc7516_A_4_7_ExampleJwe,
                 mode: SerializationMode.smJson);
 
@@ -733,7 +733,7 @@ namespace UnitTests.Jwe
              ""k"": ""GZy6sIZ6wl9NJOKB-jnmVQ""
             }";
 
-        private static string Rfc7520_Figure72_ExamplePlaintext = 
+        private static string Rfc7520_Figure72_ExamplePlaintext =
                "You can trust us to stick with you through thick and "
                + "thin\x2013to the bitter end. And you can trust us to "
                + "keep any secret of yours\x2013closer than you keep it "
