@@ -19,8 +19,8 @@ namespace UnitTests.Jwe
     public class JweTest
     {
         [Theory]
-        [InlineData(SerializationMode.smCompact)]
-        [InlineData(SerializationMode.smJson)]
+        [InlineData(SerializationMode.Compact)]
+        [InlineData(SerializationMode.Json)]
         public void EncryptDecrypt_RoundTripOneRecipient_PlaintextSurvives(SerializationMode mode)
         {
             //given
@@ -78,10 +78,10 @@ namespace UnitTests.Jwe
                 plaintext: payload,
                 recipients: recipients,
                 JweEncryption.A256GCM,
-                mode: SerializationMode.smJson,
+                mode: SerializationMode.Json,
                 extraHeaders: sharedProtectedHeaders);
 
-            var decrypted = JWE.Decrypt(jwe, decryptKey, mode: SerializationMode.smJson);
+            var decrypted = JWE.Decrypt(jwe, decryptKey, mode: SerializationMode.Json);
 
             //then
             Assert.Equal(payload, decrypted.Plaintext);
@@ -108,12 +108,12 @@ namespace UnitTests.Jwe
                 plaintext: payload,
                 recipients: recipients,
                 JweEncryption.A256GCM,
-                mode: SerializationMode.smJson,
+                mode: SerializationMode.Json,
                 extraHeaders: sharedProtectedHeaders);
 
 
             //when
-            var exception = Record.Exception(() => JWE.Decrypt(jwe, aes256KWKey2, expectedJweAlg, expectedJweEnc, mode: SerializationMode.smJson));
+            var exception = Record.Exception(() => JWE.Decrypt(jwe, aes256KWKey2, expectedJweAlg, expectedJweEnc, mode: SerializationMode.Json));
 
             //then
             Assert.IsType<InvalidAlgorithmException>(exception);
@@ -141,11 +141,11 @@ namespace UnitTests.Jwe
                 plaintext: payload,
                 recipients: recipients,
                 JweEncryption.A256GCM,
-                mode: SerializationMode.smJson,
+                mode: SerializationMode.Json,
                 extraHeaders: sharedProtectedHeaders);
 
             //when
-            var exception = Record.Exception(() => { JWE.Decrypt(jwe, aes256KWKey3, mode: SerializationMode.smJson); });
+            var exception = Record.Exception(() => { JWE.Decrypt(jwe, aes256KWKey3, mode: SerializationMode.Json); });
 
             //then
             Assert.IsType<IntegrityException>(exception);
@@ -153,7 +153,7 @@ namespace UnitTests.Jwe
         }
 
         [Theory]
-        [InlineData(SerializationMode.smCompact, "Only one recipient is supported by the JWE Compact Serialization.")]
+        [InlineData(SerializationMode.Compact, "Only one recipient is supported by the JWE Compact Serialization.")]
         public void Encrypt_WithMoreThanOneRecipient_Throws(SerializationMode mode, string expectedMessage)
         {
             //given
@@ -216,7 +216,7 @@ namespace UnitTests.Jwe
                 plaintext: plaintext,
                 recipients: new Recipient[] { recipientAes128KW, recipientAes128KW },
                 JweEncryption.A128CBC_HS256,
-                mode: SerializationMode.smJson);
+                mode: SerializationMode.Json);
 
             //then
             Console.Out.WriteLine("Empty bytes A128KW_A128CBC_HS256 (General Json Serialization) = {0}", jwe);
@@ -240,7 +240,7 @@ namespace UnitTests.Jwe
             Assert.Equal(22, ((string)deserialized["ciphertext"]).Length); //cipher text size
             Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
 
-            Assert.Equal(new byte[0], JWE.Decrypt(jwe, aes128KWKey, mode: SerializationMode.smJson).Plaintext);
+            Assert.Equal(new byte[0], JWE.Decrypt(jwe, aes128KWKey, mode: SerializationMode.Json).Plaintext);
 #else
             throw new NotImplementedException("Test not currently implemented on net461");
 #endif
@@ -257,7 +257,7 @@ namespace UnitTests.Jwe
                 plaintext: plaintext,
                 recipients: new Recipient[] { recipientAes128KW },
                 JweEncryption.A128CBC_HS256,
-                mode: SerializationMode.smJson);
+                mode: SerializationMode.Json);
 
             //then
             Console.Out.WriteLine("Empty bytes A128KW_A128CBC_HS256 (Flattened Json Serialization) = {0}", jwe);
@@ -276,7 +276,7 @@ namespace UnitTests.Jwe
             Assert.Equal(22, ((string)deserialized["ciphertext"]).Length); //cipher text size
             Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
 
-            Assert.Equal(new byte[0], JWE.Decrypt(jwe, aes128KWKey, mode: SerializationMode.smJson).Plaintext);
+            Assert.Equal(new byte[0], JWE.Decrypt(jwe, aes128KWKey, mode: SerializationMode.Json).Plaintext);
 #else
             throw new NotImplementedException("Test not currently implemented on net461");
 #endif
@@ -292,7 +292,7 @@ namespace UnitTests.Jwe
             var decrypted = JWE.Decrypt(
                 Rfc7516_A_4_7_ExampleJwe,
                 key,
-                mode: SerializationMode.smJson);
+                mode: SerializationMode.Json);
 
             //then
             Assert.Equal("Live long and prosper.", UTF8Encoding.UTF8.GetString(decrypted.Plaintext));
@@ -315,7 +315,7 @@ namespace UnitTests.Jwe
             var decrypted = JWE.Decrypt(
                 Rfc7516_A_4_7_ExampleJwe,
                 key,
-                mode: SerializationMode.smJson);
+                mode: SerializationMode.Json);
 
             //then
             Assert.Equal("Live long and prosper.", UTF8Encoding.UTF8.GetString(decrypted.Plaintext));
@@ -343,7 +343,7 @@ namespace UnitTests.Jwe
                 new Recipient[] { new Recipient(JweAlgorithm.A128KW, key) },
                 JweEncryption.A128CBC_HS256,
                 aad: Base64Url.Decode(Rfc7520_Figure176_ExampleBase64UrlEncodedAad),
-                mode: SerializationMode.smJson);
+                mode: SerializationMode.Json);
 
             //then
 #if NETCOREAPP
@@ -369,13 +369,13 @@ namespace UnitTests.Jwe
                 UTF8Encoding.UTF8.GetBytes(Rfc7520_Figure72_ExamplePlaintext),
                 new Recipient[] { new Recipient(JweAlgorithm.A128KW, key) },
                 JweEncryption.A128CBC_HS256,
-                mode: SerializationMode.smJson);
+                mode: SerializationMode.Json);
 
             //then
             var decrypted = JWE.Decrypt(
                 jwe,
                 key,
-                mode: SerializationMode.smJson);
+                mode: SerializationMode.Json);
 
             Assert.Equal(plaintext, UTF8Encoding.UTF8.GetString(decrypted.Plaintext));
         }
@@ -411,7 +411,7 @@ namespace UnitTests.Jwe
             var decrypted = JWE.Decrypt(
                 Rfc7520_5_10_ExampleJwe,
                 key,
-                mode: SerializationMode.smJson);
+                mode: SerializationMode.Json);
 
             //then
             Assert.Equal(Rfc7520_Figure72_ExamplePlaintext, UTF8Encoding.UTF8.GetString(decrypted.Plaintext));
@@ -436,7 +436,7 @@ namespace UnitTests.Jwe
             var exception = Record.Exception(() => JWE.Decrypt(
                 tamperedJwe,
                 key,
-                mode: SerializationMode.smJson));
+                mode: SerializationMode.Json));
 
             //then
             Assert.IsType<EncryptionException>(exception);
@@ -485,7 +485,7 @@ namespace UnitTests.Jwe
                 plaintext: plaintext,
                 recipients: recipients,
                 JweEncryption.A128CBC_HS256,
-                mode: SerializationMode.smJson));
+                mode: SerializationMode.Json));
 
             //then
             if (expectedError == null)
@@ -527,7 +527,7 @@ namespace UnitTests.Jwe
                         })
                 },
                 JweEncryption.A128CBC_HS256,
-                mode: SerializationMode.smJson,
+                mode: SerializationMode.Json,
                 extraHeaders: new Dictionary<string, object>
                 {
                     { "cty", "text/plain" },
@@ -570,7 +570,7 @@ namespace UnitTests.Jwe
                         })
                 },
                 JweEncryption.A128CBC_HS256,
-                mode: SerializationMode.smJson,
+                mode: SerializationMode.Json,
                 extraHeaders: new Dictionary<string, object>
                 {
                     { "cty", "text/plain" },
@@ -596,7 +596,7 @@ namespace UnitTests.Jwe
             //when
             var headers = JWE.UnsafeJoseHeaders(
                 jwe,
-                mode: SerializationMode.smCompact);
+                mode: SerializationMode.Compact);
 
             //then
             Assert.Single(headers);
@@ -614,7 +614,7 @@ namespace UnitTests.Jwe
             //when
             var headers = JWE.UnsafeJoseHeaders(
                 Rfc7516_A_4_7_ExampleJwe,
-                mode: SerializationMode.smJson);
+                mode: SerializationMode.Json);
 
             //then
             Assert.Equal(2, headers.Count());

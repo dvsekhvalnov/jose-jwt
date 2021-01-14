@@ -28,8 +28,8 @@
 
     public enum SerializationMode
     {
-        smCompact,
-        smJson,
+        Compact,
+        Json,
     };
 
     /// <summary>
@@ -48,7 +48,7 @@
         /// <param name="extraHeaders">optional extra headers to put in the JoseProtectedHeader.</param>
         /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
-        public static string Encrypt(byte[] plaintext, IEnumerable<Recipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.smCompact, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
+        public static string Encrypt(byte[] plaintext, IEnumerable<Recipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Compact, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
         {
             if (plaintext == null)
             {
@@ -114,7 +114,7 @@
 
             switch (mode)
             {
-                case SerializationMode.smCompact:
+                case SerializationMode.Compact:
                     {
                         if (recipientsOut.Count != 1)
                         {
@@ -135,7 +135,7 @@
                         return Compact.Serialize(header, recipientsOut[0].EncryptedKey, encParts[0], encParts[1], encParts[2]);
                     }
 
-                case SerializationMode.smJson:
+                case SerializationMode.Json:
                     {
                         var protectedHeaderBytes = Encoding.UTF8.GetBytes(settings.JsonMapper.Serialize(joseProtectedHeader));                        
                         byte[] asciiEncodedProtectedHeader = Encoding.ASCII.GetBytes(Base64Url.Encode(protectedHeaderBytes));
@@ -189,7 +189,7 @@
         /// <exception cref="IntegrityException">if AEAD operation validation failed</exception>
         /// <exception cref="EncryptionException">if JWE can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if encryption or compression algorithm is not supported</exception>
-        public static (byte[] Plaintext, IDictionary<string, object> JoseHeaders, byte[] Aad) Decrypt(string jwe, object key, JweAlgorithm? expectedJweAlg = null, JweEncryption? expectedJweEnc = null, SerializationMode mode = SerializationMode.smCompact, JwtSettings settings = null)
+        public static (byte[] Plaintext, IDictionary<string, object> JoseHeaders, byte[] Aad) Decrypt(string jwe, object key, JweAlgorithm? expectedJweAlg = null, JweEncryption? expectedJweEnc = null, SerializationMode mode = SerializationMode.Compact, JwtSettings settings = null)
         {
             Ensure.IsNotEmpty(jwe, "Incoming jwe expected to be in a valid serialization form, not empty, whitespace or null.");
 
@@ -294,7 +294,7 @@
         /// <exception cref="IntegrityException">if AEAD operation validation failed</exception>
         /// <exception cref="EncryptionException">if JWE can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if encryption or compression algorithm is not supported</exception>
-        public static IEnumerable<IDictionary<string, object>> UnsafeJoseHeaders(string jwe, SerializationMode mode = SerializationMode.smCompact, JwtSettings settings = null)
+        public static IEnumerable<IDictionary<string, object>> UnsafeJoseHeaders(string jwe, SerializationMode mode = SerializationMode.Compact, JwtSettings settings = null)
         {
             settings = GetSettings(settings);
             

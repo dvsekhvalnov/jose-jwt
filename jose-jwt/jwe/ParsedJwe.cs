@@ -13,12 +13,12 @@
         {
             switch (mode)
             {
-                case SerializationMode.smCompact:
+                case SerializationMode.Compact:
                     {
                         return ParseCompact(jwe);
                     }
 
-                case SerializationMode.smJson:
+                case SerializationMode.Json:
                     {
                         return ParseJson(jwe, settings);
                     }
