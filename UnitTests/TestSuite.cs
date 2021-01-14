@@ -8,7 +8,9 @@ using Jose;
 using Jose.keys;
 using Xunit;
 using Jose.Jwe;
+#if NETCOREAPP
 using Newtonsoft.Json.Linq;
+#endif //NETCOREAPP
 
 namespace UnitTests
 {
@@ -2470,22 +2472,48 @@ namespace UnitTests
                 { "exp", 1363284000 },
                 { "crit", new [] {"exp"} },
             };
-                
+
             //when
-            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256, 
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256,
                 extraHeaders: headers,
-                options: new JwtOptions { DetachPayload = true, EncodePayload = false});
+                options: new JwtOptions { DetachPayload = true, EncodePayload = false });
 
             //then
             Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0IiwiZXhwIl0sImV4cCI6MTM2MzI4NDAwMH0..9nZCB1H_OMmoTRBe2p5qeq38cyzcjJ6FzUZ9SkeZ4TU");
             Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key), payload: @"{""hello"": ""world""}"), json);
             var tokenHeaders = Jose.JWT.Headers(token);
-	
+
             Assert.Equal(tokenHeaders.Count(), 4);
             Assert.Equal(tokenHeaders["alg"], "HS256");
             Assert.Equal(tokenHeaders["b64"], false);
-            Assert.Equal(tokenHeaders["exp"], 1363284000L);
+            Assert.Equal(Convert.ToInt64(tokenHeaders["exp"]), 1363284000L);
+        }
+
+        [Fact]
+        public void EncodeWithUnencodedDetachedExtraHeadersCrit()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            var headers = new Dictionary<string, object>
+            {
+                { "exp", 1363284000 },
+                { "crit", new [] {"exp"} },
+            };
+
+            //when
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256,
+                extraHeaders: headers,
+                options: new JwtOptions { DetachPayload = true, EncodePayload = false });
+
+            //then
+            var tokenHeaders = Jose.JWT.Headers(token);
+
+#if NETCOREAPP
             Assert.Equal(tokenHeaders["crit"], new JArray(new [] {"b64", "exp"}));
+#else
+            throw new NotImplementedException("Test not currently implemented on net461 - has hard dependency on Newtonsoft");
+#endif
         }
 
         [Fact]

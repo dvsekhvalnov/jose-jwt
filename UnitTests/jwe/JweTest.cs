@@ -1,11 +1,12 @@
-#if NETCOREAPP
 namespace UnitTests.Jwe
 {
     using Jose;
     using Jose.Jwe;
     using Jose.keys;
     using Microsoft.IdentityModel.Tokens;
+#if NETCOREAPP
     using Newtonsoft.Json.Linq;
+#endif //NETCOREAPP
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -220,7 +221,7 @@ namespace UnitTests.Jwe
             //then
             Console.Out.WriteLine("Empty bytes A128KW_A128CBC_HS256 (General Json Serialization) = {0}", jwe);
 
-            //dynamic deserialized = JsonConvert.DeserializeObject(jwe);
+#if NETCOREAPP
             JObject deserialized = JObject.Parse(jwe);
 
             Assert.Equal("{\"enc\":\"A128CBC-HS256\"}",
@@ -240,6 +241,9 @@ namespace UnitTests.Jwe
             Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
 
             Assert.Equal(new byte[0], JWE.Decrypt(jwe, aes128KWKey, mode: SerializationMode.smJson).Plaintext);
+#else
+            throw new NotImplementedException("Test not currently implemented on net461");
+#endif
         }
 
         [Fact]
@@ -258,6 +262,7 @@ namespace UnitTests.Jwe
             //then
             Console.Out.WriteLine("Empty bytes A128KW_A128CBC_HS256 (Flattened Json Serialization) = {0}", jwe);
 
+#if NETCOREAPP
             JObject deserialized = JObject.Parse(jwe);
 
             Assert.Equal("{\"enc\":\"A128CBC-HS256\"}",
@@ -272,6 +277,9 @@ namespace UnitTests.Jwe
             Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
 
             Assert.Equal(new byte[0], JWE.Decrypt(jwe, aes128KWKey, mode: SerializationMode.smJson).Plaintext);
+#else
+            throw new NotImplementedException("Test not currently implemented on net461");
+#endif
         }
 
         [Fact]
@@ -338,11 +346,15 @@ namespace UnitTests.Jwe
                 mode: SerializationMode.smJson);
 
             //then
+#if NETCOREAPP
             JObject deserialized = JObject.Parse(jwe);
 
             var base64UrlAad = (string)deserialized["aad"];
             Assert.NotNull(base64UrlAad);
             Assert.Equal(Rfc7520_Figure176_ExampleBase64UrlEncodedAad, base64UrlAad);
+#else
+            throw new NotImplementedException("Test not currently implemented on net461");
+#endif
         }
 
         [Fact]
@@ -366,6 +378,25 @@ namespace UnitTests.Jwe
                 mode: SerializationMode.smJson);
 
             Assert.Equal(plaintext, UTF8Encoding.UTF8.GetString(decrypted.Plaintext));
+        }
+
+        [Fact]
+        public void DefaultJsonMapper_Used_ReturnsExpectedObjects()
+        {
+            //given
+
+            //when
+            var json = JWT.DefaultSettings.JsonMapper.Parse<JweJson>(Rfc7520_5_10_ExampleJwe);
+
+            //then
+            Assert.Equal(1, json.recipients.Count());
+            Assert.Equal("4YiiQ_ZzH76TaIkJmYfRFgOV9MIpnx4X", json.recipients.ElementAt(0).encrypted_key);
+            // ""protected"": ""eyJhbGciOiJBMTI4S1ciLCJraWQiOiI4MWIyMDk2NS04MzMyLTQzZDktYTQ2OC04MjE2MGFkOTFhYzgiLCJlbmMiOiJBMTI4R0NNIn0"",
+            // ""iv"": ""veCx9ece2orS7c_N"",
+            // ""aad"": ""WyJ2Y2FyZCIsW1sidmVyc2lvbiIse30sInRleHQiLCI0LjAiXSxbImZuIix7fSwidGV4dCIsIk1lcmlhZG9jIEJyYW5keWJ1Y2siXSxbIm4iLHt9LCJ0ZXh0IixbIkJyYW5keWJ1Y2siLCJNZXJpYWRvYyIsIk1yLiIsIiJdXSxbImJkYXkiLHt9LCJ0ZXh0IiwiVEEgMjk4MiJdLFsiZ2VuZGVyIix7fSwidGV4dCIsIk0iXV1d"",
+            //  ""ciphertext"": ""Z_3cbr0k3bVM6N3oSNmHz7Lyf3iPppGf3Pj17wNZqteJ0Ui8p74SchQP8xygM1oFRWCNzeIa6s6BcEtp8qEFiqTUEyiNkOWDNoF14T_4NFqF-p2Mx8zkbKxI7oPK8KNarFbyxIDvICNqBLba-v3uzXBdB89fzOI-Lv4PjOFAQGHrgv1rjXAmKbgkft9cB4WeyZw8MldbBhc-V_KWZslrsLNygon_JJWd_ek6LQn5NRehvApqf9ZrxB4aq3FXBxOxCys35PhCdaggy2kfUfl2OkwKnWUbgXVD1C6HxLIlqHhCwXDG59weHrRDQeHyMRoBljoV3X_bUTJDnKBFOod7nLz-cj48JMx3SnCZTpbQAkFV"",
+            //  ""tag"": ""vOaH_Rajnpy_3hOtqvZHRA""
+           
         }
 
         [Fact]
@@ -507,7 +538,7 @@ namespace UnitTests.Jwe
             //then
             Assert.NotNull(exception);
             Assert.IsType<ArgumentException>(exception);
-            Assert.Equal($"An item with the same key has already been added. Key: {injectedHeaderName}", exception.Message);
+            Assert.StartsWith("An item with the same key has already been added.", exception.Message);
         }
 
         /// <summary>
@@ -549,7 +580,7 @@ namespace UnitTests.Jwe
             //then
             Assert.NotNull(exception);
             Assert.IsType<ArgumentException>(exception);
-            Assert.Equal($"An item with the same key has already been added. Key: {injectedHeaderName}", exception.Message);
+            Assert.StartsWith("An item with the same key has already been added.", exception.Message);
         }
 
         [Fact]
@@ -606,7 +637,8 @@ namespace UnitTests.Jwe
             switch (jwk.Kty)
             {
                 case "RSA":
-                    return RSA.Create(new RSAParameters()
+                    var rsa = RSA.Create();
+                    rsa.ImportParameters(new RSAParameters()
                     {
                         Modulus = Base64Url.Decode(jwk.N),
                         Exponent = Base64Url.Decode(jwk.E),
@@ -617,6 +649,7 @@ namespace UnitTests.Jwe
                         DQ = Base64Url.Decode(jwk.DQ),
                         InverseQ = Base64Url.Decode(jwk.QI),
                     });
+                    return rsa;
 
                 case "oct":
                     return Base64Url.Decode(jwk.K);
@@ -751,4 +784,3 @@ namespace UnitTests.Jwe
             "[\"vcard\",[[\"version\",{},\"text\",\"4.0\"],[\"fn\",{},\"text\",\"Meriadoc Brandybuck\"],[\"n\",{},\"text\",[\"Brandybuck\",\"Meriadoc\",\"Mr.\",\"\"]],[\"bday\",{},\"text\",\"TA 2982\"],[\"gender\",{},\"text\",\"M\"]]]";
     };
 }
-#endif //NETSTANDARD2_1

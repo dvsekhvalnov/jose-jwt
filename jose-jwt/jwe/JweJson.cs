@@ -1,49 +1,35 @@
-﻿#if NETSTANDARD
-namespace Jose.Jwe
+﻿namespace Jose.Jwe
 {
-    using Newtonsoft.Json;
     using System.Collections.Generic;
 
     /// <summary>
-    /// Internal class used as helper deserialize Json Serialized JWE
+    /// public class used as helper deserialize Json Serialized JWE
     /// </summary>
-    internal class JweJson
+    public class JweJson
     {
-        [JsonProperty("protected")]
-        internal string Protected { get; set; }
+        public string @protected { get; set; }
 
-        [JsonProperty("unprotected")]
-        internal IDictionary<string, object> Unprotected { get; set; }
+        public IDictionary<string, object> unprotected { get; set; }
 
-        [JsonProperty("iv")]
-        internal string Iv { get; set; }
+        public string iv { get; set; }
 
-        [JsonProperty("aad")]
-        internal string Aad { get; set; }
+        public string aad { get; set; }
 
-        [JsonProperty("ciphertext")]
-        internal string Ciphertext { get; set; }
+        public string ciphertext { get; set; }
 
-        [JsonProperty("tag")]
-        internal string Tag { get; set; }
+        public string tag { get; set; }
   
-        [JsonProperty("recipients")]
-        internal IEnumerable<RecipientJson> Recipients { get; set; }
+        public IEnumerable<RecipientJson> recipients { get; set; }
   
-        [JsonProperty("encrypted_key")]
-        internal string EncryptedKey { get; set; }
+        public string encrypted_key { get; set; }
 
-        [JsonProperty("header")]
-        internal IDictionary<string, object> Header { get; set; }
+        public IDictionary<string, object> header { get; set; }
     }
 
-    internal class RecipientJson
+    public class RecipientJson
     {
-        [JsonProperty("encrypted_key")]
-        internal string EncryptedKey { get; set; }
+        public string encrypted_key { get; set; }
 
-        [JsonProperty("header")]
-        internal IDictionary<string, object> Header { get; set; }
+        public IDictionary<string, object> header { get; set; }
     }
 }
-#endif //NETSTANDARD2_1

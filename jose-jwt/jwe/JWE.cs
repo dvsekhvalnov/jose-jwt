@@ -1,12 +1,10 @@
-﻿#if NETSTANDARD
-namespace Jose.Jwe
+﻿namespace Jose.Jwe
 {
-    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-
+    
     public class Recipient
     {
         /// <summary
@@ -327,4 +325,3 @@ namespace Jose.Jwe
         }
     }
 }
-#endif //NETSTANDARD2_1

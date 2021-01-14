@@ -1,5 +1,4 @@
-﻿#if NETSTANDARD
-namespace Jose.Jwe
+﻿namespace Jose.Jwe
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -86,29 +85,28 @@ namespace Jose.Jwe
             var jweJson = settings.JsonMapper.Parse<JweJson>(jwe);
 
             var recipients = new List<(byte[] EncryptedCek, IDictionary<string, object> Header)>();
-            if (jweJson.Recipients?.Count() > 0)
+            if (jweJson.recipients?.Count() > 0)
             {
-                foreach (var recipient in jweJson.Recipients)
+                foreach (var recipient in jweJson.recipients)
                 {
-                    byte[] encryptedCek = Base64Url.Decode(recipient.EncryptedKey);
-                    recipients.Add((EncryptedCek: encryptedCek, Header: recipient.Header));
+                    byte[] encryptedCek = Base64Url.Decode(recipient.encrypted_key);
+                    recipients.Add((EncryptedCek: encryptedCek, Header: recipient.header));
                 }
             }
             else
             {
-                byte[] encryptedCek = Base64Url.Decode(jweJson.EncryptedKey);
-                recipients.Add((EncryptedCek: encryptedCek, Header: jweJson.Header));
+                byte[] encryptedCek = Base64Url.Decode(jweJson.encrypted_key);
+                recipients.Add((EncryptedCek: encryptedCek, Header: jweJson.header));
             }
 
             return new ParsedJwe(
-                protectedHeaderBytes: Base64Url.Decode(jweJson.Protected),
-                unprotectedHeader: jweJson.Unprotected,
-                aad: jweJson.Aad == null ? null : Base64Url.Decode(jweJson.Aad),
+                protectedHeaderBytes: Base64Url.Decode(jweJson.@protected),
+                unprotectedHeader: jweJson.unprotected,
+                aad: jweJson.aad == null ? null : Base64Url.Decode(jweJson.aad),
                 recipients: recipients,
-                iv: Base64Url.Decode(jweJson.Iv),
-                ciphertext: Base64Url.Decode(jweJson.Ciphertext),
-                authTag: Base64Url.Decode(jweJson.Tag));
+                iv: Base64Url.Decode(jweJson.iv),
+                ciphertext: Base64Url.Decode(jweJson.ciphertext),
+                authTag: Base64Url.Decode(jweJson.tag));
         }
     }
 }
-#endif //NETSTANDARD2_1

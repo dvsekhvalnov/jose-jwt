@@ -276,7 +276,13 @@ namespace UnitTests
 
         #region mocks
 
-        class MockJsonMapper : NewtonsoftMapper, IJsonMapper
+        class MockJsonMapper
+#if NETCOREAPP
+            : NewtonsoftMapper,
+#elif NET40 || NET461
+            : JSSerializerMapper,
+#endif
+               IJsonMapper
         {
             public bool SerializeCalled { get; set; }
             public bool ParseCalled { get; set; }
@@ -368,6 +374,6 @@ namespace UnitTests
             }
         }
 
-        #endregion
+#endregion
     }
 }
