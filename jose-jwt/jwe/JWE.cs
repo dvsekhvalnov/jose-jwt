@@ -63,7 +63,7 @@
                 throw new JoseException(string.Format("Unsupported JWE enc requested: {0}", enc));
             }
 
-            IDictionary<string, object> joseProtectedHeader = MergeHeaders(
+            IDictionary<string, object> joseProtectedHeader = Dictionaries.MergeHeaders(
                 new Dictionary<string, object> { { "enc", settings.JweHeaderValue(enc) } },
                 extraHeaders);
 
@@ -82,7 +82,7 @@
                 // joseHeader - is merge of headers
                 // - key management will read from (e.g. enc,apv,apu - ECDH-ES)
                 // - key management will write to (e.g. iv, tag - AesGcmKW)
-                IDictionary<string, object> joseHeader = MergeHeaders(
+                IDictionary<string, object> joseHeader = Dictionaries.MergeHeaders(
                     joseProtectedHeader,
                     new Dictionary<string, object> { { "alg", settings.JwaHeaderValue(recipient.Alg) } },
                     recipient.PerRecipientHeaders);
@@ -126,7 +126,7 @@
                             throw new JoseException("JWE AAD value is not valid for JWE Compact Serialization.");
                         }
 
-                        joseProtectedHeader = MergeHeaders(recipientsOut[0].Header, joseProtectedHeader);
+                        joseProtectedHeader = Dictionaries.MergeHeaders(recipientsOut[0].Header, joseProtectedHeader);
 
                         byte[] header = Encoding.UTF8.GetBytes(settings.JsonMapper.Serialize(joseProtectedHeader));
                         aad = Encoding.UTF8.GetBytes(Compact.Serialize(header));
@@ -215,7 +215,7 @@
 
             var algMatchingRecipients = parsedJwe.Recipients.Select(r =>
             {
-                var joseHeader = MergeHeaders(protectedHeader, parsedJwe.UnprotectedHeader, r.Header);
+                var joseHeader = Dictionaries.MergeHeaders(protectedHeader, parsedJwe.UnprotectedHeader, r.Header);
                 return new
                 {
                     JoseHeader = joseHeader,
@@ -306,18 +306,10 @@
             var ret = new List<IDictionary<string, object>>();
             foreach(var recipient in parsedJwe.Recipients)
             {
-                ret.Add(MergeHeaders(protectedHeaders, parsedJwe.UnprotectedHeader, recipient.Header));
+                ret.Add(Dictionaries.MergeHeaders(protectedHeaders, parsedJwe.UnprotectedHeader, recipient.Header));
             }
             return ret;
-        }
-
-        private static IDictionary<string, object> MergeHeaders(params IDictionary<string, object>[] dicts)
-        {
-            return dicts
-                .Where(dict => dict != null)
-                .SelectMany(x => x)
-                .ToDictionary(k => k.Key, k => k.Value);
-        }
+        }        
 
         private static JwtSettings GetSettings(JwtSettings settings)
         {

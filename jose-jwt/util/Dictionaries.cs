@@ -31,5 +31,21 @@ namespace Jose
 
             return value;
         }
+
+        /// <summary>
+        /// Merges the IDictionaries supplied and returns an IDictionary containing the union of key/value pairs of all
+        /// supplied IDictionaries.
+        /// Note - the method will throw an ArgumentException if there are duplicate key names supplied.
+        /// </summary>
+        /// <param name="dicts"></param>
+        /// <exception cref="ArgumentException">Thrown if there are duplicated keys between the supplied dicts.</exception>
+        /// <returns>IDictionary containing union of key/values of all supplied dicts.</returns>
+        public static IDictionary<string, object> MergeHeaders(params IDictionary<string, object>[] dicts)
+        {
+            return dicts
+                .Where(dict => dict != null)
+                .SelectMany(x => x)
+                .ToDictionary(k => k.Key, k => k.Value);
+        }
     }
 }
