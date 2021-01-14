@@ -389,7 +389,7 @@ namespace UnitTests.Jwe
             var json = JWT.DefaultSettings.JsonMapper.Parse<JweJson>(Rfc7520_5_10_ExampleJwe);
 
             //then
-            Assert.Equal(1, json.recipients.Count());
+            Assert.Single(json.recipients);
             Assert.Equal("4YiiQ_ZzH76TaIkJmYfRFgOV9MIpnx4X", json.recipients.ElementAt(0).encrypted_key);
             // ""protected"": ""eyJhbGciOiJBMTI4S1ciLCJraWQiOiI4MWIyMDk2NS04MzMyLTQzZDktYTQ2OC04MjE2MGFkOTFhYzgiLCJlbmMiOiJBMTI4R0NNIn0"",
             // ""iv"": ""veCx9ece2orS7c_N"",
@@ -599,7 +599,7 @@ namespace UnitTests.Jwe
                 mode: SerializationMode.smCompact);
 
             //then
-            Assert.Equal(1, headers.Count());
+            Assert.Single(headers);
 
             Assert.Equal(2, headers.ElementAt(0).Count());
             Assert.Equal("A128CBC-HS256", headers.ElementAt(0)["enc"]);
