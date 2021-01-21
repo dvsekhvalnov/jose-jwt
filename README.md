@@ -8,15 +8,26 @@ Extensively tested for compatibility with [jose.4.j](https://bitbucket.org/b_c/j
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
+- v3.0 and above additionally targets `netstandard2.1` to leverage better .net crypto support on *\*nix* systems and enable more supported algorithms.
+All new features will most likely appear based on given version. 
+
 - v2.1 and above added extra features support for .NET461+ and coming with 3 version of binaries (`NET4`, `NET461` and `netstandard1.4`).
 
-- v2.0 and above is .NET Core compatible and aimed to support both .NET framework (`NET40`) and .NET Core (`netstandard1.4`) runtimes. This is the version you should prefer unless you have really strong reason to stay with v1.9.
+- v2.0 and above is .NET Core compatible and aimed to support both .NET framework (`NET40`) and .NET Core (`netstandard1.4`) runtimes. 
 
 - v1.9 is built against .NET framework only and should be compatible with `NET40` and above. The version is not actively maintained anymore except critical bug fixes.
 
 - WinRT compatible version (Windows 8.1 and Windows Phone 8.1) is avaliable as standalone project here: [jose-rt](https://github.com/dvsekhvalnov/jose-rt).
 
 - PCLCrypto based experimental project living up here: [jose-pcl](https://github.com/dvsekhvalnov/jose-pcl).
+
+## Important upgrade notes
+> :warning: **v2 -> v3 update public sdk changes** 
+>
+> Moved: 
+> - `Security.Cryptography.EccKey` to `Jose.keys.EccKey` 
+> - `Security.Cryptography.RsaKey` to `Jose.keys.RsaKey` 
+
 
 
 ## Foreword
