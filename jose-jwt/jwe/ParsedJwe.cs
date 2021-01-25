@@ -1,5 +1,6 @@
 ﻿namespace Jose.Jwe
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -9,22 +10,18 @@
     /// </summary>
     internal class ParsedJwe
     {
-        internal static ParsedJwe Parse(string jwe, SerializationMode mode, JwtSettings settings)
+        internal static ParsedJwe Parse(string jwe, JwtSettings settings)
         {
-            switch (mode)
+            jwe = jwe.Trim();
+            bool modeIsJson = jwe.StartsWith("{", StringComparison.Ordinal);
+
+            if (modeIsJson)
             {
-                case SerializationMode.Compact:
-                    {
-                        return ParseCompact(jwe);
-                    }
-
-                case SerializationMode.Json:
-                    {
-                        return ParseJson(jwe, settings);
-                    }
-
-                default:
-                    throw new JoseException($"Unsupported serializtion mode: {mode}");
+                return ParseJson(jwe, settings);
+            }
+            else
+            {
+                return ParseCompact(jwe);
             }
         }
 

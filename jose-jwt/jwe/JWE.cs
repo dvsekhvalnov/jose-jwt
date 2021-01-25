@@ -183,19 +183,18 @@
         /// <param name="key">key for decoding suitable for JWE algorithm used to encrypt the CEK.</param>
         /// <param name="expectedJweAlg">The algorithm type that we expect to receive in the header.</param>
         /// <param name="expectedJweEnc">The encryption type that we expect to receive in the header.</param>
-        /// <param name="mode">serialization mode to use. Note only one recipient can be specified for compact and flattened json serialization.</param>
         /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>Decrypted plaintext as binary data</returns>
         /// <exception cref="IntegrityException">if AEAD operation validation failed</exception>
         /// <exception cref="EncryptionException">if JWE can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if encryption or compression algorithm is not supported</exception>
-        public static (byte[] Plaintext, IDictionary<string, object> JoseHeaders, byte[] Aad) Decrypt(string jwe, object key, JweAlgorithm? expectedJweAlg = null, JweEncryption? expectedJweEnc = null, SerializationMode mode = SerializationMode.Compact, JwtSettings settings = null)
+        public static (byte[] Plaintext, IDictionary<string, object> JoseHeaders, byte[] Aad) Decrypt(string jwe, object key, JweAlgorithm? expectedJweAlg = null, JweEncryption? expectedJweEnc = null, JwtSettings settings = null)
         {
             Ensure.IsNotEmpty(jwe, "Incoming jwe expected to be in a valid serialization form, not empty, whitespace or null.");
 
             settings = GetSettings(settings);
 
-            ParsedJwe parsedJwe = ParsedJwe.Parse(jwe, mode, settings);
+            ParsedJwe parsedJwe = ParsedJwe.Parse(jwe, settings);
 
             IDictionary<string, object> protectedHeader = settings.JsonMapper.Parse<Dictionary<string, object>>(
                 Encoding.UTF8.GetString(parsedJwe.ProtectedHeaderBytes));
@@ -287,18 +286,17 @@
         /// This method is NOT performing integrity checking. 
         /// </summary>
         /// <param name="jwe">JWE to decrypt.</param>
-        /// <param name="mode">serialization mode to use. Note only one recipient can be specified for compact and flattened json serialization.</param>
         /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>List of Jose headers. For Compact and Flattened this will be length 1 and contain just the protected header. 
         ///  For General Json this will be the Jose headers (merge of protected, unprotected and per-recipient).</returns>
         /// <exception cref="IntegrityException">if AEAD operation validation failed</exception>
         /// <exception cref="EncryptionException">if JWE can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if encryption or compression algorithm is not supported</exception>
-        public static IEnumerable<IDictionary<string, object>> UnsafeJoseHeaders(string jwe, SerializationMode mode = SerializationMode.Compact, JwtSettings settings = null)
+        public static IEnumerable<IDictionary<string, object>> UnsafeJoseHeaders(string jwe, JwtSettings settings = null)
         {
             settings = GetSettings(settings);
             
-            var parsedJwe = ParsedJwe.Parse(jwe, mode, settings);           
+            var parsedJwe = ParsedJwe.Parse(jwe, settings);           
 
             var protectedHeaders = settings.JsonMapper.Parse<Dictionary<string, object>>(
                 Encoding.UTF8.GetString(parsedJwe.ProtectedHeaderBytes));
