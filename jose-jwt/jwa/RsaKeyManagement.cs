@@ -5,7 +5,7 @@ using Jose.keys;
 
 namespace Jose
 {
-    public class RsaKeyManagement:IKeyManagement
+    public class RsaKeyManagement : IKeyManagement
     {        
         private bool useRsaOaepPadding; //true for RSA-OAEP, false for RSA-PKCS#1 v1.5
         
@@ -17,6 +17,12 @@ namespace Jose
         public byte[][] WrapNewKey(int cekSizeBits, object key, IDictionary<string, object> header)
         {
             var cek = Arrays.Random(cekSizeBits);
+
+            return new byte[][] { cek, this.WrapKey(cek, key, header) };
+        }
+
+        public byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header)
+        {
 
 #if NET40
             var publicKey = Ensure.Type<RSACryptoServiceProvider>(key, "RsaKeyManagement alg expects key to be of RSACryptoServiceProvider type.");
@@ -30,14 +36,14 @@ namespace Jose
                 var padding = useRsaOaepPadding ? RSAEncryptionPadding.OaepSHA1 :
                                                   RSAEncryptionPadding.Pkcs1;
 
-                return new[] { cek, publicKey.Encrypt(cek, padding) };
+                return publicKey.Encrypt(cek, padding);
             }
 
             if (key is RSACryptoServiceProvider)
             {
                 var publicKey = (RSACryptoServiceProvider) key;
 
-                return new[] { cek, publicKey.Encrypt(cek, useRsaOaepPadding) };
+                return publicKey.Encrypt(cek, useRsaOaepPadding);
             }
 
             if (key is RSA)
@@ -47,7 +53,7 @@ namespace Jose
                 var padding = useRsaOaepPadding ? RSAEncryptionPadding.OaepSHA1 :
                                                   RSAEncryptionPadding.Pkcs1;
 
-                return new[] { cek, publicKey.Encrypt(cek, padding) };
+                return publicKey.Encrypt(cek, padding);
             }
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of either CngKey, RSACryptoServiceProvider or RSA types.");
@@ -58,7 +64,7 @@ namespace Jose
             var padding = useRsaOaepPadding ? RSAEncryptionPadding.OaepSHA1 :
                                               RSAEncryptionPadding.Pkcs1;
 
-            return new[] { cek, publicKey.Encrypt(cek, padding) };
+            return publicKey.Encrypt(cek, padding);
 #endif
         }
 

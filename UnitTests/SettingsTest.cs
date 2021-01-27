@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using Jose.keys;
 using Jose;
-using Jose.jwe;
+using Jose.Jwe;
 using Xunit;
 
 namespace UnitTests
@@ -276,7 +276,13 @@ namespace UnitTests
 
         #region mocks
 
-        class MockJsonMapper : NewtonsoftMapper, IJsonMapper
+        class MockJsonMapper
+#if NETCOREAPP
+            : NewtonsoftMapper,
+#elif NET40 || NET461
+            : JSSerializerMapper,
+#endif
+               IJsonMapper
         {
             public bool SerializeCalled { get; set; }
             public bool ParseCalled { get; set; }
@@ -368,6 +374,6 @@ namespace UnitTests
             }
         }
 
-        #endregion
+#endregion
     }
 }

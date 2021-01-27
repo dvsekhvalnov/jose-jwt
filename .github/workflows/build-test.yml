@@ -1,0 +1,51 @@
+name: BuildAndTestFunctions
+on:
+  push:
+
+  pull_request:
+    branches:
+    - master
+
+jobs:
+
+  build-test-linux:
+    name: Build and test
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false # we want to see list of failing tests for each combination
+      matrix:
+        os: [windows-2019, ubuntu-18.04]
+        framework: ['netcoreapp3.1', 'netcoreapp2.1']
+    steps:
+
+    - name: Check out code onto host
+      uses: actions/checkout@v1
+
+    - name: Setup .Net 2.1
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '2.1.801' # SDK Version to use.
+      #if: matrix.framework == 'netcoreapp2.1'
+
+    - name: Setup .Net 3.1
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '3.1.300' # SDK Version to use.
+      #if: matrix.framework == 'netcoreapp3.1'
+
+    - name: Dotnet info
+      run: |
+        dotnet --version
+        dotnet --info
+
+    - name: Clear nuget cache
+    # Workaround for https://github.com/actions/setup-dotnet/issues/155
+      run: |
+        dotnet clean jose-jwt.sln
+        dotnet nuget locals all --clear
+
+    - name: Run unit tests
+      run: |
+        dotnet test jose-jwt.sln --framework=${{ matrix.framework }}
+

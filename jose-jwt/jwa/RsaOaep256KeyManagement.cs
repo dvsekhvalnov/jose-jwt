@@ -11,6 +11,11 @@ namespace Jose
         {
             var cek = Arrays.Random(cekSizeBits);
 
+            return new byte[][] { cek, this.WrapKey(cek, key, header) };
+        }
+        
+        public byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header)
+        {            
         #if NET40
             if (key is CngKey)
             {
@@ -25,7 +30,7 @@ namespace Jose
                 //To be removed in 3.x 
                 var publicKey = RsaKey.New(((RSACryptoServiceProvider)key).ExportParameters(false));
 
-                return new[] { cek, RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256) };
+                return RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256);
             }
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey type.");
@@ -35,7 +40,7 @@ namespace Jose
             {
                 var publicKey = (CngKey) key;
 
-                return new[] {cek, RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256)};
+                return RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256);
             }
 
             if (key is RSACryptoServiceProvider)
@@ -44,14 +49,14 @@ namespace Jose
                 //To be removed in 3.x 
                 var publicKey = RsaKey.New(((RSACryptoServiceProvider) key).ExportParameters(false));
 
-                return new[] {cek, RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256)};
+                return RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256);
             }
 
             if (key is RSA)
             {
 	            var publicKey = (RSA) key;
 
-                return new[] { cek, publicKey.Encrypt(cek, RSAEncryptionPadding.OaepSHA256) };
+                return publicKey.Encrypt(cek, RSAEncryptionPadding.OaepSHA256);
             }
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of either CngKey or RSA types.");
@@ -60,7 +65,7 @@ namespace Jose
 #elif NETSTANDARD
             var publicKey = Ensure.Type<RSA>(key, "RsaKeyManagement algorithm expects key to be of RSA type.");
 
-            return new[] { cek, publicKey.Encrypt(cek, RSAEncryptionPadding.OaepSHA256) };
+            return publicKey.Encrypt(cek, RSAEncryptionPadding.OaepSHA256);
 #endif
 
         }

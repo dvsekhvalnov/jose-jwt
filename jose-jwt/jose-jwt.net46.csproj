@@ -38,7 +38,7 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml" />    
   </ItemGroup>
   <ItemGroup>
     <Compile Include="compression\DeflateCompression.cs" />
@@ -64,6 +64,9 @@
     <Compile Include="jwe\AesCbcHmacEncryption.cs" />
     <Compile Include="jwe\AesGcmEncryption.cs" />
     <Compile Include="jwe\IJweAlgorithm.cs" />
+    <Compile Include="jwe\JWE.cs" />
+    <Compile Include="jwe\JweJson.cs" />
+    <Compile Include="jwe\ParsedJwe.cs" />
     <Compile Include="jws\EcdsaUsingSha.cs" />
     <Compile Include="jws\HmacUsingSha.cs" />
     <Compile Include="jws\IJwsAlgorithm.cs" />

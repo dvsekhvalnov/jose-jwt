@@ -9,11 +9,11 @@ Library is fully FIPS compliant since v2.1
 
 ## Which version?
 - v3.0 and above additionally targets `netstandard2.1` to leverage better .net crypto support on *\*nix* systems and enable more supported algorithms.
-All new features will most likely appear based on given version. 
+All new features will most likely appear based on given version.
 
 - v2.1 and above added extra features support for .NET461+ and coming with 3 version of binaries (`NET4`, `NET461` and `netstandard1.4`).
 
-- v2.0 and above is .NET Core compatible and aimed to support both .NET framework (`NET40`) and .NET Core (`netstandard1.4`) runtimes. 
+- v2.0 and above is .NET Core compatible and aimed to support both .NET framework (`NET40`) and .NET Core (`netstandard1.4`) runtimes.
 
 - v1.9 is built against .NET framework only and should be compatible with `NET40` and above. The version is not actively maintained anymore except critical bug fixes.
 
@@ -22,11 +22,15 @@ All new features will most likely appear based on given version.
 - PCLCrypto based experimental project living up here: [jose-pcl](https://github.com/dvsekhvalnov/jose-pcl).
 
 ## Important upgrade notes
-> :warning: **v2 -> v3 update public sdk changes** 
+> :warning: **v3.0 -> v3.1 stricter argument validation extraHeaders argument**
 >
-> Moved: 
-> - `Security.Cryptography.EccKey` to `Jose.keys.EccKey` 
-> - `Security.Cryptography.RsaKey` to `Jose.keys.RsaKey` 
+> In 3.1 and above an attempt to override `enc` or `alg` header values in `extraHeaders` will throw `ArgumentException`.
+
+> :warning: **v2 -> v3 update public sdk changes**
+>
+> Moved:
+> - `Security.Cryptography.EccKey` to `Jose.keys.EccKey`
+> - `Security.Cryptography.RsaKey` to `Jose.keys.RsaKey`
 
 
 
@@ -164,7 +168,7 @@ var privateKey=new X509Certificate2("my-key.p12", "password").GetRSAPrivateKey()
 string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.RS256);
 ```
 **NET461**:
-Accepts `RSACryptoServiceProvider`, `RSA` or `CngKey` types of keys. 
+Accepts `RSACryptoServiceProvider`, `RSA` or `CngKey` types of keys.
 
 
 #### ES-\*  family
@@ -203,7 +207,7 @@ var privateKey=new X509Certificate2("ecc-key.p12", "password").GetECDsaPrivateKe
 string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
 ```
 **NET461**:
-Accepts `CngKey` and `ECDsa` types of keys. 
+Accepts `CngKey` and `ECDsa` types of keys.
 
 
 ### Creating encrypted Tokens
@@ -241,7 +245,7 @@ string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEnc
 ```
 
 **NET461**:
-Accepts `RSACryptoServiceProvider`, `RSA` or `CngKey` types of keys. 
+Accepts `RSACryptoServiceProvider`, `RSA` or `CngKey` types of keys.
 
 
 #### DIR direct pre-shared symmetric key family of algorithms
@@ -316,14 +320,14 @@ var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
     { "exp", 1300819380 }
-};  	
+};
 
 string token = Jose.JWT.Encode(payload, "top secret", JweAlgorithm.PBES2_HS256_A128KW, JweEncryption.A256CBC_HS512);
 ```
 
 Iteration counts can be controlled by setting `p2c` header value:
 ```c#
-var headers = new Dictionary<string, object> 
+var headers = new Dictionary<string, object>
 {
     { "p2c", 10000 }
 };
@@ -386,7 +390,7 @@ string json = Jose.JWT.Decode(token,privateKey);
 
 
 
-**ES256, ES284, ES512** signatures expects 
+**ES256, ES284, ES512** signatures expects
 
 **NET40-NET45**: `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
 sure correct `usage:` value is set. Should be `CngKeyUsages.Signing` for ES-* signatures (default value, can be ommited).
@@ -469,7 +473,7 @@ Now, if the library deserializes a token issued before the change of `Payload` c
 
 The user will get someone else's identity (id: 0) .
 
-So developers should always use [nullable data types](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/nullable-value-types) for payload class properties. 
+So developers should always use [nullable data types](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/nullable-value-types) for payload class properties.
 
 
 ## Additional utilities
@@ -514,7 +518,7 @@ byte[] payload = Jose.JWT.DecodeBytes(token, PubKey(), payload: BinaryPayload);
 
 ### Adding extra headers
 jose-jwt allows to pass extra headers when encoding token to overide deafault values<sup>\*</sup>. `extraHeaders:` named param can be used, it accepts `IDictionary<string, object>` type.
-jose-jwt is NOT allow to override `alg` and `enc` headers .
+jose-jwt is NOT allow to override `alg` and `enc` headers.
 
 ```C#
 var payload = new Dictionary<string, object>()
@@ -671,7 +675,7 @@ string data=Jose.JWT.Encode(obj,secrectKey,JwsAlgorithm.HS256); //for object arg
 ## Settings
 As of v2.3.0 settings can be configured either globally or on a per-call basis using a `JwtSettings` object.  The `JWT.DefaultSettings` object can be modified to change global settings, or a `JwtSettings` instance can be passed to any public method on `JWT` to override the global settings for particular method call.
 It is possible to provide custom implementations of:
-- specific signing `JwtSettings.RegisterJws(alg, impl)` 
+- specific signing `JwtSettings.RegisterJws(alg, impl)`
 - encryption,      `JwtSettings.RegisterJwe(alg, impl)`
 - key management   `JwtSettings.RegisterJwa(alg, impl)`
 - or compression   `JwtSettings.RegisterCompression(alg, impl)`
@@ -691,7 +695,7 @@ Jose.JWT.DefaultSettings.JsonMapper = new Jose.NewtonsoftMapper();
 
 
 Jose.JWTSettings settings = new Jose.JwtSettings();
-settings.JsonMapper = new Jose.JSSerializerMapper(); 
+settings.JsonMapper = new Jose.JSSerializerMapper();
 
 // override global settings for this call
 Jose.JWT.Decode(token, secretKey, settings: settings);
@@ -716,10 +720,10 @@ public class NewtonsoftMapper : IJsonMapper
          var settings = new JsonSerializerSettings
          {
          	ContractResolver = new DictionaryKeysResolver(),
-         	NullValueHandling = NullValueHandling.Ignore,                                                              
+         	NullValueHandling = NullValueHandling.Ignore,
          };
 
-        return JsonConvert.SerializeObject(obj, Formatting.Indented, settings);		
+        return JsonConvert.SerializeObject(obj, Formatting.Indented, settings);
     }
 
     public T Parse<T>(string json)
@@ -796,8 +800,8 @@ Jose.JWT.Decode(token, secretKey, settings: new JwtSettings()
 						.RegisterJws(JwsAlgorithm.RS256, amazonKmsImpl)
 						.RegisterJws(JwsAlgorithm.RS384, amazonKmsImpl)
 						.RegisterJws(JwsAlgorithm.RS512, amazonKmsImpl)
-						.RegisterJwa(JweAlgorithm.RSA_OAEP_256, hsmImpl)						
-						.RegisterJwe(JweEncryption.A128GCM, linuxGcmImpl)						
+						.RegisterJwa(JweAlgorithm.RSA_OAEP_256, hsmImpl)
+						.RegisterJwe(JweEncryption.A128GCM, linuxGcmImpl)
 						.RegisterJwaAlias("RSA_OAEP_256", JweAlgorithm.RSA_OAEP_256)
 						.RegisterCompression(JweCompression.DEF, hardwareAcceleratedDeflate)
 );
@@ -902,7 +906,7 @@ var tokenValidationParameters = new TokenValidationParameters
 
     ValidateActor = false,
 };
-            
+
 app.UseJwtBearerAuthentication(new JwtBearerOptions
 {
     AutomaticAuthenticate = true,

@@ -16,11 +16,18 @@ namespace Jose
 
         public override byte[][] WrapNewKey(int cekSizeBits, object key, IDictionary<string, object> header)
         {
+            var cek = Arrays.Random(cekSizeBits);
+
+            return new byte[][] { cek, this.WrapKey(cek, key, header) };
+        }
+
+        public override byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header)
+        {
             byte[][] agreement = base.WrapNewKey(keyLengthBits, key, header);
 
             byte[] kek = agreement[0]; //use agreed key as KEK for AES-KW
 
-            return aesKW.WrapNewKey(cekSizeBits, kek, header);
+            return aesKW.WrapKey(cek, kek, header);
         }
 
         public override byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
