@@ -32,6 +32,7 @@
         internal byte[] Iv { get; }
         internal byte[] Ciphertext { get; }
         internal byte[] AuthTag { get; }
+        internal SerializationMode Encoding { get; }
 
         private ParsedJwe(
             byte[] protectedHeaderBytes,
@@ -40,15 +41,17 @@
             byte[] aad,
             byte[] iv,
             byte[] ciphertext,
-            byte[] authTag)
+            byte[] authTag,
+            SerializationMode encoding)
         {
-            this.ProtectedHeaderBytes = protectedHeaderBytes;
-            this.UnprotectedHeader = unprotectedHeader;
-            this.Recipients = recipients;
-            this.Aad = aad;
-            this.Iv = iv;
-            this.Ciphertext = ciphertext;
-            this.AuthTag = authTag;
+            ProtectedHeaderBytes = protectedHeaderBytes;
+            UnprotectedHeader = unprotectedHeader;
+            Recipients = recipients;
+            Aad = aad;
+            Iv = iv;
+            Ciphertext = ciphertext;
+            AuthTag = authTag;
+            Encoding = encoding;
         }
 
         private static ParsedJwe ParseCompact(string jwe)
@@ -73,7 +76,8 @@
                 recipients: recipients,
                 iv: iv,
                 ciphertext: ciphertext,
-                authTag: authTag);
+                authTag: authTag,
+                encoding: SerializationMode.Compact);
         }
 
         private static ParsedJwe ParseJson(string jwe, JwtSettings settings)
@@ -97,13 +101,14 @@
             }
 
             return new ParsedJwe(
-                protectedHeaderBytes: Base64Url.Decode(jweJson.@protected),
+                protectedHeaderBytes: jweJson.@protected == null ? new byte[0] : Base64Url.Decode(jweJson.@protected),
                 unprotectedHeader: jweJson.unprotected,
                 aad: jweJson.aad == null ? null : Base64Url.Decode(jweJson.aad),
                 recipients: recipients,
                 iv: Base64Url.Decode(jweJson.iv),
                 ciphertext: Base64Url.Decode(jweJson.ciphertext),
-                authTag: Base64Url.Decode(jweJson.tag));
+                authTag: Base64Url.Decode(jweJson.tag),
+                encoding: SerializationMode.Json);
         }
     }
 }

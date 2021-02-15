@@ -40,6 +40,18 @@ namespace UnitTests
         }
 
         [Fact]
+        public void Get()
+        {
+            //given
+            var src = new Dictionary<string, string> { { "one", "1" }, { "two", "2" } };
+
+            //then
+            Assert.Equal(Dictionaries.Get(src, "one"), "1");
+            Assert.Equal(Dictionaries.Get(src, "two"), "2");
+            Assert.Null(Dictionaries.Get(src, "three"));
+        }
+
+        [Fact]
         public void MergeHeaders_CalledWithOnlyNulls_ReturnsEmptyDictionary()
         {
             //given

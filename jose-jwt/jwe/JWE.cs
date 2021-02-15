@@ -199,24 +199,35 @@
             IDictionary<string, object> protectedHeader = settings.JsonMapper.Parse<Dictionary<string, object>>(
                 Encoding.UTF8.GetString(parsedJwe.ProtectedHeaderBytes));
 
-            JweEncryption headerEnc = settings.JweAlgorithmFromHeader((string)protectedHeader["enc"]);
-            IJweAlgorithm enc = settings.Jwe(headerEnc);
-
-            if (enc == null)
+            if(protectedHeader==null && parsedJwe.Encoding == SerializationMode.Compact)
             {
-                throw new JoseException(string.Format("Unsupported JWE algorithm requested: {0}", headerEnc));
+                throw new JoseException(string.Format("Protected header was missing but required with compact encoding."));
             }
 
-            if (expectedJweEnc != null && expectedJweEnc != headerEnc)
-            {
-                throw new InvalidAlgorithmException("The encryption type passed to the Decrypt method did not match the encryption type in the header.");
-            }
+            IJweAlgorithm enc = null;
 
+/*
+            if (protectedHeader != null)
+            {
+                JweEncryption headerEnc = settings.JweAlgorithmFromHeader((string)protectedHeader["enc"]);
+                enc = settings.Jwe(headerEnc);
+
+                if (enc == null && parsedJwe.Encoding == SerializationMode.Compact)
+                {
+                    throw new JoseException(string.Format("Unsupported JWE algorithm requested: {0}", headerEnc));
+                }
+
+                if (expectedJweEnc != null && expectedJweEnc != headerEnc && parsedJwe.Encoding == SerializationMode.Compact)
+                {
+                    throw new InvalidAlgorithmException("The encryption type passed to the Decrypt method did not match the encryption type in the header.");
+                }
+            }
+*/
             var algMatchingRecipients = parsedJwe.Recipients.Select(r =>
             {
                 var joseHeader = Dictionaries.MergeHeaders(protectedHeader, parsedJwe.UnprotectedHeader, r.Header);
                 return new
-                {
+                {                    
                     JoseHeader = joseHeader,
                     HeaderAlg = settings.JwaAlgorithmFromHeader((string)joseHeader["alg"]),
                     EncryptedCek = r.EncryptedCek,
@@ -242,12 +253,25 @@
 
                 try
                 {
-                    byte[] cek = keys.Unwrap(recipient.EncryptedCek, key, enc.KeySize, protectedHeader);
+                    JweEncryption headerEnc = settings.JweAlgorithmFromHeader((string)recipient.JoseHeader["enc"]);
+                    enc = settings.Jwe(headerEnc);
+
+                    if (enc == null)
+                    {
+                        throw new JoseException(string.Format("Unsupported JWE algorithm requested: {0}", headerEnc));
+                    }
+
+                    if (expectedJweEnc != null && expectedJweEnc != headerEnc)
+                    {
+                        throw new InvalidAlgorithmException("The encryption type passed to the Decrypt method did not match the encryption type in the header.");
+                    }
+
+
+                    byte[] cek = keys.Unwrap(recipient.EncryptedCek, key, enc.KeySize, recipient.JoseHeader);
                     byte[] asciiEncodedProtectedHeader = Encoding.ASCII.GetBytes(Base64Url.Encode(parsedJwe.ProtectedHeaderBytes));
 
                     byte[] aad = parsedJwe.Aad == null ? 
-                        Encoding.ASCII.GetBytes(Base64Url.Encode(parsedJwe.ProtectedHeaderBytes)) 
-                        :
+                        Encoding.ASCII.GetBytes(Base64Url.Encode(parsedJwe.ProtectedHeaderBytes)) :
                         Encoding.ASCII.GetBytes(string.Concat(Base64Url.Encode(parsedJwe.ProtectedHeaderBytes), ".", Base64Url.Encode(parsedJwe.Aad)));
 
                     byte[] plaintext = enc.Decrypt(aad, cek, parsedJwe.Iv, parsedJwe.Ciphertext, parsedJwe.AuthTag);
