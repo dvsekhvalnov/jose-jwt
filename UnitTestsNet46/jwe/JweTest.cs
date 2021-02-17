@@ -120,7 +120,6 @@ namespace UnitTests.Jwe
                 mode: SerializationMode.Json,
                 extraHeaders: sharedProtectedHeaders);
 
-
             //when
             var exception = Record.Exception(() => JWE.Decrypt(jwe, aes256KWKey2, expectedJweAlg, expectedJweEnc));
 

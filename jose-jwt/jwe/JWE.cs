@@ -206,32 +206,23 @@
 
             IJweAlgorithm enc = null;
 
-/*
-            if (protectedHeader != null)
-            {
-                JweEncryption headerEnc = settings.JweAlgorithmFromHeader((string)protectedHeader["enc"]);
-                enc = settings.Jwe(headerEnc);
-
-                if (enc == null && parsedJwe.Encoding == SerializationMode.Compact)
-                {
-                    throw new JoseException(string.Format("Unsupported JWE algorithm requested: {0}", headerEnc));
-                }
-
-                if (expectedJweEnc != null && expectedJweEnc != headerEnc && parsedJwe.Encoding == SerializationMode.Compact)
-                {
-                    throw new InvalidAlgorithmException("The encryption type passed to the Decrypt method did not match the encryption type in the header.");
-                }
-            }
-*/
             var algMatchingRecipients = parsedJwe.Recipients.Select(r =>
             {
-                var joseHeader = Dictionaries.MergeHeaders(protectedHeader, parsedJwe.UnprotectedHeader, r.Header);
-                return new
-                {                    
-                    JoseHeader = joseHeader,
-                    HeaderAlg = settings.JwaAlgorithmFromHeader((string)joseHeader["alg"]),
-                    EncryptedCek = r.EncryptedCek,
-                };
+                try
+                {
+                    var joseHeader = Dictionaries.MergeHeaders(protectedHeader, parsedJwe.UnprotectedHeader, r.Header);
+
+                    return new
+                    {
+                        JoseHeader = joseHeader,
+                        HeaderAlg = settings.JwaAlgorithmFromHeader((string)joseHeader["alg"]),
+                        EncryptedCek = r.EncryptedCek,
+                    };
+                }
+                catch(ArgumentException)
+                {
+                    throw new JoseException("Invalid JWE data, duplicate header keys found between protected, unprotected and recipient headers");
+                }                
             })
             .Where(r => (expectedJweAlg == null || expectedJweAlg == r.HeaderAlg));
 
@@ -331,7 +322,7 @@
                 ret.Add(Dictionaries.MergeHeaders(protectedHeaders, parsedJwe.UnprotectedHeader, recipient.Header));
             }
             return ret;
-        }        
+        }                
 
         private static JwtSettings GetSettings(JwtSettings settings)
         {

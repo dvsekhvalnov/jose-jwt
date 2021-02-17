@@ -77,6 +77,6 @@ namespace Jose
         {
             if(left.Length!=right.Length)
                 throw new ArgumentException(string.Format(msg, args));
-        }
+        }       
     }
 }
