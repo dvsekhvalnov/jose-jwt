@@ -20,11 +20,16 @@ namespace Jose
         }
     }
 
-    class NestedDictionariesConverter : CustomCreationConverter<IDictionary<string, object>>
+    class NestedDictionariesConverter : CustomCreationConverter<object>
     {
-        public override IDictionary<string, object> Create(Type objectType)
+        public override object Create(Type objectType)
         {
-            return new Dictionary<string, object>();
+            if(objectType == typeof(IEnumerable<>))
+            {
+                return new List<object>();
+            }
+            
+            return new Dictionary<string, object>(); 
         }
 
         public override bool CanConvert(Type objectType)
@@ -39,7 +44,19 @@ namespace Jose
         {
             if (reader.TokenType == JsonToken.StartObject
                 || reader.TokenType == JsonToken.Null)
+            {
                 return base.ReadJson(reader, objectType, existingValue, serializer);
+            }
+
+            if (reader.TokenType == JsonToken.StartArray)
+            {
+                return base.ReadJson(reader, typeof(IEnumerable<>), existingValue, serializer);
+            }
+
+            if (reader.TokenType == JsonToken.Integer)
+            {
+                return Convert.ToInt32(reader.Value);
+            }
 
             // if the next token is not an object
             // then fall back on standard deserializer (strings, numbers etc.)

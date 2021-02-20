@@ -84,6 +84,7 @@
     <Compile Include="DictionariesTest.cs" />
     <Compile Include="jwe\JWCryptoTest.cs" />
     <Compile Include="jwe\JweTest.cs" />
+    <Compile Include="jwe\JweTokenTest.cs" />
     <Compile Include="SecurityVulnerabilitiesTest.cs" />
     <Compile Include="SettingsTest.cs" />
     <Compile Include="TestConsole.cs" />

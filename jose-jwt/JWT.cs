@@ -1,4 +1,4 @@
-using Jose.Jwe;
+using Jose;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -94,7 +94,7 @@ namespace Jose
         /// <returns>unmarshalled headers</returns>        
         public static IDictionary<string, object> Headers(string token, JwtSettings settings = null)
         {
-            return Headers<IDictionary<string, object>>(token, settings);
+            return (IDictionary<string, object>)Headers<object>(token, settings);
         }
 
         /// <summary>
@@ -282,7 +282,7 @@ namespace Jose
             if (!jwtOptions.EncodePayload)
             {
                 jwtHeader["b64"] = false;
-                jwtHeader["crit"] = Collections.Union(new[] {"b64"}, Dictionaries.Get(extraHeaders, "crit"));
+                jwtHeader["crit"] = Collections.Union(new[] {"b64"}, Dictionaries.Get<object>(extraHeaders, "crit"));
             }
 
             Dictionaries.Append(jwtHeader, extraHeaders);

@@ -1,4 +1,4 @@
-﻿namespace Jose.Jwe
+﻿namespace Jose
 {
     public interface IJweAlgorithm
     {

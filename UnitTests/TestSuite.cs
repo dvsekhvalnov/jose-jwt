@@ -7,7 +7,6 @@ using System.Text;
 using Jose;
 using Jose.keys;
 using Xunit;
-using Jose.Jwe;
 #if NETCOREAPP
 using Newtonsoft.Json.Linq;
 #endif //NETCOREAPP
@@ -2325,20 +2324,24 @@ namespace UnitTests
             Assert.Equal(Jose.JWT.Decode(token, aes512Key), json);
         }
 
-        [Fact]
+	[Fact]
         public void Headers()
         {
             //given
             string token =
-                "eyJhbGciOiJIUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.chIoYWrQMA8XL5nFz6oLDJyvgHk2KA4BrFGrKymjC8E";
+                "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJwMmMiOjgxOTIsInAycyI6Ik5rWGppMTk0N2ZSc0tUbEIiLCJlbmMiOiJBMjU2R0NNIiwiZXhwIjoxMzYzMjg0MDAwLCJjcml0IjpbImV4cCJdfQ.24Im9mr5z0o6I8wlHNrAN-UpTvaCPvl7PwIeKp-w-WalNbo1A4MiqQ.GDmmMnvEIXH_Gzql.HtyJQWcZOC66MBpSoip6yVc2SM77UnJN1fIIBCySBiactWAeZNqTESixX93rEm3LQEk7Ah24ZGXKaMInalkU2NNb1G8F2hUr6XZDYd6LTsc1gjC0vg3Iec_mdHbbTN0jhaMkwdNmNlIwU49TT1ZPDbwtVJfLZiDQTDBWhkJY3FOP0acNkWiGxXyYB6KUTwNGAPEqurRhPkspbGB2oumR7qkQKh7s4Ku_0Si9zAEg1kQ-s3cmB1qkXgUh8iyt-pS1o28r4g.vT7TJ7TEWlyR94tSo9gb9A";
 
             //when
             var test = Jose.JWT.Headers(token);
 
             //then
-            Assert.Equal(test.Count, 2);
-            Assert.Equal(test["alg"], "HS256");
-            Assert.Equal(test["cty"], "text/plain");
+            Assert.Equal(test.Count, 6);
+            Assert.Equal(test["alg"], "PBES2-HS256+A128KW");
+            Assert.Equal(test["enc"], "A256GCM");
+            Assert.Equal(test["p2c"], 8192);
+            Assert.Equal(test["p2s"], "NkXji1947fRsKTlB");
+            Assert.Equal(test["exp"], 1363284000);
+            Assert.Equal(test["crit"], new[] { "exp"});
         }
 
         [Fact]
@@ -2508,12 +2511,13 @@ namespace UnitTests
 
             //then
             var tokenHeaders = Jose.JWT.Headers(token);
-
-#if NETCOREAPP
-            Assert.Equal(tokenHeaders["crit"], new JArray(new [] {"b64", "exp"}));
-#else
-            throw new NotImplementedException("Test not currently implemented on net461 - has hard dependency on Newtonsoft");
-#endif
+	    Assert.Equal(tokenHeaders["crit"], new [] {"b64", "exp"});	    
+/*	    List crit = (List)tokenHeaders["crit"];
+	    Assert.Collection(crit,
+                item => Assert.Equal("b64", item),
+                item => Assert.Equal("exp", item)
+            );
+*/
         }
 
         [Fact]

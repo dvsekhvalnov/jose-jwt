@@ -25,7 +25,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;NET46</DefineConstants>
+    <DefineConstants>TRACE;NET461</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -65,8 +65,7 @@
     <Compile Include="jwe\AesGcmEncryption.cs" />
     <Compile Include="jwe\IJweAlgorithm.cs" />
     <Compile Include="jwe\JWE.cs" />
-    <Compile Include="jwe\JweJson.cs" />
-    <Compile Include="jwe\ParsedJwe.cs" />
+    <Compile Include="jwe\JweToken.cs" />
     <Compile Include="jws\EcdsaUsingSha.cs" />
     <Compile Include="jws\HmacUsingSha.cs" />
     <Compile Include="jws\IJwsAlgorithm.cs" />

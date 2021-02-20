@@ -1,4 +1,4 @@
-﻿namespace Jose.Jwe
+﻿namespace Jose
 {
     using System;
     using System.Collections.Generic;
@@ -194,7 +194,7 @@
 
             settings = GetSettings(settings);
 
-            ParsedJwe parsedJwe = ParsedJwe.Parse(jwe, settings);
+            JweToken parsedJwe = JweToken.FromString(jwe, settings.JsonMapper);
 
             IDictionary<string, object> protectedHeader = settings.JsonMapper.Parse<Dictionary<string, object>>(
                 Encoding.UTF8.GetString(parsedJwe.ProtectedHeaderBytes));
@@ -202,50 +202,44 @@
             if(protectedHeader==null && parsedJwe.Encoding == SerializationMode.Compact)
             {
                 throw new JoseException(string.Format("Protected header was missing but required with compact encoding."));
-            }
-
-            IJweAlgorithm enc = null;
-
-            var algMatchingRecipients = parsedJwe.Recipients.Select(r =>
-            {
-                try
-                {
-                    var joseHeader = Dictionaries.MergeHeaders(protectedHeader, parsedJwe.UnprotectedHeader, r.Header);
-
-                    return new
-                    {
-                        JoseHeader = joseHeader,
-                        HeaderAlg = settings.JwaAlgorithmFromHeader((string)joseHeader["alg"]),
-                        EncryptedCek = r.EncryptedCek,
-                    };
-                }
-                catch(ArgumentException)
-                {
-                    throw new JoseException("Invalid JWE data, duplicate header keys found between protected, unprotected and recipient headers");
-                }                
-            })
-            .Where(r => (expectedJweAlg == null || expectedJweAlg == r.HeaderAlg));
-
-            if (!algMatchingRecipients.Any())
-            {
-                throw new InvalidAlgorithmException("The algorithm type passed to the Decrypt method did not match the algorithm type in the header.");
-            }
+            }            
 
             var exceptions = new List<Exception>();
 
-            foreach (var recipient in algMatchingRecipients)
+            foreach (var recipient in parsedJwe.Recipients)
             {
-                IKeyManagement keys = settings.Jwa(recipient.HeaderAlg);
+                IDictionary<string, object> joseHeader;
+
+                try
+                {
+                    joseHeader = Dictionaries.MergeHeaders(protectedHeader, parsedJwe.UnprotectedHeader, recipient.Header);                    
+                }
+                catch (ArgumentException)
+                {
+                    throw new JoseException("Invalid JWE data, duplicate header keys found between protected, unprotected and recipient headers");
+                }
+
+
+                var headerAlg = settings.JwaAlgorithmFromHeader((string)joseHeader["alg"]);
+                var encryptedCek = recipient.EncryptedCek;
+
+                // skip recipient if asked to do strict validation
+                if(expectedJweAlg != null && expectedJweAlg != headerAlg)
+                {
+                    continue;
+                }
+
+                IKeyManagement keys = settings.Jwa(headerAlg);
 
                 if (keys == null)
                 {
-                    throw new JoseException(string.Format("Unsupported JWA algorithm requested: {0}", recipient.HeaderAlg));
+                    throw new JoseException(string.Format("Unsupported JWA algorithm requested: {0}", headerAlg));
                 }
 
                 try
                 {
-                    JweEncryption headerEnc = settings.JweAlgorithmFromHeader((string)recipient.JoseHeader["enc"]);
-                    enc = settings.Jwe(headerEnc);
+                    JweEncryption headerEnc = settings.JweAlgorithmFromHeader((string)joseHeader["enc"]);
+                    IJweAlgorithm enc = settings.Jwe(headerEnc);
 
                     if (enc == null)
                     {
@@ -258,7 +252,7 @@
                     }
 
 
-                    byte[] cek = keys.Unwrap(recipient.EncryptedCek, key, enc.KeySize, recipient.JoseHeader);
+                    byte[] cek = keys.Unwrap(recipient.EncryptedCek, key, enc.KeySize, joseHeader);
                     byte[] asciiEncodedProtectedHeader = Encoding.ASCII.GetBytes(Base64Url.Encode(parsedJwe.ProtectedHeaderBytes));
 
                     byte[] aad = parsedJwe.Aad == null ? 
@@ -267,13 +261,13 @@
 
                     byte[] plaintext = enc.Decrypt(aad, cek, parsedJwe.Iv, parsedJwe.Ciphertext, parsedJwe.AuthTag);
 
-                    if (recipient.JoseHeader.TryGetValue("zip", out var compressionAlg))
+                    if (joseHeader.TryGetValue("zip", out var compressionAlg))
                     {
                         var compression = settings.Compression((string)compressionAlg);
 
                         plaintext = compression.Decompress(plaintext);
                     }
-                    return (Plaintext: plaintext, JoseHeaders: recipient.JoseHeader, Aad: parsedJwe.Aad);
+                    return (Plaintext: plaintext, JoseHeaders: joseHeader, Aad: parsedJwe.Aad);
                 }
                 catch (ArgumentException ex)
                 {
@@ -285,6 +279,13 @@
                 }
             }
 
+            // nobody was eligable for decryption
+            if(exceptions.Count == 0)
+            {
+                throw new InvalidAlgorithmException("The algorithm type passed to the Decrypt method did not match the algorithm type in the header.");
+            }
+
+            // decryption failed
             if (exceptions.Select(e => (e.GetType(), e.Message)).Distinct().Count() == 1)
             {
                 // throw the first
@@ -311,12 +312,13 @@
         {
             settings = GetSettings(settings);
             
-            var parsedJwe = ParsedJwe.Parse(jwe, settings);           
+            var parsedJwe = JweToken.FromString(jwe, settings.JsonMapper);           
 
             var protectedHeaders = settings.JsonMapper.Parse<Dictionary<string, object>>(
                 Encoding.UTF8.GetString(parsedJwe.ProtectedHeaderBytes));
 
             var ret = new List<IDictionary<string, object>>();
+
             foreach(var recipient in parsedJwe.Recipients)
             {
                 ret.Add(Dictionaries.MergeHeaders(protectedHeaders, parsedJwe.UnprotectedHeader, recipient.Header));

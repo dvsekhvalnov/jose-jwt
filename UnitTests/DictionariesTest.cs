@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Jose;
 using Xunit;
@@ -43,12 +42,14 @@ namespace UnitTests
         public void Get()
         {
             //given
-            var src = new Dictionary<string, string> { { "one", "1" }, { "two", "2" } };
+            var src = new Dictionary<string, object> { { "one", "1" }, { "two", 2 }, { "four", new double[] { 4.1, 4.2, 4.3 } } };
 
             //then
-            Assert.Equal(Dictionaries.Get(src, "one"), "1");
-            Assert.Equal(Dictionaries.Get(src, "two"), "2");
-            Assert.Null(Dictionaries.Get(src, "three"));
+            Assert.Equal(Dictionaries.Get<string>(src, "one"), "1");
+            Assert.Equal(Dictionaries.Get<int>(src, "two"), 2);
+            Assert.Equal(Dictionaries.Get<double[]>(src, "four"), new double[] { 4.1, 4.2, 4.3 });
+            Assert.Null(Dictionaries.Get<string>(src, "three"));
+            Assert.Null(Dictionaries.Get<string>(null, "one"));
         }
 
         [Fact]
@@ -116,8 +117,8 @@ namespace UnitTests
 
             //then
             Assert.NotNull(exception);
-            Assert.IsType<ArgumentException>(exception);
+            Assert.IsType<System.ArgumentException>(exception);
             Assert.StartsWith("An item with the same key has already been added.", exception.Message);
-        }
+        }       
     }
 }

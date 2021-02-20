@@ -24,12 +24,16 @@ namespace Jose
         /// <summary>
         /// Syntax sugar for IDictionary.TryGetValue() to lookup unknown keys.
         /// </summary>
-        public static V Get<K, V>(IDictionary<K, V> src, K key)
+        public static V Get<V>(IDictionary<string, object> src, string key)
         {
-            V value;
-            src.TryGetValue(key, out value);
+            if(src==null)
+            {
+                return default;
+            }
 
-            return value;
+            object value;
+
+            return src.TryGetValue(key, out value) ? (V)value : default;
         }
 
         /// <summary>

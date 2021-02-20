@@ -6,7 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace UnitTests.jwe
+namespace UnitTests
 {
     public class JWCryptoTest
     {
@@ -24,7 +24,7 @@ namespace UnitTests.jwe
         {
             var token = @"{""ciphertext"":""tzh1xXdNDke99sLmZEnmYw"",""encrypted_key"":""DNszn45AFTiUAWsPeLi-AZd4oSkUKLK95FrRMpDv9qEe9TIA6QOPezOh7NrOzTXa8AdrbnDRQJwO7S_0i4p5xQrEukjkzelD"",""header"":{""alg"":""A256KW"",""enc"":""A256CBC-HS512""},""iv"":""480QxkaQPCiaEmxJFPxgsg"",""tag"":""dHeG5UCb4nCSbysUKva_4I_Z4D2WfYUaeasxOsJXTYg""}";
 
-            var payload = Jose.Jwe.JWE.Decrypt(token, sharedKey);
+            var payload = Jose.JWE.Decrypt(token, sharedKey);
 
             Assert.Equal("Hello World", System.Text.Encoding.UTF8.GetString(payload.Plaintext));
 
@@ -59,7 +59,7 @@ namespace UnitTests.jwe
 	            ""tag"": ""9UFM1EdyzU3ExyrtLaWaQg""
             }";
 
-            var firstRecipient = Jose.Jwe.JWE.Decrypt(token, sharedKey);
+            var firstRecipient = Jose.JWE.Decrypt(token, sharedKey);
 
             Assert.Equal("Hello World", System.Text.Encoding.UTF8.GetString(firstRecipient.Plaintext));
 
@@ -67,7 +67,7 @@ namespace UnitTests.jwe
             Assert.Equal(firstRecipient.JoseHeaders["enc"], "A256GCM");
             Assert.Equal(firstRecipient.JoseHeaders["alg"], "A256KW");
 
-            var secondRecipient = Jose.Jwe.JWE.Decrypt(token, PrivKey());
+            var secondRecipient = Jose.JWE.Decrypt(token, PrivKey());
 
             Assert.Equal("Hello World", System.Text.Encoding.UTF8.GetString(secondRecipient.Plaintext));
 
@@ -102,7 +102,7 @@ namespace UnitTests.jwe
 	            ""tag"": ""q_8tx6Ud3q-X1K6NKaYF_qfUriicAm8M4eRX7H75N04""
             }";
 
-            var firstRecipient = Jose.Jwe.JWE.Decrypt(token, sharedKey);
+            var firstRecipient = Jose.JWE.Decrypt(token, sharedKey);
 
             Assert.Equal("Hello World", System.Text.Encoding.UTF8.GetString(firstRecipient.Plaintext));
 
@@ -111,7 +111,7 @@ namespace UnitTests.jwe
             Assert.Equal(firstRecipient.JoseHeaders["typ"], "JWE");
             Assert.Equal(firstRecipient.JoseHeaders["alg"], "A256KW");
             
-            var secondRecipient = Jose.Jwe.JWE.Decrypt(token, PrivKey());
+            var secondRecipient = Jose.JWE.Decrypt(token, PrivKey());
 
             Assert.Equal("Hello World", System.Text.Encoding.UTF8.GetString(secondRecipient.Plaintext));
 
@@ -157,7 +157,7 @@ namespace UnitTests.jwe
 	            }
             }";
 
-            var firstRecipient = Jose.Jwe.JWE.Decrypt(token, "secret");
+            var firstRecipient = Jose.JWE.Decrypt(token, "secret");
 
             Assert.Equal("Hello World", System.Text.Encoding.UTF8.GetString(firstRecipient.Plaintext));
 
@@ -168,7 +168,7 @@ namespace UnitTests.jwe
             Assert.Equal(firstRecipient.JoseHeaders["p2c"], 8192);
             Assert.Equal(firstRecipient.JoseHeaders["p2s"], "C5Hn0y-ho1mwygXPVfDynQ");
 
-            var secondRecipient = Jose.Jwe.JWE.Decrypt(token, Ecc256Private());
+            var secondRecipient = Jose.JWE.Decrypt(token, Ecc256Private());
 
             Assert.Equal("Hello World", System.Text.Encoding.UTF8.GetString(secondRecipient.Plaintext));
 
@@ -213,7 +213,7 @@ namespace UnitTests.jwe
             }";            
 
             //then
-            Assert.Throws<JoseException>(() => Jose.Jwe.JWE.Decrypt(token, sharedKey));
+            Assert.Throws<JoseException>(() => Jose.JWE.Decrypt(token, sharedKey));
         }
 
         [Fact]
@@ -253,7 +253,7 @@ namespace UnitTests.jwe
 	            }
             }";
             //then
-            Assert.Throws<JoseException>(() => Jose.Jwe.JWE.Decrypt(token, sharedKey));
+            Assert.Throws<JoseException>(() => Jose.JWE.Decrypt(token, sharedKey));
         }
 
 		[Fact]
@@ -293,7 +293,7 @@ namespace UnitTests.jwe
 	            }
             }";
 			//then
-			Assert.Throws<JoseException>(() => Jose.Jwe.JWE.Decrypt(token, Ecc256Private()));
+			Assert.Throws<JoseException>(() => Jose.JWE.Decrypt(token, Ecc256Private()));
 		}
 
 		private static RSA PrivKey()

@@ -4,7 +4,6 @@ using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using Jose.keys;
 using Jose;
-using Jose.Jwe;
 using Xunit;
 
 namespace UnitTests
