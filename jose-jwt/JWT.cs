@@ -217,7 +217,7 @@ namespace Jose
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
         public static string EncodeBytes(byte[] payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
         {
-            return JWE.Encrypt(payload, new Recipient[] { new Recipient(alg, key) }, enc, aad: null, SerializationMode.Compact, compression, extraHeaders, settings);                
+            return JWE.EncryptBytes(payload, new Recipient[] { new Recipient(alg, key) }, enc, aad: null, SerializationMode.Compact, compression, extraHeaders, null, settings);                
         }
 
         /// <summary>

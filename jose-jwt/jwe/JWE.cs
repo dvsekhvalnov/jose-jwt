@@ -37,6 +37,11 @@
     /// </summary>
     public class JWE
     {
+        public static string Encrypt(string plaintext, IEnumerable<Recipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Compact, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
+        {
+            return EncryptBytes(Encoding.UTF8.GetBytes(plaintext), recipients, enc, aad, mode, compression, extraProtectedHeaders, unprotectedHeaders, settings);
+        }
+
         /// <summary>
         /// Encrypts given plaintext using JWE and applies requested encryption/compression algorithms.
         /// </summary>
@@ -45,10 +50,10 @@
         /// <param name="enc">encryption algorithm to be used to encrypt the plaintext.</param>
         /// <param name="mode">serialization mode to use. Note only one recipient can be specified for compact and flattened json serialization.</param>
         /// <param name="compression">optional compression type to use.</param>
-        /// <param name="extraHeaders">optional extra headers to put in the JoseProtectedHeader.</param>
+        /// <param name="extraProtectedHeaders">optional extra headers to put in the JoseProtectedHeader.</param>
         /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
-        public static string Encrypt(byte[] plaintext, IEnumerable<Recipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Compact, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
+        public static string EncryptBytes(byte[] plaintext, IEnumerable<Recipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Compact, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
         {
             if (plaintext == null)
             {
@@ -65,7 +70,7 @@
 
             IDictionary<string, object> joseProtectedHeader = Dictionaries.MergeHeaders(
                 new Dictionary<string, object> { { "enc", settings.JweHeaderValue(enc) } },
-                extraHeaders);
+                extraProtectedHeaders);
 
             byte[] cek = null;
 
@@ -85,7 +90,9 @@
                 IDictionary<string, object> joseHeader = Dictionaries.MergeHeaders(
                     joseProtectedHeader,
                     new Dictionary<string, object> { { "alg", settings.JwaHeaderValue(recipient.Alg) } },
-                    recipient.PerRecipientHeaders);
+                    recipient.PerRecipientHeaders,
+                    unprotectedHeaders
+                    );
 
                 byte[] encryptedCek;
                 if(cek == null)
@@ -99,9 +106,14 @@
                     encryptedCek = keys.WrapKey(cek, recipient.Key, joseHeader);
                 }
 
-                // For the per-receipient header we want the headers from the result of IKeyManagements key wrapping.. but without the
-                // protected headers that were merged in
-                IDictionary<string, object> recipientHeader = joseHeader.Except(joseProtectedHeader).ToDictionary(x => x.Key, v => v.Value);
+                // For the per-receipient header we want the headers from the result of IKeyManagements key wrapping but without the
+                // shared headers
+                IDictionary<string, object> recipientHeader = joseHeader
+                    .Where(
+                        kvp => !joseProtectedHeader.ContainsKey(kvp.Key) && 
+                        (unprotectedHeaders==null || !unprotectedHeaders.ContainsKey(kvp.Key))
+                    )                                                                       
+                   .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
                 recipientsOut.Add((EncryptedKey: encryptedCek, Header: recipientHeader));
             }
@@ -150,9 +162,15 @@
                             { "ciphertext", Base64Url.Encode(encParts[1]) },
                             { "tag" , Base64Url.Encode(encParts[2]) },
                         };
+
                         if (aad != null)
                         {
                             toSerialize["aad"] = Base64Url.Encode(aad);
+                        }
+
+                        if (unprotectedHeaders != null)
+                        {
+                            toSerialize["unprotected"] = unprotectedHeaders;
                         }
                         
                         if (recipientsOut.Count == 1)

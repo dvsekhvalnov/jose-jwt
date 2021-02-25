@@ -39,12 +39,12 @@ namespace UnitTests
             };
 
             //when
-            var jwe = JWE.Encrypt(
+            var jwe = JWE.EncryptBytes(
                 plaintext: payload,
                 recipients: recipients,
                 JweEncryption.A256GCM,
                 mode: mode,
-                extraHeaders: sharedProtectedHeaders);
+                extraProtectedHeaders: sharedProtectedHeaders);
 
             var decrypted = JWE.Decrypt(jwe, aes256KWKey1);
 
@@ -80,12 +80,12 @@ namespace UnitTests
             };
 
             //when
-            var jwe = JWE.Encrypt(
+            var jwe = JWE.EncryptBytes(
                 plaintext: payload,
                 recipients: recipients,
                 JweEncryption.A256GCM,
                 mode: SerializationMode.Json,
-                extraHeaders: sharedProtectedHeaders);
+                extraProtectedHeaders: sharedProtectedHeaders);
 
             var decrypted = JWE.Decrypt(jwe, decryptKey);
 
@@ -112,12 +112,12 @@ namespace UnitTests
             {
                 { "cty", "application/octet-string"},
             };
-            var jwe = JWE.Encrypt(
+            var jwe = JWE.EncryptBytes(
                 plaintext: payload,
                 recipients: recipients,
                 JweEncryption.A256GCM,
                 mode: SerializationMode.Json,
-                extraHeaders: sharedProtectedHeaders);
+                extraProtectedHeaders: sharedProtectedHeaders);
 
             //when
             var exception = Record.Exception(() => JWE.Decrypt(jwe, aes256KWKey2, expectedJweAlg, expectedJweEnc));
@@ -144,12 +144,12 @@ namespace UnitTests
             {
                 { "cty", "application/octet-string"},
             };
-            var jwe = JWE.Encrypt(
+            var jwe = JWE.EncryptBytes(
                 plaintext: payload,
                 recipients: recipients,
                 JweEncryption.A256GCM,
                 mode: SerializationMode.Json,
-                extraHeaders: sharedProtectedHeaders);
+                extraProtectedHeaders: sharedProtectedHeaders);
 
             //when
             var exception = Record.Exception(() => { JWE.Decrypt(jwe, aes256KWKey3); });
@@ -172,7 +172,7 @@ namespace UnitTests
             };
 
             //when
-            var exception = Record.Exception(() => JWE.Encrypt(
+            var exception = Record.Exception(() => JWE.EncryptBytes(
                 plaintext: plaintext,
                 recipients: recipients,
                 JweEncryption.A256GCM,
@@ -190,7 +190,7 @@ namespace UnitTests
             byte[] plaintext = { };
 
             //when
-            var jwe = JWE.Encrypt(
+            var jwe = JWE.EncryptBytes(
                 plaintext: plaintext,
                 recipients: new Recipient[] { recipientAes128KW },
                 JweEncryption.A128CBC_HS256);
@@ -219,7 +219,7 @@ namespace UnitTests
             byte[] plaintext = { };
 
             //when
-            var jwe = JWE.Encrypt(
+            var jwe = JWE.EncryptBytes(
                 plaintext: plaintext,
                 recipients: new Recipient[] { recipientAes128KW, recipientAes128KW },
                 JweEncryption.A128CBC_HS256,
@@ -256,7 +256,7 @@ namespace UnitTests
             byte[] plaintext = { };
 
             //when
-            var jwe = JWE.Encrypt(
+            var jwe = JWE.EncryptBytes(
                 plaintext: plaintext,
                 recipients: new Recipient[] { recipientAes128KW },
                 JweEncryption.A128CBC_HS256,
@@ -330,7 +330,7 @@ namespace UnitTests
             var key = GetLegacyKeyObjectFromJwk(new JsonWebKey(Rfc7520_5_8_1_Figure151_ExampleJwk));            
 
             //when
-            var jwe = JWE.Encrypt(
+            var jwe = JWE.EncryptBytes(
                 UTF8Encoding.UTF8.GetBytes(Rfc7520_Figure72_ExamplePlaintext),
                 new Recipient[] { new Recipient(JweAlgorithm.A128KW, key) },
                 JweEncryption.A128CBC_HS256,
@@ -353,7 +353,7 @@ namespace UnitTests
             var plaintext = Rfc7520_Figure72_ExamplePlaintext;
 
             //when
-            var jwe = JWE.Encrypt(
+            var jwe = JWE.EncryptBytes(
                 UTF8Encoding.UTF8.GetBytes(Rfc7520_Figure72_ExamplePlaintext),
                 new Recipient[] { new Recipient(JweAlgorithm.A128KW, key) },
                 JweEncryption.A128CBC_HS256,
@@ -424,7 +424,7 @@ namespace UnitTests
             byte[] plaintext = { };
 
             //when
-            var exception = Record.Exception(() => JWE.Encrypt(
+            var exception = Record.Exception(() => JWE.EncryptBytes(
                 plaintext: plaintext,
                 recipients: recipients,
                 JweEncryption.A128CBC_HS256,
@@ -456,7 +456,7 @@ namespace UnitTests
             byte[] plaintext = { };
 
             //when
-            var exception = Record.Exception(() => JWE.Encrypt(
+            var exception = Record.Exception(() => JWE.EncryptBytes(
                 plaintext: plaintext,
                 recipients: new Recipient[]
                 {
@@ -471,7 +471,7 @@ namespace UnitTests
                 },
                 JweEncryption.A128CBC_HS256,
                 mode: SerializationMode.Json,
-                extraHeaders: new Dictionary<string, object>
+                extraProtectedHeaders: new Dictionary<string, object>
                 {
                     { "cty", "text/plain" },
                     { "example.com:extra_header", "another value" },
@@ -498,7 +498,7 @@ namespace UnitTests
             byte[] plaintext = { };
 
             //when
-            var exception = Record.Exception(() => JWE.Encrypt(
+            var exception = Record.Exception(() => JWE.EncryptBytes(
                 plaintext: plaintext,
                 recipients: new Recipient[]
                 {
@@ -514,7 +514,7 @@ namespace UnitTests
                 },
                 JweEncryption.A128CBC_HS256,
                 mode: SerializationMode.Json,
-                extraHeaders: new Dictionary<string, object>
+                extraProtectedHeaders: new Dictionary<string, object>
                 {
                     { "cty", "text/plain" },
                     { "example.com:extra_header", "another value" },
@@ -531,7 +531,7 @@ namespace UnitTests
         {
             //given
             byte[] plaintext = { };
-            var jwe = JWE.Encrypt(
+            var jwe = JWE.EncryptBytes(
                 plaintext: plaintext,
                 recipients: new Recipient[] { recipientAes128KW },
                 JweEncryption.A128CBC_HS256,

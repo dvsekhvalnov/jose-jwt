@@ -1,8 +1,11 @@
 ﻿using Jose;
 using Jose.keys;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -81,26 +84,26 @@ namespace UnitTests
         public void DecodeMultipleRecipientsWithProtectedHeader()
         {
             var token = @"{
-	            ""ciphertext"": ""hPHYxxZWLWxI5g224mPnAA"",
-	            ""iv"": ""r_DCANXTkVo1TEwkd-Cx1w"",
-	            ""protected"": ""eyJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwidHlwIjoiSldFIn0"",
-	            ""recipients"": [
-		            {
-			            ""encrypted_key"": ""KqEaCvRWCxZW9kG3eaf4ekL1nf5YWjv_m96QVjOaSV0H5O1lORQkDCkuNrWYwHLMGAEgXSaGGRXFIdFuG68zgVQJ5u1I7Ona"",
-			            ""header"": {
-				            ""alg"": ""A256KW""
-			            }
-		            },
-		            {
-			            ""encrypted_key"": ""EYPZerMlLRu0LU1yfNiNNnl92Stz36hzM-NMNiBHmBLyysg6JTOi8PB2QOh4FUKO-YWpq80iacMiUniGmEnRrK8x4n4_acYADtj_36aKf5guJ3XOWjpm8BfTRtLJ-D7OlrDlLnn23pQHYlYHAXZMEky1JRbUbpt-1Jf1raHUUZIxSS2s2aZxkxpQR8lgfId3aPwzGdIqPWgWvKsNtR510E8RSKJVatNL5uGwDDo1F5gpxIThdUcNAAoINaBlpbBUWQvefRAQYzOT25jcmCuNQmKMPJrhsZZpyC4QVvjJ5nXqi027xHKelOIaUkpliPFmnq2rFp0RDFe_Kcq7_hk86A"",
-			            ""header"": {
-				            ""alg"": ""RSA-OAEP-256"",
-				            ""kid"": ""Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc""
-			            }
-		            }
-	            ],
-	            ""tag"": ""q_8tx6Ud3q-X1K6NKaYF_qfUriicAm8M4eRX7H75N04""
-            }";
+				""ciphertext"": ""gVZ-iyqX3o8xlFzZD3e58g"",
+				""iv"": ""iv7cQBIEzM5Jdvt1nakgvw"",
+				""protected"": ""eyJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwidHlwIjoiSldFIn0"",
+				""recipients"": [
+					{
+						""encrypted_key"": ""5xCobIXzGwDTSITcStYvDc8C636p4i4PjHsvfTCD2yaHjXuA-0YDxRj6tPDTn2rkhnRII3hhDC6XO0b_ir-OZ2FWKr01nC3a"",
+						""header"": {
+							""alg"": ""A256KW""
+						}
+					},
+					{
+						""encrypted_key"": ""Vx6HmM8aoem03w67iQOGiBI2B-thcLwVIZWLZavwDWRub3yZNTHlsM0FNGXhX9qhenJ-3eIBbsAwQnbdkBQaOugxHANp-xoYbWqq1FXcHiaQSRs9K1vCd-xgyJbNuqJHD3h1gEupIoxCJNAu6dypzrUcC_nLX8L6Y-H4ST_18bPFfSMbD3YatvS9k879NJzru_gigvaoyCrwW0LD1Fry05cPEl9hkyiKpnr63MmOVfGHYQvqO_xAKq02w5-LcYmuloPfpFOZEAoF3OB_4zKAcEEhEmRujSvIPrsaG3mJiRRchryiRSt5TIDO_gOkaySGQ8JFULt8zK_k5Sl0SdhZ-Q"",
+						""header"": {
+							""alg"": ""RSA-OAEP-256"",
+							""kid"": ""Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc""
+						}
+					}
+				],
+				""tag"": ""UxOqwzlsIQsbR3W0nin1EAtez0MMgJbuNr2ZjCtmMIE""
+			}";
 
             var firstRecipient = Jose.JWE.Decrypt(token, sharedKey);
 
@@ -125,37 +128,37 @@ namespace UnitTests
         [Fact]
         public void DecodeMultipleRecipientsWithUnprotectedHeader()
         {
-            var token = @"{
-	            ""ciphertext"": ""z95vPJ_gXxejpFsno9EBCQ"",
-	            ""iv"": ""jGdsbNjl-_uHT4V86MdFBA"",
-	            ""protected"": ""eyJ0eXAiOiJKV0UifQ"",
-	            ""recipients"": [
-		            {
-			            ""encrypted_key"": ""Kpr6FHWViJNnGCuDEEl27dsCiyWHRjiYuB2dOque06oqJZGVYgu9yif0L6OKd9gWvltrGJdo_byafGF5lwIvcl6ZGCNfRF3s"",
-			            ""header"": {
-				            ""alg"": ""PBES2-HS256+A128KW"",
-				            ""p2c"": 8192,
-				            ""p2s"": ""C5Hn0y-ho1mwygXPVfDynQ""
-			            }
-		            },
-		            {
-			            ""encrypted_key"": ""VuzPor1OEenPP-w0qg__uGS0w4h6Yt7K2ZHtzjqj0mnAzhNzTHumYFjaivk0dUwk1H2jxieEO9FYdC48BOMMjMcylnVGTgAV"",
-			            ""header"": {
-				            ""alg"": ""ECDH-ES+A128KW"",
-				            ""epk"": {
-					            ""crv"": ""P-256"",
-					            ""kty"": ""EC"",
-					            ""x"": ""LqM-HYhs3GcIPKRdiR2R7CuPx-aPVwBohgzP9l2WdfA"",
-					            ""y"": ""0hP45SduS8HPQaZ8RAyikZTuvYCjKaknhcCSVK_tIIY""
-				            }
-			            }
-		            }
-	            ],
-	            ""tag"": ""cbKJYp4ZRWWPWVHDyL2vuUjAZ3oAHXT1I75t1j9rCKI"",
-	            ""unprotected"": {
-		            ""enc"": ""A256CBC-HS512""
-	            }
-            }";
+			var token = @"{
+				""ciphertext"": ""wnecd9ceRDb0PqFdvNkjUw"",
+				""iv"": ""d-F9AVZ7W6M5bWp45G_okw"",
+				""protected"": ""eyJ0eXAiOiJKV0UifQ"",
+				""recipients"": [
+					{
+						""encrypted_key"": ""gk0a-lu_f588KjKomSl8v4ULeNEXktECpLWkTyxpmtFXMDyO-BtARt1fuBkFJsYqAwUNxz4uh1u4i3QCpKxdl01tZRW1yyxR"",
+						""header"": {
+							""alg"": ""PBES2-HS256+A128KW"",
+							""p2c"": 8192,
+							""p2s"": ""kpL8s71MjhPnBExCF-cIMA""
+						}
+					},
+					{
+						""encrypted_key"": ""WDt1HtoyK0lazAF84EBoL7OWtkCyKBEj2hG_QEgX0hx2QDAgFh7HGiR5NnnChFTwdpXIA-8tBDzhWFLd6aEU8w8sqjC4txoc"",
+						""header"": {
+							""alg"": ""ECDH-ES+A128KW"",
+							""epk"": {
+								""crv"": ""P-256"",
+								""kty"": ""EC"",
+								""x"": ""WOqJxZwzivLSO-r3qRkBVDd9uA_de_AIu3G3hkIQg1M"",
+								""y"": ""aFbCEl231v5IeA_Zjg8kMVJXxZWhpEHibtvHnq7Kk9k""
+							}
+						}
+					}
+				],
+				""tag"": ""zJxGA445Q4LBp4WAXo0vdCfD8ZdrWVLGRPkUH8Sv_6I"",
+				""unprotected"": {
+					""enc"": ""A256CBC-HS512""
+				}
+			}";
 
             var firstRecipient = Jose.JWE.Decrypt(token, "secret");
 
@@ -166,7 +169,7 @@ namespace UnitTests
             Assert.Equal(firstRecipient.JoseHeaders["typ"], "JWE");
             Assert.Equal(firstRecipient.JoseHeaders["alg"], "PBES2-HS256+A128KW");
             Assert.Equal(firstRecipient.JoseHeaders["p2c"], 8192);
-            Assert.Equal(firstRecipient.JoseHeaders["p2s"], "C5Hn0y-ho1mwygXPVfDynQ");
+            Assert.Equal(firstRecipient.JoseHeaders["p2s"], "kpL8s71MjhPnBExCF-cIMA");
 
             var secondRecipient = Jose.JWE.Decrypt(token, Ecc256Private());
 
@@ -182,8 +185,8 @@ namespace UnitTests
             Assert.Equal(epk.Count, 4);
             Assert.Equal(epk["crv"], "P-256");
             Assert.Equal(epk["kty"], "EC");
-            Assert.Equal(epk["x"], "LqM-HYhs3GcIPKRdiR2R7CuPx-aPVwBohgzP9l2WdfA");
-            Assert.Equal(epk["y"], "0hP45SduS8HPQaZ8RAyikZTuvYCjKaknhcCSVK_tIIY");
+            Assert.Equal(epk["x"], "WOqJxZwzivLSO-r3qRkBVDd9uA_de_AIu3G3hkIQg1M");
+            Assert.Equal(epk["y"], "aFbCEl231v5IeA_Zjg8kMVJXxZWhpEHibtvHnq7Kk9k");
         }
 
         [Fact]
@@ -296,6 +299,231 @@ namespace UnitTests
 			Assert.Throws<JoseException>(() => Jose.JWE.Decrypt(token, Ecc256Private()));
 		}
 
+		[Fact]
+		public void EncodeSingleRecipient()
+        {
+			var payload = "Hello World !";
+			Recipient r = new Recipient(JweAlgorithm.A256KW, sharedKey);
+
+			string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json);
+
+			Console.Out.WriteLine("[JSON][A256KW][A256GCM]: {0}", token);
+
+            JObject deserialized = JObject.Parse(token);
+
+			Assert.Equal("{\"enc\":\"A256GCM\"}",
+							 UTF8Encoding.UTF8.GetString(Base64Url.Decode((string)deserialized["protected"])));
+
+			Assert.True(deserialized["header"] is JObject);
+			Assert.Equal("{\"alg\":\"A256KW\"}", deserialized["header"].ToString(Newtonsoft.Json.Formatting.None));
+			Assert.Equal("A256KW", deserialized["header"]["alg"]);
+			Assert.Equal(54, ((string)deserialized["encrypted_key"]).Length); //CEK size
+			Assert.Equal(16, ((string)deserialized["iv"]).Length); //IV size
+			Assert.Equal(18, ((string)deserialized["ciphertext"]).Length); //cipher text size
+			Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
+
+
+			var decoded = JWE.Decrypt(token, sharedKey);
+			Assert.Equal(Encoding.UTF8.GetString(decoded.Plaintext), payload);
+		}
+		
+		[Fact]
+		public void EncodeMultipleRecipients()
+        {
+			var payload = "Hello World !";
+			Recipient r1 = new Recipient(JweAlgorithm.PBES2_HS256_A128KW, "secret");
+			Recipient r2 = new Recipient(JweAlgorithm.ECDH_ES_A128KW, Ecc256Public());
+			Recipient r3 = new Recipient(JweAlgorithm.RSA_OAEP_256, PubKey());
+
+			string token = JWE.Encrypt(payload, new[] { r1, r2, r3 }, JweEncryption.A256GCM, mode: SerializationMode.Json);
+
+			Console.Out.WriteLine("[JSON][PBES2_HS256_A128KW, ECDH-ES+A128KW, RSA_OAEP_256][A256GCM]: {0}", token);
+
+            JObject deserialized = JObject.Parse(token);
+
+            Assert.Equal("{\"enc\":\"A256GCM\"}",
+                             UTF8Encoding.UTF8.GetString(Base64Url.Decode((string)deserialized["protected"])));
+
+            
+            Assert.Equal(16, ((string)deserialized["iv"]).Length); //IV size
+            Assert.Equal(18, ((string)deserialized["ciphertext"]).Length); //cipher text size
+            Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
+
+			Assert.True(deserialized["recipients"] is JArray);
+			Assert.Equal(3, ((JArray)deserialized["recipients"]).Count);
+			var rec0 = ((JArray)deserialized["recipients"])[0];
+			var rec1 = ((JArray)deserialized["recipients"])[1];
+			var rec2 = ((JArray)deserialized["recipients"])[2];
+
+			Assert.True(rec0["header"] is JObject);			
+			Assert.Equal("PBES2-HS256+A128KW", rec0["header"]["alg"]);
+			Assert.Equal(8192, rec0["header"]["p2c"]);
+			Assert.Equal(16, ((string)rec0["header"]["p2s"]).Length);
+			Assert.Equal(54, ((string)rec0["encrypted_key"]).Length);
+
+			Assert.True(rec1["header"] is JObject);			
+			Assert.True(rec1["header"]["epk"] is JObject);			
+			Assert.Equal("ECDH-ES+A128KW", rec1["header"]["alg"]);
+			Assert.Equal("EC", rec1["header"]["epk"]["kty"]);
+			Assert.Equal("P-256", rec1["header"]["epk"]["crv"]);
+			Assert.Equal(43, ((string)rec1["header"]["epk"]["x"]).Length);
+			Assert.Equal(43, ((string)rec1["header"]["epk"]["y"]).Length);			
+			Assert.Equal(54, ((string)rec1["encrypted_key"]).Length);
+
+			Assert.True(rec2["header"] is JObject);
+			Assert.Equal("RSA-OAEP-256", rec2["header"]["alg"]);
+			Assert.Equal(342, ((string)rec2["encrypted_key"]).Length);
+
+			Assert.Equal(Encoding.UTF8.GetString(JWE.Decrypt(token, "secret").Plaintext), payload);
+			Assert.Equal(Encoding.UTF8.GetString(JWE.Decrypt(token, PrivKey()).Plaintext), payload);
+			Assert.Equal(Encoding.UTF8.GetString(JWE.Decrypt(token, Ecc256Private()).Plaintext), payload);
+		}
+		
+		[Fact]
+		public void EncodeUnprotectedHeader()
+        {
+			var payload = "Hello World !";
+			var unprotected = new Dictionary<string, object>
+			{
+				{ "jku", "https://server.example.com/keys.jwks" }
+			};
+
+			Recipient r = new Recipient(JweAlgorithm.RSA_OAEP_256, PubKey());
+
+			string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json, unprotectedHeaders: unprotected);
+
+			Console.Out.WriteLine("[JSON][RSA_OAEP_256][A256GCM]: {0}", token);
+
+            JObject deserialized = JObject.Parse(token);
+
+            Assert.Equal("{\"enc\":\"A256GCM\"}",
+                             UTF8Encoding.UTF8.GetString(Base64Url.Decode((string)deserialized["protected"])));
+
+			Assert.True(deserialized["header"] is JObject);
+			Assert.Equal("{\"alg\":\"RSA-OAEP-256\"}", deserialized["header"].ToString(Newtonsoft.Json.Formatting.None));
+
+			Assert.True(deserialized["unprotected"] is JObject);
+			Assert.Equal("{\"jku\":\"https://server.example.com/keys.jwks\"}", deserialized["unprotected"].ToString(Newtonsoft.Json.Formatting.None));
+
+			Assert.Equal(16, ((string)deserialized["iv"]).Length); //IV size
+            Assert.Equal(18, ((string)deserialized["ciphertext"]).Length); //cipher text size
+            Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
+			
+			Assert.Equal(Encoding.UTF8.GetString(JWE.Decrypt(token, PrivKey()).Plaintext), payload);
+		}
+
+		[Fact]
+		public void EncodeExtraProtectedHeaders()
+        {
+			var payload = "Hello World !";
+			var extra = new Dictionary<string, object>
+			{
+				{ "jku", "https://server.example.com/keys.jwks" }
+			};
+
+			Recipient r = new Recipient(JweAlgorithm.RSA_OAEP_256, PubKey());
+
+			string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json, extraProtectedHeaders: extra);
+
+			Console.Out.WriteLine("[JSON][RSA_OAEP_256][A256GCM]: {0}", token);
+
+            JObject deserialized = JObject.Parse(token);
+
+            Assert.Equal("{\"enc\":\"A256GCM\",\"jku\":\"https://server.example.com/keys.jwks\"}",
+                             UTF8Encoding.UTF8.GetString(Base64Url.Decode((string)deserialized["protected"])));
+
+			Assert.True(deserialized["header"] is JObject);
+			Assert.Equal("{\"alg\":\"RSA-OAEP-256\"}", deserialized["header"].ToString(Newtonsoft.Json.Formatting.None));
+
+			Assert.Equal(16, ((string)deserialized["iv"]).Length); //IV size
+            Assert.Equal(18, ((string)deserialized["ciphertext"]).Length); //cipher text size
+            Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
+			
+			Assert.Equal(Encoding.UTF8.GetString(JWE.Decrypt(token, PrivKey()).Plaintext), payload);
+		}
+
+		[Fact]
+		public void EncodeExtraRecipientHeaders()
+		{
+			var payload = "Hello World !";
+			var extra = new Dictionary<string, object>
+			{
+				{ "kid", "2011-04-29" }
+			};
+
+			Recipient r = new Recipient(JweAlgorithm.RSA_OAEP_256, PubKey(), perRecipientHeaders: extra);
+
+			string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json);
+
+			Console.Out.WriteLine("[JSON][RSA_OAEP_256][A256GCM]: {0}", token);
+
+			JObject deserialized = JObject.Parse(token);
+
+			Assert.Equal("{\"enc\":\"A256GCM\"}",
+							 UTF8Encoding.UTF8.GetString(Base64Url.Decode((string)deserialized["protected"])));
+
+			Assert.True(deserialized["header"] is JObject);
+			Assert.Equal("{\"alg\":\"RSA-OAEP-256\",\"kid\":\"2011-04-29\"}", deserialized["header"].ToString(Newtonsoft.Json.Formatting.None));
+
+			Assert.Equal(16, ((string)deserialized["iv"]).Length); //IV size
+			Assert.Equal(18, ((string)deserialized["ciphertext"]).Length); //cipher text size
+			Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
+
+			Assert.Equal(Encoding.UTF8.GetString(JWE.Decrypt(token, PrivKey()).Plaintext), payload);
+		}
+
+		[Fact]
+		public void EncodeDuplicateHeaders_Protected_PerRecipient()
+		{
+			var payload = "Hello World !";
+			var headers = new Dictionary<string, object>()
+			{
+				{ "enc", "A256GCM" }
+			};			
+
+			Recipient r = new Recipient(JweAlgorithm.RSA_OAEP_256, PubKey(), headers);			
+
+			//then
+			Assert.Throws<ArgumentException>(() => JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json));
+		}
+
+		[Fact]
+		public void EncodeDuplicateHeaders_Protected_Unprotected()
+		{
+			var payload = "Hello World !";
+
+			var unprotected = new Dictionary<string, object>
+			{
+				{ "enc", "A256GCM" }
+			};
+
+			Recipient r = new Recipient(JweAlgorithm.RSA_OAEP_256, PubKey());			
+
+			//then
+			Assert.Throws<ArgumentException>(() => JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json, unprotectedHeaders: unprotected));
+		}
+
+		[Fact]
+		public void EncodeDuplicateHeaders_Unprotected_PerRecipient()
+		{
+			var payload = "Hello World !";
+			var headers = new Dictionary<string, object>()
+			{				
+				{ "jku", "https://server.example.com/keys.jwks" }
+			};
+
+			var unprotected = new Dictionary<string, object>
+			{
+				{ "jku", "https://server.example.com/keys.jwks" }
+			};
+
+
+			Recipient r = new Recipient(JweAlgorithm.RSA_OAEP_256, PubKey(), headers);
+
+			//then
+			Assert.Throws<ArgumentException>(() => JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json, unprotectedHeaders: unprotected));
+		}
+
 		private static RSA PrivKey()
         {
             return X509().GetRSAPrivateKey();
@@ -311,7 +539,16 @@ namespace UnitTests
             return new X509Certificate2("jwt-2048.p12", "1", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
         }
 
-        private CngKey Ecc256Private()
+		private CngKey Ecc256Public()
+		{
+			byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+			byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+			byte[] d = { 42, 148, 231, 48, 225, 196, 166, 201, 23, 190, 229, 199, 20, 39, 226, 70, 209, 148, 29, 70, 125, 14, 174, 66, 9, 198, 80, 251, 95, 107, 98, 206 };
+
+			return EccKey.New(x, y, usage: CngKeyUsages.KeyAgreement);
+		}
+
+		private CngKey Ecc256Private()
         {
             byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
             byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
