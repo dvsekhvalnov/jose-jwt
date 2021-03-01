@@ -10,6 +10,54 @@
     /// </summary>
     public class JweToken
     {
+        public string AsString(IJsonMapper mapper)
+        {
+            var json = new Dictionary<string, object>()
+            {
+                { "ciphertext",  Base64Url.Encode(Ciphertext) },
+                { "protected",  Base64Url.Encode(ProtectedHeaderBytes) },
+                { "iv",  Base64Url.Encode(Iv) },
+                { "tag",  Base64Url.Encode(AuthTag) }
+            };
+
+            if (Aad != null)
+            {
+                json["aad"] = Base64Url.Encode(Aad);
+            }
+
+            if (UnprotectedHeader != null)
+            {
+                json["unprotected"] = UnprotectedHeader;
+            }
+
+
+            if (Recipients.Count == 1)
+            {
+                json["header"] = Recipients[0].Header;
+                json["encrypted_key"] = Base64Url.Encode(Recipients[0].EncryptedCek);
+            }
+            else
+            {
+                var recipientList = new List<object>();
+
+
+                foreach (var recipient in Recipients)
+                {
+                    recipientList.Add(
+                        new Dictionary<string, object> {
+                            { "header", recipient.Header },
+                            { "encrypted_key", Base64Url.Encode(recipient.EncryptedCek) }
+                        }
+                    );
+                }
+            
+                json["recipients"] = recipientList;
+            }
+
+            return mapper.Serialize(json);
+        }
+
+
         public static JweToken FromString(string token, IJsonMapper jsonMapper=null)
         {
             bool isJsonEncoded = token.Trim().StartsWith("{", StringComparison.Ordinal);
@@ -28,7 +76,7 @@
         public byte[] AuthTag { get; }
         public SerializationMode Encoding { get; }
 
-        private JweToken(
+        public JweToken(
             byte[] protectedHeaderBytes,
             IDictionary<string, object> unprotectedHeader,
             List<(byte[] EncryptedCek, IDictionary<string, object> Header)> recipients,

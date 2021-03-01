@@ -148,7 +148,7 @@
                     }
 
                 case SerializationMode.Json:
-                    {
+                    {                        
                         var protectedHeaderBytes = Encoding.UTF8.GetBytes(settings.JsonMapper.Serialize(joseProtectedHeader));                        
                         byte[] asciiEncodedProtectedHeader = Encoding.ASCII.GetBytes(Base64Url.Encode(protectedHeaderBytes));
                         var aadToEncrypt = aad == null ? asciiEncodedProtectedHeader : asciiEncodedProtectedHeader.Concat(new byte[] { 0x2E }).Concat(aad).ToArray();
@@ -186,6 +186,8 @@
                                 encrypted_key = Base64Url.Encode(r.EncryptedKey),
                             });
                         }
+
+                        JweToken token = new JweToken(protectedHeaderBytes, unprotectedHeaders, recipientsOut, aad, encParts[0], encParts[1], encParts[2], SerializationMode.Json);
                         return settings.JsonMapper.Serialize(toSerialize);
                     }
 
