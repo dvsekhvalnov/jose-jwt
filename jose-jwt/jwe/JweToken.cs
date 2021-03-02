@@ -10,8 +10,13 @@
     /// </summary>
     public class JweToken
     {
-        public string AsString(IJsonMapper mapper)
+        public string AsString(IJsonMapper mapper=null)
         {
+            if(Encoding == SerializationMode.Compact)
+            {
+                return Compact.Serialize(ProtectedHeaderBytes, Recipients[0].EncryptedCek, Iv, Ciphertext, AuthTag);
+            }
+
             var json = new Dictionary<string, object>()
             {
                 { "ciphertext",  Base64Url.Encode(Ciphertext) },

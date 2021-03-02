@@ -144,7 +144,16 @@
                         aad = Encoding.UTF8.GetBytes(Compact.Serialize(header));
                         byte[][] encParts = _enc.Encrypt(aad, plaintext, cek);
 
-                        return Compact.Serialize(header, recipientsOut[0].EncryptedKey, encParts[0], encParts[1], encParts[2]);
+                        return new JweToken(
+                                        header, 
+                                        null, 
+                                        recipientsOut, 
+                                        null, 
+                                        encParts[0], 
+                                        encParts[1], 
+                                        encParts[2], 
+                                        mode)
+                                   .AsString();                        
                     }
 
                 case SerializationMode.Json:
@@ -153,42 +162,18 @@
                         byte[] asciiEncodedProtectedHeader = Encoding.ASCII.GetBytes(Base64Url.Encode(protectedHeaderBytes));
                         var aadToEncrypt = aad == null ? asciiEncodedProtectedHeader : asciiEncodedProtectedHeader.Concat(new byte[] { 0x2E }).Concat(aad).ToArray();
 
-                        byte[][] encParts = _enc.Encrypt(aadToEncrypt, plaintext, cek);
+                        byte[][] encParts = _enc.Encrypt(aadToEncrypt, plaintext, cek);                       
 
-                        var toSerialize = new Dictionary<string, object>
-                        {
-                            { "protected", Base64Url.Encode(protectedHeaderBytes) },
-                            { "iv", Base64Url.Encode(encParts[0]) },                            
-                            { "ciphertext", Base64Url.Encode(encParts[1]) },
-                            { "tag" , Base64Url.Encode(encParts[2]) },
-                        };
-
-                        if (aad != null)
-                        {
-                            toSerialize["aad"] = Base64Url.Encode(aad);
-                        }
-
-                        if (unprotectedHeaders != null)
-                        {
-                            toSerialize["unprotected"] = unprotectedHeaders;
-                        }
-                        
-                        if (recipientsOut.Count == 1)
-                        {
-                            toSerialize["header"] = recipientsOut.Select(r => r.Header).First();
-                            toSerialize["encrypted_key"] = recipientsOut.Select(r => Base64Url.Encode(r.EncryptedKey)).First();                            
-                        }
-                        else
-                        {
-                            toSerialize["recipients"] = recipientsOut.Select(r => new
-                            {
-                                header = r.Header,
-                                encrypted_key = Base64Url.Encode(r.EncryptedKey),
-                            });
-                        }
-
-                        JweToken token = new JweToken(protectedHeaderBytes, unprotectedHeaders, recipientsOut, aad, encParts[0], encParts[1], encParts[2], SerializationMode.Json);
-                        return settings.JsonMapper.Serialize(toSerialize);
+                        return new JweToken(
+                                    protectedHeaderBytes, 
+                                    unprotectedHeaders, 
+                                    recipientsOut, 
+                                    aad, 
+                                    encParts[0], 
+                                    encParts[1], 
+                                    encParts[2], 
+                                    mode)
+                                .AsString(settings.JsonMapper);                        
                     }
 
                 default:
