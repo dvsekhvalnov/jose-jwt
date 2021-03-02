@@ -137,8 +137,8 @@ namespace UnitTests
 		public void SerializeJsonEncodingSingleRecipient()
 		{
 
-			var recipients = new List<(byte[] EncryptedCek, IDictionary<string, object> Header)>();
-			recipients.Add((
+			var recipients = new List<JweRecipient>();
+			recipients.Add(new JweRecipient(
 					new byte[] { 42, 154, 250, 20, 117, 149, 136, 147, 103, 24, 43, 131, 16, 73, 118, 237, 219, 2, 139, 37, 135, 70, 56, 152, 184, 29, 157, 58, 171, 158, 211, 170, 42, 37, 145, 149, 98, 11, 189, 202, 39, 244, 47, 163, 138, 119, 216, 22, 190, 91, 107, 24, 151, 104, 253, 188, 154, 124, 97, 121, 151, 2, 47, 114, 94, 153, 24, 35, 95, 68, 93, 236 }, new Dictionary<string, object>
 					{
 						{ "alg", "PBES2-HS256+A128KW" }
@@ -170,15 +170,15 @@ namespace UnitTests
 		public void SerializeJsonEncodingMultipleRecipient()
 		{
 
-			var recipients = new List<(byte[] EncryptedCek, IDictionary<string, object> Header)>();
-			recipients.Add((
+			var recipients = new List<JweRecipient>();
+			recipients.Add(new JweRecipient(
 					new byte[] { 42, 154, 250, 20, 117, 149, 136, 147, 103, 24, 43, 131, 16, 73, 118, 237, 219, 2, 139, 37, 135, 70, 56, 152, 184, 29, 157, 58, 171, 158, 211, 170, 42, 37, 145, 149, 98, 11, 189, 202, 39, 244, 47, 163, 138, 119, 216, 22, 190, 91, 107, 24, 151, 104, 253, 188, 154, 124, 97, 121, 151, 2, 47, 114, 94, 153, 24, 35, 95, 68, 93, 236 }, new Dictionary<string, object>
 					{
 						{ "alg", "PBES2-HS256+A128KW" }
 					}
 			)); 
 
-			recipients.Add((
+			recipients.Add(new JweRecipient(
 					new byte[] { 86, 236, 207, 162, 189, 78, 17, 233, 207, 63, 236, 52, 170, 15, 255, 184, 100, 180, 195, 136, 122, 98, 222, 202, 217, 145, 237, 206, 58, 163, 210, 105, 192, 206, 19, 115, 76, 123, 166, 96, 88, 218, 138, 249, 52, 117, 76, 36, 212, 125, 163, 198, 39, 132, 59, 209, 88, 116, 46, 60, 4, 227, 12, 140, 199, 50, 150, 117, 70, 78, 0, 21 }, new Dictionary<string, object>
 					{
 						{ "alg", "ECDH-ES+A128KW" },
@@ -214,8 +214,8 @@ namespace UnitTests
 		public void SerializeJsonEncodingAad()
 		{
 			// given
-			var recipients = new List<(byte[] EncryptedCek, IDictionary<string, object> Header)>();
-			recipients.Add((
+			var recipients = new List<JweRecipient>();
+			recipients.Add(new JweRecipient(
 					new byte[] { 42, 154, 250, 20, 117, 149, 136, 147, 103, 24, 43, 131, 16, 73, 118, 237, 219, 2, 139, 37, 135, 70, 56, 152, 184, 29, 157, 58, 171, 158, 211, 170, 42, 37, 145, 149, 98, 11, 189, 202, 39, 244, 47, 163, 138, 119, 216, 22, 190, 91, 107, 24, 151, 104, 253, 188, 154, 124, 97, 121, 151, 2, 47, 114, 94, 153, 24, 35, 95, 68, 93, 236 }, new Dictionary<string, object>
 					{
 						{ "alg", "PBES2-HS256+A128KW" }
@@ -244,8 +244,8 @@ namespace UnitTests
 		public void SerializeJsonEncodingUnprotectedHeader()
 		{
 			// given
-			var recipients = new List<(byte[] EncryptedCek, IDictionary<string, object> Header)>();
-			recipients.Add((
+			var recipients = new List<JweRecipient>();
+			recipients.Add(new JweRecipient(
 					new byte[] { 42, 154, 250, 20, 117, 149, 136, 147, 103, 24, 43, 131, 16, 73, 118, 237, 219, 2, 139, 37, 135, 70, 56, 152, 184, 29, 157, 58, 171, 158, 211, 170, 42, 37, 145, 149, 98, 11, 189, 202, 39, 244, 47, 163, 138, 119, 216, 22, 190, 91, 107, 24, 151, 104, 253, 188, 154, 124, 97, 121, 151, 2, 47, 114, 94, 153, 24, 35, 95, 68, 93, 236 }, new Dictionary<string, object>
 					{
 						{ "alg", "PBES2-HS256+A128KW" }
@@ -279,8 +279,8 @@ namespace UnitTests
 		public void SerializeCompact()
         {
 			// given
-			var recipients = new List<(byte[] EncryptedCek, IDictionary<string, object> Header)>();
-			recipients.Add((
+			var recipients = new List<JweRecipient>();
+			recipients.Add(new JweRecipient(
 				new byte[] { 22, 136, 242, 203, 60, 160, 180, 83, 178, 52, 24, 243, 169, 52, 95, 175, 209, 213, 28, 250, 239, 182, 166, 213, 82, 223, 108, 93, 43, 148, 231, 214, 97, 46, 92, 228, 236, 90, 226, 174, 188, 133, 156, 81, 173, 143, 198, 2, 246, 92, 126, 33, 125, 121, 233, 26, 61, 172, 22, 137, 76, 37, 63, 117, 241, 17, 119, 78, 67, 132, 243, 31, 125, 62, 52, 173, 215, 3, 136, 188, 95, 8, 179, 152, 208, 77, 143, 126, 195, 50, 25, 3, 225, 35, 166, 45, 52, 27, 95, 254, 196, 35, 93, 97, 1, 11, 159, 115, 31, 245, 104, 179, 1, 64, 82, 203, 100, 189, 118, 61, 121, 85, 94, 114, 131, 62, 91, 209, 197, 148, 140, 112, 81, 115, 21, 164, 67, 237, 75, 222, 177, 101, 126, 75, 50, 75, 3, 128, 159, 108, 96, 52, 205, 107, 161, 16, 56, 13, 33, 127, 60, 52, 237, 240, 255, 20, 82, 82, 133, 203, 158, 168, 155, 168, 38, 50, 11, 97, 182, 157, 248, 1, 219, 166, 114, 211, 87, 138, 19, 108, 84, 216, 142, 201, 17, 198, 145, 24, 66, 191, 105, 148, 86, 108, 79, 143, 241, 42, 32, 148, 243, 219, 37, 79, 209, 5, 134, 107, 154, 137, 66, 63, 248, 209, 157, 95, 233, 13, 15, 36, 25, 143, 101, 109, 137, 222, 11, 72, 229, 111, 230, 65, 177, 203, 40, 19, 134, 228, 27, 235, 8, 235, 212, 1, 158, 214 }, null
 			));
 

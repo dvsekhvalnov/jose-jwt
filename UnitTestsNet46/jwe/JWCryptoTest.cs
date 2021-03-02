@@ -303,7 +303,7 @@ namespace UnitTests
 		public void EncodeSingleRecipient()
         {
 			var payload = "Hello World !";
-			Recipient r = new Recipient(JweAlgorithm.A256KW, sharedKey);
+			JweRecipient r = new JweRecipient(JweAlgorithm.A256KW, sharedKey);
 
 			string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json);
 
@@ -331,9 +331,9 @@ namespace UnitTests
 		public void EncodeMultipleRecipients()
         {
 			var payload = "Hello World !";
-			Recipient r1 = new Recipient(JweAlgorithm.PBES2_HS256_A128KW, "secret");
-			Recipient r2 = new Recipient(JweAlgorithm.ECDH_ES_A128KW, Ecc256Public());
-			Recipient r3 = new Recipient(JweAlgorithm.RSA_OAEP_256, PubKey());
+			JweRecipient r1 = new JweRecipient(JweAlgorithm.PBES2_HS256_A128KW, "secret");
+			JweRecipient r2 = new JweRecipient(JweAlgorithm.ECDH_ES_A128KW, Ecc256Public());
+			JweRecipient r3 = new JweRecipient(JweAlgorithm.RSA_OAEP_256, PubKey());
 
 			string token = JWE.Encrypt(payload, new[] { r1, r2, r3 }, JweEncryption.A256GCM, mode: SerializationMode.Json);
 
@@ -388,7 +388,7 @@ namespace UnitTests
 				{ "jku", "https://server.example.com/keys.jwks" }
 			};
 
-			Recipient r = new Recipient(JweAlgorithm.RSA_OAEP_256, PubKey());
+			JweRecipient r = new JweRecipient(JweAlgorithm.RSA_OAEP_256, PubKey());
 
 			string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json, unprotectedHeaders: unprotected);
 
@@ -421,7 +421,7 @@ namespace UnitTests
 				{ "jku", "https://server.example.com/keys.jwks" }
 			};
 
-			Recipient r = new Recipient(JweAlgorithm.RSA_OAEP_256, PubKey());
+			JweRecipient r = new JweRecipient(JweAlgorithm.RSA_OAEP_256, PubKey());
 
 			string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json, extraProtectedHeaders: extra);
 
@@ -451,7 +451,7 @@ namespace UnitTests
 				{ "kid", "2011-04-29" }
 			};
 
-			Recipient r = new Recipient(JweAlgorithm.RSA_OAEP_256, PubKey(), perRecipientHeaders: extra);
+			JweRecipient r = new JweRecipient(JweAlgorithm.RSA_OAEP_256, PubKey(), header: extra);
 
 			string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json);
 
@@ -481,7 +481,7 @@ namespace UnitTests
 				{ "enc", "A256GCM" }
 			};			
 
-			Recipient r = new Recipient(JweAlgorithm.RSA_OAEP_256, PubKey(), headers);			
+			JweRecipient r = new JweRecipient(JweAlgorithm.RSA_OAEP_256, PubKey(), headers);			
 
 			//then
 			Assert.Throws<ArgumentException>(() => JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json));
@@ -497,7 +497,7 @@ namespace UnitTests
 				{ "enc", "A256GCM" }
 			};
 
-			Recipient r = new Recipient(JweAlgorithm.RSA_OAEP_256, PubKey());			
+			JweRecipient r = new JweRecipient(JweAlgorithm.RSA_OAEP_256, PubKey());			
 
 			//then
 			Assert.Throws<ArgumentException>(() => JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json, unprotectedHeaders: unprotected));
@@ -518,7 +518,7 @@ namespace UnitTests
 			};
 
 
-			Recipient r = new Recipient(JweAlgorithm.RSA_OAEP_256, PubKey(), headers);
+			JweRecipient r = new JweRecipient(JweAlgorithm.RSA_OAEP_256, PubKey(), headers);
 
 			//then
 			Assert.Throws<ArgumentException>(() => JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json, unprotectedHeaders: unprotected));

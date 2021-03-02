@@ -74,7 +74,7 @@
 
         public byte[] ProtectedHeaderBytes { get; }
         public IDictionary<string, object> UnprotectedHeader { get; }
-        public List<(byte[] EncryptedCek, IDictionary<string, object> Header)> Recipients { get; }
+        public List<JweRecipient> Recipients { get; }
         public byte[] Aad { get; }
         public byte[] Iv { get; }
         public byte[] Ciphertext { get; }
@@ -84,7 +84,7 @@
         public JweToken(
             byte[] protectedHeaderBytes,
             IDictionary<string, object> unprotectedHeader,
-            List<(byte[] EncryptedCek, IDictionary<string, object> Header)> recipients,
+            List<JweRecipient> recipients,
             byte[] aad,
             byte[] iv,
             byte[] ciphertext,
@@ -111,10 +111,8 @@
             var ciphertext = parts.Next();
             var authTag = parts.Next();
 
-            var recipients = new List<(byte[] EncryptedCek, IDictionary<string, object> Header)>
-                {
-                    ((EncryptedCek: encryptedCek, Header: new Dictionary<string, object>())),
-                };
+            var recipients = new List<JweRecipient>();
+            recipients.Add(new JweRecipient(encryptedCek, new Dictionary<string, object>()));
 
             return new JweToken(
                 protectedHeaderBytes: protectedHeaderBytes,
@@ -129,7 +127,7 @@
 
         private static JweToken ParseJson(IDictionary<string, object> json)
         {
-            var recipients = new List<(byte[] EncryptedCek, IDictionary<string, object> Header)>();
+            var recipients = new List<JweRecipient>();
 
            IEnumerable _recipients = Dictionaries.Get<IEnumerable>(json, "recipients");
 
@@ -138,13 +136,13 @@
                 foreach (IDictionary<string, object> recipient in _recipients)
                 {
                     byte[] encryptedCek = Base64Url.Decode(Dictionaries.Get<string>(recipient, "encrypted_key"));
-                    recipients.Add((EncryptedCek: encryptedCek, Header: Dictionaries.Get<IDictionary<string, object>>(recipient, "header")));
+                    recipients.Add(new JweRecipient(encryptedCek, Dictionaries.Get<IDictionary<string, object>>(recipient, "header")));
                 }
             }
             else if (recipients.Count == 0)
             {
                 byte[] encryptedCek = Base64Url.Decode(Dictionaries.Get<string>(json, "encrypted_key"));
-                recipients.Add((EncryptedCek: encryptedCek, Header: Dictionaries.Get<IDictionary<string, object>>(json, "header")));
+                recipients.Add(new JweRecipient(encryptedCek, Dictionaries.Get<IDictionary<string, object>>(json, "header")));
             }
 
             var _protected = Dictionaries.Get<string>(json, "protected");

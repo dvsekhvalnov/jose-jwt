@@ -3,28 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;
-    
-    public class Recipient
-    {
-        /// <summary
-        /// A recipient for a Jwe
-        /// </summary
-        /// <param name="alg">algorithm to be used to encrypt the CEK (Content Encryption Key).</param>
-        /// <param name="key">key for encrypting CEK (Content Encryption Key). Cannot be null.</param>
-        public Recipient(JweAlgorithm alg, object key, IDictionary<string, object> perRecipientHeaders = null)
-        {
-            this.Alg = alg;
-            this.Key = key ?? throw new ArgumentNullException(nameof(key));
-            this.PerRecipientHeaders = perRecipientHeaders;
-        }
-
-        public JweAlgorithm Alg { get; set; }
-
-        public object Key { get; set; }
-
-        internal IDictionary<string, object> PerRecipientHeaders { get; }
-    }
+    using System.Text;       
 
     public enum SerializationMode
     {
@@ -37,7 +16,7 @@
     /// </summary>
     public class JWE
     {
-        public static string Encrypt(string plaintext, IEnumerable<Recipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Compact, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
+        public static string Encrypt(string plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Compact, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
         {
             return EncryptBytes(Encoding.UTF8.GetBytes(plaintext), recipients, enc, aad, mode, compression, extraProtectedHeaders, unprotectedHeaders, settings);
         }
@@ -53,7 +32,7 @@
         /// <param name="extraProtectedHeaders">optional extra headers to put in the JoseProtectedHeader.</param>
         /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
-        public static string EncryptBytes(byte[] plaintext, IEnumerable<Recipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Compact, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
+        public static string EncryptBytes(byte[] plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Compact, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
         {
             if (plaintext == null)
             {
@@ -74,7 +53,7 @@
 
             byte[] cek = null;
 
-            var recipientsOut = new List<(byte[] EncryptedKey, IDictionary<string, object> Header)>();
+            var recipientsOut = new List<JweRecipient>();
             foreach (var recipient in recipients)
             {
                 IKeyManagement keys = settings.Jwa(recipient.Alg);
@@ -90,7 +69,7 @@
                 IDictionary<string, object> joseHeader = Dictionaries.MergeHeaders(
                     joseProtectedHeader,
                     new Dictionary<string, object> { { "alg", settings.JwaHeaderValue(recipient.Alg) } },
-                    recipient.PerRecipientHeaders,
+                    recipient.Header,
                     unprotectedHeaders
                     );
 
@@ -115,7 +94,8 @@
                     )                                                                       
                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-                recipientsOut.Add((EncryptedKey: encryptedCek, Header: recipientHeader));
+                recipientsOut.Add(new JweRecipient(encryptedCek, recipientHeader));
+                    //(EncryptedKey: encryptedCek, Header: recipientHeader));
             }
 
             if (compression.HasValue)
