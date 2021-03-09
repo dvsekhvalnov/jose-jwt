@@ -3,8 +3,16 @@ using System.Collections.Generic;
 
 namespace Jose
 {
+    /// <summary>
+    /// JWE Recipient object representation. Part of JWE token.
+    /// </summary>
     public class JweRecipient
     {
+        /// <summary>
+        /// Constructs recipient for JWE decryption with encrypted CEK and headers
+        /// </summary>
+        /// <param name="encryptedCek">encrypted content encryption key</param>
+        /// <param name="header">per recipient headers</param>
         public JweRecipient(byte[] encryptedCek, IDictionary<string, object> header)
         {
             EncryptedCek = encryptedCek;
@@ -12,7 +20,7 @@ namespace Jose
         }
 
         /// <summary
-        /// A recipient for a Jwe
+        /// Constructs recipient for JWE encryption with desired KEK and key management algorithm
         /// </summary
         /// <param name="alg">algorithm to be used to encrypt the CEK (Content Encryption Key).</param>
         /// <param name="key">key for encrypting CEK (Content Encryption Key). Cannot be null.</param>
@@ -23,12 +31,29 @@ namespace Jose
             this.Header = header;
         }
 
+        /// <summary>
+        /// Content key encryption algorithm
+        /// </summary>
         public JweAlgorithm Alg { get; }
 
+        /// <summary>
+        /// Key to encrypt content key (KEK)
+        /// </summary>
         public object Key { get; }
+
+        /// <summary>
+        /// Encrypted content encryption key
+        /// </summary>
         public byte[] EncryptedCek { get; }
 
+        /// <summary>
+        /// Per recipient headers
+        /// </summary>
         public IDictionary<string, object> Header { get; }
+
+        /// <summary>
+        /// Effective headers (protected | unprotected | recipient), avaliable only in context of JWE token
+        /// </summary>
         public IDictionary<string, object> JoseHeader { get; internal set; }
     }
 }

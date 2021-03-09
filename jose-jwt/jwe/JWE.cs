@@ -17,20 +17,35 @@ namespace Jose
     /// </summary>
     public class JWE
     {
-        public static string Encrypt(string plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Compact, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
-        {
-            return EncryptBytes(Encoding.UTF8.GetBytes(plaintext), recipients, enc, aad, mode, compression, extraProtectedHeaders, unprotectedHeaders, settings);
-        }
-
         /// <summary>
         /// Encrypts given plaintext using JWE and applies requested encryption/compression algorithms.
         /// </summary>
         /// <param name="plaintext">Binary data to encrypt (not null)</param>
         /// <param name="recipients">The details of who to encrypt the plaintext (or rather the CEK) to.</param>
         /// <param name="enc">encryption algorithm to be used to encrypt the plaintext.</param>
+        /// <param name="aad">additional authentication data (SerializationMode.Json only)</param>
         /// <param name="mode">serialization mode to use. Note only one recipient can be specified for compact and flattened json serialization.</param>
         /// <param name="compression">optional compression type to use.</param>
-        /// <param name="extraProtectedHeaders">optional extra headers to put in the JoseProtectedHeader.</param>
+        /// <param name="extraProtectedHeaders">optional extra headers to put in the protected header.</param>
+        /// <param name="unprotectedHeaders">optional unprotected headers</param> 
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
+        /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
+        public static string Encrypt(string plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Compact, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
+        {
+            return EncryptBytes(Encoding.UTF8.GetBytes(plaintext), recipients, enc, aad, mode, compression, extraProtectedHeaders, unprotectedHeaders, settings);
+        }
+
+        /// <summary>
+        /// Encrypts given binary plaintext using JWE and applies requested encryption/compression algorithms.
+        /// </summary>
+        /// <param name="plaintext">Binary data to encrypt (not null)</param>
+        /// <param name="recipients">The details of who to encrypt the plaintext (or rather the CEK) to.</param>
+        /// <param name="enc">encryption algorithm to be used to encrypt the plaintext.</param>
+        /// <param name="aad">additional authentication data (SerializationMode.Json only)</param>
+        /// <param name="mode">serialization mode to use. Note only one recipient can be specified for compact and flattened json serialization.</param>
+        /// <param name="compression">optional compression type to use.</param>
+        /// <param name="extraProtectedHeaders">optional extra headers to put in the protected header.</param>
+        /// <param name="unprotectedHeaders">optional unprotected headers</param> 
         /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
         public static string EncryptBytes(byte[] plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Compact, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
@@ -96,7 +111,6 @@ namespace Jose
                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
                 recipientsOut.Add(new JweRecipient(encryptedCek, recipientHeader));
-                    //(EncryptedKey: encryptedCek, Header: recipientHeader));
             }
 
             if (compression.HasValue)
@@ -170,7 +184,7 @@ namespace Jose
         /// <param name="expectedJweAlg">The algorithm type that we expect to receive in the header.</param>
         /// <param name="expectedJweEnc">The encryption type that we expect to receive in the header.</param>
         /// <param name="settings">optional settings to override global DefaultSettings</param>
-        /// <returns>Decrypted plaintext as binary data</returns>
+        /// <returns>Decrypted JweToken object</returns>
         /// <exception cref="IntegrityException">if AEAD operation validation failed</exception>
         /// <exception cref="EncryptionException">if JWE can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if encryption or compression algorithm is not supported</exception>
@@ -243,8 +257,6 @@ namespace Jose
                     token.Recipient = recipient;
 
                     return token;
-
-                    //return (Plaintext: plaintext, JoseHeaders: recipient.JoseHeader, Aad: token.Aad);
                 }
                 catch (ArgumentException ex)
                 {
@@ -275,10 +287,10 @@ namespace Jose
         }
 
         /// <summary>
-        /// Parses JWE token, extracts and unmarshal protected+unprotcted+per recipient headers as IDictionary<string, object>.
-        /// This method is NOT performing integrity checking. 
+        /// Parses JWE token, extracts and unmarshal protected+unprotcted+per recipient headers
+        /// This method is NOT performing integrity checking and actual decryption 
         /// </summary>
-        /// <param name="jwe">JWE to decrypt.</param>
+        /// <param name="jwe">Serialized JWE string to decrypt.</param>
         /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>List of Jose headers. For Compact and Flattened this will be length 1 and contain just the protected header. 
         ///  For General Json this will be the Jose headers (merge of protected, unprotected and per-recipient).</returns>

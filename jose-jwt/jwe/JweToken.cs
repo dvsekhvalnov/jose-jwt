@@ -5,8 +5,8 @@
     using System.Collections.Generic;
 
     /// <summary>
-    /// Internal class used to represent the data withing a JWE
-    /// Note - could have come in as compant, flattened json or general json.
+    /// JWE token object representation.
+    /// Supports serizalization / deserialization from as compact, flattened json or general json.
     /// </summary>
     public class JweToken
     {

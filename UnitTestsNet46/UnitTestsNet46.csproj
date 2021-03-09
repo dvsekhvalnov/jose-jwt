@@ -79,7 +79,6 @@
     <Compile Include="CompactTest.cs" />
     <Compile Include="ConcatKDFTest.cs" />
     <Compile Include="DictionariesTest.cs" />
-    <Compile Include="jwe\JWCryptoTest.cs" />
     <Compile Include="jwe\JweTest.cs" />
     <Compile Include="jwe\JweTokenTest.cs" />
     <Compile Include="SecurityVulnerabilitiesTest.cs" />
