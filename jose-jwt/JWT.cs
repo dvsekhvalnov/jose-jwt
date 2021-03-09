@@ -474,7 +474,7 @@ namespace Jose
 
             if (parts.Count == 5) //encrypted JWT
             {
-                return JWE.Decrypt(token, key, expectedJweAlg, expectedJweEnc, settings).Plaintext;
+                return JWE.Decrypt(token, key, expectedJweAlg, expectedJweEnc, settings).PlaintextBytes;
             }
             else
             {

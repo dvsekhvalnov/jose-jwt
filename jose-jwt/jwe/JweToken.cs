@@ -10,7 +10,10 @@
     /// </summary>
     public class JweToken
     {
-        public string AsString(IJsonMapper mapper=null)
+        /// <summary>
+        /// Serialize token according to serialization mode
+        /// </summary>
+        public string AsString(IJsonMapper mapper = null)
         {
             if(Encoding == SerializationMode.Compact)
             {
@@ -62,7 +65,9 @@
             return mapper.Serialize(json);
         }
 
-
+        /// <summary>
+        /// Parse serialized token
+        /// </summary>
         public static JweToken FromString(string token, IJsonMapper jsonMapper=null)
         {
             bool isJsonEncoded = token.Trim().StartsWith("{", StringComparison.Ordinal);
@@ -72,13 +77,66 @@
                 : ParseCompact(token);
         }
 
+        /// <summary>
+        /// Protected header serialized value
+        /// </summary>
         public byte[] ProtectedHeaderBytes { get; }
+
+        /// <summary>
+        /// Unprotected header
+        /// </summary>
         public IDictionary<string, object> UnprotectedHeader { get; }
+
+        /// <summary>
+        /// List of recipient information token is encoded for
+        /// </summary>
         public List<JweRecipient> Recipients { get; }
+
+        /// <summary>
+        /// Effective recipient that have been used to decode token. Null if no decode happened successfully.
+        /// </summary>
+        public JweRecipient Recipient { get; internal set; }
+
+        /// <summary>
+        /// Additional Authentication Data (JSON only)
+        /// </summary>
         public byte[] Aad { get; }
+
+        /// <summary>
+        /// Init vector
+        /// </summary>
         public byte[] Iv { get; }
+
+        /// <summary>
+        /// Ciphertext (encrypted plaintext)
+        /// </summary>
         public byte[] Ciphertext { get; }
+
+        /// <summary>
+        /// Plaintext (decrypted ciphertext). Null if no decode happened successfully.
+        /// </summary>
+        public byte[] PlaintextBytes { get; internal set; }
+
+        /// <summary>
+        /// Convinience helper to get Plaintext as string
+        /// </summary>
+        public string Plaintext { 
+            get 
+            {
+                var blob = PlaintextBytes;
+
+                return blob == null ? null : System.Text.Encoding.UTF8.GetString(PlaintextBytes);
+            } 
+        }
+
+        /// <summary>
+        /// Authentication tag
+        /// </summary>
         public byte[] AuthTag { get; }
+
+        /// <summary>
+        /// Token serialization: Json | Compact
+        /// </summary>
         public SerializationMode Encoding { get; }
 
         public JweToken(

@@ -51,7 +51,7 @@ namespace UnitTests
             Console.Out.WriteLine("[{0}][A256GCM] = {1}", mode, jwe);
 
             //then
-            Assert.Equal(payload, decrypted.Plaintext);
+            Assert.Equal(payload, decrypted.PlaintextBytes);
         }
 
         public static IEnumerable<object[]> TestDataModeGeneralJsonRoundTripMultipleRecipients =>
@@ -92,7 +92,7 @@ namespace UnitTests
             Console.Out.WriteLine("[Json][Multiple][A256GCM] = {0}", jwe);
 
             //then
-            Assert.Equal(payload, decrypted.Plaintext);
+            Assert.Equal(payload, decrypted.PlaintextBytes);
         }
 
         [Theory]
@@ -209,7 +209,7 @@ namespace UnitTests
             Assert.Equal(22, parts[3].Length); //cipher text size
             Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(new byte[0], JWE.Decrypt(jwe, aes128KWKey).Plaintext);
+            Assert.Equal(new byte[0], JWE.Decrypt(jwe, aes128KWKey).PlaintextBytes);
         }
 
         [Fact]
@@ -246,7 +246,7 @@ namespace UnitTests
             Assert.Equal(22, ((string)deserialized["ciphertext"]).Length); //cipher text size
             Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
 
-            Assert.Equal(new byte[0], JWE.Decrypt(jwe, aes128KWKey).Plaintext);
+            Assert.Equal(new byte[0], JWE.Decrypt(jwe, aes128KWKey).PlaintextBytes);
         }
 
         [Fact]
@@ -278,7 +278,7 @@ namespace UnitTests
             Assert.Equal(22, ((string)deserialized["ciphertext"]).Length); //cipher text size
             Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
 
-            Assert.Equal(new byte[0], JWE.Decrypt(jwe, aes128KWKey).Plaintext);
+            Assert.Equal(new byte[0], JWE.Decrypt(jwe, aes128KWKey).PlaintextBytes);
         }
 
         [Fact]
@@ -291,14 +291,14 @@ namespace UnitTests
             var decrypted = JWE.Decrypt(Rfc7516_A_4_7_ExampleJwe, key);
 
             //then
-            Assert.Equal("Live long and prosper.", UTF8Encoding.UTF8.GetString(decrypted.Plaintext));
+            Assert.Equal("Live long and prosper.", decrypted.Plaintext);
 
-            Assert.Equal(4, decrypted.JoseHeaders.Count);
+            Assert.Equal(4, decrypted.Recipient.JoseHeader.Count);
 
-            Assert.Equal("RSA1_5", decrypted.JoseHeaders["alg"]);
-            Assert.Equal("2011-04-29", decrypted.JoseHeaders["kid"]);
-            Assert.Equal("A128CBC-HS256", decrypted.JoseHeaders["enc"]);
-            Assert.Equal("https://server.example.com/keys.jwks", decrypted.JoseHeaders["jku"]);
+            Assert.Equal("RSA1_5", decrypted.Recipient.JoseHeader["alg"]);
+            Assert.Equal("2011-04-29", decrypted.Recipient.JoseHeader["kid"]);
+            Assert.Equal("A128CBC-HS256", decrypted.Recipient.JoseHeader["enc"]);
+            Assert.Equal("https://server.example.com/keys.jwks", decrypted.Recipient.JoseHeader["jku"]);
         }
 
         [Fact]
@@ -311,14 +311,14 @@ namespace UnitTests
             var decrypted = JWE.Decrypt(Rfc7516_A_4_7_ExampleJwe, key);
 
             //then
-            Assert.Equal("Live long and prosper.", UTF8Encoding.UTF8.GetString(decrypted.Plaintext));
+            Assert.Equal("Live long and prosper.", decrypted.Plaintext);
 
-            Assert.Equal(4, decrypted.JoseHeaders.Count);
+            Assert.Equal(4, decrypted.Recipient.JoseHeader.Count);
 
-            Assert.Equal("A128KW", decrypted.JoseHeaders["alg"]);
-            Assert.Equal("7", decrypted.JoseHeaders["kid"]);
-            Assert.Equal("A128CBC-HS256", decrypted.JoseHeaders["enc"]);
-            Assert.Equal("https://server.example.com/keys.jwks", decrypted.JoseHeaders["jku"]);
+            Assert.Equal("A128KW", decrypted.Recipient.JoseHeader["alg"]);
+            Assert.Equal("7", decrypted.Recipient.JoseHeader["kid"]);
+            Assert.Equal("A128CBC-HS256", decrypted.Recipient.JoseHeader["enc"]);
+            Assert.Equal("https://server.example.com/keys.jwks", decrypted.Recipient.JoseHeader["jku"]);
 
             Assert.Null(decrypted.Aad);
         }
@@ -362,7 +362,7 @@ namespace UnitTests
             //then
             var decrypted = JWE.Decrypt(jwe, key);
 
-            Assert.Equal(plaintext, UTF8Encoding.UTF8.GetString(decrypted.Plaintext));
+            Assert.Equal(plaintext, decrypted.Plaintext);
         }        
 
         [Fact]
@@ -377,13 +377,13 @@ namespace UnitTests
             var decrypted = JWE.Decrypt(Rfc7520_5_10_ExampleJwe, key);
 
             //then
-            Assert.Equal(Rfc7520_Figure72_ExamplePlaintext, UTF8Encoding.UTF8.GetString(decrypted.Plaintext));
+            Assert.Equal(Rfc7520_Figure72_ExamplePlaintext, decrypted.Plaintext);
 
-            Assert.Equal(3, decrypted.JoseHeaders.Count);
+            Assert.Equal(3, decrypted.Recipient.JoseHeader.Count);
 
-            Assert.Equal(jwk.Alg, decrypted.JoseHeaders["alg"]);
-            Assert.Equal(jwk.Kid, decrypted.JoseHeaders["kid"]);
-            Assert.Equal("A128GCM", decrypted.JoseHeaders["enc"]);
+            Assert.Equal(jwk.Alg, decrypted.Recipient.JoseHeader["alg"]);
+            Assert.Equal(jwk.Kid, decrypted.Recipient.JoseHeader["kid"]);
+            Assert.Equal("A128GCM", decrypted.Recipient.JoseHeader["enc"]);
 
             Assert.Equal(Rfc7520_5_10_1_ExampleAadString, UTF8Encoding.UTF8.GetString(decrypted.Aad));
         }
@@ -538,38 +538,36 @@ namespace UnitTests
                 mode: SerializationMode.Compact);
 
             //when
-            var headers = JWE.UnsafeJoseHeaders(jwe);
+            var test = JWE.UnsafeJoseHeaders(jwe);
 
             //then
-            Assert.Single(headers);
+            Assert.Single(test.Recipients);
 
-            Assert.Equal(2, headers.ElementAt(0).Count());
-            Assert.Equal("A128CBC-HS256", headers.ElementAt(0)["enc"]);
-            Assert.Equal("A128KW", headers.ElementAt(0)["alg"]);
+            Assert.Equal(2, test.Recipients[0].JoseHeader.Count());
+            Assert.Equal("A128CBC-HS256", test.Recipients[0].JoseHeader["enc"]);
+            Assert.Equal("A128KW", test.Recipients[0].JoseHeader["alg"]);
         }
 
         [Fact]
         public void UnsafeJoseHeaders_Rfc7516AppendixA23_ExpectedResults()
         {
-            //given
-
             //when
-            var headers = JWE.UnsafeJoseHeaders(Rfc7516_A_4_7_ExampleJwe);
+            var test = JWE.UnsafeJoseHeaders(Rfc7516_A_4_7_ExampleJwe);
 
             //then
-            Assert.Equal(2, headers.Count());
+            Assert.Equal(2, test.Recipients.Count());
 
-            Assert.Equal(4, headers.ElementAt(0).Count());
-            Assert.Equal("A128CBC-HS256", headers.ElementAt(0)["enc"]);
-            Assert.Equal("https://server.example.com/keys.jwks", headers.ElementAt(0)["jku"]);
-            Assert.Equal("RSA1_5", headers.ElementAt(0)["alg"]);
-            Assert.Equal("2011-04-29", headers.ElementAt(0)["kid"]);
+            Assert.Equal(4, test.Recipients[0].JoseHeader.Count());
+            Assert.Equal("A128CBC-HS256", test.Recipients[0].JoseHeader["enc"]);
+            Assert.Equal("https://server.example.com/keys.jwks", test.Recipients[0].JoseHeader["jku"]);
+            Assert.Equal("RSA1_5", test.Recipients[0].JoseHeader["alg"]);
+            Assert.Equal("2011-04-29", test.Recipients[0].JoseHeader["kid"]);
 
-            Assert.Equal(4, headers.ElementAt(1).Count());
-            Assert.Equal("A128CBC-HS256", headers.ElementAt(0)["enc"]);
-            Assert.Equal("https://server.example.com/keys.jwks", headers.ElementAt(1)["jku"]);
-            Assert.Equal("A128KW", headers.ElementAt(1)["alg"]);
-            Assert.Equal("7", headers.ElementAt(1)["kid"]);
+            Assert.Equal(4, test.Recipients[1].JoseHeader.Count());
+            Assert.Equal("A128CBC-HS256", test.Recipients[1].JoseHeader["enc"]);
+            Assert.Equal("https://server.example.com/keys.jwks", test.Recipients[1].JoseHeader["jku"]);
+            Assert.Equal("A128KW", test.Recipients[1].JoseHeader["alg"]);
+            Assert.Equal("7", test.Recipients[1].JoseHeader["kid"]);
         }
 
         private static object GetLegacyKeyObjectFromJwk(JsonWebKey jwk)

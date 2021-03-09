@@ -29,5 +29,6 @@ namespace Jose
         public byte[] EncryptedCek { get; }
 
         public IDictionary<string, object> Header { get; }
+        public IDictionary<string, object> JoseHeader { get; internal set; }
     }
 }

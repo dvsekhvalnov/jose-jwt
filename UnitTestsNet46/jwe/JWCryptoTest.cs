@@ -29,11 +29,11 @@ namespace UnitTests
 
             var payload = Jose.JWE.Decrypt(token, sharedKey);
 
-            Assert.Equal("Hello World", System.Text.Encoding.UTF8.GetString(payload.Plaintext));
+            Assert.Equal("Hello World", payload.Plaintext);
 
-            Assert.Equal(payload.JoseHeaders.Count, 2);
-            Assert.Equal(payload.JoseHeaders["enc"], "A256CBC-HS512");
-            Assert.Equal(payload.JoseHeaders["alg"], "A256KW");
+            Assert.Equal(payload.Recipient.JoseHeader.Count, 2);
+            Assert.Equal(payload.Recipient.JoseHeader["enc"], "A256CBC-HS512");
+            Assert.Equal(payload.Recipient.JoseHeader["alg"], "A256KW");
         } 
 
         [Fact]
@@ -64,20 +64,20 @@ namespace UnitTests
 
             var firstRecipient = Jose.JWE.Decrypt(token, sharedKey);
 
-            Assert.Equal("Hello World", System.Text.Encoding.UTF8.GetString(firstRecipient.Plaintext));
+            Assert.Equal("Hello World", firstRecipient.Plaintext);
 
-            Assert.Equal(firstRecipient.JoseHeaders.Count, 2);
-            Assert.Equal(firstRecipient.JoseHeaders["enc"], "A256GCM");
-            Assert.Equal(firstRecipient.JoseHeaders["alg"], "A256KW");
+            Assert.Equal(firstRecipient.Recipient.JoseHeader.Count, 2);
+            Assert.Equal(firstRecipient.Recipient.JoseHeader["enc"], "A256GCM");
+            Assert.Equal(firstRecipient.Recipient.JoseHeader["alg"], "A256KW");
 
             var secondRecipient = Jose.JWE.Decrypt(token, PrivKey());
 
-            Assert.Equal("Hello World", System.Text.Encoding.UTF8.GetString(secondRecipient.Plaintext));
+            Assert.Equal("Hello World", secondRecipient.Plaintext);
 
-            Assert.Equal(secondRecipient.JoseHeaders.Count, 3);
-            Assert.Equal(secondRecipient.JoseHeaders["enc"], "A256GCM");
-            Assert.Equal(secondRecipient.JoseHeaders["typ"], "JWE");
-            Assert.Equal(secondRecipient.JoseHeaders["alg"], "RSA-OAEP-256");
+            Assert.Equal(secondRecipient.Recipient.JoseHeader.Count, 3);
+            Assert.Equal(secondRecipient.Recipient.JoseHeader["enc"], "A256GCM");
+            Assert.Equal(secondRecipient.Recipient.JoseHeader["typ"], "JWE");
+            Assert.Equal(secondRecipient.Recipient.JoseHeader["alg"], "RSA-OAEP-256");
         }
 
         [Fact]
@@ -107,22 +107,22 @@ namespace UnitTests
 
             var firstRecipient = Jose.JWE.Decrypt(token, sharedKey);
 
-            Assert.Equal("Hello World", System.Text.Encoding.UTF8.GetString(firstRecipient.Plaintext));
+            Assert.Equal("Hello World", firstRecipient.Plaintext);
 
-            Assert.Equal(firstRecipient.JoseHeaders.Count, 3);
-            Assert.Equal(firstRecipient.JoseHeaders["enc"], "A256CBC-HS512");
-            Assert.Equal(firstRecipient.JoseHeaders["typ"], "JWE");
-            Assert.Equal(firstRecipient.JoseHeaders["alg"], "A256KW");
+            Assert.Equal(firstRecipient.Recipient.JoseHeader.Count, 3);
+            Assert.Equal(firstRecipient.Recipient.JoseHeader["enc"], "A256CBC-HS512");
+            Assert.Equal(firstRecipient.Recipient.JoseHeader["typ"], "JWE");
+            Assert.Equal(firstRecipient.Recipient.JoseHeader["alg"], "A256KW");
             
             var secondRecipient = Jose.JWE.Decrypt(token, PrivKey());
 
-            Assert.Equal("Hello World", System.Text.Encoding.UTF8.GetString(secondRecipient.Plaintext));
+            Assert.Equal("Hello World", secondRecipient.Plaintext);
 
-            Assert.Equal(secondRecipient.JoseHeaders.Count, 4);
-            Assert.Equal(secondRecipient.JoseHeaders["enc"], "A256CBC-HS512");
-            Assert.Equal(secondRecipient.JoseHeaders["typ"], "JWE");
-            Assert.Equal(secondRecipient.JoseHeaders["alg"], "RSA-OAEP-256");
-            Assert.Equal(secondRecipient.JoseHeaders["kid"], "Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc");            
+            Assert.Equal(secondRecipient.Recipient.JoseHeader.Count, 4);
+            Assert.Equal(secondRecipient.Recipient.JoseHeader["enc"], "A256CBC-HS512");
+            Assert.Equal(secondRecipient.Recipient.JoseHeader["typ"], "JWE");
+            Assert.Equal(secondRecipient.Recipient.JoseHeader["alg"], "RSA-OAEP-256");
+            Assert.Equal(secondRecipient.Recipient.JoseHeader["kid"], "Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc");            
         }
 
         [Fact]
@@ -162,26 +162,26 @@ namespace UnitTests
 
             var firstRecipient = Jose.JWE.Decrypt(token, "secret");
 
-            Assert.Equal("Hello World", System.Text.Encoding.UTF8.GetString(firstRecipient.Plaintext));
+            Assert.Equal("Hello World", firstRecipient.Plaintext);
 
-            Assert.Equal(firstRecipient.JoseHeaders.Count, 5);
-            Assert.Equal(firstRecipient.JoseHeaders["enc"], "A256CBC-HS512");
-            Assert.Equal(firstRecipient.JoseHeaders["typ"], "JWE");
-            Assert.Equal(firstRecipient.JoseHeaders["alg"], "PBES2-HS256+A128KW");
-            Assert.Equal(firstRecipient.JoseHeaders["p2c"], 8192);
-            Assert.Equal(firstRecipient.JoseHeaders["p2s"], "kpL8s71MjhPnBExCF-cIMA");
+            Assert.Equal(firstRecipient.Recipient.JoseHeader.Count, 5);
+            Assert.Equal(firstRecipient.Recipient.JoseHeader["enc"], "A256CBC-HS512");
+            Assert.Equal(firstRecipient.Recipient.JoseHeader["typ"], "JWE");
+            Assert.Equal(firstRecipient.Recipient.JoseHeader["alg"], "PBES2-HS256+A128KW");
+            Assert.Equal(firstRecipient.Recipient.JoseHeader["p2c"], 8192);
+            Assert.Equal(firstRecipient.Recipient.JoseHeader["p2s"], "kpL8s71MjhPnBExCF-cIMA");
 
             var secondRecipient = Jose.JWE.Decrypt(token, Ecc256Private());
 
-            Assert.Equal("Hello World", System.Text.Encoding.UTF8.GetString(secondRecipient.Plaintext));
+            Assert.Equal("Hello World", secondRecipient.Plaintext);
 
-            Assert.Equal(secondRecipient.JoseHeaders.Count, 4);
-            Assert.Equal(secondRecipient.JoseHeaders["enc"], "A256CBC-HS512");
-            Assert.Equal(secondRecipient.JoseHeaders["typ"], "JWE");
-            Assert.Equal(secondRecipient.JoseHeaders["alg"], "ECDH-ES+A128KW");
-            Assert.True(secondRecipient.JoseHeaders.ContainsKey("epk"));
+            Assert.Equal(secondRecipient.Recipient.JoseHeader.Count, 4);
+            Assert.Equal(secondRecipient.Recipient.JoseHeader["enc"], "A256CBC-HS512");
+            Assert.Equal(secondRecipient.Recipient.JoseHeader["typ"], "JWE");
+            Assert.Equal(secondRecipient.Recipient.JoseHeader["alg"], "ECDH-ES+A128KW");
+            Assert.True(secondRecipient.Recipient.JoseHeader.ContainsKey("epk"));
 
-            var epk = (IDictionary<string, object>)secondRecipient.JoseHeaders["epk"];
+            var epk = (IDictionary<string, object>)secondRecipient.Recipient.JoseHeader["epk"];
             Assert.Equal(epk.Count, 4);
             Assert.Equal(epk["crv"], "P-256");
             Assert.Equal(epk["kty"], "EC");
@@ -324,7 +324,7 @@ namespace UnitTests
 
 
 			var decoded = JWE.Decrypt(token, sharedKey);
-			Assert.Equal(Encoding.UTF8.GetString(decoded.Plaintext), payload);
+			Assert.Equal(decoded.Plaintext, payload);
 		}
 		
 		[Fact]
@@ -374,9 +374,9 @@ namespace UnitTests
 			Assert.Equal("RSA-OAEP-256", rec2["header"]["alg"]);
 			Assert.Equal(342, ((string)rec2["encrypted_key"]).Length);
 
-			Assert.Equal(Encoding.UTF8.GetString(JWE.Decrypt(token, "secret").Plaintext), payload);
-			Assert.Equal(Encoding.UTF8.GetString(JWE.Decrypt(token, PrivKey()).Plaintext), payload);
-			Assert.Equal(Encoding.UTF8.GetString(JWE.Decrypt(token, Ecc256Private()).Plaintext), payload);
+			Assert.Equal(JWE.Decrypt(token, "secret").Plaintext, payload);
+			Assert.Equal(JWE.Decrypt(token, PrivKey()).Plaintext, payload);
+			Assert.Equal(JWE.Decrypt(token, Ecc256Private()).Plaintext, payload);
 		}
 		
 		[Fact]
@@ -409,7 +409,7 @@ namespace UnitTests
             Assert.Equal(18, ((string)deserialized["ciphertext"]).Length); //cipher text size
             Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
 			
-			Assert.Equal(Encoding.UTF8.GetString(JWE.Decrypt(token, PrivKey()).Plaintext), payload);
+			Assert.Equal(Encoding.UTF8.GetString(JWE.Decrypt(token, PrivKey()).PlaintextBytes), payload);
 		}
 
 		[Fact]
@@ -439,7 +439,7 @@ namespace UnitTests
             Assert.Equal(18, ((string)deserialized["ciphertext"]).Length); //cipher text size
             Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
 			
-			Assert.Equal(Encoding.UTF8.GetString(JWE.Decrypt(token, PrivKey()).Plaintext), payload);
+			Assert.Equal(Encoding.UTF8.GetString(JWE.Decrypt(token, PrivKey()).PlaintextBytes), payload);
 		}
 
 		[Fact]
@@ -469,7 +469,7 @@ namespace UnitTests
 			Assert.Equal(18, ((string)deserialized["ciphertext"]).Length); //cipher text size
 			Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
 
-			Assert.Equal(Encoding.UTF8.GetString(JWE.Decrypt(token, PrivKey()).Plaintext), payload);
+			Assert.Equal(Encoding.UTF8.GetString(JWE.Decrypt(token, PrivKey()).PlaintextBytes), payload);
 		}
 
 		[Fact]

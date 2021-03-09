@@ -1,4 +1,5 @@
-﻿namespace Jose
+﻿
+namespace Jose
 {
     using System;
     using System.Collections.Generic;
@@ -173,39 +174,24 @@
         /// <exception cref="IntegrityException">if AEAD operation validation failed</exception>
         /// <exception cref="EncryptionException">if JWE can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if encryption or compression algorithm is not supported</exception>
-        public static (byte[] Plaintext, IDictionary<string, object> JoseHeaders, byte[] Aad) Decrypt(string jwe, object key, JweAlgorithm? expectedJweAlg = null, JweEncryption? expectedJweEnc = null, JwtSettings settings = null)
+        public static JweToken Decrypt(string jwe, object key, JweAlgorithm? expectedJweAlg = null, JweEncryption? expectedJweEnc = null, JwtSettings settings = null)
         {
             Ensure.IsNotEmpty(jwe, "Incoming jwe expected to be in a valid serialization form, not empty, whitespace or null.");
 
             settings = GetSettings(settings);
+            
+            JweToken token = UnsafeJoseHeaders(jwe);
 
-            JweToken parsedJwe = JweToken.FromString(jwe, settings.JsonMapper);
-
-            IDictionary<string, object> protectedHeader = settings.JsonMapper.Parse<Dictionary<string, object>>(
-                Encoding.UTF8.GetString(parsedJwe.ProtectedHeaderBytes));
-
-            if(protectedHeader==null && parsedJwe.Encoding == SerializationMode.Compact)
+            if(token.ProtectedHeaderBytes==null && token.Encoding == SerializationMode.Compact)
             {
                 throw new JoseException(string.Format("Protected header was missing but required with compact encoding."));
             }            
 
             var exceptions = new List<Exception>();
 
-            foreach (var recipient in parsedJwe.Recipients)
+            foreach (var recipient in token.Recipients)
             {
-                IDictionary<string, object> joseHeader;
-
-                try
-                {
-                    joseHeader = Dictionaries.MergeHeaders(protectedHeader, parsedJwe.UnprotectedHeader, recipient.Header);                    
-                }
-                catch (ArgumentException)
-                {
-                    throw new JoseException("Invalid JWE data, duplicate header keys found between protected, unprotected and recipient headers");
-                }
-
-
-                var headerAlg = settings.JwaAlgorithmFromHeader((string)joseHeader["alg"]);
+                var headerAlg = settings.JwaAlgorithmFromHeader((string)recipient.JoseHeader["alg"]);
                 var encryptedCek = recipient.EncryptedCek;
 
                 // skip recipient if asked to do strict validation
@@ -223,7 +209,7 @@
 
                 try
                 {
-                    JweEncryption headerEnc = settings.JweAlgorithmFromHeader((string)joseHeader["enc"]);
+                    JweEncryption headerEnc = settings.JweAlgorithmFromHeader((string)recipient.JoseHeader["enc"]);
                     IJweAlgorithm enc = settings.Jwe(headerEnc);
 
                     if (enc == null)
@@ -237,22 +223,28 @@
                     }
 
 
-                    byte[] cek = keys.Unwrap(recipient.EncryptedCek, key, enc.KeySize, joseHeader);
-                    byte[] asciiEncodedProtectedHeader = Encoding.ASCII.GetBytes(Base64Url.Encode(parsedJwe.ProtectedHeaderBytes));
+                    byte[] cek = keys.Unwrap(recipient.EncryptedCek, key, enc.KeySize, recipient.JoseHeader);
+                    byte[] asciiEncodedProtectedHeader = Encoding.ASCII.GetBytes(Base64Url.Encode(token.ProtectedHeaderBytes));
 
-                    byte[] aad = parsedJwe.Aad == null ? 
-                        Encoding.ASCII.GetBytes(Base64Url.Encode(parsedJwe.ProtectedHeaderBytes)) :
-                        Encoding.ASCII.GetBytes(string.Concat(Base64Url.Encode(parsedJwe.ProtectedHeaderBytes), ".", Base64Url.Encode(parsedJwe.Aad)));
+                    byte[] aad = token.Aad == null ? 
+                        Encoding.ASCII.GetBytes(Base64Url.Encode(token.ProtectedHeaderBytes)) :
+                        Encoding.ASCII.GetBytes(string.Concat(Base64Url.Encode(token.ProtectedHeaderBytes), ".", Base64Url.Encode(token.Aad)));
 
-                    byte[] plaintext = enc.Decrypt(aad, cek, parsedJwe.Iv, parsedJwe.Ciphertext, parsedJwe.AuthTag);
+                    byte[] plaintext = enc.Decrypt(aad, cek, token.Iv, token.Ciphertext, token.AuthTag);
 
-                    if (joseHeader.TryGetValue("zip", out var compressionAlg))
+                    if (recipient.JoseHeader.TryGetValue("zip", out var compressionAlg))
                     {
                         var compression = settings.Compression((string)compressionAlg);
 
                         plaintext = compression.Decompress(plaintext);
                     }
-                    return (Plaintext: plaintext, JoseHeaders: joseHeader, Aad: parsedJwe.Aad);
+                    
+                    token.PlaintextBytes = plaintext;
+                    token.Recipient = recipient;
+
+                    return token;
+
+                    //return (Plaintext: plaintext, JoseHeaders: recipient.JoseHeader, Aad: token.Aad);
                 }
                 catch (ArgumentException ex)
                 {
@@ -271,7 +263,7 @@
             }
 
             // decryption failed
-            if (exceptions.Select(e => (e.GetType(), e.Message)).Distinct().Count() == 1)
+            if (exceptions.Select(e => new KeyValuePair<Type, String>(e.GetType(), e.Message)).Distinct().Count() == 1)
             {
                 // throw the first
                 throw exceptions[0];
@@ -293,22 +285,28 @@
         /// <exception cref="IntegrityException">if AEAD operation validation failed</exception>
         /// <exception cref="EncryptionException">if JWE can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if encryption or compression algorithm is not supported</exception>
-        public static IEnumerable<IDictionary<string, object>> UnsafeJoseHeaders(string jwe, JwtSettings settings = null)
+        public static JweToken UnsafeJoseHeaders(string jwe, JwtSettings settings = null)
         {
             settings = GetSettings(settings);
             
-            var parsedJwe = JweToken.FromString(jwe, settings.JsonMapper);           
+            var token = JweToken.FromString(jwe, settings.JsonMapper);           
 
-            var protectedHeaders = settings.JsonMapper.Parse<Dictionary<string, object>>(
-                Encoding.UTF8.GetString(parsedJwe.ProtectedHeaderBytes));
+            var protectedHeader = settings.JsonMapper.Parse<Dictionary<string, object>>(
+                Encoding.UTF8.GetString(token.ProtectedHeaderBytes));
 
-            var ret = new List<IDictionary<string, object>>();
-
-            foreach(var recipient in parsedJwe.Recipients)
+            foreach(var recipient in token.Recipients)
             {
-                ret.Add(Dictionaries.MergeHeaders(protectedHeaders, parsedJwe.UnprotectedHeader, recipient.Header));
+                try
+                {
+                    recipient.JoseHeader = Dictionaries.MergeHeaders(protectedHeader, token.UnprotectedHeader, recipient.Header);
+                }
+                catch (ArgumentException)
+                {
+                    throw new JoseException("Invalid JWE data, duplicate header keys found between protected, unprotected and recipient headers");
+                }            
             }
-            return ret;
+
+            return token;
         }                
 
         private static JwtSettings GetSettings(JwtSettings settings)
