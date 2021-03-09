@@ -160,7 +160,7 @@ namespace UnitTests
 
 
 			// when
-			string test = token.AsString(new JSSerializerMapper());
+			string test = token.AsString(JWT.DefaultSettings.JsonMapper);
 
 			// then
 			Assert.Equal(test, @"{""ciphertext"":""z95vPJ_gXxejpFsno9EBCQ"",""protected"":""eyJ0eXAiOiJKV0UifQ"",""iv"":""jGdsbNjl-_uHT4V86MdFBA"",""tag"":""cbKJYp4ZRWWPWVHDyL2vuUjAZ3oAHXT1I75t1j9rCKI"",""header"":{""alg"":""PBES2-HS256+A128KW""},""encrypted_key"":""Kpr6FHWViJNnGCuDEEl27dsCiyWHRjiYuB2dOque06oqJZGVYgu9yif0L6OKd9gWvltrGJdo_byafGF5lwIvcl6ZGCNfRF3s""}");
@@ -204,7 +204,7 @@ namespace UnitTests
 			);
 
 			// when
-			string test = token.AsString(new JSSerializerMapper());
+			string test = token.AsString(JWT.DefaultSettings.JsonMapper);
 
 			// then
 			Assert.Equal(test, @"{""ciphertext"":""z95vPJ_gXxejpFsno9EBCQ"",""protected"":""eyJ0eXAiOiJKV0UifQ"",""iv"":""jGdsbNjl-_uHT4V86MdFBA"",""tag"":""cbKJYp4ZRWWPWVHDyL2vuUjAZ3oAHXT1I75t1j9rCKI"",""recipients"":[{""header"":{""alg"":""PBES2-HS256+A128KW""},""encrypted_key"":""Kpr6FHWViJNnGCuDEEl27dsCiyWHRjiYuB2dOque06oqJZGVYgu9yif0L6OKd9gWvltrGJdo_byafGF5lwIvcl6ZGCNfRF3s""},{""header"":{""alg"":""ECDH-ES+A128KW"",""epk"":{""crv"":""P-256"",""kty"":""EC""}},""encrypted_key"":""VuzPor1OEenPP-w0qg__uGS0w4h6Yt7K2ZHtzjqj0mnAzhNzTHumYFjaivk0dUwk1H2jxieEO9FYdC48BOMMjMcylnVGTgAV""}]}");
@@ -234,7 +234,7 @@ namespace UnitTests
 			);
 
 			// when
-			string test = token.AsString(new JSSerializerMapper());
+			string test = token.AsString(JWT.DefaultSettings.JsonMapper);
 
 			// then
 			Assert.Equal(test, @"{""ciphertext"":""z95vPJ_gXxejpFsno9EBCQ"",""protected"":""eyJ0eXAiOiJKV0UifQ"",""iv"":""jGdsbNjl-_uHT4V86MdFBA"",""tag"":""cbKJYp4ZRWWPWVHDyL2vuUjAZ3oAHXT1I75t1j9rCKI"",""aad"":""eyJ0eXAiOiJKV0UifQ"",""header"":{""alg"":""PBES2-HS256+A128KW""},""encrypted_key"":""Kpr6FHWViJNnGCuDEEl27dsCiyWHRjiYuB2dOque06oqJZGVYgu9yif0L6OKd9gWvltrGJdo_byafGF5lwIvcl6ZGCNfRF3s""}");
@@ -269,7 +269,7 @@ namespace UnitTests
 			);
 
 			// when
-			string test = token.AsString(new JSSerializerMapper());			
+			string test = token.AsString(JWT.DefaultSettings.JsonMapper);			
 
 			// then
 			Assert.Equal(test, @"{""ciphertext"":""z95vPJ_gXxejpFsno9EBCQ"",""protected"":""eyJ0eXAiOiJKV0UifQ"",""iv"":""jGdsbNjl-_uHT4V86MdFBA"",""tag"":""cbKJYp4ZRWWPWVHDyL2vuUjAZ3oAHXT1I75t1j9rCKI"",""unprotected"":{""jku"":""https://server.example.com/keys.jwks""},""header"":{""alg"":""PBES2-HS256+A128KW""},""encrypted_key"":""Kpr6FHWViJNnGCuDEEl27dsCiyWHRjiYuB2dOque06oqJZGVYgu9yif0L6OKd9gWvltrGJdo_byafGF5lwIvcl6ZGCNfRF3s""}");
