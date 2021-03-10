@@ -155,9 +155,7 @@ namespace Jose
                     {                        
                         var protectedHeaderBytes = Encoding.UTF8.GetBytes(settings.JsonMapper.Serialize(joseProtectedHeader));                        
                         byte[] asciiEncodedProtectedHeader = Encoding.ASCII.GetBytes(Base64Url.Encode(protectedHeaderBytes));
-                        var aadToEncrypt = aad == null ? asciiEncodedProtectedHeader : asciiEncodedProtectedHeader.Concat(new byte[] { 0x2E }).Concat(aad).ToArray();
-
-                        byte[][] encParts = _enc.Encrypt(aadToEncrypt, plaintext, cek);                       
+                        byte[][] encParts = _enc.Encrypt(Aad(protectedHeaderBytes, aad), plaintext, cek);                       
 
                         return new JweToken(
                                     protectedHeaderBytes, 
@@ -236,15 +234,8 @@ namespace Jose
                         throw new InvalidAlgorithmException("The encryption type passed to the Decrypt method did not match the encryption type in the header.");
                     }
 
-
                     byte[] cek = keys.Unwrap(recipient.EncryptedCek, key, enc.KeySize, recipient.JoseHeader);
-                    byte[] asciiEncodedProtectedHeader = Encoding.ASCII.GetBytes(Base64Url.Encode(token.ProtectedHeaderBytes));
-
-                    byte[] aad = token.Aad == null ? 
-                        Encoding.ASCII.GetBytes(Base64Url.Encode(token.ProtectedHeaderBytes)) :
-                        Encoding.ASCII.GetBytes(string.Concat(Base64Url.Encode(token.ProtectedHeaderBytes), ".", Base64Url.Encode(token.Aad)));
-
-                    byte[] plaintext = enc.Decrypt(aad, cek, token.Iv, token.Ciphertext, token.AuthTag);
+                    byte[] plaintext = enc.Decrypt(Aad(token.ProtectedHeaderBytes, token.Aad), cek, token.Iv, token.Ciphertext, token.AuthTag);
 
                     if (recipient.JoseHeader.TryGetValue("zip", out var compressionAlg))
                     {
@@ -325,5 +316,13 @@ namespace Jose
         {
             return settings ?? JWT.DefaultSettings;
         }
+
+        private static byte[] Aad(byte[] protectedHeader, byte[] aad = null)
+        {
+            return aad == null ?
+                Encoding.ASCII.GetBytes(Base64Url.Encode(protectedHeader)) :
+                Encoding.ASCII.GetBytes(string.Concat(Base64Url.Encode(protectedHeader), ".", Base64Url.Encode(aad)));
+        }
+
     }
 }

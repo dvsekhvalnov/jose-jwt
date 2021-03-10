@@ -343,11 +343,15 @@ namespace UnitTests
             var base64UrlAad = (string)deserialized["aad"];
             Assert.NotNull(base64UrlAad);
             Assert.Equal(Rfc7520_Figure176_ExampleBase64UrlEncodedAad, base64UrlAad);
+
+            var decrypted = JWE.Decrypt(jwe, key);
+
+            Assert.Equal(Rfc7520_Figure72_ExamplePlaintext, decrypted.Plaintext);
         }
 
         [Fact]
         public void EncryptDecrypt_WithAdditionalAuthenticatedData_RoundtripOk()
-        {
+        {            
             //given
             var key = GetLegacyKeyObjectFromJwk(new JsonWebKey(Rfc7520_5_8_1_Figure151_ExampleJwk));
             var plaintext = Rfc7520_Figure72_ExamplePlaintext;
@@ -357,7 +361,8 @@ namespace UnitTests
                 UTF8Encoding.UTF8.GetBytes(Rfc7520_Figure72_ExamplePlaintext),
                 new JweRecipient[] { new JweRecipient(JweAlgorithm.A128KW, key) },
                 JweEncryption.A128CBC_HS256,
-                mode: SerializationMode.Json);
+                aad: Base64Url.Decode(Rfc7520_Figure176_ExampleBase64UrlEncodedAad),
+                mode: SerializationMode.Json); ;
 
             //then
             var decrypted = JWE.Decrypt(jwe, key);
@@ -571,7 +576,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void DecodeKeySingleRecipientProtectedHeader()
+        public void DecodeSingleRecipientProtectedHeader()
         {
             var token = @"{""ciphertext"":""tzh1xXdNDke99sLmZEnmYw"",""encrypted_key"":""DNszn45AFTiUAWsPeLi-AZd4oSkUKLK95FrRMpDv9qEe9TIA6QOPezOh7NrOzTXa8AdrbnDRQJwO7S_0i4p5xQrEukjkzelD"",""header"":{""alg"":""A256KW"",""enc"":""A256CBC-HS512""},""iv"":""480QxkaQPCiaEmxJFPxgsg"",""tag"":""dHeG5UCb4nCSbysUKva_4I_Z4D2WfYUaeasxOsJXTYg""}";
 
@@ -582,6 +587,22 @@ namespace UnitTests
             Assert.Equal(payload.Recipient.JoseHeader.Count, 2);
             Assert.Equal(payload.Recipient.JoseHeader["enc"], "A256CBC-HS512");
             Assert.Equal(payload.Recipient.JoseHeader["alg"], "A256KW");
+        }
+
+        [Fact]
+        public void DecodeAAD()
+        {
+            var token = @"{""aad"":""ZXlKaGJHY2lPaUpCTVRJNFMxY2lMQ0psYm1NaU9pSkJNVEk0UTBKRExVaFRNalUySW4w"",""ciphertext"":""02VvoX1sUsmFi2ZpIbTI8g"",""encrypted_key"":""kH4te-O3DNZoDlxeDnBXM9CNx2d5IgVGO-cVMmqTRW_ws0EG_RKDQ7FLLztMM83z2s-pSNSZtFf3bx9Aky8XOzhIYCIU7XvmiQ0pp5z1FRdrwO-RxEOJfb2hAjD-hE5lCJkkY722QGs4IrUQ5N5Atc9h9-0vDcg-gksFIuaLMeRQj3LxivhwJO-QWFd6sG0FY6fBCwS1X6zsrZo-m9DNvrB6FhMpkLPBDOlCNnjKf1_Mz_jAuXIwnVUhoq59m8tvxQY1Fyngiug6zSnM207-0BTXzuCTnPgPAwGWGDLO7o0ttPT6RI_tLvYE6AuOynsqsHDaecyIkJ26dif3iRmkeg"",""header"":{""alg"":""RSA-OAEP-256"",""kid"":""Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc""},""iv"":""E1BAiqIeAH_0eInT59zb8w"",""protected"":""eyJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwidHlwIjoiSldFIn0"",""tag"":""yYBiajF5oMtyK3mRVQyPnlJL25hXW8Ct8ZMcFK5ehDY""}";
+
+            var payload = Jose.JWE.Decrypt(token, PrivKey());
+
+            Assert.Equal("Hello World", payload.Plaintext);
+
+            Assert.Equal(payload.Recipient.JoseHeader.Count, 4);
+            Assert.Equal(payload.Recipient.JoseHeader["enc"], "A256CBC-HS512");
+            Assert.Equal(payload.Recipient.JoseHeader["alg"], "RSA-OAEP-256");
+            Assert.Equal(payload.Recipient.JoseHeader["kid"], "Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc");
+            Assert.Equal(payload.Recipient.JoseHeader["typ"], "JWE");
         }
 
         [Fact]
@@ -856,6 +877,36 @@ namespace UnitTests
             string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json);
 
             Console.Out.WriteLine("[JSON][A256KW][A256GCM]: {0}", token);
+
+            JObject deserialized = JObject.Parse(token);
+
+            Assert.Equal("{\"enc\":\"A256GCM\"}",
+                             UTF8Encoding.UTF8.GetString(Base64Url.Decode((string)deserialized["protected"])));
+
+            Assert.True(deserialized["header"] is JObject);
+            Assert.Equal("{\"alg\":\"A256KW\"}", deserialized["header"].ToString(Newtonsoft.Json.Formatting.None));
+            Assert.Equal("A256KW", deserialized["header"]["alg"]);
+            Assert.Equal(54, ((string)deserialized["encrypted_key"]).Length); //CEK size
+            Assert.Equal(16, ((string)deserialized["iv"]).Length); //IV size
+            Assert.Equal(18, ((string)deserialized["ciphertext"]).Length); //cipher text size
+            Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
+
+
+            var decoded = JWE.Decrypt(token, sharedKey);
+            Assert.Equal(decoded.Plaintext, payload);
+        }
+
+        [Fact]
+        public void EncodeWithAAD()
+        {
+            var payload = "Hello World !";
+            JweRecipient r = new JweRecipient(JweAlgorithm.A256KW, sharedKey);
+
+            var aad = new byte[] { 101, 121, 74, 104, 98, 71, 99, 105, 79, 105, 74, 66, 77, 84, 73, 52, 83, 49, 99, 105, 76, 67, 74, 108, 98, 109, 77, 105, 79, 105, 74, 66, 77, 84, 73, 52, 81, 48, 74, 68, 76, 85, 104, 84, 77, 106, 85, 50, 73, 110, 48 };
+
+            string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, aad, mode: SerializationMode.Json);
+
+            Console.Out.WriteLine("[JSON][A256KW][A256GCM][AAD]: {0}", token);
 
             JObject deserialized = JObject.Parse(token);
 
