@@ -8,6 +8,8 @@ Extensively tested for compatibility with [jose.4.j](https://bitbucket.org/b_c/j
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
+- v3.1 introduced JWE JSON Serialization support and targets `NET4`, `NET461`, `netstandard1.4` and `netstandard2.1`
+
 - v3.0 and above additionally targets `netstandard2.1` to leverage better .net crypto support on *\*nix* systems and enable more supported algorithms.
 All new features will most likely appear based on given version.
 
@@ -31,7 +33,6 @@ All new features will most likely appear based on given version.
 > Moved:
 > - `Security.Cryptography.EccKey` to `Jose.keys.EccKey`
 > - `Security.Cryptography.RsaKey` to `Jose.keys.RsaKey`
-
 
 
 ## Foreword
@@ -447,6 +448,10 @@ string token = "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2
 
 string json = Jose.JWT.Decode(token, "top secret");
 ```
+
+### JWE JSON Serialization support
+Available since v3.1.
+[TODO]
 
 ### Potential security risk
 
