@@ -2640,6 +2640,17 @@ namespace UnitTests
         }
 
         [Fact]
+        public void PayloadFailure()
+        {
+            //given
+            string token = "null";
+
+            //then
+            var exception = Assert.Throws<JoseException>(() => Jose.JWT.Payload(token));
+            Assert.Equal("The given token doesn't follow JWT format and must contains at least three parts.", exception.Message);
+        }
+
+        [Fact]
         public void PayloadBytes()
         {
             //given
@@ -2763,6 +2774,28 @@ namespace UnitTests
             Assert.Equal(tokenHeaders["b64"], false);
             Assert.Equal(tokenHeaders["exp"], 1363284000);
             Assert.Equal(tokenHeaders["crit"], new [] {"b64", "exp"});
+        }
+
+        [Fact]
+        public void EncodeWithUnencodedDetachedExtraHeadersCrit()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            var headers = new Dictionary<string, object>
+            {
+                { "exp", 1363284000 },
+                { "crit", new [] {"exp"} },
+            };
+
+            //when
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256,
+                extraHeaders: headers,
+                options: new JwtOptions { DetachPayload = true, EncodePayload = false });
+
+            //then
+            var tokenHeaders = Jose.JWT.Headers(token);
+            Assert.Equal(tokenHeaders["crit"], new[] { "b64", "exp" });
         }
 
         [Fact]

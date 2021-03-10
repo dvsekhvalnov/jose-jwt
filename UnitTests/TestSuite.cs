@@ -2512,12 +2512,6 @@ namespace UnitTests
             //then
             var tokenHeaders = Jose.JWT.Headers(token);
 	    Assert.Equal(tokenHeaders["crit"], new [] {"b64", "exp"});	    
-/*	    List crit = (List)tokenHeaders["crit"];
-	    Assert.Collection(crit,
-                item => Assert.Equal("b64", item),
-                item => Assert.Equal("exp", item)
-            );
-*/
         }
 
         [Fact]
