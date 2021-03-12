@@ -1,14 +1,15 @@
-# Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET and .NET Core
+# Ultimate Javascript Object Signing and Encryption (JOSE), JSON Web Token (JWT) and JSON Web Encryption (JWE) Implementation for .NET and .NET Core
 
 Minimallistic zero-dependency library for generating, decoding and encryption [JSON Web Tokens](http://tools.ietf.org/html/draft-jones-json-web-token-10). Supports full suite
 of [JSON Web Algorithms](https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-31) as of July 4, 2014 version. JSON parsing agnostic, can plug any desired JSON processing library.
 Extensively tested for compatibility with [jose.4.j](https://bitbucket.org/b_c/jose4j/wiki/Home), [Nimbus-JOSE-JWT](https://bitbucket.org/nimbusds/nimbus-jose-jwt/wiki/Home) and [json-jwt](https://github.com/nov/json-jwt) libraries.
+JWE JSON Serialization cross-tested with [JWCrypto](https://github.com/latchset/jwcrypto/).
 
 ## FIPS compliance ##
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
-- v3.1 introduced JWE JSON Serialization support and targets `NET4`, `NET461`, `netstandard1.4` and `netstandard2.1`
+- v3.1 introduced JWE JSON Serialization defined in [RFC 7516](https://tools.ietf.org/html/rfc7516)
 
 - v3.0 and above additionally targets `netstandard2.1` to leverage better .net crypto support on *\*nix* systems and enable more supported algorithms.
 All new features will most likely appear based on given version.
@@ -449,9 +450,58 @@ string token = "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2
 string json = Jose.JWT.Decode(token, "top secret");
 ```
 
-### JWE JSON Serialization support
-Available since v3.1.
-[TODO]
+### JWE JSON Serialization support (RFC 7516)
+As of version v3.1 `jose-jwt` library provides full support for json serialized encrypted content.
+
+#### Decoding json serialized encrypted content
+
+`JweToken Jose.JWE.Decrypt(token, key)` - can be used to decrypt JSON serialized token. It returns object of type `JweToken` with following properties:
+* `PlaintextBytes` - byte array with decrypted content, only when decryption successfully performed
+* `Plaintext` - decrypted content as string, only when decryption successfully performed 
+* `Recipient` - effective recipient that was used to decrypt token, only when decryption was successfully performed
+* `Aad` - additional authentication data
+* `Iv` - initialization vector
+* `Ciphertext` - ciphertext (encrypted content)
+* `AuthTag` - authenication tag	
+* `UnprotectedHeader` - shared unprotected headers (key-value pairs)
+* `ProtectedHeaderBytes` - shared signature protected headers, binary blob
+* `Recipients` - list of `JweRecipient` objects as specified in token
+
+`JweRecipient` object supports following properties:
+* `Alg` - 
+* `Header` - 
+* `JoseHeader` - effective headers for given recipient, calculated we union of shared headers and per-recipient headers, only when decryption successfully performed or `Jose.JWE.Header` was called.
+
+
+``` cs
+string token = @"
+{
+	""aad"": ""ZXlKaGJHY2lPaUpCTVRJNFMxY2lMQ0psYm1NaU9pSkJNVEk0UTBKRExVaFRNalUySW4w"",
+	""ciphertext"": ""02VvoX1sUsmFi2ZpIbTI8g"",
+	""encrypted_key"": ""kH4te-O3DNZoDlxeDnBXM9CNx2d5IgVGO-cVMmqTRW_ws0EG_RKDQ7FLLztMM83z2s-pSNSZtFf3bx9Aky8XOzhIYCIU7XvmiQ0pp5z1FRdrwO-RxEOJfb2hAjD-hE5lCJkkY722QGs4IrUQ5N5Atc9h9-0vDcg-gksFIuaLMeRQj3LxivhwJO-QWFd6sG0FY6fBCwS1X6zsrZo-m9DNvrB6FhMpkLPBDOlCNnjKf1_Mz_jAuXIwnVUhoq59m8tvxQY1Fyngiug6zSnM207-0BTXzuCTnPgPAwGWGDLO7o0ttPT6RI_tLvYE6AuOynsqsHDaecyIkJ26dif3iRmkeg"",
+	""header"": {
+		""alg"": ""RSA-OAEP-256"",
+		""kid"": ""Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc""
+	},
+	""iv"": ""E1BAiqIeAH_0eInT59zb8w"",
+	""protected"": ""eyJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwidHlwIjoiSldFIn0"",
+	""tag"": ""yYBiajF5oMtyK3mRVQyPnlJL25hXW8Ct8ZMcFK5ehDY""
+}";
+
+var key = LoadPrivateRsaKey(); // Use key type approporiate for your recipient  
+
+JweToken jwe = Jose.JWE.Decrypt(token, key);
+
+// generic form to access decrypted content as blob
+byte[] binaryContent = jwe.PlaintextBytes;
+
+// convinient helper to get decrypted content as string
+string content = jwe.Plaintext;
+
+// effective recipient information that was elligable for decryption
+JweRecipient recipient = jwe.Recipient;
+
+```
 
 ### Potential security risk
 
