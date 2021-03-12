@@ -455,22 +455,26 @@ As of version v3.1 `jose-jwt` library provides full support for json serialized 
 
 #### Decoding json serialized encrypted content
 
-`JweToken Jose.JWE.Decrypt(token, key)` - can be used to decrypt JSON serialized token. It returns object of type `JweToken` with following properties:
+`JweToken Jose.JWE.Decrypt(token, key)` - can be used to decrypt JSON serialized token.
+
+See [Verifying and Decoding Tokens](#verifying-and-decoding-tokens) section for information about different key types usage.
+
+The function returns object of type `JweToken` with following properties:
 * `PlaintextBytes` - byte array with decrypted content, only when decryption successfully performed
-* `Plaintext` - decrypted content as string, only when decryption successfully performed 
+* `Plaintext` - decrypted content as string, only when decryption successfully performed
 * `Recipient` - effective recipient that was used to decrypt token, only when decryption was successfully performed
 * `Aad` - additional authentication data
 * `Iv` - initialization vector
 * `Ciphertext` - ciphertext (encrypted content)
-* `AuthTag` - authenication tag	
+* `AuthTag` - authenication tag
 * `UnprotectedHeader` - shared unprotected headers (key-value pairs)
 * `ProtectedHeaderBytes` - shared signature protected headers, binary blob
 * `Recipients` - list of `JweRecipient` objects as specified in token
 
 `JweRecipient` object supports following properties:
-* `Alg` - 
-* `Header` - 
-* `JoseHeader` - effective headers for given recipient, calculated we union of shared headers and per-recipient headers, only when decryption successfully performed or `Jose.JWE.Header` was called.
+* `Alg` - Key encryption algorithm
+* `Header` - Per recipient set of headers
+* `JoseHeader` - effective headers for given recipient, calculated as union of shared headers and per-recipient headers, only when decryption successfully performed via `Jose.JWE.Decrypt()` or `Jose.JWE.Headers()` was called.
 
 
 ``` cs
@@ -488,8 +492,10 @@ string token = @"
 	""tag"": ""yYBiajF5oMtyK3mRVQyPnlJL25hXW8Ct8ZMcFK5ehDY""
 }";
 
-var key = LoadPrivateRsaKey(); // Use key type approporiate for your recipient  
+// Use key type approporiate for your recipient
+var key = LoadPrivateRsaKey();
 
+// decrypt JSON serialized token
 JweToken jwe = Jose.JWE.Decrypt(token, key);
 
 // generic form to access decrypted content as blob
@@ -498,10 +504,15 @@ byte[] binaryContent = jwe.PlaintextBytes;
 // convinient helper to get decrypted content as string
 string content = jwe.Plaintext;
 
-// effective recipient information that was elligable for decryption
+// effective recipient information that was used for decryption
 JweRecipient recipient = jwe.Recipient;
 
+// accessing effective headers
+string keyId = recipient.JoseHeaders["kid"];
 ```
+
+#### Encrypting using JSON serialization
+
 
 ### Potential security risk
 
