@@ -192,7 +192,7 @@ namespace Jose
 
             settings = GetSettings(settings);
             
-            JweToken token = UnsafeJoseHeaders(jwe);
+            JweToken token = Headers(jwe);
 
             if(token.ProtectedHeaderBytes==null && token.Encoding == SerializationMode.Compact)
             {
@@ -288,7 +288,7 @@ namespace Jose
         /// <exception cref="IntegrityException">if AEAD operation validation failed</exception>
         /// <exception cref="EncryptionException">if JWE can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if encryption or compression algorithm is not supported</exception>
-        public static JweToken UnsafeJoseHeaders(string jwe, JwtSettings settings = null)
+        public static JweToken Headers(string jwe, JwtSettings settings = null)
         {
             settings = GetSettings(settings);
             

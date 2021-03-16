@@ -543,7 +543,7 @@ namespace UnitTests
                 mode: SerializationMode.Compact);
 
             //when
-            var test = JWE.UnsafeJoseHeaders(jwe);
+            var test = JWE.Headers(jwe);
 
             //then
             Assert.Single(test.Recipients);
@@ -557,7 +557,7 @@ namespace UnitTests
         public void UnsafeJoseHeaders_Rfc7516AppendixA23_ExpectedResults()
         {
             //when
-            var test = JWE.UnsafeJoseHeaders(Rfc7516_A_4_7_ExampleJwe);
+            var test = JWE.Headers(Rfc7516_A_4_7_ExampleJwe);
 
             //then
             Assert.Equal(2, test.Recipients.Count());
