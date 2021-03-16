@@ -512,6 +512,29 @@ string keyId = recipient.JoseHeaders["kid"];
 ```
 
 #### Encrypting using JSON serialization
+`string Jose.JWE.Encrypt(......)` - can be used to encrypt string content and produce JSON serialized token.
+
+Convinient alternate version to encrypt binary content `string Jose.JWE.EncryptBytes(......)` is also available.
+
+See [Creating encrypted Tokens](#creating-encrypted-tokens) section for information about different key types usage.
+
+
+``` cs
+var payload = "Hello World !";
+JweRecipient r1 = new JweRecipient(JweAlgorithm.PBES2_HS256_A128KW, "secret");
+JweRecipient r2 = new JweRecipient(JweAlgorithm.ECDH_ES_A128KW, ECPublicKey());
+JweRecipient r3 = new JweRecipient(JweAlgorithm.RSA_OAEP_256, RsaPublicKey());
+
+string token = JWE.Encrypt(payload, new[] { r1, r2, r3 }, JweEncryption.A256GCM, mode: SerializationMode.Json);
+```
+
+Encrypt for multiple recipients at once:
+``` cs
+```
+
+Provide additional authentication data and unprotected shared headers:
+``` cs
+```
 
 
 ### Potential security risk
