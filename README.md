@@ -517,14 +517,14 @@ string keyId = recipient.JoseHeaders["kid"];
 Alternate version to encrypt binary content is also available `string Jose.JWE.EncryptBytes()`.
 
 Where:
-* `plaintext` - string, content (payload) to be encrypted
-* `recipients` - IEnumerable<JweRecipient>, one or more recipients information
-* `encryption` - JweEncryption, encryption to be used
-* `add` - byte[], optional, Additional Authentication Data
-* `serialization` - SerializationMode, optional, `Json` is default, final token encoding
-* `compression` - JweCompression, optional, compression algorithm
-* `extraProtectedHeaders` - IDictionary, optional, additional key-value pairs to include into protected header
-* `unprotectedHeaders` - IDictionary, optional, key-value pairs to include into unprotected header
+* `plaintext` - content (payload) to be encrypted
+* `recipients` - one or more recipients information
+* `encryption` - encryption to be used
+* `add` - optional, Additional Authentication Data
+* `serialization` - optional, `Json` is default, final token encoding
+* `compression` - optional, compression algorithm
+* `extraProtectedHeaders` - optional, additional key-value pairs to include into protected header
+* `unprotectedHeaders` - optional, key-value pairs to include into unprotected header
 
 See [Creating encrypted Tokens](#creating-encrypted-tokens) section for information about different key types usage.
 
@@ -587,7 +587,6 @@ Options can be mixed in any combinations. To match RFC 7797:
 ```C#
 string token = Jose.JWT.Encode(json, secretKey, JwsAlgorithm.HS256, options: new JwtOptions { DetachPayload = true, EncodePayload = false});
 ```
-
 or just skip payload for instance:
 
 ```C#
@@ -668,6 +667,9 @@ unmarshalled type.
 `string Jose.JWT.Payload(string token)` to return unparsed payload and `T Jose.JWT.Payload<T>(string token)` to return unmarshalled payload type. Those 2 methods works only with
 signed tokens and will throw `JoseException` when applied on encrypted token.
 
+With JWE JSON (RFC 7516) serialized tokens `JweToken JWE.Headers()` method can be used for same purpose.
+It will parse JSON structre into `JweToken` object and pre-populate effective headers (`JweRecipient.JoseHeader` property, see [JWE](#decoding-json-serialized-encrypted-content)) per every recipient in token. But will not perform actual decryption or integrity verification.
+
 **Security warning: please note, you should NOT rely on infromation extracted by given helpers without performing token validation as second step.**
 
 Below are couple examples on how two-phase validation can be implemented with jose-jwt:
@@ -714,6 +716,21 @@ key.ImportParameters(new RSAParameters
 
 // step 2: perform actual token validation
 var paylod = Jose.JWT.Decode(token, key);
+```
+
+```C#
+// Validate JWE JSON token with dynamic key
+
+// step 1a: parse token, extract public JWK set and keyid for some recipient
+var parsed = JWE.Headers(token);
+var keysUrl = parsed.UnprotectedHeader["jku"];
+var keyId = parsed.Recipients[0].Header["keyid"];
+
+// step 1b: find/retrieve/ensure actual key for decyption
+var key = FindKey(keysUrl, keyId);
+
+// step 2: perform actual token validation
+var payload = JWE.Decrypt(token, key).Plaintext;
 ```
 
 ### Strict validation
@@ -768,7 +785,7 @@ MyDomainObject obj=Jose.JWT.Decode<MyDomainObject>(token,secretKey); //will invo
 string data=Jose.JWT.Encode(obj,secrectKey,JwsAlgorithm.HS256); //for object argument configured IJsonMapper will be invoked to serialize object to json string before encoding
 ```
 
-### Potential security risk
+#### Potential security risk
 
 While deserializing a token, if a field is not provided in token (may due to payload schema changes), the field will remain its default value. This is Newtonsoft.Json's behavior. This hehavior is quite dangerous, which could give attacker chances.
 
