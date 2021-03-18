@@ -83,8 +83,7 @@ namespace UnitTests
             var jwe = JWE.EncryptBytes(
                 plaintext: payload,
                 recipients: recipients,
-                JweEncryption.A256GCM,
-                mode: SerializationMode.Json,
+                JweEncryption.A256GCM,                
                 extraProtectedHeaders: sharedProtectedHeaders);
 
             var decrypted = JWE.Decrypt(jwe, decryptKey);
@@ -116,7 +115,6 @@ namespace UnitTests
                 plaintext: payload,
                 recipients: recipients,
                 JweEncryption.A256GCM,
-                mode: SerializationMode.Json,
                 extraProtectedHeaders: sharedProtectedHeaders);
 
             //when
@@ -148,7 +146,6 @@ namespace UnitTests
                 plaintext: payload,
                 recipients: recipients,
                 JweEncryption.A256GCM,
-                mode: SerializationMode.Json,
                 extraProtectedHeaders: sharedProtectedHeaders);
 
             //when
@@ -193,7 +190,9 @@ namespace UnitTests
             var jwe = JWE.EncryptBytes(
                 plaintext: plaintext,
                 recipients: new JweRecipient[] { recipientAes128KW },
-                JweEncryption.A128CBC_HS256);
+                JweEncryption.A128CBC_HS256,
+                mode: SerializationMode.Compact
+            );
 
             //then
             Console.Out.WriteLine("Empty bytes A128KW_A128CBC_HS256 = {0}", jwe);
@@ -222,8 +221,8 @@ namespace UnitTests
             var jwe = JWE.EncryptBytes(
                 plaintext: plaintext,
                 recipients: new JweRecipient[] { recipientAes128KW, recipientAes128KW },
-                JweEncryption.A128CBC_HS256,
-                mode: SerializationMode.Json);
+                JweEncryption.A128CBC_HS256
+            );
 
             //then
             Console.Out.WriteLine("Empty bytes A128KW_A128CBC_HS256 (General Json Serialization) = {0}", jwe);
@@ -259,8 +258,8 @@ namespace UnitTests
             var jwe = JWE.EncryptBytes(
                 plaintext: plaintext,
                 recipients: new JweRecipient[] { recipientAes128KW },
-                JweEncryption.A128CBC_HS256,
-                mode: SerializationMode.Json);
+                JweEncryption.A128CBC_HS256
+            );
 
             //then
             Console.Out.WriteLine("Empty bytes A128KW_A128CBC_HS256 (Flattened Json Serialization) = {0}", jwe);
@@ -334,8 +333,8 @@ namespace UnitTests
                 UTF8Encoding.UTF8.GetBytes(Rfc7520_Figure72_ExamplePlaintext),
                 new JweRecipient[] { new JweRecipient(JweAlgorithm.A128KW, key) },
                 JweEncryption.A128CBC_HS256,
-                aad: Base64Url.Decode(Rfc7520_Figure176_ExampleBase64UrlEncodedAad),
-                mode: SerializationMode.Json);
+                aad: Base64Url.Decode(Rfc7520_Figure176_ExampleBase64UrlEncodedAad)
+            );
 
             //then
             JObject deserialized = JObject.Parse(jwe);
@@ -361,8 +360,8 @@ namespace UnitTests
                 UTF8Encoding.UTF8.GetBytes(Rfc7520_Figure72_ExamplePlaintext),
                 new JweRecipient[] { new JweRecipient(JweAlgorithm.A128KW, key) },
                 JweEncryption.A128CBC_HS256,
-                aad: Base64Url.Decode(Rfc7520_Figure176_ExampleBase64UrlEncodedAad),
-                mode: SerializationMode.Json); ;
+                aad: Base64Url.Decode(Rfc7520_Figure176_ExampleBase64UrlEncodedAad)            
+            );
 
             //then
             var decrypted = JWE.Decrypt(jwe, key);
@@ -432,8 +431,7 @@ namespace UnitTests
             var exception = Record.Exception(() => JWE.EncryptBytes(
                 plaintext: plaintext,
                 recipients: recipients,
-                JweEncryption.A128CBC_HS256,
-                mode: SerializationMode.Json));
+                JweEncryption.A128CBC_HS256));
 
             //then
             if (expectedError == null)
@@ -474,8 +472,7 @@ namespace UnitTests
                             { "example.com:extra_recipient_header", "value1" },
                         })
                 },
-                JweEncryption.A128CBC_HS256,
-                mode: SerializationMode.Json,
+                JweEncryption.A128CBC_HS256,                
                 extraProtectedHeaders: new Dictionary<string, object>
                 {
                     { "cty", "text/plain" },
@@ -518,7 +515,6 @@ namespace UnitTests
                         })
                 },
                 JweEncryption.A128CBC_HS256,
-                mode: SerializationMode.Json,
                 extraProtectedHeaders: new Dictionary<string, object>
                 {
                     { "cty", "text/plain" },
@@ -874,7 +870,7 @@ namespace UnitTests
             var payload = "Hello World !";
             JweRecipient r = new JweRecipient(JweAlgorithm.A256KW, sharedKey);
 
-            string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json);
+            string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM);
 
             Console.Out.WriteLine("[JSON][A256KW][A256GCM]: {0}", token);
 
@@ -904,7 +900,7 @@ namespace UnitTests
 
             var aad = new byte[] { 101, 121, 74, 104, 98, 71, 99, 105, 79, 105, 74, 66, 77, 84, 73, 52, 83, 49, 99, 105, 76, 67, 74, 108, 98, 109, 77, 105, 79, 105, 74, 66, 77, 84, 73, 52, 81, 48, 74, 68, 76, 85, 104, 84, 77, 106, 85, 50, 73, 110, 48 };
 
-            string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, aad, mode: SerializationMode.Json);
+            string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, aad);
 
             Console.Out.WriteLine("[JSON][A256KW][A256GCM][AAD]: {0}", token);
 
@@ -989,7 +985,7 @@ namespace UnitTests
 
             JweRecipient r = new JweRecipient(JweAlgorithm.RSA_OAEP_256, PubKey());
 
-            string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json, unprotectedHeaders: unprotected);
+            string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, unprotectedHeaders: unprotected);
 
             Console.Out.WriteLine("[JSON][RSA_OAEP_256][A256GCM]: {0}", token);
 
@@ -1022,7 +1018,7 @@ namespace UnitTests
 
             JweRecipient r = new JweRecipient(JweAlgorithm.RSA_OAEP_256, PubKey());
 
-            string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json, extraProtectedHeaders: extra);
+            string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, extraProtectedHeaders: extra);
 
             Console.Out.WriteLine("[JSON][RSA_OAEP_256][A256GCM]: {0}", token);
 
@@ -1052,7 +1048,7 @@ namespace UnitTests
 
             JweRecipient r = new JweRecipient(JweAlgorithm.RSA_OAEP_256, PubKey(), header: extra);
 
-            string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json);
+            string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM);
 
             Console.Out.WriteLine("[JSON][RSA_OAEP_256][A256GCM]: {0}", token);
 
@@ -1083,7 +1079,7 @@ namespace UnitTests
             JweRecipient r = new JweRecipient(JweAlgorithm.RSA_OAEP_256, PubKey(), headers);
 
             //then
-            Assert.Throws<ArgumentException>(() => JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json));
+            Assert.Throws<ArgumentException>(() => JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM));
         }
 
         [Fact]
@@ -1099,7 +1095,7 @@ namespace UnitTests
             JweRecipient r = new JweRecipient(JweAlgorithm.RSA_OAEP_256, PubKey());
 
             //then
-            Assert.Throws<ArgumentException>(() => JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json, unprotectedHeaders: unprotected));
+            Assert.Throws<ArgumentException>(() => JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, unprotectedHeaders: unprotected));
         }
 
         [Fact]
@@ -1120,7 +1116,7 @@ namespace UnitTests
             JweRecipient r = new JweRecipient(JweAlgorithm.RSA_OAEP_256, PubKey(), headers);
 
             //then
-            Assert.Throws<ArgumentException>(() => JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, mode: SerializationMode.Json, unprotectedHeaders: unprotected));
+            Assert.Throws<ArgumentException>(() => JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, unprotectedHeaders: unprotected));
         }
 
         private static object GetLegacyKeyObjectFromJwk(JsonWebKey jwk)

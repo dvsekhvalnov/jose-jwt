@@ -30,7 +30,7 @@ namespace Jose
         /// <param name="unprotectedHeaders">optional unprotected headers</param> 
         /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
-        public static string Encrypt(string plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Compact, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
+        public static string Encrypt(string plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Json, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
         {
             return EncryptBytes(Encoding.UTF8.GetBytes(plaintext), recipients, enc, aad, mode, compression, extraProtectedHeaders, unprotectedHeaders, settings);
         }
@@ -48,7 +48,7 @@ namespace Jose
         /// <param name="unprotectedHeaders">optional unprotected headers</param> 
         /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
-        public static string EncryptBytes(byte[] plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Compact, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
+        public static string EncryptBytes(byte[] plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Json, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
         {
             if (plaintext == null)
             {
