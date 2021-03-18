@@ -512,58 +512,66 @@ string keyId = recipient.JoseHeaders["kid"];
 ```
 
 #### Encrypting using JSON serialization
-`string Jose.JWE.Encrypt(......)` - can be used to encrypt string content and produce JSON serialized token.
+`string Jose.JWE.Encrypt(plaintext, recipients, encryption, add, serialization, compression, extraProtectedHeaders, unprotectedHeaders, settings)` - can be used to encrypt string content and produce JSON serialized token.
 
-Convinient alternate version to encrypt binary content `string Jose.JWE.EncryptBytes(......)` is also available.
+Alternate version to encrypt binary content is also available `string Jose.JWE.EncryptBytes()`.
+
+Where:
+* `plaintext` - string, content (payload) to be encrypted
+* `recipients` - IEnumerable<JweRecipient>, one or more recipients information
+* `encryption` - JweEncryption, encryption to be used
+* `add` - byte[], optional, Additional Authentication Data
+* `serialization` - SerializationMode, optional, `Json` is default, final token encoding
+* `compression` - JweCompression, optional, compression algorithm
+* `extraProtectedHeaders` - IDictionary, optional, additional key-value pairs to include into protected header
+* `unprotectedHeaders` - IDictionary, optional, key-value pairs to include into unprotected header
 
 See [Creating encrypted Tokens](#creating-encrypted-tokens) section for information about different key types usage.
 
+``` cs
+var payload = "Hello JWE !";
+var blob = new byte[] { 72, 101, 108, 108, 111, 32, 74, 87, 69, 32, 33 };
+var preSharedKey = LoadKey();
 
+// generate JSON encoded token
+string token_1 = JWE.Encrypt(payload, new[] { new JweRecipient(JweAlgorithm.A256KW, preSharedKey) }, JweEncryption.A256GCM);
+
+// encrypt binary
+string token_2 = JWE.EncryptBytes(payload, new[] { new JweRecipient(JweAlgorithm.A256KW, preSharedKey) }, JweEncryption.A256GCM);
+
+// can opt-in for Compact encoded tokens with same interface
+string token_3 = JWE.Encrypt(payload, new[] { new JweRecipient(JweAlgorithm.A256KW, preSharedKey), mode: SerializationMode.Compact }, JweEncryption.A256GCM);
+```
+
+Encrypt for multiple recipients at once:
 ``` cs
 var payload = "Hello World !";
 JweRecipient r1 = new JweRecipient(JweAlgorithm.PBES2_HS256_A128KW, "secret");
 JweRecipient r2 = new JweRecipient(JweAlgorithm.ECDH_ES_A128KW, ECPublicKey());
 JweRecipient r3 = new JweRecipient(JweAlgorithm.RSA_OAEP_256, RsaPublicKey());
 
-string token = JWE.Encrypt(payload, new[] { r1, r2, r3 }, JweEncryption.A256GCM, mode: SerializationMode.Json);
-```
-
-Encrypt for multiple recipients at once:
-``` cs
+string token = JWE.Encrypt(payload, new[] { r1, r2, r3 }, JweEncryption.A256GCM);
 ```
 
 Provide additional authentication data and unprotected shared headers:
-``` cs
-```
-
-
-### Potential security risk
-
-While deserializing a token, if a field is not provided in token (may due to payload schema changes), the field will remain its default value. This is Newtonsoft.Json's behavior. This hehavior is quite dangerous, which could give attacker chances.
-
-Suppose the payload class is `Payload`.
 
 ``` cs
-class Payload
+var payload = "Hello World !";
+
+// additional authenticatin data
+var aad = new byte[] { 101, 121, 74, 104, 98, 71, 99, 105, 79, 105, 74, 66, 77, 84, 73, 52, 83, 49, 99, 105, 76, 67, 74, 108, 98, 109, 77, 105, 79, 105, 74, 66, 77, 84, 73, 52, 81, 48, 74, 68, 76, 85, 104, 84, 77, 106, 85, 50, 73, 110, 48 };
+
+// shared unprotected headers
+var unprotected = new Dictionary<string, object>
 {
-    public int UserId { get; set; }
-}
+    { "jku", "https://server.example.com/keys.jwks" }
+};
+
+var preSharedKey = LoadKey();
+
+string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, aad, unprotectedHeaders: unprotected);
+
 ```
-
-Later the `Payload` class is changed to:
-
-```cs
-class Payload
-{
-    public int Id { get; set; } // UserId -> Id
-}
-```
-Now, if the library deserializes a token issued before the change of `Payload` class, proterty `Id` is not provided in the token and will remain its default value `0`. The payload data will be: `{Id = 0}`.
-
-The user will get someone else's identity (id: 0) .
-
-So developers should always use [nullable data types](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/nullable-value-types) for payload class properties.
-
 
 ## Additional utilities
 
@@ -603,7 +611,6 @@ string token = "eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJSUzI1NiJ9..ToCewD
 // will echo provided payload back as return value, for consistency
 byte[] payload = Jose.JWT.DecodeBytes(token, PubKey(), payload: BinaryPayload);
 ```
-
 
 ### Adding extra headers
 jose-jwt allows to pass extra headers when encoding token to overide deafault values<sup>\*</sup>. `extraHeaders:` named param can be used, it accepts `IDictionary<string, object>` type.
@@ -760,6 +767,33 @@ MyDomainObject obj=Jose.JWT.Decode<MyDomainObject>(token,secretKey); //will invo
 
 string data=Jose.JWT.Encode(obj,secrectKey,JwsAlgorithm.HS256); //for object argument configured IJsonMapper will be invoked to serialize object to json string before encoding
 ```
+
+### Potential security risk
+
+While deserializing a token, if a field is not provided in token (may due to payload schema changes), the field will remain its default value. This is Newtonsoft.Json's behavior. This hehavior is quite dangerous, which could give attacker chances.
+
+Suppose the payload class is `Payload`.
+
+``` cs
+class Payload
+{
+    public int UserId { get; set; }
+}
+```
+
+Later the `Payload` class is changed to:
+
+```cs
+class Payload
+{
+    public int Id { get; set; } // UserId -> Id
+}
+```
+Now, if the library deserializes a token issued before the change of `Payload` class, proterty `Id` is not provided in the token and will remain its default value `0`. The payload data will be: `{Id = 0}`.
+
+The user will get someone else's identity (id: 0) .
+
+So developers should always use [nullable data types](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/nullable-value-types) for payload class properties.
 
 ## Settings
 As of v2.3.0 settings can be configured either globally or on a per-call basis using a `JwtSettings` object.  The `JWT.DefaultSettings` object can be modified to change global settings, or a `JwtSettings` instance can be passed to any public method on `JWT` to override the global settings for particular method call.
