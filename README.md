@@ -668,7 +668,7 @@ unmarshalled type.
 signed tokens and will throw `JoseException` when applied on encrypted token.
 
 With JWE JSON (RFC 7516) serialized tokens `JweToken JWE.Headers()` method can be used for same purpose.
-It will parse JSON structre into `JweToken` object and pre-populate effective headers (`JweRecipient.JoseHeader` property, see [JWE](#decoding-json-serialized-encrypted-content)) per every recipient in token. But will not perform actual decryption or integrity verification.
+It will parse JSON structure into `JweToken` object and pre-populate effective headers (`JweRecipient.JoseHeader` property, see [JWE](#decoding-json-serialized-encrypted-content)) per every recipient in token. But will not perform actual decryption or integrity verification.
 
 **Security warning: please note, you should NOT rely on infromation extracted by given helpers without performing token validation as second step.**
 
@@ -726,7 +726,7 @@ var parsed = JWE.Headers(token);
 var keysUrl = parsed.UnprotectedHeader["jku"];
 var keyId = parsed.Recipients[0].Header["keyid"];
 
-// step 1b: find/retrieve/ensure actual key for decyption
+// step 1b: find/retrieve/ensure actual key for decryption
 var key = FindKey(keysUrl, keyId);
 
 // step 2: perform actual token validation
