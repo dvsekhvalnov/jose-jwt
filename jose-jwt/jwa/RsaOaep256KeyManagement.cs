@@ -19,9 +19,9 @@ namespace Jose
         #if NET40
             if (key is CngKey)
             {
-                var publicKey = Ensure.Type<CngKey>(key, "RsaOaep256KeyManagement alg expects key to be of CngKey type.");
+                var publicKey = (CngKey)key;
 
-                return new[] {cek, RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256)};
+                return RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256);
             }
 
             if (key is RSACryptoServiceProvider)
@@ -33,7 +33,7 @@ namespace Jose
                 return RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256);
             }
 
-            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey type.");
+            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey or RSACryptoServiceProvider types.");
 
         #elif NET461
             if (key is CngKey)

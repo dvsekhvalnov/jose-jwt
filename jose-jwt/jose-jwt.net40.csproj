@@ -63,6 +63,9 @@
     <Compile Include="jwe\AesCbcHmacEncryption.cs" />
     <Compile Include="jwe\AesGcmEncryption.cs" />
     <Compile Include="jwe\IJweAlgorithm.cs" />
+    <Compile Include="jwe\JWE.cs" />
+    <Compile Include="jwe\JweRecipient.cs" />
+    <Compile Include="jwe\JweToken.cs" />
     <Compile Include="jws\EcdsaUsingSha.cs" />
     <Compile Include="jws\HmacUsingSha.cs" />
     <Compile Include="jws\IJwsAlgorithm.cs" />

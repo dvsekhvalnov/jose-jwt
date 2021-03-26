@@ -7,7 +7,7 @@ using Jose;
 using Jose.keys;
 using NUnit.Framework;
 using System.Linq;
-using Jose.jwe;
+using Jose;
 
 namespace UnitTests
 {
@@ -2373,15 +2373,19 @@ namespace UnitTests
         {
             //given
             string token =
-                "eyJhbGciOiJIUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.chIoYWrQMA8XL5nFz6oLDJyvgHk2KA4BrFGrKymjC8E";
+                "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJwMmMiOjgxOTIsInAycyI6Ik5rWGppMTk0N2ZSc0tUbEIiLCJlbmMiOiJBMjU2R0NNIiwiZXhwIjoxMzYzMjg0MDAwLCJjcml0IjpbImV4cCJdfQ.24Im9mr5z0o6I8wlHNrAN-UpTvaCPvl7PwIeKp-w-WalNbo1A4MiqQ.GDmmMnvEIXH_Gzql.HtyJQWcZOC66MBpSoip6yVc2SM77UnJN1fIIBCySBiactWAeZNqTESixX93rEm3LQEk7Ah24ZGXKaMInalkU2NNb1G8F2hUr6XZDYd6LTsc1gjC0vg3Iec_mdHbbTN0jhaMkwdNmNlIwU49TT1ZPDbwtVJfLZiDQTDBWhkJY3FOP0acNkWiGxXyYB6KUTwNGAPEqurRhPkspbGB2oumR7qkQKh7s4Ku_0Si9zAEg1kQ-s3cmB1qkXgUh8iyt-pS1o28r4g.vT7TJ7TEWlyR94tSo9gb9A";
 
             //when
             var test = Jose.JWT.Headers(token);
 
             //then
-            Assert.That(test.Count, Is.EqualTo(2));
-            Assert.That(test["alg"], Is.EqualTo("HS256"));
-            Assert.That(test["cty"], Is.EqualTo("text/plain"));
+            Assert.That(test.Count, Is.EqualTo(6));
+            Assert.That(test["alg"], Is.EqualTo("PBES2-HS256+A128KW"));
+            Assert.That(test["enc"], Is.EqualTo("A256GCM"));
+            Assert.That(test["p2c"], Is.EqualTo(8192));
+            Assert.That(test["p2s"], Is.EqualTo("NkXji1947fRsKTlB"));
+            Assert.That(test["exp"], Is.EqualTo(1363284000));
+            Assert.That(test["crit"], Is.EqualTo(new[] { "exp" }));
         }
 
         [Test]

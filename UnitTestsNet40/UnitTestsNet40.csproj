@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>lib\nunit.framework.dll</HintPath>
     </Reference>
@@ -60,6 +63,8 @@
     <Compile Include="CompactTest.cs" />
     <Compile Include="ConcatKDFTest.cs" />
     <Compile Include="DictionariesTest.cs" />
+    <Compile Include="jwe\JweTest.cs" />
+    <Compile Include="jwe\JweTokenTest.cs" />
     <Compile Include="PBKDF2Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SecurityVulnerabilitiesTest.cs" />
@@ -70,6 +75,7 @@
     <None Include="jwt-2048.p12">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\jose-jwt\jose-jwt.net40.csproj">
