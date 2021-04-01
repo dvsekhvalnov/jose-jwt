@@ -1,96 +1,72 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET 
+    <Description>Javascript Object Signing and Encryption (JOSE), JSON Web Token (JWT) and JSON Web Encryption (JWE) Implementation for .NET 
 
-
-Ultimate Javascript Object Signing and Encryption (JOSE) and JSON Web Token (JWT) Implementation for .NET. Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms. 
+Ultimate Javascript Object Signing and Encryption (JOSE), JSON Web Token (JWT) and JSON Web Encryption (JWE) Implementation for .NET. Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms. 
 Supports generating, decoding, encryption and compression of JSON Web Tokens. JSON parsing agnostic. Supports two-phase validation. FIPS compliant. Unencoded payload and detached content support (RFC 7797). 
 JSON Web Encryption (JWE, RFC 7516) support.
 
-
-CLR supported algorithms 
-
-Signing: 
-
-- HMAC signatures with HS256, HS384 and HS512. 
-- ECDSA signatures with ES256, ES384 and ES512. 
-- RSASSA-PKCS1-V1_5 signatures with RS256, RS384 and RS512. 
-- RSASSA-PSS signatures (probabilistic signature scheme with appendix) with PS256, PS384 and PS512. 
-- NONE (unprotected) plain text algorithm without integrity protection 
-
-
-Encryption: 
-
-- RSAES OAEP 256 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
-- RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
-- RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
-- Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM 
-- A128KW, A192KW, A256KW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM 
-- A128GCMKW, A192GCMKW, A256GCMKW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM 
-- ECDH-ES encryption with A128CBC-HS256, A128GCM, A192GCM, A256GCM 
-- ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW encryption with A128CBC-HS256, A128GCM, A192GCM, A256GCM 
-- PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
-
-
-Compression: 
-
-- DEFLATE compression
-
-
-RFC 7797: 
-
-- Unencoded payload
-
-- Detached content
-
-
-RFC 7516: 
-
-- JSON Web Encryption (JWE) support
-
-
-CORECLR (.netstandard 2.1) supported algorithms:
+CLR (.net framework 4.0+) supported algorithms 
 
 Signing: 
-
-- HMAC signatures with HS256, HS384 and HS512. 
-- ECDSA signatures with ES256, ES384 and ES512. 
-- RSASSA-PKCS1-V1_5 signatures with RS256, RS384 and RS512. 
-- RSASSA-PSS signatures (probabilistic signature scheme with appendix) with PS256, PS384 and PS512. 
-- NONE (unprotected) plain text algorithm without integrity protection 
-
+  - HMAC signatures with HS256, HS384 and HS512. 
+  - ECDSA signatures with ES256, ES384 and ES512. 
+  - RSASSA-PKCS1-V1_5 signatures with RS256, RS384 and RS512. 
+  - RSASSA-PSS signatures (probabilistic signature scheme with appendix) with PS256, PS384 and PS512. 
+  - NONE (unprotected) plain text algorithm without integrity protection 
 
 Encryption: 
-
-- RSAES OAEP 256 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
-- RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
-- RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
-- Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM 
-- A128KW, A192KW, A256KW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM 
-- A128GCMKW, A192GCMKW, A256GCMKW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM 
-- ECDH-ES encryption with A128CBC-HS256, A128GCM, A192GCM, A256GCM 
-- ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW encryption with A128CBC-HS256, A128GCM, A192GCM, A256GCM 
-- PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
-
+  - RSAES OAEP 256 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
+  - RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
+  - RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
+  - Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM 
+  - A128KW, A192KW, A256KW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM 
+  - A128GCMKW, A192GCMKW, A256GCMKW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM 
+  - ECDH-ES encryption with A128CBC-HS256, A128GCM, A192GCM, A256GCM 
+  - ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW encryption with A128CBC-HS256, A128GCM, A192GCM, A256GCM 
+  - PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
 
 Compression: 
-
-- DEFLATE compression
-
+  - DEFLATE compression
 
 RFC 7797: 
-
-- Unencoded payload
-
-- Detached content
-
+  - Unencoded payload
+  - Detached content
 
 RFC 7516: 
+  - JSON Web Encryption (JWE) support
 
-- JSON Web Encryption (JWE) support
 
+CORECLR (.netstandard 1.4+) supported algorithms:
 
+Signing: 
+  - HMAC signatures with HS256, HS384 and HS512. 
+  - ECDSA signatures with ES256, ES384 and ES512. 
+  - RSASSA-PKCS1-V1_5 signatures with RS256, RS384 and RS512. 
+  - RSASSA-PSS signatures (probabilistic signature scheme with appendix) with PS256, PS384 and PS512. 
+  - NONE (unprotected) plain text algorithm without integrity protection 
+
+Encryption: 
+  - RSAES OAEP 256 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
+  - RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
+  - RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
+  - Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM 
+  - A128KW, A192KW, A256KW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM 
+  - A128GCMKW, A192GCMKW, A256GCMKW encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM 
+  - ECDH-ES encryption with A128CBC-HS256, A128GCM, A192GCM, A256GCM 
+  - ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW encryption with A128CBC-HS256, A128GCM, A192GCM, A256GCM 
+  - PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
+
+Compression: 
+  - DEFLATE compression
+
+RFC 7797: 
+  - Unencoded payload
+  - Detached content
+
+RFC 7516: 
+  - JSON Web Encryption (JWE) support
 </Description>
     <Copyright>Copyright dvsekhvalnov 2014-2021</Copyright>
     <AssemblyTitle>Jose JWT</AssemblyTitle>
