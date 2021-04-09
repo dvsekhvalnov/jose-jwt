@@ -730,7 +730,7 @@ namespace UnitTests
             Assert.Equal(firstRecipient.Recipient.JoseHeader["enc"], "A256CBC-HS512");
             Assert.Equal(firstRecipient.Recipient.JoseHeader["typ"], "JWE");
             Assert.Equal(firstRecipient.Recipient.JoseHeader["alg"], "PBES2-HS256+A128KW");
-            Assert.Equal(firstRecipient.Recipient.JoseHeader["p2c"], 8192);
+            Assert.Equal(firstRecipient.Recipient.JoseHeader["p2c"], 8192L);
             Assert.Equal(firstRecipient.Recipient.JoseHeader["p2s"], "kpL8s71MjhPnBExCF-cIMA");
 
             var secondRecipient = Jose.JWE.Decrypt(token, Ecc256Private());
@@ -949,7 +949,7 @@ namespace UnitTests
 
             Assert.True(rec0["header"] is JObject);
             Assert.Equal("PBES2-HS256+A128KW", rec0["header"]["alg"]);
-            Assert.Equal(8192, rec0["header"]["p2c"]);
+            Assert.Equal(8192L, rec0["header"]["p2c"]);
             Assert.Equal(16, ((string)rec0["header"]["p2s"]).Length);
             Assert.Equal(54, ((string)rec0["encrypted_key"]).Length);
 

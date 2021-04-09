@@ -100,7 +100,7 @@ namespace UnitTests
 			Assert.Equal(new byte[] { 42, 154, 250, 20, 117, 149, 136, 147, 103, 24, 43, 131, 16, 73, 118, 237, 219, 2, 139, 37, 135, 70, 56, 152, 184, 29, 157, 58, 171, 158, 211, 170, 42, 37, 145, 149, 98, 11, 189, 202, 39, 244, 47, 163, 138, 119, 216, 22, 190, 91, 107, 24, 151, 104, 253, 188, 154, 124, 97, 121, 151, 2, 47, 114, 94, 153, 24, 35, 95, 68, 93, 236 }, test.Recipients[0].EncryptedCek);
 			Assert.Equal(3, test.Recipients[0].Header.Count);
 			Assert.Equal("PBES2-HS256+A128KW", test.Recipients[0].Header["alg"]);
-			Assert.Equal(8192, test.Recipients[0].Header["p2c"]);
+			Assert.Equal(8192L, test.Recipients[0].Header["p2c"]);
 			Assert.Equal("C5Hn0y-ho1mwygXPVfDynQ", test.Recipients[0].Header["p2s"]);
 
 			Assert.Equal(new byte[] { 86, 236, 207, 162, 189, 78, 17, 233, 207, 63, 236, 52, 170, 15, 255, 184, 100, 180, 195, 136, 122, 98, 222, 202, 217, 145, 237, 206, 58, 163, 210, 105, 192, 206, 19, 115, 76, 123, 166, 96, 88, 218, 138, 249, 52, 117, 76, 36, 212, 125, 163, 198, 39, 132, 59, 209, 88, 116, 46, 60, 4, 227, 12, 140, 199, 50, 150, 117, 70, 78, 0, 21 }, test.Recipients[1].EncryptedCek);

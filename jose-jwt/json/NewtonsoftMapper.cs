@@ -55,7 +55,7 @@ namespace Jose
 
             if (reader.TokenType == JsonToken.Integer)
             {
-                return Convert.ToInt32(reader.Value);
+                return Convert.ToInt64(reader.Value);
             }
 
             // if the next token is not an object

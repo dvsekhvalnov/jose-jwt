@@ -2780,6 +2780,27 @@ namespace UnitTests
             Assert.That(Jose.JWT.Decode(token, aes128Key), Is.EqualTo(""));
         }
 
+        [Test]
+        public void Int64SerializationRoundTrip()
+        {
+            var headers = new Dictionary<string, object>
+            {
+                 {"typ", "JWT"},
+                 {"kid", 0xFFFFFFFF}
+            };
+
+                    var payload = new Dictionary<string, object>
+            {
+                 {"sub", 0xFFFFFFFF},
+                 {"iss", "JustAName"}
+            };
+
+            string token = JWT.Encode(payload, PrivKey(), JwsAlgorithm.RS256, headers);
+
+            IDictionary<string, object> test = JWT.Headers(token);
+
+            Assert.That((long)test["kid"], Is.EqualTo(0xFFFFFFFF));
+        }
 
         #region test utils
 

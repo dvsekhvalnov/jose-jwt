@@ -3009,6 +3009,30 @@ namespace UnitTests
             Assert.Equal(Jose.JWT.Decode(token, aes128Key), "");
         }
 
+        [Fact]
+        public void Int64SerializationRoundTrip()
+        {
+            var headers = new Dictionary<string, object>
+            {
+                 {"typ", "JWT"},
+                 {"kid", 0xFFFFFFFF}      
+            };
+
+            var payload = new Dictionary<string, object>
+            {
+                 {"sub", 0xFFFFFFFF},   
+                 {"iss", "JustAName"},
+                 {"iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds() },
+                 {"exp", DateTimeOffset.UtcNow.AddMinutes(30).ToUnixTimeSeconds() }
+            };
+
+            string token = JWT.Encode(payload, PrivRsaKey(), JwsAlgorithm.RS256, headers);
+
+            IDictionary<string, object> test = JWT.Headers(token);
+
+            Assert.Equal((long)test["kid"], 0xFFFFFFFF);
+        }
+
         #region test utils
 
         private RSACryptoServiceProvider PrivKey()
