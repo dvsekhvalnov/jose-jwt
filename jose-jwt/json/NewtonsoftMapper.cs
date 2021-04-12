@@ -15,8 +15,15 @@ namespace Jose
         }
 
         public T Parse<T>(string json)
-        {      
-            return JsonConvert.DeserializeObject<T>(json, new NestedDictionariesConverter());
+        {
+            Type objectType = typeof(T);
+
+            if (objectType == typeof(IDictionary<string, object>))
+            {
+                return JsonConvert.DeserializeObject<T>(json, new NestedDictionariesConverter());
+            }
+
+            return JsonConvert.DeserializeObject<T>(json);
         }
     }
 
@@ -24,12 +31,12 @@ namespace Jose
     {
         public override object Create(Type objectType)
         {
-            if(objectType == typeof(IEnumerable<>))
+            if (objectType == typeof(IEnumerable<>))
             {
                 return new List<object>();
             }
-            
-            return new Dictionary<string, object>(); 
+
+            return new Dictionary<string, object>();
         }
 
         public override bool CanConvert(Type objectType)

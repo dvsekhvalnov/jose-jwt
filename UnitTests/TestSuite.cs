@@ -2749,6 +2749,28 @@ namespace UnitTests
             Assert.Equal((long)test["kid"], 0xFFFFFFFF);
         }
 
+	[Fact]
+        public void DecodeObject()
+        {
+            var payload = new TestPayloadModel
+            {
+                jti = "7eb8f0e3-1144-4ed2-b4d9-be266f68f212",
+                iss = "My Application",
+                iat = 1617749964L, 
+                aud = "https://example.com",
+                sub = "testperson@example.com"
+            };
+            
+            var token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3ZWI4ZjBlMy0xMTQ0LTRlZDItYjRkOS1iZTI2NmY2OGYyMTIiLCJpc3MiOiJNeSBBcHBsaWNhdGlvbiIsImlhdCI6MTYxNzc0OTk2NCwiYXVkIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsInN1YiI6InRlc3RwZXJzb25AZXhhbXBsZS5jb20ifQ.U1O2Yy9HZNz7H83x6vgpzF7C0IkCZsI2DFIsf48V8CNDZUIh12tH2WH0yd3ck7D-u3biqoux2MppOFoKlC_XqhQBmKJRo4RkKdTmIUdTBNULC7kfcL5327iYCg0mHVR4HQbuPA2v2_vcPv0wsTSvo6-0Dj8AZGHZ2Qzmb22dc3WD0YCbDI24sXjAlCBBtpogYmSNHC-WtzQJVTf8hLu1n9h9W0gQ9D1hq6LnkyWTuXS-Mr3vzWvxILnrhErTseC9z2Xl-gOUUq_h_Y-DeRXirzhTq2a6wXfD5M7Jw6axjWI41VX8cCJ5WitfzMgOhjOO4NWY1mQZImPz0q7Q1zNdAg";
+            TestPayloadModel test = JWT.Decode<TestPayloadModel>(token, PubKey());
+
+            Assert.Equal(test.jti, "7eb8f0e3-1144-4ed2-b4d9-be266f68f212");
+            Assert.Equal(test.iss, "My Application");
+            Assert.Equal(test.iat, 1617749964L);
+            Assert.Equal(test.aud, "https://example.com");
+            Assert.Equal(test.sub, "testperson@example.com");
+        }
+
         #region test utils
 
         private RSA PrivKey()
@@ -2834,5 +2856,14 @@ namespace UnitTests
         }
 
         #endregion
+    }
+
+    public class TestPayloadModel
+    {
+        public string jti { get; set; }
+        public string iss { get; set; }
+        public long iat { get; set; }
+        public string aud { get; set; }
+        public string sub { get; set; }
     }
 }

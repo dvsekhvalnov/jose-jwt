@@ -94,7 +94,7 @@ namespace Jose
         /// <returns>unmarshalled headers</returns>        
         public static IDictionary<string, object> Headers(string token, JwtSettings settings = null)
         {
-            return (IDictionary<string, object>)Headers<object>(token, settings);
+            return Headers<IDictionary<string, object>>(token, settings);
         }
 
         /// <summary>
@@ -483,7 +483,7 @@ namespace Jose
 
                 byte[] header = parts.Next();
 
-                var headerData = jwtSettings.JsonMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(header));
+                var headerData = jwtSettings.JsonMapper.Parse<IDictionary<string, object>>(Encoding.UTF8.GetString(header));
 
                 bool b64 = true;
 
@@ -540,7 +540,7 @@ namespace Jose
             byte[] authTag = parts.Next();
 
             JwtSettings jwtSettings = GetSettings(settings);
-            IDictionary<string, object> jwtHeader = jwtSettings.JsonMapper.Parse<Dictionary<string, object>>(Encoding.UTF8.GetString(header));
+            IDictionary<string, object> jwtHeader = jwtSettings.JsonMapper.Parse<IDictionary<string, object>>(Encoding.UTF8.GetString(header));
 
             JweAlgorithm headerAlg = jwtSettings.JwaAlgorithmFromHeader((string)jwtHeader["alg"]);
             JweEncryption headerEnc = jwtSettings.JweAlgorithmFromHeader((string)jwtHeader["enc"]);

@@ -294,7 +294,7 @@ namespace Jose
             
             var token = JweToken.FromString(jwe, settings.JsonMapper);           
 
-            var protectedHeader = settings.JsonMapper.Parse<Dictionary<string, object>>(
+            var protectedHeader = settings.JsonMapper.Parse<IDictionary<string, object>>(
                 Encoding.UTF8.GetString(token.ProtectedHeaderBytes));
 
             foreach(var recipient in token.Recipients)

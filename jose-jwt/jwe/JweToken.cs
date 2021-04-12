@@ -73,7 +73,7 @@
             bool isJsonEncoded = token.Trim().StartsWith("{", StringComparison.Ordinal);
 
             return isJsonEncoded 
-                ? ParseJson(jsonMapper.Parse<Dictionary<string, object>>(token)) 
+                ? ParseJson(jsonMapper.Parse<IDictionary<string, object>>(token)) 
                 : ParseCompact(token);
         }
 
