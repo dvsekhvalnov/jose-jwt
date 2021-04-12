@@ -39,7 +39,7 @@ namespace Jose
                     }
                 }
             }
-        #elif NETSTANDARD1_4
+        #else
             throw new NotImplementedException("not yet");
         #endif
         }
