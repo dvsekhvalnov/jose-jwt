@@ -277,7 +277,7 @@ namespace UnitTests
 
         class MockJsonMapper
 #if NETCOREAPP
-            : NewtonsoftMapper,
+            : JsonMapper,
 #elif NET40 || NET461
             : JSSerializerMapper,
 #endif
