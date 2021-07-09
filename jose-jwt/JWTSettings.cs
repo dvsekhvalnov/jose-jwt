@@ -132,9 +132,11 @@ namespace Jose
         private Dictionary<string, JweCompression> compressionAlgorithmsAliases = new Dictionary<string, JweCompression>();
 
 #if NET40 || NET461
-        private IJsonMapper jsMapper = new JSSerializerMapper();                
-#elif NETSTANDARD
+        private IJsonMapper jsMapper = new JSSerializerMapper();
+#elif NETSTANDARD1_4
         private IJsonMapper jsMapper = new NewtonsoftMapper();
+#elif NETSTANDARD2_1
+        private IJsonMapper jsMapper = new JsonMapper();
 #endif
 
         //Builder-style methods
