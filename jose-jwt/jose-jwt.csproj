@@ -71,7 +71,7 @@ RFC 7516:
     <Copyright>Copyright dvsekhvalnov 2014-2021</Copyright>
     <AssemblyTitle>Jose JWT</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <VersionPrefix>3.1.1</VersionPrefix>
+    <VersionPrefix>3.2.0</VersionPrefix>
     <Authors>Dmitry Vsekhvalnov</Authors>
     <TargetFrameworks>net40;net461;netstandard1.4;netstandard2.1</TargetFrameworks>
     <AssemblyName>jose-jwt</AssemblyName>
