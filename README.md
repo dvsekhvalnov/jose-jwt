@@ -9,6 +9,8 @@ JWE JSON Serialization cross-tested with [JWCrypto](https://github.com/latchset/
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
+- v3.2 dropped `Newtonsoft.Json` support in favor of `System.Text.Json` on `netstandard2.1`
+
 - v3.1 introduced JWE JSON Serialization defined in [RFC 7516](https://tools.ietf.org/html/rfc7516)
 
 - v3.0 and above additionally targets `netstandard2.1` to leverage better .net crypto support on *\*nix* systems and enable more supported algorithms.
