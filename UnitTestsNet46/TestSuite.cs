@@ -156,6 +156,21 @@ namespace UnitTests
         }
 
         [Fact]
+        public void DecodeHS512_JsonWebKey()
+        {
+            //given
+            string token = "eyJhbGciOiJIUzUxMiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.9KirTNe8IRwFCBLjO8BZuXf3U2ZVagdsg7F9ZsvMwG3FuqY9W0vqwjzPOjLqPN-GkjPm6C3qWPnINhpr5bEDJQ";
+
+            //when            
+            string json = Jose.JWT.Decode(token, new JWK(Encoding.UTF8.GetBytes(key)));            
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(json, @"{""hello"": ""world""}");
+        }
+
+        [Fact]
         public void DecodeRS256()
         {
             //given
