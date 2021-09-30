@@ -1,4 +1,7 @@
-﻿namespace Jose
+﻿using System;
+using System.Collections.Generic;
+
+namespace Jose
 {
     public class JWK
     {
@@ -22,7 +25,12 @@
 
         public byte[] OctKey()
         {
-            return octKey;
+            if (octKey == null && K != null)
+            {
+                octKey = Base64Url.Decode(K);
+            }
+
+            return octKey;            
         }
 
         // Elliptic keys
@@ -34,6 +42,50 @@
             Kty = Oct;
             K = Base64Url.Encode(key);
             octKey = key;
+        }
+
+        public JWK()
+        {
+
+        }
+
+        public IDictionary<string, object> ToDictionary()
+        {
+            var result = new Dictionary<string, Object>();
+
+            result["kty"] = Kty;
+            
+            if (Kty == JWK.Oct)
+            {
+                result["k"] = K;
+            }
+
+            return result;
+        }
+
+        public static JWK FromDictionary(IDictionary<string, object> data)
+        {
+            var key = new JWK
+            {
+                Kty = Dictionaries.Get<string>(data, "kty"),                
+                Use = Dictionaries.Get<string>(data, "user"),                
+                K = Dictionaries.Get<string>(data, "k"),                
+            };
+            
+
+            return key;
+        }
+
+        public string ToJson(IJsonMapper mapper = null)
+        {
+            return mapper.Serialize(ToDictionary());
+        }
+
+        public static JWK FromJson(string json, IJsonMapper mapper = null)
+        {
+            return JWK.FromDictionary(
+                mapper.Parse<IDictionary<string, object>>(json)
+            );
         }
     }
 }
