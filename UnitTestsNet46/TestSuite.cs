@@ -520,6 +520,22 @@ namespace UnitTests
         }
 
         [Fact]
+        public void EncodeHS384_JsonWebKey()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, new JWK(Encoding.UTF8.GetBytes(key)), JwsAlgorithm.HS384);
+
+            //then
+            Console.Out.WriteLine("HS384 = {0}", token);
+
+            Assert.Equal(token, "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.VjsBP04wkLVQ9SXqN0qe-J7FHQPGhnMAXnQvVEUdDh8wsvWNEN4wVlSkGuWIIk-b");
+            Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), json);
+        }
+
+        [Fact]
         public void EncodeHS512()
         {
             //given

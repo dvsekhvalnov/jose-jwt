@@ -26,7 +26,7 @@ namespace Jose
             {
                 var jwk = (JWK)key;
 
-                if (jwk.Kty == JWK.Oct)
+                if (jwk.Kty == JWK.KeyTypes.OCT)
                 {
                     using (var sha = KeyedHash(jwk.OctKey()))
                     {
