@@ -48,9 +48,23 @@ namespace Jose
                 return pkcs1.VerifySignature(hash, signature);
             }
 #elif NETSTANDARD || NET461
-            var publicKey = Ensure.Type<RSA>(key, "RsaUsingSha alg expects key to be of RSA type.");   
-                      
-            return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pkcs1);
+            if (key is RSA)
+            {
+                var publicKey = (RSA)key;
+                return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pkcs1);
+            }
+
+            if (key is JWK)
+            {
+                var publicKey = (JWK)key;
+
+                if (publicKey.Kty == JWK.KeyTypes.RSA)
+                {
+                    return publicKey.RsaKey().VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pkcs1);
+                }
+            }            
+
+            throw new ArgumentException("RsaUsingSha alg expectes key to be of RSA typs or JWK typs with kty='rsa'");
 #endif
         }
 

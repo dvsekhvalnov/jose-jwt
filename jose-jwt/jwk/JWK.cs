@@ -90,6 +90,13 @@ namespace Jose
 
         }
 
+        public JWK(string e, string n)
+        {
+            Kty = KeyTypes.RSA;
+            E = e;
+            N = n;
+        }
+
         public JWK(byte[] key)
         {
             Kty = KeyTypes.OCT;
