@@ -68,6 +68,36 @@ namespace Jose
                 param.Modulus = Base64Url.Decode(N);
                 param.Exponent = Base64Url.Decode(E);
 
+                if (D != null)
+                {
+                    param.D = Base64Url.Decode(D);
+                }
+
+                if (P != null)
+                {
+                    param.P = Base64Url.Decode(P);
+                }
+
+                if (Q != null)
+                {
+                    param.Q = Base64Url.Decode(Q);
+                }
+
+                if (DP != null)
+                {
+                    param.DP = Base64Url.Decode(DP);
+                }
+
+                if (DQ != null)
+                {
+                    param.DQ = Base64Url.Decode(DQ);
+                }
+
+                if (QI != null)
+                {
+                    param.InverseQ = Base64Url.Decode(QI);
+                }
+
                 rsaKey = RSA.Create();
                 rsaKey.ImportParameters(param);
             }
@@ -90,11 +120,17 @@ namespace Jose
 
         }
 
-        public JWK(string e, string n)
+        public JWK(string e, string n, string p = null, string q = null, string d = null, string dp = null, string dq = null, string qi = null)
         {
             Kty = KeyTypes.RSA;
             E = e;
             N = n;
+            P = p;
+            Q = q;
+            D = d;
+            DP = dp;
+            DQ = dq;
+            QI = qi;
         }
 
         public JWK(byte[] key)
