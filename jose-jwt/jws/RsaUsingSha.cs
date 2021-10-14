@@ -28,9 +28,22 @@ namespace Jose
             }
 
 #elif NETSTANDARD || NET461
-            var privateKey = Ensure.Type<RSA>(key, "RsaUsingSha alg expects key to be of RSA type.");   
-                         
-            return privateKey.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pkcs1);
+            if (key is RSA)
+            {                
+                return ((RSA)key).SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pkcs1);
+            }
+
+            if (key is JWK)
+            {
+                var privateKey = (JWK)key;
+
+                if (privateKey.Kty == JWK.KeyTypes.RSA)
+                {
+                    return privateKey.RsaKey().SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pkcs1);
+                }
+            }
+
+            throw new ArgumentException("RsaUsingSha alg expectes key to be of RSA typs or JWK typs with kty='rsa'");
 #endif
         }
 

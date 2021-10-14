@@ -183,18 +183,31 @@ namespace Jose
 
         public IDictionary<string, object> ToDictionary()
         {
-            var result = new Dictionary<string, Object>();
+            var result = new Dictionary<string, object>();
 
             result["kty"] = Kty;
 
-            if(Use != null) { result["use"] = Use; }
-            if(KeyOps != null) { result["key_ops"] = KeyOps; }
-            if(Alg != null) { result["alg"] = Alg; }
+            if (Use != null) { result["use"] = Use; }
+            if (KeyOps != null) { result["key_ops"] = KeyOps; }
+            if (Alg != null) { result["alg"] = Alg; }
             
             if (Kty == JWK.KeyTypes.OCT)
             {
                 result["k"] = K;
-            }           
+            }     
+            
+            if (Kty == JWK.KeyTypes.RSA)
+            {
+                result["e"] = E;
+                result["n"] = N;
+
+                if (D != null) { result["d"] = D; }
+                if (P != null) { result["p"] = P; }
+                if (Q != null) { result["q"] = Q; }
+                if (DP != null) { result["dp"] = DP; }
+                if (DQ != null) { result["dq"] = DQ; }
+                if (QI != null) { result["qi"] = QI; }
+            }
 
             return result;
         }
@@ -204,12 +217,20 @@ namespace Jose
             var key = new JWK
             {
                 Kty = Dictionaries.Get<string>(data, "kty"),                
-                Use = Dictionaries.Get<string>(data, "user"),                
+                Use = Dictionaries.Get<string>(data, "use"),                
                 Alg = Dictionaries.Get<string>(data, "alg"),
                 KeyId = Dictionaries.Get<string>(data, "kid"),
                 KeyOps = Dictionaries.Get<List<string>>(data, "key_ops"),
 
-                K = Dictionaries.Get<string>(data, "k"),                
+                K = Dictionaries.Get<string>(data, "k"),  
+                E = Dictionaries.Get<string>(data, "e"),  
+                N = Dictionaries.Get<string>(data, "n"),  
+                D = Dictionaries.Get<string>(data, "d"),  
+                P = Dictionaries.Get<string>(data, "p"),  
+                Q = Dictionaries.Get<string>(data, "q"),  
+                DP = Dictionaries.Get<string>(data, "dp"),  
+                DQ = Dictionaries.Get<string>(data, "dq"),  
+                QI = Dictionaries.Get<string>(data, "qi"),                  
             };
             
 
