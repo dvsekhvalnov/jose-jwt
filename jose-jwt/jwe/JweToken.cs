@@ -15,7 +15,7 @@
         /// </summary>
         public string AsString(IJsonMapper mapper = null)
         {
-            if(Encoding == SerializationMode.Compact)
+            if (Encoding == SerializationMode.Compact)
             {
                 return Compact.Serialize(ProtectedHeaderBytes, Recipients[0].EncryptedCek, Iv, Ciphertext, AuthTag);
             }
@@ -38,7 +38,6 @@
                 json["unprotected"] = UnprotectedHeader;
             }
 
-
             if (Recipients.Count == 1)
             {
                 json["header"] = Recipients[0].Header;
@@ -47,7 +46,6 @@
             else
             {
                 var recipientList = new List<object>();
-
 
                 foreach (var recipient in Recipients)
                 {
@@ -58,7 +56,7 @@
                         }
                     );
                 }
-            
+
                 json["recipients"] = recipientList;
             }
 
@@ -68,12 +66,12 @@
         /// <summary>
         /// Parse serialized token
         /// </summary>
-        public static JweToken FromString(string token, IJsonMapper jsonMapper=null)
+        public static JweToken FromString(string token, IJsonMapper jsonMapper = null)
         {
             bool isJsonEncoded = token.Trim().StartsWith("{", StringComparison.Ordinal);
 
-            return isJsonEncoded 
-                ? ParseJson(jsonMapper.Parse<IDictionary<string, object>>(token)) 
+            return isJsonEncoded
+                ? ParseJson(jsonMapper.Parse<IDictionary<string, object>>(token))
                 : ParseCompact(token);
         }
 
@@ -120,13 +118,14 @@
         /// <summary>
         /// Convinience helper to get Plaintext as string
         /// </summary>
-        public string Plaintext { 
-            get 
+        public string Plaintext
+        {
+            get
             {
                 var blob = PlaintextBytes;
 
                 return blob == null ? null : System.Text.Encoding.UTF8.GetString(PlaintextBytes);
-            } 
+            }
         }
 
         /// <summary>
@@ -175,8 +174,8 @@
             return new JweToken(
                 protectedHeaderBytes: protectedHeaderBytes,
                 unprotectedHeader: null,
-                aad: null,
                 recipients: recipients,
+                aad: null,
                 iv: iv,
                 ciphertext: ciphertext,
                 authTag: authTag,
@@ -187,7 +186,7 @@
         {
             var recipients = new List<JweRecipient>();
 
-           IEnumerable _recipients = Dictionaries.Get<IEnumerable>(json, "recipients");
+            IEnumerable _recipients = Dictionaries.Get<IEnumerable>(json, "recipients");
 
             if (_recipients != null)
             {
@@ -209,8 +208,8 @@
             return new JweToken(
                 protectedHeaderBytes: _protected == null ? new byte[0] : Base64Url.Decode(_protected),
                 unprotectedHeader: Dictionaries.Get<IDictionary<string, object>>(json, "unprotected"),
-                aad: _aad == null ? null : Base64Url.Decode(_aad),
                 recipients: recipients,
+                aad: _aad == null ? null : Base64Url.Decode(_aad),
                 iv: Base64Url.Decode(Dictionaries.Get<string>(json, "iv")),
                 ciphertext: Base64Url.Decode(Dictionaries.Get<string>(json, "ciphertext")),
                 authTag: Base64Url.Decode(Dictionaries.Get<string>(json, "tag")),

@@ -6,7 +6,7 @@ namespace Jose
 {
     public class AesCbcHmacEncryption : IJweAlgorithm
     {
-        private IJwsAlgorithm hashAlgorithm;
+        private readonly IJwsAlgorithm hashAlgorithm;
 
         private readonly int keyLength;
 
@@ -51,12 +51,12 @@ namespace Jose
             }
             catch (CryptographicException e)
             {
-                throw new EncryptionException("Unable to encrypt content.", e);    
+                throw new EncryptionException("Unable to encrypt content.", e);
             }
 
             byte[] authTag = ComputeAuthTag(aad, iv, cipherText, hmacKey);
 
-            return new[] {iv, cipherText, authTag};
+            return new[] { iv, cipherText, authTag };
         }
 
         public byte[] Decrypt(byte[] aad, byte[] cek, byte[] iv, byte[] cipherText, byte[] authTag)
@@ -79,20 +79,20 @@ namespace Jose
                 using (Aes aes = Aes.Create())
                 {
                     aes.Key = aesKey;
-                    aes.IV = iv;                
+                    aes.IV = iv;
 
                     using (MemoryStream ms = new MemoryStream())
                     {
                         using (ICryptoTransform decryptor = aes.CreateDecryptor(aes.Key, aes.IV))
                         {
                             using (CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Write))
-                            {                                                        
+                            {
                                 cs.Write(cipherText, 0, cipherText.Length);
                                 cs.FlushFinalBlock();
 
                                 return ms.ToArray();
                             }
-                        }                    
+                        }
                     }
                 }
             }
@@ -116,6 +116,5 @@ namespace Jose
 
             return Arrays.FirstHalf(hmac);
         }
-
     }
 }

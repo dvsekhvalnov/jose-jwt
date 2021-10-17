@@ -9,9 +9,9 @@ namespace Jose
         {
             using (MemoryStream output = new MemoryStream())
             {
-                using (DeflateStream gzip =new DeflateStream(output, CompressionMode.Compress))
+                using (DeflateStream gzip = new DeflateStream(output, CompressionMode.Compress))
                 {
-                    gzip.Write(plainText,0,plainText.Length);
+                    gzip.Write(plainText, 0, plainText.Length);
                 }
 
                 return output.ToArray();

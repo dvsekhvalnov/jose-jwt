@@ -5,10 +5,10 @@ namespace Jose
 {
     public class EcdhKeyManagementWithAesKeyWrap : EcdhKeyManagement
     {
-        private AesKeyWrapManagement aesKW;
-        private int keyLengthBits;
+        private readonly AesKeyWrapManagement aesKW;
+        private readonly int keyLengthBits;
 
-        public EcdhKeyManagementWithAesKeyWrap(int keyLengthBits, AesKeyWrapManagement aesKw):base(false)
+        public EcdhKeyManagementWithAesKeyWrap(int keyLengthBits, AesKeyWrapManagement aesKw) : base(false)
         {
             aesKW = aesKw;
             this.keyLengthBits = keyLengthBits;

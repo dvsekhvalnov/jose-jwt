@@ -16,7 +16,7 @@ namespace Jose
             if (status != BCrypt.ERROR_SUCCESS)
                 throw new CryptographicException(string.Format("NCrypt.Decrypt() (plaintext buffer size) failed with status code:{0}", status));
 
-            var plainText=new byte[plainTextByteSize];
+            var plainText = new byte[plainTextByteSize];
 
             status = NCrypt.NCryptDecrypt(key.Handle, cipherText, cipherText.Length, ref paddingInfo, plainText, plainTextByteSize, out plainTextByteSize, BCrypt.BCRYPT_PAD_OAEP);
 

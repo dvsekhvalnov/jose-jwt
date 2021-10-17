@@ -13,50 +13,44 @@ namespace Jose
 
             return new byte[][] { cek, this.WrapKey(cek, key, header) };
         }
-        
-        public byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header)
-        {            
-        #if NET40
-            if (key is CngKey)
-            {
-                var publicKey = (CngKey)key;
 
-                return RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256);
+        public byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header)
+        {
+#if NET40
+            if (key is CngKey cngKey)
+            {
+                return RsaOaep.Encrypt(cek, cngKey, CngAlgorithm.Sha256);
             }
 
-            if (key is RSACryptoServiceProvider)
+            else if (key is RSACryptoServiceProvider rsaKey)
             {
-                //This is for backward compatibility only with 2.x 
-                //To be removed in 3.x 
-                var publicKey = RsaKey.New(((RSACryptoServiceProvider)key).ExportParameters(false));
+                //This is for backward compatibility only with 2.x
+                //To be removed in 3.x
+                var publicKey = RsaKey.New(rsaKey.ExportParameters(false));
 
                 return RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256);
             }
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey or RSACryptoServiceProvider types.");
 
-        #elif NET461
-            if (key is CngKey)
+#elif NET461
+            if (key is CngKey cngKey)
             {
-                var publicKey = (CngKey) key;
+                return RsaOaep.Encrypt(cek, cngKey, CngAlgorithm.Sha256);
+            }
+
+            else if (key is RSACryptoServiceProvider rsaKey)
+            {
+                //This is for backward compatibility only with 2.x
+                //To be removed in 3.x
+                var publicKey = RsaKey.New(rsaKey.ExportParameters(false));
 
                 return RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256);
             }
 
-            if (key is RSACryptoServiceProvider)
+            else if (key is RSA rsa)
             {
-                //This is for backward compatibility only with 2.x 
-                //To be removed in 3.x 
-                var publicKey = RsaKey.New(((RSACryptoServiceProvider) key).ExportParameters(false));
-
-                return RsaOaep.Encrypt(cek, publicKey, CngAlgorithm.Sha256);
-            }
-
-            if (key is RSA)
-            {
-	            var publicKey = (RSA) key;
-
-                return publicKey.Encrypt(cek, RSAEncryptionPadding.OaepSHA256);
+                return rsa.Encrypt(cek, RSAEncryptionPadding.OaepSHA256);
             }
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of either CngKey or RSA types.");
@@ -72,57 +66,50 @@ namespace Jose
 
         public byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
         {
-        #if NET40
-            if(key is RSACryptoServiceProvider)
+#if NET40
+            if (key is CngKey cngKey)
             {
-                //This is for backward compatibility only with 2.x 
-                //To be removed in 3.x 
-                var privateKey = RsaKey.New(((RSACryptoServiceProvider) key).ExportParameters(true));
-
-                return RsaOaep.Decrypt(encryptedCek, privateKey, CngAlgorithm.Sha256);
-
+                return RsaOaep.Decrypt(encryptedCek, cngKey, CngAlgorithm.Sha256);
             }
 
-            if(key is CngKey)
+            else if (key is RSACryptoServiceProvider rsaKey)
             {
-                var privateKey = (CngKey) key;
+                //This is for backward compatibility only with 2.x
+                //To be removed in 3.x
+                var privateKey = RsaKey.New(rsaKey.ExportParameters(true));
 
-	            return RsaOaep.Decrypt(encryptedCek, privateKey, CngAlgorithm.Sha256);
+                return RsaOaep.Decrypt(encryptedCek, privateKey, CngAlgorithm.Sha256);
             }
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey type.");
 
-         #elif NET461
-            if (key is CngKey)
+#elif NET461
+            if (key is CngKey cngKey)
             {
-                var privateKey = (CngKey) key;
-
-	            return RsaOaep.Decrypt(encryptedCek, privateKey, CngAlgorithm.Sha256);
+                return RsaOaep.Decrypt(encryptedCek, cngKey, CngAlgorithm.Sha256);
             }
 
-            if (key is RSACryptoServiceProvider)
+            else if (key is RSACryptoServiceProvider rsaKey)
             {
-                //This is for backward compatibility only with 2.x 
-                //To be removed in 3.x 
-                var privateKey = RsaKey.New(((RSACryptoServiceProvider) key).ExportParameters(true));
+                //This is for backward compatibility only with 2.x
+                //To be removed in 3.x
+                var privateKey = RsaKey.New(rsaKey.ExportParameters(true));
 
                 return RsaOaep.Decrypt(encryptedCek, privateKey, CngAlgorithm.Sha256);
             }
 
-            if (key is RSA)
+            else if (key is RSA rsa)
             {
-                var privateKey = (RSA) key;
-
-                return privateKey.Decrypt(encryptedCek, RSAEncryptionPadding.OaepSHA256);				
+                return rsa.Decrypt(encryptedCek, RSAEncryptionPadding.OaepSHA256);
             }
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of either CngKey or RSA types.");
 
-        #elif NETSTANDARD
+#elif NETSTANDARD
             var privateKey = Ensure.Type<RSA>(key, "RsaKeyManagement algorithm expects key to be of RSA type.");
 
             return privateKey.Decrypt(encryptedCek, RSAEncryptionPadding.OaepSHA256);
-        #endif
+#endif
         }
     }
 }

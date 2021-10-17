@@ -4,7 +4,7 @@ namespace Jose
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;       
+    using System.Text;
 
     public enum SerializationMode
     {
@@ -15,7 +15,7 @@ namespace Jose
     /// <summary>
     /// Provides methods for encrypting and decrypting using JSON Web Encryption (JWE).
     /// </summary>
-    public class JWE
+    public static class JWE
     {
         /// <summary>
         /// Encrypts given plaintext using JWE and applies requested encryption/compression algorithms.
@@ -27,7 +27,7 @@ namespace Jose
         /// <param name="mode">serialization mode to use. Note only one recipient can be specified for compact and flattened json serialization.</param>
         /// <param name="compression">optional compression type to use.</param>
         /// <param name="extraProtectedHeaders">optional extra headers to put in the protected header.</param>
-        /// <param name="unprotectedHeaders">optional unprotected headers</param> 
+        /// <param name="unprotectedHeaders">optional unprotected headers</param>
         /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
         public static string Encrypt(string plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Json, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
@@ -45,7 +45,7 @@ namespace Jose
         /// <param name="mode">serialization mode to use. Note only one recipient can be specified for compact and flattened json serialization.</param>
         /// <param name="compression">optional compression type to use.</param>
         /// <param name="extraProtectedHeaders">optional extra headers to put in the protected header.</param>
-        /// <param name="unprotectedHeaders">optional unprotected headers</param> 
+        /// <param name="unprotectedHeaders">optional unprotected headers</param>
         /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
         public static string EncryptBytes(byte[] plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Json, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
@@ -90,7 +90,7 @@ namespace Jose
                     );
 
                 byte[] encryptedCek;
-                if(cek == null)
+                if (cek == null)
                 {
                     byte[][] contentKeys = keys.WrapNewKey(_enc.KeySize, recipient.Key, joseHeader);
                     cek = contentKeys[0];
@@ -105,9 +105,9 @@ namespace Jose
                 // shared headers
                 IDictionary<string, object> recipientHeader = joseHeader
                     .Where(
-                        kvp => !joseProtectedHeader.ContainsKey(kvp.Key) && 
-                        (unprotectedHeaders==null || !unprotectedHeaders.ContainsKey(kvp.Key))
-                    )                                                                       
+                        kvp => !joseProtectedHeader.ContainsKey(kvp.Key) &&
+                        (unprotectedHeaders == null || !unprotectedHeaders.ContainsKey(kvp.Key))
+                    )
                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
                 recipientsOut.Add(new JweRecipient(encryptedCek, recipientHeader));
@@ -140,39 +140,39 @@ namespace Jose
                         byte[][] encParts = _enc.Encrypt(aad, plaintext, cek);
 
                         return new JweToken(
-                                        header, 
-                                        null, 
-                                        recipientsOut, 
-                                        null, 
-                                        encParts[0], 
-                                        encParts[1], 
-                                        encParts[2], 
+                                        header,
+                                        null,
+                                        recipientsOut,
+                                        null,
+                                        encParts[0],
+                                        encParts[1],
+                                        encParts[2],
                                         mode)
-                                   .AsString();                        
+                                   .AsString();
                     }
 
                 case SerializationMode.Json:
-                    {                        
-                        var protectedHeaderBytes = Encoding.UTF8.GetBytes(settings.JsonMapper.Serialize(joseProtectedHeader));                        
+                    {
+                        var protectedHeaderBytes = Encoding.UTF8.GetBytes(settings.JsonMapper.Serialize(joseProtectedHeader));
                         byte[] asciiEncodedProtectedHeader = Encoding.ASCII.GetBytes(Base64Url.Encode(protectedHeaderBytes));
-                        byte[][] encParts = _enc.Encrypt(Aad(protectedHeaderBytes, aad), plaintext, cek);                       
+                        byte[][] encParts = _enc.Encrypt(Aad(protectedHeaderBytes, aad), plaintext, cek);
 
                         return new JweToken(
-                                    protectedHeaderBytes, 
-                                    unprotectedHeaders, 
-                                    recipientsOut, 
-                                    aad, 
-                                    encParts[0], 
-                                    encParts[1], 
-                                    encParts[2], 
+                                    protectedHeaderBytes,
+                                    unprotectedHeaders,
+                                    recipientsOut,
+                                    aad,
+                                    encParts[0],
+                                    encParts[1],
+                                    encParts[2],
                                     mode)
-                                .AsString(settings.JsonMapper);                        
+                                .AsString(settings.JsonMapper);
                     }
 
                 default:
                     throw new JoseException($"Unsupported serializtion mode: {mode}.");
             }
-        }        
+        }
 
         /// <summary>
         /// Decypts a JWE by performing necessary decompression/decryption and authenticated decryption as defined in RFC7516.
@@ -191,13 +191,13 @@ namespace Jose
             Ensure.IsNotEmpty(jwe, "Incoming jwe expected to be in a valid serialization form, not empty, whitespace or null.");
 
             settings = GetSettings(settings);
-            
+
             JweToken token = Headers(jwe);
 
-            if(token.ProtectedHeaderBytes==null && token.Encoding == SerializationMode.Compact)
+            if (token.ProtectedHeaderBytes == null && token.Encoding == SerializationMode.Compact)
             {
                 throw new JoseException(string.Format("Protected header was missing but required with compact encoding."));
-            }            
+            }
 
             var exceptions = new List<Exception>();
 
@@ -207,7 +207,7 @@ namespace Jose
                 var encryptedCek = recipient.EncryptedCek;
 
                 // skip recipient if asked to do strict validation
-                if(expectedJweAlg != null && expectedJweAlg != headerAlg)
+                if (expectedJweAlg != null && expectedJweAlg != headerAlg)
                 {
                     continue;
                 }
@@ -243,7 +243,7 @@ namespace Jose
 
                         plaintext = compression.Decompress(plaintext);
                     }
-                    
+
                     token.PlaintextBytes = plaintext;
                     token.Recipient = recipient;
 
@@ -260,7 +260,7 @@ namespace Jose
             }
 
             // nobody was eligable for decryption
-            if(exceptions.Count == 0)
+            if (exceptions.Count == 0)
             {
                 throw new InvalidAlgorithmException("The algorithm type passed to the Decrypt method did not match the algorithm type in the header.");
             }
@@ -279,11 +279,11 @@ namespace Jose
 
         /// <summary>
         /// Parses JWE token, extracts and unmarshal protected+unprotcted+per recipient headers
-        /// This method is NOT performing integrity checking and actual decryption 
+        /// This method is NOT performing integrity checking and actual decryption
         /// </summary>
         /// <param name="jwe">Serialized JWE string to decrypt.</param>
         /// <param name="settings">optional settings to override global DefaultSettings</param>
-        /// <returns>List of Jose headers. For Compact and Flattened this will be length 1 and contain just the protected header. 
+        /// <returns>List of Jose headers. For Compact and Flattened this will be length 1 and contain just the protected header.
         ///  For General Json this will be the Jose headers (merge of protected, unprotected and per-recipient).</returns>
         /// <exception cref="IntegrityException">if AEAD operation validation failed</exception>
         /// <exception cref="EncryptionException">if JWE can't be decrypted</exception>
@@ -291,13 +291,13 @@ namespace Jose
         public static JweToken Headers(string jwe, JwtSettings settings = null)
         {
             settings = GetSettings(settings);
-            
-            var token = JweToken.FromString(jwe, settings.JsonMapper);           
+
+            var token = JweToken.FromString(jwe, settings.JsonMapper);
 
             var protectedHeader = settings.JsonMapper.Parse<IDictionary<string, object>>(
                 Encoding.UTF8.GetString(token.ProtectedHeaderBytes));
 
-            foreach(var recipient in token.Recipients)
+            foreach (var recipient in token.Recipients)
             {
                 try
                 {
@@ -306,11 +306,11 @@ namespace Jose
                 catch (ArgumentException)
                 {
                     throw new JoseException("Invalid JWE data, duplicate header keys found between protected, unprotected and recipient headers");
-                }            
+                }
             }
 
             return token;
-        }                
+        }
 
         private static JwtSettings GetSettings(JwtSettings settings)
         {
@@ -323,6 +323,5 @@ namespace Jose
                 Encoding.ASCII.GetBytes(Base64Url.Encode(protectedHeader)) :
                 Encoding.ASCII.GetBytes(string.Concat(Base64Url.Encode(protectedHeader), ".", Base64Url.Encode(aad)));
         }
-
     }
 }

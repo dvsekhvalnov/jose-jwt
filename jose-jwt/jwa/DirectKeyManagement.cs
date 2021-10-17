@@ -6,7 +6,7 @@ namespace Jose
     {
         public byte[][] WrapNewKey(int cekSizeBits, object key, IDictionary<string, object> header)
         {
-            return new []{Ensure.Type<byte[]>(key, "DirectKeyManagement alg expectes key to be byte[] array."), Arrays.Empty};
+            return new[] { Ensure.Type<byte[]>(key, "DirectKeyManagement alg expectes key to be byte[] array."), Arrays.Empty };
         }
 
         public byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header)

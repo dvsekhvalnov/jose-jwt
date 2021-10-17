@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Jose
 {
-    public class Ensure
+    public static class Ensure
     {
         public static void IsEmpty(byte[] arr, string msg, params object[] args)
         {

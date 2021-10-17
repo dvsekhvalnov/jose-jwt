@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace Jose
 {
-    public class Compact
+    public static class Compact
     {
         public static string Serialize(params byte[][] parts)
         {
@@ -88,7 +88,6 @@ namespace Jose
 
                     return decode ? Base64Url.Decode(part) : Encoding.UTF8.GetBytes(part);
                 }
-
 
                 return null;
             }

@@ -6,7 +6,7 @@ namespace Jose
 {
     public class EcdsaUsingSha : IJwsAlgorithm
     {
-        private int keySize;
+        private readonly int keySize;
 
         public EcdsaUsingSha(int keySize)
         {
@@ -30,7 +30,7 @@ namespace Jose
             }
             catch (CryptographicException e)
             {
-                throw new JoseException("Unable to sign content.", e);    
+                throw new JoseException("Unable to sign content.", e);
             }
         }
 
@@ -45,7 +45,7 @@ namespace Jose
                 using (var signer = new ECDsaCng(publicKey))
                 {
                     signer.HashAlgorithm = Hash;
-                
+
                     return signer.VerifyData(securedInput, signature);
                 }
             }
@@ -59,14 +59,17 @@ namespace Jose
         {
             get
             {
-                if (keySize == 256)
-                    return CngAlgorithm.Sha256;
-                if (keySize == 384)
-                    return CngAlgorithm.Sha384;
-                if (keySize == 521)
-                    return CngAlgorithm.Sha512;
-
-                throw new ArgumentException(string.Format("Unsupported key size: '{0} bytes'", keySize));
+                switch (keySize)
+                {
+                    case 256:
+                        return CngAlgorithm.Sha256;
+                    case 384:
+                        return CngAlgorithm.Sha384;
+                    case 521:
+                        return CngAlgorithm.Sha512;
+                    default:
+                        throw new ArgumentException(string.Format("Unsupported key size: '{0} bytes'", keySize));
+                }
             }
         }
     }

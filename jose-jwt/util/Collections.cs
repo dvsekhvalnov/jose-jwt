@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Jose
 {
-    public class Collections
+    public static class Collections
     {
         /// <summary>
         /// Union 'src' array with 'other' enumerable. Deduplicating values.

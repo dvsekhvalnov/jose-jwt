@@ -5,11 +5,11 @@
     /// </summary>
     public class JwtOptions
     {
-        public static readonly JwtOptions Default = new JwtOptions {EncodePayload = true, DetachPayload = false};
+        public static readonly JwtOptions Default = new JwtOptions { EncodePayload = true, DetachPayload = false };
 
         /// <summary>
         /// RFC 7797:  whether payload part should be base64 encoded (default) during
-        /// token encoding (JWS only) 
+        /// token encoding (JWS only)
         /// </summary>
         public bool EncodePayload { get; set; } = true;
 
@@ -18,6 +18,5 @@
         /// False by default (include payload)
         /// </summary>
         public bool DetachPayload { get; set; }
-
     }
 }

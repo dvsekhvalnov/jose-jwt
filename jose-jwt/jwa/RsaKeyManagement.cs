@@ -6,9 +6,9 @@ using Jose.keys;
 namespace Jose
 {
     public class RsaKeyManagement : IKeyManagement
-    {        
-        private bool useRsaOaepPadding; //true for RSA-OAEP, false for RSA-PKCS#1 v1.5
-        
+    {
+        private readonly bool useRsaOaepPadding; //true for RSA-OAEP, false for RSA-PKCS#1 v1.5
+
         public RsaKeyManagement(bool useRsaOaepPadding)
         {
             this.useRsaOaepPadding = useRsaOaepPadding;
@@ -23,15 +23,14 @@ namespace Jose
 
         public byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header)
         {
-
 #if NET40
             var publicKey = Ensure.Type<RSACryptoServiceProvider>(key, "RsaKeyManagement alg expects key to be of RSACryptoServiceProvider type.");
 
             return publicKey.Encrypt(cek, useRsaOaepPadding);
 #elif NET461
-            if (key is CngKey)
+            if (key is CngKey cngKey)
             {
-                var publicKey = new RSACng((CngKey) key);
+                var publicKey = new RSACng(cngKey);
 
                 var padding = useRsaOaepPadding ? RSAEncryptionPadding.OaepSHA1 :
                                                   RSAEncryptionPadding.Pkcs1;
@@ -39,21 +38,17 @@ namespace Jose
                 return publicKey.Encrypt(cek, padding);
             }
 
-            if (key is RSACryptoServiceProvider)
+            else if (key is RSACryptoServiceProvider rsaKey)
             {
-                var publicKey = (RSACryptoServiceProvider) key;
-
-                return publicKey.Encrypt(cek, useRsaOaepPadding);
+                return rsaKey.Encrypt(cek, useRsaOaepPadding);
             }
 
-            if (key is RSA)
+            else if (key is RSA rsa)
             {
-                var publicKey = (RSA) key;
-
                 var padding = useRsaOaepPadding ? RSAEncryptionPadding.OaepSHA1 :
                                                   RSAEncryptionPadding.Pkcs1;
 
-                return publicKey.Encrypt(cek, padding);
+                return rsa.Encrypt(cek, padding);
             }
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of either CngKey, RSACryptoServiceProvider or RSA types.");
@@ -75,9 +70,9 @@ namespace Jose
 
             return privateKey.Decrypt(encryptedCek, useRsaOaepPadding);
 #elif NET461
-            if (key is CngKey)
+            if (key is CngKey cngKey)
             {
-                var privateKey = new RSACng((CngKey)key);
+                var privateKey = new RSACng(cngKey);
 
                 var padding = useRsaOaepPadding ? RSAEncryptionPadding.OaepSHA1 :
                                                   RSAEncryptionPadding.Pkcs1;
@@ -85,21 +80,17 @@ namespace Jose
                 return privateKey.Decrypt(encryptedCek, padding);
             }
 
-            if (key is RSACryptoServiceProvider)
+            else if (key is RSACryptoServiceProvider rsaKey)
             {
-                var privateKey = (RSACryptoServiceProvider) key;
-
-                return privateKey.Decrypt(encryptedCek, useRsaOaepPadding);
+                return rsaKey.Decrypt(encryptedCek, useRsaOaepPadding);
             }
 
-            if (key is RSA)
+            else if (key is RSA rsa)
             {
-                var privateKey = (RSA) key;
-
                 var padding = useRsaOaepPadding ? RSAEncryptionPadding.OaepSHA1 :
                                                   RSAEncryptionPadding.Pkcs1;
 
-                return privateKey.Decrypt(encryptedCek, padding);
+                return rsa.Decrypt(encryptedCek, padding);
             }
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of either CngKey, RSACryptoServiceProvider or RSA types.");

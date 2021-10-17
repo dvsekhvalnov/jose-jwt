@@ -7,7 +7,7 @@ namespace Jose.netstandard1_4
 {
     public class EcdsaUsingSha : IJwsAlgorithm
     {
-        private int keySize;
+        private readonly int keySize;
 
         public EcdsaUsingSha(int keySize)
         {
@@ -18,24 +18,20 @@ namespace Jose.netstandard1_4
         {
             try
             {
-                if (key is CngKey)
+                if (key is CngKey cngKey)
                 {
-                    var privateKey = (CngKey) key;
+                    Ensure.BitSize(cngKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, cngKey.KeySize));
 
-                    Ensure.BitSize(privateKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, privateKey.KeySize));
-
-                    using (var signer = new ECDsaCng(privateKey))
+                    using (var signer = new ECDsaCng(cngKey))
                     {
                         return signer.SignData(securedInput, Hash);
                     }
                 }
-                if (key is ECDsa)
+                else if (key is ECDsa ecDsa)
                 {
-                    var privateKey = (ECDsa) key;
+                    Ensure.BitSize(ecDsa.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, ecDsa.KeySize));
 
-                    Ensure.BitSize(privateKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, privateKey.KeySize));
-
-                    return privateKey.SignData(securedInput, Hash);
+                    return ecDsa.SignData(securedInput, Hash);
                 }
 
                 throw new ArgumentException("EcdsaUsingSha algorithm expects key to be of either CngKey or ECDsa types.");
@@ -50,25 +46,20 @@ namespace Jose.netstandard1_4
         {
             try
             {
-                if (key is CngKey)
+                if (key is CngKey cngKey)
                 {
-                    var publicKey = (CngKey) key;
+                    Ensure.BitSize(cngKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, cngKey.KeySize));
 
-                    Ensure.BitSize(publicKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, publicKey.KeySize));
-
-                    using (var signer = new ECDsaCng(publicKey))
+                    using (var signer = new ECDsaCng(cngKey))
                     {
                         return signer.VerifyData(securedInput, signature, Hash);
                     }
                 }
-
-                if (key is ECDsa)
+                else if (key is ECDsa ecDsa)
                 {
-                    var publicKey = (ECDsa)key;
+                    Ensure.BitSize(ecDsa.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, ecDsa.KeySize));
 
-                    Ensure.BitSize(publicKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, publicKey.KeySize));
-
-                    return publicKey.VerifyData(securedInput, signature, Hash);
+                    return ecDsa.VerifyData(securedInput, signature, Hash);
                 }
 
                 throw new ArgumentException("EcdsaUsingSha algorithm expects key to be of either CngKey or ECDsa types.");
@@ -83,14 +74,17 @@ namespace Jose.netstandard1_4
         {
             get
             {
-                if (keySize == 256)
-                    return HashAlgorithmName.SHA256;
-                if (keySize == 384)
-                    return HashAlgorithmName.SHA384;
-                if (keySize == 521)
-                    return HashAlgorithmName.SHA512;
-
-                throw new ArgumentException(string.Format("Unsupported key size: '{0} bytes'", keySize));
+                switch (keySize)
+                {
+                    case 256:
+                        return HashAlgorithmName.SHA256;
+                    case 384:
+                        return HashAlgorithmName.SHA384;
+                    case 521:
+                        return HashAlgorithmName.SHA512;
+                    default:
+                        throw new ArgumentException(string.Format("Unsupported key size: '{0} bytes'", keySize));
+                }
             }
         }
     }
