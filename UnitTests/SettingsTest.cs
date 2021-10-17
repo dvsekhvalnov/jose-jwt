@@ -10,12 +10,12 @@ namespace UnitTests
 {
     public class SettingsTest
     {
-        private byte[] aes128Key = { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
+        private static readonly byte[] aes128Key = { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
 
         [Fact]
         public void Encode_IJsonMapper_Override()
         {
-            //given            
+            //given
             MockJsonMapper jsMapper = new MockJsonMapper();
 
             var payload = new
@@ -23,13 +23,13 @@ namespace UnitTests
                 hello = "world"
             };
             //when
-            string token = Jose.JWT.Encode(payload, null, JwsAlgorithm.none, 
+            string token = Jose.JWT.Encode(payload, null, JwsAlgorithm.none,
                 settings: new JwtSettings().RegisterMapper(jsMapper));
 
             Console.Out.WriteLine("Plaintext:" + token);
 
             //then
-            Assert.Equal(token, "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.");
+            Assert.Equal("eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.", token);
             Assert.True(jsMapper.SerializeCalled);
         }
 
@@ -46,14 +46,14 @@ namespace UnitTests
             var test = Jose.JWT.Decode<IDictionary<string, object>>(token, settings: settings);
 
             //then
-            Assert.Equal(test, new Dictionary<string, object> { { "hello", "world" } });
+            Assert.Equal(new Dictionary<string, object> { { "hello", "world" } }, test);
             Assert.True(jsMapper.ParseCalled);
         }
 
         [Fact]
         public void Encode_IJwsAlgorithm_Override()
         {
-            //given            
+            //given
             MockJwsAlgorithm jwsAlg = new MockJwsAlgorithm();
 
             var payload = new
@@ -62,13 +62,13 @@ namespace UnitTests
             };
 
             //when
-            string token = Jose.JWT.Encode(payload, null, 
-                JwsAlgorithm.none,  settings: new JwtSettings().RegisterJws(JwsAlgorithm.none, jwsAlg));
+            string token = Jose.JWT.Encode(payload, null,
+                JwsAlgorithm.none, settings: new JwtSettings().RegisterJws(JwsAlgorithm.none, jwsAlg));
 
             Console.Out.WriteLine("Plaintext:" + token);
 
             //then
-            Assert.Equal(token, "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.");
+            Assert.Equal("eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.", token);
             Assert.True(jwsAlg.SignCalled);
         }
 
@@ -84,7 +84,7 @@ namespace UnitTests
             var test = Jose.JWT.Decode<IDictionary<string, object>>(token, settings: new JwtSettings().RegisterJws(JwsAlgorithm.none, jwsAlg));
 
             //then
-            Assert.Equal(test, new Dictionary<string, object> { { "hello", "world" } });
+            Assert.Equal(new Dictionary<string, object> { { "hello", "world" } }, test);
             Assert.True(jwsAlg.VerifyCalled);
         }
 
@@ -93,7 +93,7 @@ namespace UnitTests
         {
             //given
             MockJweAlgorithm encAlg = new MockJweAlgorithm(128);
-            
+
             string json =
                 @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
 
@@ -103,14 +103,14 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("DIR_A128GCM = {0}", token);
 
-            Assert.Equal(Jose.JWT.Decode(token, aes128Key), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, aes128Key));
             Assert.True(encAlg.EncryptCalled);
         }
 
         [Fact]
         public void Decode_IJweAlgorithm_Override()
         {
-            //given            
+            //given
             MockJweAlgorithm encAlg = new MockJweAlgorithm(128);
 
             string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..yVi-LdQQngN0C5WS.1McwSmhZzAtmmLp9y-OdnJwaJFo1nj_4ashmzl2LhubGf0Jl1OTEVJzsHZb7bkup7cGTkuxh6Vfv10ljHsjWf_URXoxP3stQqQeViVcuPV0y2Q_WHYzTNGZpmHGe-hM6gjDhyZyvu3yeXGFSvfPQmp9pWVOgDjI4RC0MQ83rzzn-rRdnZkznWjbmOPxwPrR72Qng0BISsEwbkPn4oO8-vlHkVmPpuDTaYzCT2ZR5K9JnIU8d8QdxEAGb7-s8GEJ1yqtd_w._umbK59DAKA3O89h15VoKQ";
@@ -121,14 +121,14 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392548520,""sub"":""alice"",""nbf"":1392547920,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0e659a67-1cd3-438b-8888-217e72951ec9"",""iat"":1392547920}");
+            Assert.Equal(@"{""exp"":1392548520,""sub"":""alice"",""nbf"":1392547920,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0e659a67-1cd3-438b-8888-217e72951ec9"",""iat"":1392547920}", json);
             Assert.True(encAlg.DecryptCalled);
         }
 
         [Fact]
         public void Encode_IKeyManagement_Override()
         {
-            //given            
+            //given
             MockKeyManagement keyMgmt = new MockKeyManagement();
             string json =
                 @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
@@ -139,9 +139,9 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("DIR_A128GCM = {0}", token);
 
-            string[] parts = token.Split('.');          
+            string[] parts = token.Split('.');
 
-            Assert.Equal(Jose.JWT.Decode(token, aes128Key), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, aes128Key));
 
             Assert.True(keyMgmt.WrapCalled);
         }
@@ -149,7 +149,7 @@ namespace UnitTests
         [Fact]
         public void Decode_IKeyManagement_Override()
         {
-            //given            
+            //given
             MockKeyManagement keyMgmt = new MockKeyManagement();
             string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..yVi-LdQQngN0C5WS.1McwSmhZzAtmmLp9y-OdnJwaJFo1nj_4ashmzl2LhubGf0Jl1OTEVJzsHZb7bkup7cGTkuxh6Vfv10ljHsjWf_URXoxP3stQqQeViVcuPV0y2Q_WHYzTNGZpmHGe-hM6gjDhyZyvu3yeXGFSvfPQmp9pWVOgDjI4RC0MQ83rzzn-rRdnZkznWjbmOPxwPrR72Qng0BISsEwbkPn4oO8-vlHkVmPpuDTaYzCT2ZR5K9JnIU8d8QdxEAGb7-s8GEJ1yqtd_w._umbK59DAKA3O89h15VoKQ";
 
@@ -159,14 +159,14 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392548520,""sub"":""alice"",""nbf"":1392547920,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0e659a67-1cd3-438b-8888-217e72951ec9"",""iat"":1392547920}");
+            Assert.Equal(@"{""exp"":1392548520,""sub"":""alice"",""nbf"":1392547920,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0e659a67-1cd3-438b-8888-217e72951ec9"",""iat"":1392547920}", json);
             Assert.True(keyMgmt.UnwrapCalled);
         }
 
         [Fact]
         public void Encode_ICompression_Override()
         {
-            //given            
+            //given
             MockCompression compress = new MockCompression();
             JwtSettings settings = new JwtSettings().RegisterCompression(JweCompression.DEF, compress);
 
@@ -181,7 +181,7 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey()));
 
             Assert.True(compress.CompressCalled);
         }
@@ -189,7 +189,7 @@ namespace UnitTests
         [Fact]
         public void Decode_ICompression_Override()
         {
-            //given           
+            //given
             MockCompression compress = new MockCompression();
 
             string token = "eyJhbGciOiJSU0EtT0FFUCIsInppcCI6IkRFRiIsImVuYyI6IkExMjhDQkMtSFMyNTYifQ.nXSS9jDwE0dXkcGI7UquZBhn2nsB2P8u-YSWEuTAgEeuV54qNU4SlE76bToI1z4LUuABHmZOv9S24xkF45b7Mrap_Fu4JXH8euXrQgKQb9o_HL5FvE8m4zk5Ow13MKGPvHvWKOaNEBFriwYIfPi6QBYrpuqn0BaANc_aMyInV0Fn7e8EAgVmvoagmy7Hxic2sPUeLEIlRCDSGa82mpiGusjo7VMJxymkhnMdKufpGPh4wod7pvgb-jDWasUHpsUkHqSKZxlrDQxcy1-Pu1G37TAnImlWPa9NU7500IXc-W07IJccXhR3qhA5QaIyBbmHY0j1Dn3808oSFOYSF85A9w.uwbZhK-8iNzcjvKRb1a2Ig.jxj1GfH9Ndu1y0b7NRz_yfmjrvX2rXQczyK9ZJGWTWfeNPGR_PZdJmddiam15Qtz7R-pzIeyR4_qQoMzOISkq6fDEvEWVZdHnnTUHQzCoGX1dZoG9jXEwfAk2G1vXYT2vynEQZ72xk0V_OBtKhpIAUEFsXwCUeLAAgjFNY4OGWZl_Kmv9RTGhnePZfVbrbwg.WuV64jlV03OZm99qHMP9wQ";
@@ -200,7 +200,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392963710,""sub"":""alice"",""nbf"":1392963110,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""9fa7a38a-28fd-421c-825c-8fab3bbf3fb4"",""iat"":1392963110}");
+            Assert.Equal(@"{""exp"":1392963710,""sub"":""alice"",""nbf"":1392963110,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""9fa7a38a-28fd-421c-825c-8fab3bbf3fb4"",""iat"":1392963110}", json);
             Assert.True(compress.DecompressCalled);
         }
 
@@ -211,7 +211,7 @@ namespace UnitTests
 
             var test = Jose.JWT.Decode<IDictionary<string, object>>(token, settings: new JwtSettings().RegisterJwsAlias("NONE-ALIAS", JwsAlgorithm.none));
 
-            Assert.Equal(test, new Dictionary<string, object> { { "hello", "world" } });
+            Assert.Equal(new Dictionary<string, object> { { "hello", "world" } }, test);
         }
 
         [Fact]
@@ -222,11 +222,11 @@ namespace UnitTests
 
             //when
             string json = Jose.JWT.Decode(token, PrivKey(), settings: new JwtSettings().RegisterJwaAlias("RSA1_5_ALIAS", JweAlgorithm.RSA1_5));
-            
+
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""hello"":""world""}");
+            Assert.Equal(@"{""hello"":""world""}", json);
         }
 
         [Fact]
@@ -241,7 +241,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", token);
 
-            Assert.Equal(json, @"{""hello"":""world""}");
+            Assert.Equal(@"{""hello"":""world""}", json);
         }
 
         [Fact]
@@ -251,7 +251,7 @@ namespace UnitTests
 
             var test = Jose.JWT.Decode<IDictionary<string, object>>(token, PrivKey(), settings: new JwtSettings().RegisterCompressionAlias("zip", JweCompression.DEF));
 
-            Assert.Equal(test, new Dictionary<string, object> { { "hello", "world" } });
+            Assert.Equal(new Dictionary<string, object> { { "hello", "world" } }, test);
         }
 
         #region test utils
@@ -275,7 +275,7 @@ namespace UnitTests
 
         #region mocks
 
-        class MockJsonMapper
+        private class MockJsonMapper
 #if NETCOREAPP
             : JsonMapper,
 #elif NET40 || NET461
@@ -284,6 +284,7 @@ namespace UnitTests
                IJsonMapper
         {
             public bool SerializeCalled { get; set; }
+
             public bool ParseCalled { get; set; }
 
             public new string Serialize(object obj)
@@ -299,7 +300,7 @@ namespace UnitTests
             }
         }
 
-        class MockJwsAlgorithm : Plaintext, IJwsAlgorithm
+        private class MockJwsAlgorithm : Plaintext, IJwsAlgorithm
         {
             public bool SignCalled { get; set; }
             public bool VerifyCalled { get; set; }
@@ -317,7 +318,7 @@ namespace UnitTests
             }
         }
 
-        class MockJweAlgorithm : AesGcmEncryption, IJweAlgorithm
+        private class MockJweAlgorithm : AesGcmEncryption, IJweAlgorithm
         {
             public MockJweAlgorithm(int keyLength) : base(keyLength) { }
 
@@ -337,7 +338,7 @@ namespace UnitTests
             }
         }
 
-        class MockKeyManagement : DirectKeyManagement, IKeyManagement
+        private class MockKeyManagement : DirectKeyManagement, IKeyManagement
         {
             public bool UnwrapCalled { get; set; }
             public bool WrapCalled { get; set; }
@@ -355,7 +356,7 @@ namespace UnitTests
             }
         }
 
-        class MockCompression : DeflateCompression, ICompression
+        private class MockCompression : DeflateCompression, ICompression
         {
             public bool CompressCalled { get; set; }
             public bool DecompressCalled { get; set; }
@@ -373,6 +374,6 @@ namespace UnitTests
             }
         }
 
-#endregion
+        #endregion
     }
 }
