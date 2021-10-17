@@ -30,7 +30,7 @@ namespace Jose
             }
             catch (CryptographicException e)
             {
-                throw new JoseException("Unable to sign content.", e);    
+                throw new JoseException("Unable to sign content.", e);
             }
         }
 
@@ -45,7 +45,7 @@ namespace Jose
                 using (var signer = new ECDsaCng(publicKey))
                 {
                     signer.HashAlgorithm = Hash;
-                
+
                     return signer.VerifyData(securedInput, signature);
                 }
             }
