@@ -34,6 +34,12 @@ jobs:
         dotnet-version: '3.1.300' # SDK Version to use.
       #if: matrix.framework == 'netcoreapp3.1'
 
+    - name: Setup .Net 5.0
+      uses: actions/setup-dotnet@v1.8.0
+      with:
+        dotnet-version: '5.0.x' # SDK Version to use.
+      #if: matrix.framework == 'net50'
+
     - name: Dotnet info
       run: |
         dotnet --version
