@@ -7,6 +7,7 @@ using System.Text;
 using Jose;
 using Jose.keys;
 using Xunit;
+using Xunit.Abstractions;
 #if NETCOREAPP
 using Newtonsoft.Json.Linq;
 #endif //NETCOREAPP
@@ -15,15 +16,22 @@ namespace UnitTests
 {
     public class TestSuite
     {
-        private string key = "a0a2abd8-6162-41c3-83d6-1cf559b46afc";
-        private byte[] aes128Key = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
-        private byte[] aes192Key = new byte[] { 139, 156, 136, 148, 17, 147, 27, 233, 145, 80, 115, 197, 223, 11, 100, 221, 5, 50, 155, 226, 136, 222, 216, 14 };
-        private byte[] aes256Key = new byte[] { 164, 60, 194, 0, 161, 189, 41, 38, 130, 89, 141, 164, 45, 170, 159, 209, 69, 137, 243, 216, 191, 131, 47, 250, 32, 107, 231, 117, 37, 158, 225, 234 };
-        private byte[] aes384Key = new byte[] { 185, 30, 233, 199, 32, 98, 209, 3, 114, 250, 30, 124, 207, 173, 227, 152, 243, 202, 238, 165, 227, 199, 202, 230, 218, 185, 216, 113, 13, 53, 40, 100, 100, 20, 59, 67, 88, 97, 191, 3, 161, 37, 147, 223, 149, 237, 190, 156 };
-        private byte[] aes512Key = new byte[] { 238, 71, 183, 66, 57, 207, 194, 93, 82, 80, 80, 152, 92, 242, 84, 206, 194, 46, 67, 43, 231, 118, 208, 168, 156, 212, 33, 105, 27, 45, 60, 160, 232, 63, 61, 235, 68, 171, 206, 35, 152, 11, 142, 121, 174, 165, 140, 11, 172, 212, 13, 101, 13, 190, 82, 244, 109, 113, 70, 150, 251, 82, 215, 226 };
+        private const string key = "a0a2abd8-6162-41c3-83d6-1cf559b46afc";
+        private static readonly byte[] aes128Key = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
+        private static readonly byte[] aes192Key = new byte[] { 139, 156, 136, 148, 17, 147, 27, 233, 145, 80, 115, 197, 223, 11, 100, 221, 5, 50, 155, 226, 136, 222, 216, 14 };
+        private static readonly byte[] aes256Key = new byte[] { 164, 60, 194, 0, 161, 189, 41, 38, 130, 89, 141, 164, 45, 170, 159, 209, 69, 137, 243, 216, 191, 131, 47, 250, 32, 107, 231, 117, 37, 158, 225, 234 };
+        private static readonly byte[] aes384Key = new byte[] { 185, 30, 233, 199, 32, 98, 209, 3, 114, 250, 30, 124, 207, 173, 227, 152, 243, 202, 238, 165, 227, 199, 202, 230, 218, 185, 216, 113, 13, 53, 40, 100, 100, 20, 59, 67, 88, 97, 191, 3, 161, 37, 147, 223, 149, 237, 190, 156 };
+        private static readonly byte[] aes512Key = new byte[] { 238, 71, 183, 66, 57, 207, 194, 93, 82, 80, 80, 152, 92, 242, 84, 206, 194, 46, 67, 43, 231, 118, 208, 168, 156, 212, 33, 105, 27, 45, 60, 160, 232, 63, 61, 235, 68, 171, 206, 35, 152, 11, 142, 121, 174, 165, 140, 11, 172, 212, 13, 101, 13, 190, 82, 244, 109, 113, 70, 150, 251, 82, 215, 226 };
 
         // The binary payload is a blob consisting of all possible byte values.
-        private byte[] BinaryPayload = Enumerable.Range(byte.MinValue, byte.MaxValue + 1).Select(i => (byte)i).ToArray();
+        private static readonly byte[] BinaryPayload = Enumerable.Range(byte.MinValue, byte.MaxValue + 1).Select(i => (byte)i).ToArray();
+
+        private readonly TestConsole Console;
+
+        public TestSuite(ITestOutputHelper output)
+        {
+            this.Console = new TestConsole(output);
+        }
 
         [Fact]
         public void DecodePlaintext()
@@ -35,7 +43,7 @@ namespace UnitTests
             var test = Jose.JWT.Decode<IDictionary<string, object>>(token);
 
             //then
-            Assert.Equal(test, new Dictionary<string, object> { { "hello", "world" } });
+            Assert.Equal(new Dictionary<string, object> { { "hello", "world" } }, test);
         }
 
         [Fact]
@@ -52,7 +60,7 @@ namespace UnitTests
             Console.Out.WriteLine("Plaintext:" + token);
 
             //then
-            Assert.Equal(token, "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.");
+            Assert.Equal("eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.", token);
         }
 
         [Fact]
@@ -66,7 +74,7 @@ namespace UnitTests
 
             Console.Out.WriteLine("EncodeBytesHS512: " + token);
 
-            Assert.Equal(token, "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w.3_-H4HJiNi8--Ss-VAMM1Dg0JtTGEXNvMo1LAHEnQ7bZpQiblqAu5tt-G9p8KFnSlSYOG6l64pIqmqu5p5RvuQ");
+            Assert.Equal("eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w.3_-H4HJiNi8--Ss-VAMM1Dg0JtTGEXNvMo1LAHEnQ7bZpQiblqAu5tt-G9p8KFnSlSYOG6l64pIqmqu5p5RvuQ", token);
         }
 
         [Fact]
@@ -82,7 +90,7 @@ namespace UnitTests
 
             Console.Out.WriteLine("DecodeBytesHS512: " + BitConverter.ToString(payload));
 
-            Assert.Equal(payload, BinaryPayload);
+            Assert.Equal(BinaryPayload, payload);
         }
 
         [Fact]
@@ -98,7 +106,7 @@ namespace UnitTests
 
             var payload = Jose.JWT.DecodeBytes(token, PrivKey(), JweAlgorithm.RSA1_5, JweEncryption.A256GCM);
 
-            Assert.Equal(payload, BinaryPayload);
+            Assert.Equal(BinaryPayload, payload);
         }
 
         [Fact]
@@ -117,7 +125,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""hello"": ""world""}");
+            Assert.Equal(@"{""hello"": ""world""}", json);
         }
 
         [Fact]
@@ -132,7 +140,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""hello"": ""world""}");
+            Assert.Equal(@"{""hello"": ""world""}", json);
         }
 
         [Fact]
@@ -147,7 +155,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""hello"": ""world""}");
+            Assert.Equal(@"{""hello"": ""world""}", json);
         }
 
         [Fact]
@@ -156,14 +164,13 @@ namespace UnitTests
             //given
             string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
 
-
             //when
             string json = Jose.JWT.Decode(token, PubKey());
 
             Console.Out.WriteLine("json = {0}", json);
 
             //then
-            Assert.Equal(json, @"{""hello"": ""world""}");
+            Assert.Equal(@"{""hello"": ""world""}", json);
         }
 
         [Fact]
@@ -178,7 +185,7 @@ namespace UnitTests
             Console.Out.WriteLine("json = {0}", json);
 
             //then
-            Assert.Equal(json, @"{""hello"": ""world""}");
+            Assert.Equal(@"{""hello"": ""world""}", json);
         }
 
         [Fact]
@@ -193,7 +200,7 @@ namespace UnitTests
             Console.Out.WriteLine("json = {0}", json);
 
             //then
-            Assert.Equal(json, @"{""hello"": ""world""}");
+            Assert.Equal(@"{""hello"": ""world""}", json);
         }
 
         [Fact]
@@ -208,7 +215,7 @@ namespace UnitTests
             Console.Out.WriteLine("json = {0}", json);
 
             //then
-            Assert.Equal(json, @"{""hello"": ""world""}");
+            Assert.Equal(@"{""hello"": ""world""}", json);
         }
 
         [Fact]
@@ -223,7 +230,7 @@ namespace UnitTests
             Console.Out.WriteLine("json = {0}", json);
 
             //then
-            Assert.Equal(json, @"{""hello"": ""world""}");
+            Assert.Equal(@"{""hello"": ""world""}", json);
         }
 
         [Fact]
@@ -238,7 +245,7 @@ namespace UnitTests
             Console.Out.WriteLine("json = {0}", json);
 
             //then
-            Assert.Equal(json, @"{""hello"": ""world""}");
+            Assert.Equal(@"{""hello"": ""world""}", json);
         }
 
         [Fact]
@@ -253,7 +260,7 @@ namespace UnitTests
             Console.Out.WriteLine("json = {0}", json);
 
             //then
-            Assert.Equal(json, @"{""hello"": ""world""}");
+            Assert.Equal(@"{""hello"": ""world""}", json);
         }
 
         [Fact]
@@ -268,7 +275,7 @@ namespace UnitTests
             Console.Out.WriteLine("token = {0}", json);
 
             //then
-            Assert.Equal(json, @"{""hello"": ""world""}");
+            Assert.Equal(@"{""hello"": ""world""}", json);
         }
 
         [Fact]
@@ -283,7 +290,7 @@ namespace UnitTests
             Console.Out.WriteLine("token = {0}", json);
 
             //then
-            Assert.Equal(json, @"{""hello"": ""world""}");
+            Assert.Equal(@"{""hello"": ""world""}", json);
         }
 
         [Fact]
@@ -298,7 +305,7 @@ namespace UnitTests
             Console.Out.WriteLine("token = {0}", json);
 
             //then
-            Assert.Equal(json, @"{""hello"": ""world""}");
+            Assert.Equal(@"{""hello"": ""world""}", json);
         }
 
         [Fact]
@@ -317,12 +324,12 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 3); //Make sure 3 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJQUzI1NiIsInR5cCI6IkpXVCJ9"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1], "eyJoZWxsbyI6ICJ3b3JsZCJ9"); //Pyaload is non encrypted and static text
-            Assert.Equal(parts[2].Length, 342); //signature size
+            Assert.Equal(3, parts.Length); //Make sure 3 parts
+            Assert.Equal("eyJhbGciOiJQUzI1NiIsInR5cCI6IkpXVCJ9", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal("eyJoZWxsbyI6ICJ3b3JsZCJ9", parts[1]); //Pyaload is non encrypted and static text
+            Assert.Equal(342, parts[2].Length); //signature size
 
-            Assert.Equal(Jose.JWT.Decode(token, PubKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PubKey()));
         }
 
         [Fact]
@@ -341,12 +348,12 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 3); //Make sure 3 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJQUzM4NCIsInR5cCI6IkpXVCJ9"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1], "eyJoZWxsbyI6ICJ3b3JsZCJ9"); //Pyaload is non encrypted and static text
-            Assert.Equal(parts[2].Length, 342); //signature size
+            Assert.Equal(3, parts.Length); //Make sure 3 parts
+            Assert.Equal("eyJhbGciOiJQUzM4NCIsInR5cCI6IkpXVCJ9", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal("eyJoZWxsbyI6ICJ3b3JsZCJ9", parts[1]); //Pyaload is non encrypted and static text
+            Assert.Equal(342, parts[2].Length); //signature size
 
-            Assert.Equal(Jose.JWT.Decode(token, PubKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PubKey()));
         }
 
         [Fact]
@@ -365,12 +372,12 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 3); //Make sure 3 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJQUzUxMiIsInR5cCI6IkpXVCJ9"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1], "eyJoZWxsbyI6ICJ3b3JsZCJ9"); //Pyaload is non encrypted and static text
-            Assert.Equal(parts[2].Length, 342); //signature size
+            Assert.Equal(3, parts.Length); //Make sure 3 parts
+            Assert.Equal("eyJhbGciOiJQUzUxMiIsInR5cCI6IkpXVCJ9", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal("eyJoZWxsbyI6ICJ3b3JsZCJ9", parts[1]); //Pyaload is non encrypted and static text
+            Assert.Equal(342, parts[2].Length); //signature size
 
-            Assert.Equal(Jose.JWT.Decode(token, PubKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PubKey()));
         }
 
         [Fact]
@@ -385,8 +392,8 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("HS256 = {0}", token);
 
-            Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.VleAUqv_-nc6dwZ9xQ8-4NiOpVRdSSrCCPCQl-7HQ2k");
-            Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), json);
+            Assert.Equal("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.VleAUqv_-nc6dwZ9xQ8-4NiOpVRdSSrCCPCQl-7HQ2k", token);
+            Assert.Equal(json, Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)));
         }
 
         [Fact]
@@ -401,8 +408,8 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("HS384 = {0}", token);
 
-            Assert.Equal(token, "eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.VjsBP04wkLVQ9SXqN0qe-J7FHQPGhnMAXnQvVEUdDh8wsvWNEN4wVlSkGuWIIk-b");
-            Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), json);
+            Assert.Equal("eyJhbGciOiJIUzM4NCIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.VjsBP04wkLVQ9SXqN0qe-J7FHQPGhnMAXnQvVEUdDh8wsvWNEN4wVlSkGuWIIk-b", token);
+            Assert.Equal(json, Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)));
         }
 
         [Fact]
@@ -417,8 +424,8 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("HS512 = {0}", token);
 
-            Assert.Equal(token, "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.IIif-Hyd8cS2_oqRb_3PzL7IwoIcPUVl_BVvOr6QbJT_x15RyNy2m_tFfUcm6lriqfAnOudqpyN-yylAXu1eFw");
-            Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), json);
+            Assert.Equal("eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.IIif-Hyd8cS2_oqRb_3PzL7IwoIcPUVl_BVvOr6QbJT_x15RyNy2m_tFfUcm6lriqfAnOudqpyN-yylAXu1eFw", token);
+            Assert.Equal(json, Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)));
         }
 
         [Fact]
@@ -433,8 +440,8 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("RS256 = {0}", test);
 
-            Assert.Equal(test, "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.AzXfyb6BuwLgNUqVkfiKeQRctG25u3-5DJIsGyDnFxOGTet74SjW6Aabm3LSXZ2HgQ5yp8_tCfqA12oDmPiviq4muhgc0LKujTpGtFlf0fcSJQJpxSTMGQZdZnxdKpz7dCSlQNvW6j1tGy1UWkXod-kf4FZckoDkGEbnRAVVVL7xRupFtLneUJGoWZCiMz5oYAoYMUY1bVil1S6lIwUJLtgsvrQMoVIcjlivjZ8fzF3tjQdInxCjYeOKD3WQ2-n3APg-1GEJT-l_2y-scbE55TPSxo9fpHoDn7G0Kcgl8wpjY4j3KR9dEa4unJN3necd83yCMOUzs6vmFncEMTrRZw");
-            Assert.Equal(Jose.JWT.Decode(test, PubKey()), json);
+            Assert.Equal("eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.AzXfyb6BuwLgNUqVkfiKeQRctG25u3-5DJIsGyDnFxOGTet74SjW6Aabm3LSXZ2HgQ5yp8_tCfqA12oDmPiviq4muhgc0LKujTpGtFlf0fcSJQJpxSTMGQZdZnxdKpz7dCSlQNvW6j1tGy1UWkXod-kf4FZckoDkGEbnRAVVVL7xRupFtLneUJGoWZCiMz5oYAoYMUY1bVil1S6lIwUJLtgsvrQMoVIcjlivjZ8fzF3tjQdInxCjYeOKD3WQ2-n3APg-1GEJT-l_2y-scbE55TPSxo9fpHoDn7G0Kcgl8wpjY4j3KR9dEa4unJN3necd83yCMOUzs6vmFncEMTrRZw", test);
+            Assert.Equal(json, Jose.JWT.Decode(test, PubKey()));
         }
 
         [Fact]
@@ -449,8 +456,8 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("RS384 = {0}", token);
 
-            Assert.Equal(token, "eyJhbGciOiJSUzM4NCIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.UW4uZuwV8UCFieKAX0IansM0u4-mYfarpim9JKD792an-HcSaq7inyI9GLt-iYflG0M_DmovC8QrjU4mP2FtWYR-Jnu4Ms467TreeDM4KOHSpPYOmdTG2N78L3JsXVZYEibHt5GHBzWUXqEnSthvSq-RHJsOXNjNVJACK2IWXc_PKvIbTVhoukZX_ejfA4B5ynEPax7Bt5mlyf9tSadfIGh1g29sm0hslPcZ9OKbwjvxWb17CdFy4gLq1bqvf7XnroeJGerYSXvbiOjulYizRXWBeDg5VKiEZWyyNt1rc9w_GNIIpY8B17jx6I0_hh_gjSMTTQoKqOp6Q2FWg7ZgLg");
-            Assert.Equal(Jose.JWT.Decode(token, PubKey()), json);
+            Assert.Equal("eyJhbGciOiJSUzM4NCIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.UW4uZuwV8UCFieKAX0IansM0u4-mYfarpim9JKD792an-HcSaq7inyI9GLt-iYflG0M_DmovC8QrjU4mP2FtWYR-Jnu4Ms467TreeDM4KOHSpPYOmdTG2N78L3JsXVZYEibHt5GHBzWUXqEnSthvSq-RHJsOXNjNVJACK2IWXc_PKvIbTVhoukZX_ejfA4B5ynEPax7Bt5mlyf9tSadfIGh1g29sm0hslPcZ9OKbwjvxWb17CdFy4gLq1bqvf7XnroeJGerYSXvbiOjulYizRXWBeDg5VKiEZWyyNt1rc9w_GNIIpY8B17jx6I0_hh_gjSMTTQoKqOp6Q2FWg7ZgLg", token);
+            Assert.Equal(json, Jose.JWT.Decode(token, PubKey()));
         }
 
         [Fact]
@@ -465,8 +472,8 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("RS512 = {0}", token);
 
-            Assert.Equal(token, "eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.EkP4VYlDO9a0ycFt6e_vSFwfI5MICvDqLCNFI779lodbs92EwBtxgzoYdgqz8E8H1ZtWEnyULsc7TkwgV-1xj_wbWVLDvQxjZ4wQfGaQBjD5yO9RTxwReWab3mtfixh7pPKi7lpmuO65sWBVnco2p1RXGsM7KtHjToRIFxu9ncA7YYdQ7i-YL1HcUHjjOc95NJzDyfqkwnaD10Wq7GM4XAixZFYYNDaz2nP7Gt8DwvEvFhtP2iPxeK3_AqhQ4T3B2GgcIDnNCjhETtx4oal-gZzujMEbrMx7ea_jdS5QpKv0EEiA2Ppv0-_4dDKELCwhmBuYzHZIGbSJUFMC_fKVqw");
-            Assert.Equal(Jose.JWT.Decode(token, PubKey()), json);
+            Assert.Equal("eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.EkP4VYlDO9a0ycFt6e_vSFwfI5MICvDqLCNFI779lodbs92EwBtxgzoYdgqz8E8H1ZtWEnyULsc7TkwgV-1xj_wbWVLDvQxjZ4wQfGaQBjD5yO9RTxwReWab3mtfixh7pPKi7lpmuO65sWBVnco2p1RXGsM7KtHjToRIFxu9ncA7YYdQ7i-YL1HcUHjjOc95NJzDyfqkwnaD10Wq7GM4XAixZFYYNDaz2nP7Gt8DwvEvFhtP2iPxeK3_AqhQ4T3B2GgcIDnNCjhETtx4oal-gZzujMEbrMx7ea_jdS5QpKv0EEiA2Ppv0-_4dDKELCwhmBuYzHZIGbSJUFMC_fKVqw", token);
+            Assert.Equal(json, Jose.JWT.Decode(token, PubKey()));
         }
 
         [Fact]
@@ -487,8 +494,8 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("RS512 (extra headers) = {0}", token);
 
-            Assert.Equal(token, "eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCIsImtleWlkIjoiMTExLTIyMi0zMzMifQ.eyJoZWxsbyI6ICJ3b3JsZCJ9.Ca6ESMOSM2O45xJtwmZqMACihVTKk0GJQA4tCP3GUIu3r7kZzhZzqwPQ369-e8N0QKfvrjJ5ZpIlHGoeut44FMYFGVNtv4M7CbzPWyIdCeubwH2vkJwBaPs-ztA9aVng4kH3BjdckBtMGRmNKkk9IWjlEMi0RboPOuCpUHcTZ8Z99jocQ6GSKii-vT0YT0wa3U6weSqIojq_h0saMb2XzzTRnXzN2YmsJiiuNksRgaL8BKva2Qxk6fbYqdXXBeTsFZUtdZ30-wYciAbUvT29Z21RZSDCiDzCJtYTOv08zAqyAN3v6ZwpJ53VM4e_ANZtjyeog4xtoUXTg9FGhbuy_g");
-            Assert.Equal(Jose.JWT.Decode(token, PubKey()), json);
+            Assert.Equal("eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCIsImtleWlkIjoiMTExLTIyMi0zMzMifQ.eyJoZWxsbyI6ICJ3b3JsZCJ9.Ca6ESMOSM2O45xJtwmZqMACihVTKk0GJQA4tCP3GUIu3r7kZzhZzqwPQ369-e8N0QKfvrjJ5ZpIlHGoeut44FMYFGVNtv4M7CbzPWyIdCeubwH2vkJwBaPs-ztA9aVng4kH3BjdckBtMGRmNKkk9IWjlEMi0RboPOuCpUHcTZ8Z99jocQ6GSKii-vT0YT0wa3U6weSqIojq_h0saMb2XzzTRnXzN2YmsJiiuNksRgaL8BKva2Qxk6fbYqdXXBeTsFZUtdZ30-wYciAbUvT29Z21RZSDCiDzCJtYTOv08zAqyAN3v6ZwpJ53VM4e_ANZtjyeog4xtoUXTg9FGhbuy_g", token);
+            Assert.Equal(json, Jose.JWT.Decode(token, PubKey()));
         }
 
         [Fact]
@@ -505,12 +512,12 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 3); //Make sure 3 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1], "eyJoZWxsbyI6ICJ3b3JsZCJ9"); //Pyaload is non encrypted and static text
-            Assert.Equal(parts[2].Length, 86); //signature size
+            Assert.Equal(3, parts.Length); //Make sure 3 parts
+            Assert.Equal("eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal("eyJoZWxsbyI6ICJ3b3JsZCJ9", parts[1]); //Pyaload is non encrypted and static text
+            Assert.Equal(86, parts[2].Length); //signature size
 
-            Assert.Equal(Jose.JWT.Decode(token, Ecc256Public()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecc256Public()));
         }
 
         [Fact]
@@ -527,12 +534,12 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 3); //Make sure 3 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1], "eyJoZWxsbyI6ICJ3b3JsZCJ9"); //Pyaload is non encrypted and static text
-            Assert.Equal(parts[2].Length, 86); //signature size
+            Assert.Equal(3, parts.Length); //Make sure 3 parts
+            Assert.Equal("eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal("eyJoZWxsbyI6ICJ3b3JsZCJ9", parts[1]); //Pyaload is non encrypted and static text
+            Assert.Equal(86, parts[2].Length); //signature size
 
-            Assert.Equal(Jose.JWT.Decode(token, ECDSa256Public()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, ECDSa256Public()));
         }
 
         [Fact]
@@ -549,12 +556,12 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 3); //Make sure 3 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJFUzM4NCIsInR5cCI6IkpXVCJ9"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1], "eyJoZWxsbyI6ICJ3b3JsZCJ9"); //Pyaload is non encrypted and static text
-            Assert.Equal(parts[2].Length, 128); //signature size
+            Assert.Equal(3, parts.Length); //Make sure 3 parts
+            Assert.Equal("eyJhbGciOiJFUzM4NCIsInR5cCI6IkpXVCJ9", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal("eyJoZWxsbyI6ICJ3b3JsZCJ9", parts[1]); //Pyaload is non encrypted and static text
+            Assert.Equal(128, parts[2].Length); //signature size
 
-            Assert.Equal(Jose.JWT.Decode(token, Ecc384Public()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecc384Public()));
         }
 
         [Fact]
@@ -571,12 +578,12 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 3); //Make sure 3 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJFUzUxMiIsInR5cCI6IkpXVCJ9"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1], "eyJoZWxsbyI6ICJ3b3JsZCJ9"); //Pyaload is non encrypted and static text
-            Assert.Equal(parts[2].Length, 176); //signature size
+            Assert.Equal(3, parts.Length); //Make sure 3 parts
+            Assert.Equal("eyJhbGciOiJFUzUxMiIsInR5cCI6IkpXVCJ9", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal("eyJoZWxsbyI6ICJ3b3JsZCJ9", parts[1]); //Pyaload is non encrypted and static text
+            Assert.Equal(176, parts[2].Length); //signature size
 
-            Assert.Equal(Jose.JWT.Decode(token, Ecc512Public()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecc512Public()));
         }
 
         [Fact]
@@ -591,7 +598,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1391196668,""sub"":""alice"",""nbf"":1391196068,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""03ac026e-55aa-4475-a806-f09e83048922"",""iat"":1391196068}");
+            Assert.Equal(@"{""exp"":1391196668,""sub"":""alice"",""nbf"":1391196068,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""03ac026e-55aa-4475-a806-f09e83048922"",""iat"":1391196068}", json);
         }
 
         [Fact]
@@ -606,10 +613,8 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392963710,""sub"":""alice"",""nbf"":1392963110,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""9fa7a38a-28fd-421c-825c-8fab3bbf3fb4"",""iat"":1392963110}");
+            Assert.Equal(@"{""exp"":1392963710,""sub"":""alice"",""nbf"":1392963110,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""9fa7a38a-28fd-421c-825c-8fab3bbf3fb4"",""iat"":1392963110}", json);
         }
-
-
 
         [Fact]
         public void Decrypt_RSA_OAEP_A256CBC_HS512()
@@ -623,7 +628,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1391196668,""sub"":""alice"",""nbf"":1391196068,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""19539b79-e5cf-4f99-a66e-00a980e1b0a9"",""iat"":1391196068}");
+            Assert.Equal(@"{""exp"":1391196668,""sub"":""alice"",""nbf"":1391196068,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""19539b79-e5cf-4f99-a66e-00a980e1b0a9"",""iat"":1391196068}", json);
         }
 
         [Fact]
@@ -638,7 +643,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1391196668,""sub"":""alice"",""nbf"":1391196068,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""59f54c91-5224-4484-9c3a-e57b87b6f212"",""iat"":1391196068}");
+            Assert.Equal(@"{""exp"":1391196668,""sub"":""alice"",""nbf"":1391196068,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""59f54c91-5224-4484-9c3a-e57b87b6f212"",""iat"":1391196068}", json);
         }
 
         [Fact]
@@ -653,7 +658,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -668,7 +673,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -683,7 +688,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -691,7 +696,6 @@ namespace UnitTests
         {
             //given
             string json = @"{""hello"": ""world""}";
-
 
             //when
             string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM);
@@ -701,14 +705,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTI4R0NNIn0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size
-            Assert.Equal(parts[3].Length, 24); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTI4R0NNIn0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size
+            Assert.Equal(24, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey()));
         }
 
         [Fact]
@@ -716,7 +720,6 @@ namespace UnitTests
         {
             //given
             string json = @"{""hello"": ""world""}";
-
 
             //when
             string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
@@ -726,14 +729,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTkyR0NNIn0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size
-            Assert.Equal(parts[3].Length, 24); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTkyR0NNIn0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size
+            Assert.Equal(24, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey()));
         }
 
         [Fact]
@@ -750,14 +753,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIn0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size
-            Assert.Equal(parts[3].Length, 24); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMjU2R0NNIn0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size
+            Assert.Equal(24, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey()));
         }
 
         [Fact]
@@ -772,7 +775,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1391196668,""sub"":""alice"",""nbf"":1391196068,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""3814fff3-db66-45d9-a29a-d2cc2407bdcf"",""iat"":1391196068}");
+            Assert.Equal(@"{""exp"":1391196668,""sub"":""alice"",""nbf"":1391196068,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""3814fff3-db66-45d9-a29a-d2cc2407bdcf"",""iat"":1391196068}", json);
         }
 
         [Fact]
@@ -787,7 +790,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1391196668,""sub"":""alice"",""nbf"":1391196068,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""c9d44ff8-ff1e-4490-8454-941e45766152"",""iat"":1391196068}");
+            Assert.Equal(@"{""exp"":1391196668,""sub"":""alice"",""nbf"":1391196068,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""c9d44ff8-ff1e-4490-8454-941e45766152"",""iat"":1391196068}", json);
         }
 
         [Fact]
@@ -802,7 +805,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1391196668,""sub"":""alice"",""nbf"":1391196068,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""7efcdbc6-b2b5-4480-985d-bdf741b376bb"",""iat"":1391196068}");
+            Assert.Equal(@"{""exp"":1391196668,""sub"":""alice"",""nbf"":1391196068,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""7efcdbc6-b2b5-4480-985d-bdf741b376bb"",""iat"":1391196068}", json);
         }
 
         [Fact]
@@ -820,14 +823,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhDQkMtSFMyNTYifQ"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhDQkMtSFMyNTYifQ", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey()));
         }
 
         [Fact]
@@ -853,12 +856,12 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExOTJDQkMtSFMzODQifQ"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 32); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExOTJDQkMtSFMzODQifQ", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(32, parts[4].Length); //auth tag size
         }
 
         [Fact]
@@ -885,12 +888,12 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZDQkMtSFM1MTIifQ"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 43); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZDQkMtSFM1MTIifQ", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(43, parts[4].Length); //auth tag size
         }
 
         [Fact]
@@ -908,14 +911,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey()));
         }
 
         [Fact]
@@ -941,12 +944,12 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTkyQ0JDLUhTMzg0In0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 32); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTkyQ0JDLUhTMzg0In0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(32, parts[4].Length); //auth tag size
         }
 
         [Fact]
@@ -964,14 +967,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 43); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(43, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey()));
         }
 
         [Fact]
@@ -986,7 +989,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1391705293,""sub"":""alice"",""nbf"":1391704693,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""2f3b5379-a851-4202-ac9a-85baae41459e"",""iat"":1391704693}");
+            Assert.Equal(@"{""exp"":1391705293,""sub"":""alice"",""nbf"":1391704693,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""2f3b5379-a851-4202-ac9a-85baae41459e"",""iat"":1391704693}", json);
         }
 
         [Fact]
@@ -1001,7 +1004,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1391710436,""sub"":""alice"",""nbf"":1391709836,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""6b646d08-2871-4e0d-bfa8-48a9e1bd6de5"",""iat"":1391709836}");
+            Assert.Equal(@"{""exp"":1391710436,""sub"":""alice"",""nbf"":1391709836,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""6b646d08-2871-4e0d-bfa8-48a9e1bd6de5"",""iat"":1391709836}", json);
         }
 
         [Fact]
@@ -1016,7 +1019,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1391710647,""sub"":""alice"",""nbf"":1391710047,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0b0f3b1b-8f36-4ee2-b463-54263b4af8b7"",""iat"":1391710047}");
+            Assert.Equal(@"{""exp"":1391710647,""sub"":""alice"",""nbf"":1391710047,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0b0f3b1b-8f36-4ee2-b463-54263b4af8b7"",""iat"":1391710047}", json);
         }
 
         [Fact]
@@ -1031,7 +1034,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1391711317,""sub"":""alice"",""nbf"":1391710717,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""cadf3d33-a109-4829-a869-94a4bfbb4cbf"",""iat"":1391710717}");
+            Assert.Equal(@"{""exp"":1391711317,""sub"":""alice"",""nbf"":1391710717,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""cadf3d33-a109-4829-a869-94a4bfbb4cbf"",""iat"":1391710717}", json);
         }
 
         [Fact]
@@ -1046,7 +1049,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1391711482,""sub"":""alice"",""nbf"":1391710882,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""7488a8fc-345a-42c2-971e-a286c14fc5af"",""iat"":1391710882}");
+            Assert.Equal(@"{""exp"":1391711482,""sub"":""alice"",""nbf"":1391710882,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""7488a8fc-345a-42c2-971e-a286c14fc5af"",""iat"":1391710882}", json);
         }
 
         [Fact]
@@ -1061,7 +1064,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1391711482,""sub"":""alice"",""nbf"":1391710882,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""77a31aed-f546-4b1d-ba77-9455a2e0a3d5"",""iat"":1391710882}");
+            Assert.Equal(@"{""exp"":1391711482,""sub"":""alice"",""nbf"":1391710882,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""77a31aed-f546-4b1d-ba77-9455a2e0a3d5"",""iat"":1391710882}", json);
         }
 
         [Fact]
@@ -1076,7 +1079,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392994388,""sub"":""alice"",""nbf"":1392993788,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""81b338eb-346e-4b04-a618-d3cbb2d64ec6"",""iat"":1392993788}");
+            Assert.Equal(@"{""exp"":1392994388,""sub"":""alice"",""nbf"":1392993788,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""81b338eb-346e-4b04-a618-d3cbb2d64ec6"",""iat"":1392993788}", json);
         }
 
         [Fact]
@@ -1094,14 +1097,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhHQ00ifQ"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size, 96 bits
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhHQ00ifQ", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size, 96 bits
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey()));
         }
 
         [Fact]
@@ -1119,14 +1122,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExOTJHQ00ifQ"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size, 96 bits
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExOTJHQ00ifQ", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size, 96 bits
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey()));
         }
 
         [Fact]
@@ -1144,14 +1147,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size, 96 bits
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00ifQ", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size, 96 bits
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey()));
         }
 
         [Fact]
@@ -1169,13 +1172,13 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00iLCJ6aXAiOiJERUYifQ"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size, 96 bits
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00iLCJ6aXAiOiJERUYifQ", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size, 96 bits
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey()));
         }
 
         [Fact]
@@ -1198,16 +1201,15 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhHQ00iLCJjdHkiOiJKV1QiLCJrZXlpZCI6IjEyMy00NTYifQ"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size
-            Assert.Equal(parts[3].Length, 24); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkExMjhHQ00iLCJjdHkiOiJKV1QiLCJrZXlpZCI6IjEyMy00NTYifQ", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size
+            Assert.Equal(24, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey()));
         }
-
 
         [Fact]
         public void Encrypt_RSA1_5_A128GCM()
@@ -1224,16 +1226,15 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4R0NNIn0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size, 96 bits
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4R0NNIn0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size, 96 bits
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey()));
         }
-
 
         [Fact]
         public void Encrypt_RSA1_5_A192GCM()
@@ -1250,14 +1251,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTkyR0NNIn0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size, 96 bits
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTkyR0NNIn0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size, 96 bits
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey()));
         }
 
         [Fact]
@@ -1275,14 +1276,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMjU2R0NNIn0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 342); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size, 96 bits
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMjU2R0NNIn0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size, 96 bits
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey()));
         }
 
         [Fact]
@@ -1297,7 +1298,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392548520,""sub"":""alice"",""nbf"":1392547920,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0e659a67-1cd3-438b-8888-217e72951ec9"",""iat"":1392547920}");
+            Assert.Equal(@"{""exp"":1392548520,""sub"":""alice"",""nbf"":1392547920,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0e659a67-1cd3-438b-8888-217e72951ec9"",""iat"":1392547920}", json);
         }
 
         [Fact]
@@ -1312,7 +1313,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392552631,""sub"":""alice"",""nbf"":1392552031,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""a3fea096-2e96-4d8b-b7cd-070e08b533fb"",""iat"":1392552031}");
+            Assert.Equal(@"{""exp"":1392552631,""sub"":""alice"",""nbf"":1392552031,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""a3fea096-2e96-4d8b-b7cd-070e08b533fb"",""iat"":1392552031}", json);
         }
 
         [Fact]
@@ -1327,7 +1328,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392552841,""sub"":""alice"",""nbf"":1392552241,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""efdfc02f-945e-4e1f-85a6-9f240f6cf153"",""iat"":1392552241}");
+            Assert.Equal(@"{""exp"":1392552841,""sub"":""alice"",""nbf"":1392552241,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""efdfc02f-945e-4e1f-85a6-9f240f6cf153"",""iat"":1392552241}", json);
         }
 
         [Fact]
@@ -1342,7 +1343,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1357,7 +1358,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1372,7 +1373,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1387,7 +1388,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1402,7 +1403,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1417,7 +1418,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1432,7 +1433,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1447,7 +1448,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1462,7 +1463,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1477,7 +1478,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1492,7 +1493,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1507,7 +1508,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1522,8 +1523,9 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}");
+            Assert.Equal(@"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}", json);
         }
+
         [Fact]
         public void Decrypt_A128GCMKW_A128CBC_HS256()
         {
@@ -1536,7 +1538,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1551,7 +1553,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1566,7 +1568,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1581,7 +1583,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1596,7 +1598,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1611,7 +1613,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1626,7 +1628,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
         [Fact]
@@ -1644,14 +1646,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0].Length, 115); //Header size
-            Assert.Equal(parts[1].Length, 54); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(115, parts[0].Length); //Header size
+            Assert.Equal(54, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, "top secret"), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, "top secret"));
         }
 
         [Fact]
@@ -1669,14 +1671,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0].Length, 107); //Header size
-            Assert.Equal(parts[1].Length, 54); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(107, parts[0].Length); //Header size
+            Assert.Equal(54, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, "top secret"), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, "top secret"));
         }
 
         [Fact]
@@ -1694,14 +1696,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0].Length, 107); //Header size
-            Assert.Equal(parts[1].Length, 43); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(107, parts[0].Length); //Header size
+            Assert.Equal(43, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, "top secret"), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, "top secret"));
         }
 
         [Fact]
@@ -1719,14 +1721,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0].Length, 115); //Header size
-            Assert.Equal(parts[1].Length, 96); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 43); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(115, parts[0].Length); //Header size
+            Assert.Equal(96, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(43, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, "top secret"), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, "top secret"));
         }
 
         [Fact]
@@ -1738,13 +1740,13 @@ namespace UnitTests
 
             //when
             var p2c = 10000;
-            string token = 
+            string token =
                 Jose.JWT.Encode(
-                    json, 
-                    "top secret", 
-                    JweAlgorithm.PBES2_HS512_A256KW, 
+                    json,
+                    "top secret",
+                    JweAlgorithm.PBES2_HS512_A256KW,
                     JweEncryption.A256CBC_HS512,
-                    extraHeaders: 
+                    extraHeaders:
                         new Dictionary<string, object>
                         {
                             { "p2c", p2c }
@@ -1755,18 +1757,17 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0].Length, 116); //Header size
-            Assert.Equal(parts[1].Length, 96); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 43); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(116, parts[0].Length); //Header size
+            Assert.Equal(96, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(43, parts[4].Length); //auth tag size
 
             Assert.Contains($"\"p2c\":{p2c}", Encoding.UTF8.GetString(Base64Url.Decode(parts[0])));
 
-            Assert.Equal(Jose.JWT.Decode(token, "top secret"), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, "top secret"));
         }
-
 
         [Fact]
         public void Encrypt_A128GCMKW_A128CBC_HS256()
@@ -1783,14 +1784,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0].Length, 128); //Header size
-            Assert.Equal(parts[1].Length, 43); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(128, parts[0].Length); //Header size
+            Assert.Equal(43, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, aes128Key), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, aes128Key));
         }
 
         [Fact]
@@ -1808,14 +1809,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0].Length, 128); //Header size
-            Assert.Equal(parts[1].Length, 86); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 43); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(128, parts[0].Length); //Header size
+            Assert.Equal(86, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(43, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, aes128Key), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, aes128Key));
         }
 
         [Fact]
@@ -1833,14 +1834,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0].Length, 128); //Header size
-            Assert.Equal(parts[1].Length, 64); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 32); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(128, parts[0].Length); //Header size
+            Assert.Equal(64, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(32, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, aes192Key), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, aes192Key));
         }
 
         [Fact]
@@ -1858,14 +1859,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0].Length, 128); //Header size
-            Assert.Equal(parts[1].Length, 86); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 43); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(128, parts[0].Length); //Header size
+            Assert.Equal(86, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(43, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, aes256Key), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, aes256Key));
         }
 
         [Fact]
@@ -1883,14 +1884,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 54); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(54, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, aes128Key), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, aes128Key));
         }
 
         [Fact]
@@ -1908,14 +1909,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0].Length, 239); //Header size
-            Assert.Equal(parts[1].Length, 54); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(239, parts[0].Length); //Header size
+            Assert.Equal(54, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)));
         }
 
         [Fact]
@@ -1933,14 +1934,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0].Length, 231); //Header size
-            Assert.Equal(parts[1].Length, 43); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(231, parts[0].Length); //Header size
+            Assert.Equal(43, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)));
         }
 
         [Fact]
@@ -1958,14 +1959,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0].Length, 231); //Header size
-            Assert.Equal(parts[1].Length, 54); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(231, parts[0].Length); //Header size
+            Assert.Equal(54, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)));
         }
 
         [Fact]
@@ -1983,14 +1984,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0].Length, 230); //Header size
-            Assert.Equal(parts[1].Length, 0); //no CEK
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(230, parts[0].Length); //Header size
+            Assert.Equal(0, parts[1].Length); //no CEK
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)));
         }
 
         [Fact]
@@ -2008,14 +2009,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0].Length, 222); //Header size
-            Assert.Equal(parts[1].Length, 0); //no CEK
-            Assert.Equal(parts[2].Length, 16); //IV size
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(222, parts[0].Length); //Header size
+            Assert.Equal(0, parts[1].Length); //no CEK
+            Assert.Equal(16, parts[2].Length); //IV size
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)));
         }
 
         [Fact]
@@ -2033,14 +2034,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0].Length, 222); //Header size
-            Assert.Equal(parts[1].Length, 0); //no CEK
-            Assert.Equal(parts[2].Length, 16); //IV size
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(222, parts[0].Length); //Header size
+            Assert.Equal(0, parts[1].Length); //no CEK
+            Assert.Equal(16, parts[2].Length); //IV size
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)));
         }
 
         [Fact]
@@ -2058,14 +2059,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0].Length, 222); //Header size
-            Assert.Equal(parts[1].Length, 0); //no CEK
-            Assert.Equal(parts[2].Length, 16); //IV size
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(222, parts[0].Length); //Header size
+            Assert.Equal(0, parts[1].Length); //no CEK
+            Assert.Equal(16, parts[2].Length); //IV size
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)));
         }
 
         [Fact]
@@ -2083,14 +2084,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJBMTkyS1ciLCJlbmMiOiJBMTkyQ0JDLUhTMzg0In0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 75); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 32); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJBMTkyS1ciLCJlbmMiOiJBMTkyQ0JDLUhTMzg0In0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(75, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(32, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, aes192Key), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, aes192Key));
         }
 
         [Fact]
@@ -2108,16 +2109,15 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 96); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 43); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(96, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(43, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, aes256Key), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, aes256Key));
         }
-
 
         [Fact]
         public void Decrypt_DIR_A192CBC_HS384()
@@ -2131,7 +2131,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553372,""sub"":""alice"",""nbf"":1392552772,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""f81648e9-e9b3-4e37-a655-fcfacace0ef0"",""iat"":1392552772}");
+            Assert.Equal(@"{""exp"":1392553372,""sub"":""alice"",""nbf"":1392552772,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""f81648e9-e9b3-4e37-a655-fcfacace0ef0"",""iat"":1392552772}", json);
         }
 
         [Fact]
@@ -2146,7 +2146,7 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("json = {0}", json);
 
-            Assert.Equal(json, @"{""exp"":1392553617,""sub"":""alice"",""nbf"":1392553017,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""029ea059-b8aa-44eb-a5ad-59458de678f8"",""iat"":1392553017}");
+            Assert.Equal(@"{""exp"":1392553617,""sub"":""alice"",""nbf"":1392553017,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""029ea059-b8aa-44eb-a5ad-59458de678f8"",""iat"":1392553017}", json);
         }
 
         [Fact]
@@ -2164,16 +2164,15 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 0); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size, 96 bits
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(0, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size, 96 bits
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, aes128Key), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, aes128Key));
         }
-
 
         [Fact]
         public void Encrypt_DIR_A256GCM()
@@ -2190,14 +2189,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 0); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size, 96 bits
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(0, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size, 96 bits
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, aes256Key), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, aes256Key));
         }
 
         [Fact]
@@ -2215,14 +2214,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTkyR0NNIn0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 0); //CEK size
-            Assert.Equal(parts[2].Length, 16); //IV size, 96 bits
-            Assert.Equal(parts[3].Length, 262); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJkaXIiLCJlbmMiOiJBMTkyR0NNIn0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(0, parts[1].Length); //CEK size
+            Assert.Equal(16, parts[2].Length); //IV size, 96 bits
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, aes192Key), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, aes192Key));
         }
 
         [Fact]
@@ -2240,14 +2239,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 0); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(0, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, aes256Key), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, aes256Key));
         }
 
         [Fact]
@@ -2265,14 +2264,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTkyQ0JDLUhTMzg0In0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 0); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 32); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJkaXIiLCJlbmMiOiJBMTkyQ0JDLUhTMzg0In0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(0, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(32, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, aes384Key), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, aes384Key));
         }
 
         [Fact]
@@ -2290,14 +2289,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 0); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 278); //cipher text size
-            Assert.Equal(parts[4].Length, 43); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(0, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(43, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, aes512Key), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, aes512Key));
         }
 
         [Fact]
@@ -2315,16 +2314,16 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiemlwIjoiREVGIn0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 0); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[4].Length, 43); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiemlwIjoiREVGIn0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(0, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(43, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, aes512Key), json);
+            Assert.Equal(json, Jose.JWT.Decode(token, aes512Key));
         }
 
-	[Fact]
+        [Fact]
         public void Headers()
         {
             //given
@@ -2335,13 +2334,13 @@ namespace UnitTests
             var test = Jose.JWT.Headers(token);
 
             //then
-            Assert.Equal(test.Count, 6);
-            Assert.Equal(test["alg"], "PBES2-HS256+A128KW");
-            Assert.Equal(test["enc"], "A256GCM");
-            Assert.Equal(test["p2c"], 8192L);
-            Assert.Equal(test["p2s"], "NkXji1947fRsKTlB");
-            Assert.Equal(test["exp"], 1363284000L);
-            Assert.Equal(test["crit"], new[] { "exp"});
+            Assert.Equal(6, test.Count);
+            Assert.Equal("PBES2-HS256+A128KW", test["alg"]);
+            Assert.Equal("A256GCM", test["enc"]);
+            Assert.Equal(8192L, test["p2c"]);
+            Assert.Equal("NkXji1947fRsKTlB", test["p2s"]);
+            Assert.Equal(1363284000L, test["exp"]);
+            Assert.Equal(new[] { "exp" }, test["crit"]);
         }
 
         [Fact]
@@ -2355,7 +2354,7 @@ namespace UnitTests
             var test = Jose.JWT.Payload(token);
 
             //then
-            Assert.Equal(test, @"{""hello"": ""world""}");
+            Assert.Equal(@"{""hello"": ""world""}", test);
         }
 
         [Fact]
@@ -2380,7 +2379,7 @@ namespace UnitTests
             var test = Jose.JWT.PayloadBytes(token);
 
             //then
-            Assert.Equal(test, new byte[] { 123, 34, 104, 101, 108, 108, 111, 34, 58, 32, 34, 119, 111, 114, 108, 100, 34, 125 });
+            Assert.Equal(new byte[] { 123, 34, 104, 101, 108, 108, 111, 34, 58, 32, 34, 119, 111, 114, 108, 100, 34, 125 }, test);
         }
 
         [Fact]
@@ -2394,11 +2393,11 @@ namespace UnitTests
             var test = Jose.JWT.PayloadBytes(token, false);
 
             //then
-            Assert.Equal(test, new byte[] { 101, 121, 74, 111, 90, 87, 120, 115, 98, 121, 73, 54, 73, 67, 74, 51, 98, 51, 74, 115, 90, 67, 74, 57 });
+            Assert.Equal(new byte[] { 101, 121, 74, 111, 90, 87, 120, 115, 98, 121, 73, 54, 73, 67, 74, 51, 98, 51, 74, 115, 90, 67, 74, 57 }, test);
         }
 
         [Fact]
-        public void PayloadOfEncryptedTOken()
+        public void PayloadOfEncryptedToken()
         {
             //given
             string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0..ZD93XtD7TOa2WMbqSuaY9g.1J5BAuxNRMWaw43s7hR82gqLiaZOHBmfD3_B9k4I2VIDKzS9oEF_NS2o7UIBa6t_fWHU7vDm9lNAN4rqq7OvtCBHJpFk31dcruQHxwYKn5xNefG7YP-o6QtpyNioNWJpaSD5VRcRO5ufRrw2bu4_nOth00yJU5jjN3O3n9f-0ewrN2UXDJIbZM-NiSuEDEgOVHImQXoOtOQd0BuaDx6xTJydw_rW5-_wtiOH2k-3YGlibfOWNu51kApGarRsAhhqKIPetYf5Mgmpv1bkUo6HJw.nVpOmg3Sxri0rh6nQXaIx5X0fBtCt7Kscg6c66NugHY";
@@ -2411,7 +2410,7 @@ namespace UnitTests
             }
             catch (JoseException e)
             {
-                Console.WriteLine(e);
+                Console.Out.WriteLine(e.ToString());
             }
         }
 
@@ -2427,10 +2426,9 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("HS256 Detached = {0}", token);
 
-           Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..VleAUqv_-nc6dwZ9xQ8-4NiOpVRdSSrCCPCQl-7HQ2k");
-           Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key), payload: @"{""hello"": ""world""}"), json);
+            Assert.Equal("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..VleAUqv_-nc6dwZ9xQ8-4NiOpVRdSSrCCPCQl-7HQ2k", token);
+            Assert.Equal(json, Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key), payload: @"{""hello"": ""world""}"));
         }
-
 
         [Fact]
         public void EncodeWithUnencodedPayload()
@@ -2444,8 +2442,8 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("HS256 Unencoded = {0}", token);
 
-            Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il0sInR5cCI6IkpXVCJ9.{\"hello\": \"world\"}.ueGnzTJermvKhFYga7Pc7W_6fXhBKHklIIJeTnMrp9M");
-            Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), json);
+            Assert.Equal("eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il0sInR5cCI6IkpXVCJ9.{\"hello\": \"world\"}.ueGnzTJermvKhFYga7Pc7W_6fXhBKHklIIJeTnMrp9M", token);
+            Assert.Equal(json, Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)));
         }
 
         [Fact]
@@ -2455,13 +2453,13 @@ namespace UnitTests
             string json = @"{""hello"": ""world""}";
 
             //when
-            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256, options: new JwtOptions { DetachPayload = true, EncodePayload = false});
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256, options: new JwtOptions { DetachPayload = true, EncodePayload = false });
 
             //then
             Console.Out.WriteLine("HS256 Unencoded & Detached = {0}", token);
 
-            Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il0sInR5cCI6IkpXVCJ9..ueGnzTJermvKhFYga7Pc7W_6fXhBKHklIIJeTnMrp9M");
-            Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key), payload: @"{""hello"": ""world""}"), json);
+            Assert.Equal("eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il0sInR5cCI6IkpXVCJ9..ueGnzTJermvKhFYga7Pc7W_6fXhBKHklIIJeTnMrp9M", token);
+            Assert.Equal(json, Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key), payload: @"{""hello"": ""world""}"));
         }
 
         [Fact]
@@ -2482,14 +2480,14 @@ namespace UnitTests
                 options: new JwtOptions { DetachPayload = true, EncodePayload = false });
 
             //then
-            Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0IiwiZXhwIl0sImV4cCI6MTM2MzI4NDAwMH0..9nZCB1H_OMmoTRBe2p5qeq38cyzcjJ6FzUZ9SkeZ4TU");
-            Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key), payload: @"{""hello"": ""world""}"), json);
+            Assert.Equal("eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0IiwiZXhwIl0sImV4cCI6MTM2MzI4NDAwMH0..9nZCB1H_OMmoTRBe2p5qeq38cyzcjJ6FzUZ9SkeZ4TU", token);
+            Assert.Equal(json, Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key), payload: @"{""hello"": ""world""}"));
             var tokenHeaders = Jose.JWT.Headers(token);
 
-            Assert.Equal(tokenHeaders.Count(), 4);
-            Assert.Equal(tokenHeaders["alg"], "HS256");
-            Assert.Equal(tokenHeaders["b64"], false);
-            Assert.Equal(Convert.ToInt64(tokenHeaders["exp"]), 1363284000L);
+            Assert.Equal(4, tokenHeaders.Count);
+            Assert.Equal("HS256", tokenHeaders["alg"]);
+            Assert.Equal(false, tokenHeaders["b64"]);
+            Assert.Equal(1363284000L, Convert.ToInt64(tokenHeaders["exp"]));
         }
 
         [Fact]
@@ -2505,13 +2503,17 @@ namespace UnitTests
             };
 
             //when
-            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256,
+            string token = Jose.JWT.Encode(
+                payload: json,
+                key: Encoding.UTF8.GetBytes(key),
+                algorithm: JwsAlgorithm.HS256,
                 extraHeaders: headers,
-                options: new JwtOptions { DetachPayload = true, EncodePayload = false });
+                options: new JwtOptions { DetachPayload = true, EncodePayload = false }
+            );
 
             //then
             var tokenHeaders = Jose.JWT.Headers(token);
-	    Assert.Equal(tokenHeaders["crit"], new [] {"b64", "exp"});	    
+            Assert.Equal(new[] { "b64", "exp" }, tokenHeaders["crit"]);
         }
 
         [Fact]
@@ -2525,20 +2527,20 @@ namespace UnitTests
             string json = Jose.JWT.Decode(token, PubKey(), payload: @"{""hello"": ""world""}");
 
             //then
-            Assert.Equal(json, @"{""hello"": ""world""}");
+            Assert.Equal(@"{""hello"": ""world""}", json);
         }
 
         [Fact]
         public void DecodeBytesUnencodedDetached()
-        {            
+        {
             //given
             string token = "eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJSUzI1NiJ9..ToCewDcERVLuqImwDkOd9iSxvTC8vzh-HrhuohOIjWMrGpTZi2FdzVN4Ll3fb2Iz3s_hj-Lno_c6m_7VcmOHfRLC9sPjSu2q9dbNkKo8Zc2FQmsCBdQi06XGAEJZW2M9380pxoYKiJ51a4EbGl4Ag7lX3hXeTPYRMVifacgdlpg2SYZzDPZQbWvibgtXFsBsIqPd-8i6ucE2eMdaNeWMLsHv-b5s7uWn8hN2nMKHj000Qce5rSbpK58l2LNeWw4IR6wNOqSZfbeerMxq1u0p-ZKIQxP24MltaPjZtqMdD4AzjrP4UCEf7VaLSkSuNVSf6ZmLmE_OYgQuQe7adFdoPg";
 
             //when
-            byte[] test = Jose.JWT.DecodeBytes(token, PubKey(), payload:BinaryPayload);
+            byte[] test = Jose.JWT.DecodeBytes(token, PubKey(), payload: BinaryPayload);
 
             //then
-            Assert.Equal(test, BinaryPayload);
+            Assert.Equal(BinaryPayload, test);
         }
 
         [Fact]
@@ -2551,7 +2553,7 @@ namespace UnitTests
             string json = Jose.JWT.Decode(token, PubKey(), JwsAlgorithm.RS256);
 
             // then
-            Assert.Equal(json, @"{""hello"": ""world""}");
+            Assert.Equal(@"{""hello"": ""world""}", json);
         }
 
         [Fact]
@@ -2561,7 +2563,7 @@ namespace UnitTests
             string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
 
             // then
-            Assert.Throws<InvalidAlgorithmException>(()=>Jose.JWT.Decode(token, PubKey(), JwsAlgorithm.RS512));
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, PubKey(), JwsAlgorithm.RS512));
         }
 
         [Fact]
@@ -2575,7 +2577,7 @@ namespace UnitTests
             string decodedToken = Jose.JWT.Decode(token, PrivKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
 
             // then
-            Assert.Equal(decodedToken, json);
+            Assert.Equal(json, decodedToken);
         }
 
         [Fact]
@@ -2586,7 +2588,7 @@ namespace UnitTests
             string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
 
             // then
-            Assert.Throws<InvalidAlgorithmException>(()=>Jose.JWT.Decode(token, PrivKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A192GCM));
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, PrivKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A192GCM));
             Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, PrivKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128CBC_HS256));
         }
 
@@ -2600,7 +2602,7 @@ namespace UnitTests
             var test = Jose.JWT.Decode<IDictionary<string, object>>(token, PubKey(), JwsAlgorithm.RS256);
 
             // then
-            Assert.Equal(test, new Dictionary<string, object> { { "hello", "world" } });
+            Assert.Equal(new Dictionary<string, object> { { "hello", "world" } }, test);
         }
 
         [Fact]
@@ -2614,7 +2616,7 @@ namespace UnitTests
             var test = Jose.JWT.Decode<IDictionary<string, object>>(token, PrivKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
 
             // then
-            Assert.Equal(test, new Dictionary<string, object> { { "hello", "world" } });
+            Assert.Equal(new Dictionary<string, object> { { "hello", "world" } }, test);
         }
 
         [Fact]
@@ -2624,10 +2626,10 @@ namespace UnitTests
             string token = "eyJhbGciOiJfUlMyNTYiLCJ0eXAiOiJKV1QifQ.eyJoZWxsbyI6ICJ3b3JsZCJ9.HhLwe11JpybXCXDqneSyG8V2pG38pZ2RzgPF3kT7CpHmYL-jmDfwn9ChNig7gmpWkhc4SZO7KNl2-dGOo8wfC7ITg9rZimjac6dMF5m7668Q8OyePiaICzGUCUPOVZ30ty6QSyH3aDVQgbh57jUTlbdXyE1-CmdhF2_b_2YA940Qm8YLeIXYP5pO-5OLKeWlzF2tXX9kEytWsa1WxrlUs4pHInMO1iA9GoE_NLa99p200L2kBwknsRlU3qzTzCs_ez_XvFhd0rq2AE9GhATNi4LZbNnkx0F3rD5ivskeFnO23AlTzjnV0wguRoNtweGyC-5tFHsVan3_1KFf7USZKg";
 
             //then
-            Assert.Throws<InvalidAlgorithmException>(()=>Jose.JWT.Decode(token, PubKey()));
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, PubKey()));
         }
 
-        [Fact]        
+        [Fact]
         public void UnknownJweAlg()
         {
             //given
@@ -2666,8 +2668,8 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("Empty HS256 = {0}", token);
 
-            Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..Ys7EjNHsGtyVcZB1Ph7Yj1CUN1j_WFbDOelXiKc2UTs");
-            Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), "");
+            Assert.Equal("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..Ys7EjNHsGtyVcZB1Ph7Yj1CUN1j_WFbDOelXiKc2UTs", token);
+            Assert.Equal("", Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)));
         }
 
         [Fact]
@@ -2681,14 +2683,14 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 54); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 22); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(54, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(22, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, aes128Key), "");
+            Assert.Equal("", Jose.JWT.Decode(token, aes128Key));
         }
 
         [Fact]
@@ -2700,8 +2702,8 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("Empty bytes HS256 = {0}", token);
 
-            Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..Ys7EjNHsGtyVcZB1Ph7Yj1CUN1j_WFbDOelXiKc2UTs");
-            Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)), "");
+            Assert.Equal("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..Ys7EjNHsGtyVcZB1Ph7Yj1CUN1j_WFbDOelXiKc2UTs", token);
+            Assert.Equal("", Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)));
         }
 
         [Fact]
@@ -2715,28 +2717,28 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(parts.Length, 5); //Make sure 5 parts
-            Assert.Equal(parts[0], "eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0"); //Header is non-encrypted and static text
-            Assert.Equal(parts[1].Length, 54); //CEK size
-            Assert.Equal(parts[2].Length, 22); //IV size
-            Assert.Equal(parts[3].Length, 22); //cipher text size
-            Assert.Equal(parts[4].Length, 22); //auth tag size
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(54, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(22, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(Jose.JWT.Decode(token, aes128Key), "");
+            Assert.Equal("", Jose.JWT.Decode(token, aes128Key));
         }
 
-	[Fact]
+        [Fact]
         public void Int64SerializationRoundTrip()
         {
             var headers = new Dictionary<string, object>
             {
                  {"typ", "JWT"},
-                 {"kid", 0xFFFFFFFF}      
+                 {"kid", 0xFFFFFFFF}
             };
 
             var payload = new Dictionary<string, object>
             {
-                 {"sub", 0xFFFFFFFF},   
+                 {"sub", 0xFFFFFFFF},
                  {"iss", "JustAName"},
                  {"iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds() },
                  {"exp", DateTimeOffset.UtcNow.AddMinutes(30).ToUnixTimeSeconds() }
@@ -2746,29 +2748,29 @@ namespace UnitTests
 
             IDictionary<string, object> test = JWT.Headers(token);
 
-            Assert.Equal((long)test["kid"], 0xFFFFFFFF);
+            Assert.Equal(0xFFFFFFFF, (long)test["kid"]);
         }
 
-	[Fact]
+        [Fact]
         public void DecodeObject()
         {
             var payload = new TestPayloadModel
             {
                 jti = "7eb8f0e3-1144-4ed2-b4d9-be266f68f212",
                 iss = "My Application",
-                iat = 1617749964L, 
+                iat = 1617749964L,
                 aud = "https://example.com",
                 sub = "testperson@example.com"
             };
-            
+
             var token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3ZWI4ZjBlMy0xMTQ0LTRlZDItYjRkOS1iZTI2NmY2OGYyMTIiLCJpc3MiOiJNeSBBcHBsaWNhdGlvbiIsImlhdCI6MTYxNzc0OTk2NCwiYXVkIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsInN1YiI6InRlc3RwZXJzb25AZXhhbXBsZS5jb20ifQ.U1O2Yy9HZNz7H83x6vgpzF7C0IkCZsI2DFIsf48V8CNDZUIh12tH2WH0yd3ck7D-u3biqoux2MppOFoKlC_XqhQBmKJRo4RkKdTmIUdTBNULC7kfcL5327iYCg0mHVR4HQbuPA2v2_vcPv0wsTSvo6-0Dj8AZGHZ2Qzmb22dc3WD0YCbDI24sXjAlCBBtpogYmSNHC-WtzQJVTf8hLu1n9h9W0gQ9D1hq6LnkyWTuXS-Mr3vzWvxILnrhErTseC9z2Xl-gOUUq_h_Y-DeRXirzhTq2a6wXfD5M7Jw6axjWI41VX8cCJ5WitfzMgOhjOO4NWY1mQZImPz0q7Q1zNdAg";
             TestPayloadModel test = JWT.Decode<TestPayloadModel>(token, PubKey());
 
-            Assert.Equal(test.jti, "7eb8f0e3-1144-4ed2-b4d9-be266f68f212");
-            Assert.Equal(test.iss, "My Application");
-            Assert.Equal(test.iat, 1617749964L);
-            Assert.Equal(test.aud, "https://example.com");
-            Assert.Equal(test.sub, "testperson@example.com");
+            Assert.Equal("7eb8f0e3-1144-4ed2-b4d9-be266f68f212", test.jti);
+            Assert.Equal("My Application", test.iss);
+            Assert.Equal(1617749964L, test.iat);
+            Assert.Equal("https://example.com", test.aud);
+            Assert.Equal("testperson@example.com", test.sub);
         }
 
         #region test utils
@@ -2835,7 +2837,6 @@ namespace UnitTests
             byte[] d = { 42, 148, 231, 48, 225, 196, 166, 201, 23, 190, 229, 199, 20, 39, 226, 70, 209, 148, 29, 70, 125, 14, 174, 66, 9, 198, 80, 251, 95, 107, 98, 206 };
 
             return EccKey.New(x, y, d, usage);
-
         }
 
         private CngKey Ecc512Public()
