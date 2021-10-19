@@ -1,4 +1,5 @@
 ﻿using Jose;
+using Jose.keys;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -349,6 +350,81 @@ namespace UnitTests
             Assert.Equal(p.DQ, new byte[] { 38, 125, 37, 168, 201, 47, 122, 97, 13, 16, 193, 181, 121, 76, 52, 115, 173, 53, 192, 243, 140, 160, 240, 248, 72, 164, 229, 156, 165, 143, 78, 84, 18, 233, 130, 18, 108, 209, 121, 80, 164, 174, 20, 188, 40, 37, 175, 71, 3, 192, 98, 124, 58, 195, 248, 199, 233, 163, 83, 53, 28, 249, 167, 162, 41, 68, 89, 74, 223, 192, 202, 170, 116, 41, 14, 149, 184, 137, 66, 18, 152, 240, 6, 117, 233, 1, 135, 231, 73, 3, 94, 25, 149, 85, 175, 1, 69, 103, 85, 65, 96, 83, 83, 53, 151, 75, 153, 23, 49, 167, 172, 145, 92, 222, 198, 212, 224, 202, 99, 220, 56, 8, 87, 55, 234, 97, 236, 197 } );
         }
 
+        [Fact]
+        public void EccKey_Public()
+        {
+            //given
+            var key = new JWK(crv: "P-256", x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
+
+            //when
+            var test = key.CngKey();
+
+            //then
+            Assert.NotNull(test);
+            Assert.Equal(key.Crv, "P-256");
+            Assert.Equal(test.Algorithm, CngAlgorithm.ECDsaP256);
+            Assert.True(test.IsEphemeral);
+        }
+
+        [Fact]
+        public void EccKey_Private()
+        {
+            //given
+            var key = new JWK(crv: "P-256", 
+                              x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", 
+                              y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
+                              d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
+                           );
+
+            //when
+            var test = key.CngKey();
+
+            //then
+            Assert.NotNull(test);
+            Assert.Equal(key.Crv, "P-256");
+            Assert.Equal(test.Algorithm, CngAlgorithm.ECDsaP256);
+            Assert.True(test.IsEphemeral);
+        }
+
+        [Fact]
+        public void EccKey_Private_KeyAgreement()
+        {
+            //given
+            var key = new JWK(crv: "P-256", 
+                              x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", 
+                              y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
+                              d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
+                           );
+
+            //when
+            var test = key.CngKey(CngKeyUsages.KeyAgreement);
+
+            //then
+            Assert.NotNull(test);
+            Assert.Equal(key.Crv, "P-256");
+            Assert.Equal(test.Algorithm, CngAlgorithm.ECDiffieHellmanP256);
+            Assert.True(test.IsEphemeral);
+        }
+        //[Fact]
+        //public void NewEccCngPublicKey()
+        //{
+        //    //given
+        //    var test = new JWK(Ecc256Public());
+
+        //    //then
+        //    Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+        //}
+
+        //[Fact]
+        //public void NewEccCngPrivateKey()
+        //{
+        //    //given
+        //    var test = new JWK(Ecc256Private());
+
+        //    //then
+        //    Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+        //}
+
         # region test utils
         private RSA PrivRsaKey()
         {
@@ -365,6 +441,39 @@ namespace UnitTests
             return new X509Certificate2("jwt-2048.p12", "1", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
         }
 
-        # endregion
+        private CngKey Ecc256Private(CngKeyUsages usage = CngKeyUsages.Signing)
+        {
+            byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+            byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+            byte[] d = { 42, 148, 231, 48, 225, 196, 166, 201, 23, 190, 229, 199, 20, 39, 226, 70, 209, 148, 29, 70, 125, 14, 174, 66, 9, 198, 80, 251, 95, 107, 98, 206 };
+
+            return EccKey.New(x, y, d, usage);
+
+        }
+
+        private CngKey Ecc256Public(CngKeyUsages usage = CngKeyUsages.Signing)
+        {
+            byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+            byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+            byte[] d = { 42, 148, 231, 48, 225, 196, 166, 201, 23, 190, 229, 199, 20, 39, 226, 70, 209, 148, 29, 70, 125, 14, 174, 66, 9, 198, 80, 251, 95, 107, 98, 206 };
+
+            return EccKey.New(x, y, usage: usage);
+        }
+
+        private ECDsa ECDSa256Public()
+        {
+            var x095 = new X509Certificate2("ecc256.p12", "12345");
+
+            return x095.GetECDsaPublicKey();
+        }
+
+        private ECDsa ECDSa256Private()
+        {
+            var x095 = new X509Certificate2("ecc256.p12", "12345");
+
+            return x095.GetECDsaPrivateKey();
+        }
+
+        #endregion
     }
 }

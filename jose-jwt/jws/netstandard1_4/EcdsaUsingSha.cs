@@ -29,6 +29,24 @@ namespace Jose.netstandard1_4
                         return signer.SignData(securedInput, Hash);
                     }
                 }
+
+                if (key is JWK)
+                {
+                    var jwk = (JWK)key;
+
+                    if (jwk.Kty == JWK.KeyTypes.EC)
+                    {
+                        var privateKey = jwk.CngKey();
+
+                        Ensure.BitSize(privateKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, privateKey.KeySize));
+
+                        using (var signer = new ECDsaCng(privateKey))
+                        {
+                            return signer.SignData(securedInput, Hash);
+                        }
+                    }
+                }
+
                 if (key is ECDsa)
                 {
                     var privateKey = (ECDsa) key;
@@ -38,7 +56,7 @@ namespace Jose.netstandard1_4
                     return privateKey.SignData(securedInput, Hash);
                 }
 
-                throw new ArgumentException("EcdsaUsingSha algorithm expects key to be of either CngKey or ECDsa types.");
+                throw new ArgumentException("EcdsaUsingSha algorithm expects key to be of CngKey, ECDsa or JWK types with kty='EC'.");
             }
             catch (CryptographicException e)
             {
@@ -62,6 +80,18 @@ namespace Jose.netstandard1_4
                     }
                 }
 
+                if (key is JWK)
+                {
+                    var publicKey = ((JWK) key).CngKey();
+
+                    Ensure.BitSize(publicKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, publicKey.KeySize));
+
+                    using (var signer = new ECDsaCng(publicKey))
+                    {
+                        return signer.VerifyData(securedInput, signature, Hash);
+                    }
+                }
+
                 if (key is ECDsa)
                 {
                     var publicKey = (ECDsa)key;
@@ -71,7 +101,7 @@ namespace Jose.netstandard1_4
                     return publicKey.VerifyData(securedInput, signature, Hash);
                 }
 
-                throw new ArgumentException("EcdsaUsingSha algorithm expects key to be of either CngKey or ECDsa types.");
+                throw new ArgumentException("EcdsaUsingSha algorithm expects key to be of CngKey, ECDsa or JWK types with kty='EC'.");
             }
             catch (CryptographicException e)
             {

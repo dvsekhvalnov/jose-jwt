@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Jose.keys;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 
@@ -21,6 +22,7 @@ namespace Jose
 
         private byte[] octKey;
         private RSA rsaKey;
+        private CngKey eccCngKey;
 
         // General
         public string Kty { get; set; }
@@ -30,11 +32,12 @@ namespace Jose
         public List<string> KeyOps { get; set; }
 
         // Symmetric keys
-        public string K { get; set; }       
+        public string K { get; set; }
 
-        // Elliptic keys
 
-        // RSA keys
+        /* 
+         * RSA keys
+         */
 
         // Modulus
         public string N { get; set; }
@@ -42,7 +45,7 @@ namespace Jose
         // Public exponent
         public string E { get; set; }
 
-        // Private exponent
+        // Private exponent or private part of ECC key
         public string D { get; set; }
 
         // First prime
@@ -59,6 +62,19 @@ namespace Jose
 
         // First CRT coefficient
         public string QI { get; set; }
+
+        /*
+         * Elliptic keys
+         */
+
+        // Curve
+        public string Crv { get; set; }
+
+        // Public part, X coordinate on curve
+        public string X { get; set; }
+
+        // Public part, Y coordinate on curve
+        public string Y { get; set; }        
 
         public RSA RsaKey()
         {
@@ -115,9 +131,30 @@ namespace Jose
             return octKey;
         }
 
+        public CngKey CngKey(CngKeyUsages usage = CngKeyUsages.Signing)
+        {
+            if (eccCngKey == null && X != null && Y != null)
+            {
+                byte[] d = (D != null) ? Base64Url.Decode(D) : null;
+
+                eccCngKey = EccKey.New(Base64Url.Decode(X), Base64Url.Decode(Y), d, usage);
+            }
+
+            return eccCngKey;
+        }
+
         public JWK()
         {
 
+        }
+
+        public JWK(string crv, string x, string y, string d = null)
+        {
+            Kty = KeyTypes.EC;
+            Crv = crv;
+            X = x;
+            Y = y;
+            D = d;
         }
 
         public JWK(string e, string n, string p = null, string q = null, string d = null, string dp = null, string dq = null, string qi = null)
@@ -179,6 +216,17 @@ namespace Jose
             {
                 QI = Base64Url.Encode(param.InverseQ);
             }
+        }
+
+        //TODO: supporting only named keys with export allowed
+        public JWK(CngKey key)
+        {
+            Kty = JWK.KeyTypes.EC;
+            var eccKey = EccKey.Export(key);
+
+            X = Base64Url.Encode(eccKey.X);
+            Y = Base64Url.Encode(eccKey.Y);
+            D = Base64Url.Encode(eccKey.D);
         }
 
         public IDictionary<string, object> ToDictionary()

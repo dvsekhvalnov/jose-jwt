@@ -43,7 +43,7 @@ namespace Jose
                 }
             }
 
-            throw new ArgumentException("RsaUsingSha alg expectes key to be of RSA typs or JWK typs with kty='rsa'");
+            throw new ArgumentException("RsaUsingSha alg expectes key to be of RSA typs or JWK types with kty='RSA'");
 #endif
         }
 
