@@ -257,6 +257,16 @@ namespace Jose
                 if (QI != null) { result["qi"] = QI; }
             }
 
+            if (Kty == JWK.KeyTypes.EC)
+            {                
+                result["crv"] = Crv;
+                result["x"] = X;
+                result["y"] = Y;
+
+                if (D != null) { result["d"] = D; }
+            }
+
+
             return result;
         }
 

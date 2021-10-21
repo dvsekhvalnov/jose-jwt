@@ -425,7 +425,51 @@ namespace UnitTests
         //    Assert.Equal(test.Kty, JWK.KeyTypes.EC);
         //}
 
-        # region test utils
+
+        [Fact]
+        public void ToDictionary_EccPubKey()
+        {
+            //given
+            var key = new JWK(crv: "P-256",
+                              x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
+                              y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"
+                           );
+
+            //when
+            var test = key.ToDictionary();
+
+            //then
+            Assert.Equal(4, test.Count);
+            Assert.Equal("EC", test["kty"]);
+            Assert.Equal("P-256", test["crv"]);
+            Assert.Equal("BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", test["x"]);
+            Assert.Equal("g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU", test["y"]);            
+        }
+
+        [Fact]
+        public void ToDictionary_EccPrivate()
+        {
+            //given
+            var key = new JWK(crv: "P-256",
+                              x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
+                              y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
+                              d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
+                           );
+
+            //when
+            var test = key.ToDictionary();
+
+            //then
+            Assert.Equal(5, test.Count);
+            Assert.Equal("EC", test["kty"]);
+            Assert.Equal("P-256", test["crv"]);
+            Assert.Equal("BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", test["x"]);
+            Assert.Equal("g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU", test["y"]);            
+            Assert.Equal("KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4", test["d"]);            
+        }
+
+
+        #region test utils
         private RSA PrivRsaKey()
         {
             return X509().GetRSAPrivateKey();
