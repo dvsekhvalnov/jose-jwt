@@ -288,7 +288,11 @@ namespace Jose
                 Q = Dictionaries.Get<string>(data, "q"),  
                 DP = Dictionaries.Get<string>(data, "dp"),  
                 DQ = Dictionaries.Get<string>(data, "dq"),  
-                QI = Dictionaries.Get<string>(data, "qi"),                  
+                QI = Dictionaries.Get<string>(data, "qi"),
+
+                Crv = Dictionaries.Get<string>(data, "crv"),
+                X = Dictionaries.Get<string>(data, "x"),
+                Y = Dictionaries.Get<string>(data, "y"),
             };
             
 

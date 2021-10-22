@@ -468,6 +468,107 @@ namespace UnitTests
             Assert.Equal("KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4", test["d"]);            
         }
 
+        [Fact]
+        public void FromDictionary_EccKey()
+        {
+            //given
+            var data = new Dictionary<string, object>
+            {
+                { "kty", "EC" },
+                { "use", "enc" },
+                { "crv", "P-256" },
+                { "x", "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk" },
+                { "y", "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU" },
+                { "d", "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4" }
+            };
+
+            //when
+            var test = JWK.FromDictionary(data);
+
+            //then
+            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Use, JWK.Usage.Encryption);            
+            Assert.Equal(test.Crv, "P-256");            
+            Assert.Equal(test.X, "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk");
+            Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
+            Assert.Equal(test.D, "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4");
+
+            var key = test.CngKey();
+
+            Assert.NotNull(key);            
+            Assert.Equal(key.Algorithm, CngAlgorithm.ECDsaP256);
+            Assert.True(key.IsEphemeral);
+        }
+
+        [Fact]
+        public void ToJson_EccPubKey()
+        {
+            //given
+            var key = new JWK(crv: "P-256",
+                              x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
+                              y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"
+                           );
+
+            //when
+            var test = key.ToJson(JWT.DefaultSettings.JsonMapper);
+
+            //then
+            Console.Out.WriteLine(test);
+            Assert.Equal(test, @"{""kty"":""EC"",""crv"":""P-256"",""x"":""BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk"",""y"":""g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU""}");
+        }
+
+        [Fact]
+        public void ToJson_EccPrivKey()
+        {
+            //given
+            var key = new JWK(crv: "P-256",
+                              x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
+                              y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
+                              d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
+                           );
+
+            //when
+            var test = key.ToJson(JWT.DefaultSettings.JsonMapper);
+
+            //then
+            Console.Out.WriteLine(test);
+            Assert.Equal(test, @"{""kty"":""EC"",""crv"":""P-256"",""x"":""BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk"",""y"":""g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"",""d"":""KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4""}");
+        }
+
+        [Fact]
+        public void FromJson_EccKey()
+        {
+            //given
+            var json = @"{
+	            ""kty"": ""EC"",
+                ""kid"": ""Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc"",
+	            ""crv"": ""P-256"",
+	            ""use"": ""enc"",
+	            ""x"": ""BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk"",
+	            ""y"": ""g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"",
+	            ""d"": ""KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4""
+            }";
+
+            //when
+            var test = JWK.FromJson(json, JWT.DefaultSettings.JsonMapper);
+
+            //then
+            Assert.Equal(test.KeyId, "Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc");
+            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Use, JWK.Usage.Encryption);
+            Assert.Equal(test.Crv, "P-256");
+            Assert.Equal(test.X, "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk");
+            Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
+            Assert.Equal(test.D, "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4");
+
+            var key = test.CngKey();
+
+            Assert.NotNull(key);
+
+            Assert.NotNull(key);
+            Assert.Equal(key.Algorithm, CngAlgorithm.ECDsaP256);
+            Assert.True(key.IsEphemeral);
+        }
 
         #region test utils
         private RSA PrivRsaKey()
