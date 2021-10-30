@@ -7,6 +7,7 @@ namespace UnitTests
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
     using System.Text;
@@ -708,9 +709,11 @@ namespace UnitTests
             Assert.Equal("Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc", secondRecipient.Recipient.JoseHeader["kid"]);
         }
 
-        [Fact]
+        [SkippableFact]
         public void DecodeMultipleRecipientsWithUnprotectedHeader()
         {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+
             var token = @"{
                 ""ciphertext"": ""wnecd9ceRDb0PqFdvNkjUw"",
                 ""iv"": ""d-F9AVZ7W6M5bWp45G_okw"",
@@ -842,9 +845,11 @@ namespace UnitTests
             Assert.Throws<JoseException>(() => Jose.JWE.Decrypt(token, sharedKey));
         }
 
-        [Fact]
+        [SkippableFact]
         public void DecodeDuplicateKeys_UnprotectedHeader_RecipientHeader()
         {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+
             var token = @"{
                 ""ciphertext"": ""z95vPJ_gXxejpFsno9EBCQ"",
                 ""iv"": ""jGdsbNjl-_uHT4V86MdFBA"",
@@ -938,9 +943,11 @@ namespace UnitTests
             Assert.Equal(payload, decoded.Plaintext);
         }
 
-        [Fact]
+        [SkippableFact]
         public void EncodeMultipleRecipients()
         {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+
             var payload = "Hello World !";
             JweRecipient r1 = new JweRecipient(JweAlgorithm.PBES2_HS256_A128KW, "secret");
             JweRecipient r2 = new JweRecipient(JweAlgorithm.ECDH_ES_A128KW, Ecc256Public());

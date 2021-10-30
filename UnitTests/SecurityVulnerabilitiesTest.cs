@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using Jose;
 using Jose.keys;
@@ -18,9 +19,11 @@ namespace UnitTests
     /// </summary>
     public class SecurityVulnerabilitiesTest
     {
-        [Fact]
+        [SkippableFact]
         public void InvalidCurveAttack()
         {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+
             // https://www.cs.bris.ac.uk/Research/CryptographySecurity/RWC/2017/nguyen.quan.pdf
             // Attack exploits some ECDH implementations which do not check
             // that ephemeral public key is on the private key's curve.

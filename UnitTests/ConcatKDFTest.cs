@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using Jose;
 using Jose.keys;
@@ -8,9 +9,11 @@ namespace UnitTests
 {
     public class ConcatKDFTest
     {
-        [Fact]
+        [SkippableFact]
         public void Derive128BitKey()
         {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+
             // https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-23#appendix-C
 
             //given
