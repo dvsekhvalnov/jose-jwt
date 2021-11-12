@@ -1,5 +1,6 @@
 ﻿using Jose;
 using Jose.keys;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
@@ -351,7 +352,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void EccKey_Public()
+        public void EccKey_Cng_Public()
         {
             //given
             var key = new JWK(crv: "P-256", x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
@@ -367,7 +368,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void EccKey_Private()
+        public void EccKey_Cng_Private()
         {
             //given
             var key = new JWK(crv: "P-256", 
@@ -387,7 +388,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void EccKey_Private_KeyAgreement()
+        public void EccKey_Cng_Private_KeyAgreement()
         {
             //given
             var key = new JWK(crv: "P-256", 
@@ -405,6 +406,77 @@ namespace UnitTests
             Assert.Equal(test.Algorithm, CngAlgorithm.ECDiffieHellmanP256);
             Assert.True(test.IsEphemeral);
         }
+
+        [Fact]
+        public void EccKey_ECDsa_Public()
+        {
+            //given
+            var key = new JWK(crv: "P-256", x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
+
+            //when
+            var test = key.ECDsaKey();
+
+            //then
+            Assert.NotNull(test);
+            Assert.Equal(key.Crv, "P-256");
+            Assert.Equal(test.KeySize, 256);
+
+            // Make sure no private key
+            Assert.Throws<CryptographicException>(() => test.ExportParameters(true));           
+        }
+
+        [Fact]
+        public void EccKey_ECDsa_Private()
+        {
+            //given
+            var key = new JWK(crv: "P-256",
+                              x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
+                              y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
+                              d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
+                           );
+
+            //when
+            var test = key.ECDsaKey();
+
+            //then
+            Assert.NotNull(test);
+            Assert.Equal(key.Crv, "P-256");
+            Assert.Equal(test.KeySize, 256);
+
+            Assert.NotNull(test.ExportParameters(true).D);
+        }
+
+        [Fact]
+        public void NewECDsaPubKey()
+        {
+            //given
+            var test = new JWK(ECDSa256Public(), false);
+
+            //then
+            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Crv, "P-256");
+            Assert.Equal(test.X, "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk");
+            Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
+            Assert.Null(test.D);
+        }
+
+        [Fact]
+        public void NewECDsaPrivKey()
+        {
+            //given
+            var test = new JWK(ECDSa256Private());
+
+            //then
+            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Crv, "P-256");
+            Assert.Equal(test.X, "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk");
+            Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
+            Assert.Equal(test.D, "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4");
+        }
+
+        // TODO: other curves !
+
+
         //[Fact]
         //public void NewEccCngPublicKey()
         //{
@@ -608,15 +680,29 @@ namespace UnitTests
         private ECDsa ECDSa256Public()
         {
             var x095 = new X509Certificate2("ecc256.p12", "12345");
-
+    
             return x095.GetECDsaPublicKey();
         }
 
         private ECDsa ECDSa256Private()
         {
-            var x095 = new X509Certificate2("ecc256.p12", "12345");
+            var x095 = new X509Certificate2("ecc256.p12", "12345", X509KeyStorageFlags.EphemeralKeySet | X509KeyStorageFlags.Exportable);          
 
-            return x095.GetECDsaPrivateKey();
+            return Exportable(x095.GetECDsaPrivateKey());            
+        }
+
+        // Make key exportable to avoid MS bugs with CNG interop
+        private ECDsa Exportable(ECDsa key)
+        {
+
+            if (key is ECDsaCng)
+            {
+                ECDsaCng cng = key as ECDsaCng;
+                CngProperty pty = new CngProperty("Export Policy", BitConverter.GetBytes((int)(CngExportPolicies.AllowPlaintextExport)), CngPropertyOptions.Persist);
+                cng.Key.SetProperty(pty);
+            }
+
+            return key;
         }
 
         #endregion

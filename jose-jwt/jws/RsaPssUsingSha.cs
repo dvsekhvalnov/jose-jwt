@@ -49,7 +49,7 @@ namespace Jose
 
             throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of CngKey type.");
     
-    #elif NET461
+    #elif NET461 || NET472
             if (key is CngKey)
             {
                 var privateKey = (CngKey)key;
@@ -130,7 +130,7 @@ namespace Jose
 
             throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of CngKey type.");
 
-    #elif NET461
+    #elif NET461 || NET472
             if (key is CngKey)
             {
                 var publicKey = (CngKey)key;
@@ -176,7 +176,7 @@ namespace Jose
     #endif
         }
 
-    #if NETSTANDARD || NET461
+    #if NETSTANDARD || NET461 || NET472
         private HashAlgorithmName HashAlgorithm
         {
             get

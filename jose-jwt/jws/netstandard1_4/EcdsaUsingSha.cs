@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD || NET461
+﻿#if NETSTANDARD || NET461 || NET472
 
 using System;
 using System.Security.Cryptography;
@@ -20,14 +20,12 @@ namespace Jose.netstandard1_4
             {
                 if (key is CngKey)
                 {
-                    var privateKey = (CngKey) key;
+                    return Sign((CngKey)key, securedInput);
+                }
 
-                    Ensure.BitSize(privateKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, privateKey.KeySize));
-
-                    using (var signer = new ECDsaCng(privateKey))
-                    {
-                        return signer.SignData(securedInput, Hash);
-                    }
+                if (key is ECDsa)
+                {
+                    return Sign((ECDsa)key, securedInput);
                 }
 
                 if (key is JWK)
@@ -36,25 +34,14 @@ namespace Jose.netstandard1_4
 
                     if (jwk.Kty == JWK.KeyTypes.EC)
                     {
-                        var privateKey = jwk.CngKey();
-
-                        Ensure.BitSize(privateKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, privateKey.KeySize));
-
-                        using (var signer = new ECDsaCng(privateKey))
-                        {
-                            return signer.SignData(securedInput, Hash);
-                        }
+                      #if NETSTANDARD || NET472
+                        return Sign(jwk.ECDsaKey(), securedInput);
+                      #else
+                        return Sign(jwk.CngKey(), securedInput);
+                      #endif
                     }
                 }
 
-                if (key is ECDsa)
-                {
-                    var privateKey = (ECDsa) key;
-
-                    Ensure.BitSize(privateKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, privateKey.KeySize));
-
-                    return privateKey.SignData(securedInput, Hash);
-                }
 
                 throw new ArgumentException("EcdsaUsingSha algorithm expects key to be of CngKey, ECDsa or JWK types with kty='EC'.");
             }
@@ -70,35 +57,26 @@ namespace Jose.netstandard1_4
             {
                 if (key is CngKey)
                 {
-                    var publicKey = (CngKey) key;
-
-                    Ensure.BitSize(publicKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, publicKey.KeySize));
-
-                    using (var signer = new ECDsaCng(publicKey))
-                    {
-                        return signer.VerifyData(securedInput, signature, Hash);
-                    }
-                }
-
-                if (key is JWK)
-                {
-                    var publicKey = ((JWK) key).CngKey();
-
-                    Ensure.BitSize(publicKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, publicKey.KeySize));
-
-                    using (var signer = new ECDsaCng(publicKey))
-                    {
-                        return signer.VerifyData(securedInput, signature, Hash);
-                    }
+                    return Verify((CngKey)key, signature, securedInput);
                 }
 
                 if (key is ECDsa)
                 {
-                    var publicKey = (ECDsa)key;
+                    return Verify((ECDsa)key, signature, securedInput);
+                }
 
-                    Ensure.BitSize(publicKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, publicKey.KeySize));
+                if (key is JWK)
+                {
+                    var jwk = (JWK)key;
 
-                    return publicKey.VerifyData(securedInput, signature, Hash);
+                    if (jwk.Kty == JWK.KeyTypes.EC)
+                    {
+                      #if NETSTANDARD || NET472
+                        return Verify(jwk.ECDsaKey(), signature, securedInput);
+                      #else
+                        return Verify(jwk.CngKey(), signature, securedInput);
+                      #endif
+                    }
                 }
 
                 throw new ArgumentException("EcdsaUsingSha algorithm expects key to be of CngKey, ECDsa or JWK types with kty='EC'.");
@@ -122,6 +100,40 @@ namespace Jose.netstandard1_4
 
                 throw new ArgumentException(string.Format("Unsupported key size: '{0} bytes'", keySize));
             }
+        }
+
+        private byte[] Sign(CngKey privateKey, byte[] securedInput)
+        {
+            Ensure.BitSize(privateKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, privateKey.KeySize));
+
+            using (var signer = new ECDsaCng(privateKey))
+            {
+                return signer.SignData(securedInput, Hash);
+            }
+        }
+
+        private byte[] Sign(ECDsa privateKey, byte[] securedInput)
+        {
+            Ensure.BitSize(privateKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, privateKey.KeySize));
+
+            return privateKey.SignData(securedInput, Hash);
+        }
+
+        private bool Verify(CngKey publicKey, byte[] signature, byte[] securedInput)
+        {
+            Ensure.BitSize(publicKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, publicKey.KeySize));
+
+            using (var signer = new ECDsaCng(publicKey))
+            {
+                return signer.VerifyData(securedInput, signature, Hash);
+            }
+        }
+
+        private bool Verify(ECDsa publicKey, byte[] signature, byte[] securedInput)
+        {
+            Ensure.BitSize(publicKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, publicKey.KeySize));
+
+            return publicKey.VerifyData(securedInput, signature, Hash);
         }
     }
 }

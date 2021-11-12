@@ -73,7 +73,7 @@ RFC 7516:
     <NeutralLanguage>en-US</NeutralLanguage>
     <VersionPrefix>3.2.0</VersionPrefix>
     <Authors>Dmitry Vsekhvalnov</Authors>
-    <TargetFrameworks>net40;net461;netstandard1.4;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net40;net461;net472;netstandard1.4;netstandard2.1</TargetFrameworks>
     <AssemblyName>jose-jwt</AssemblyName>
     <PackageId>jose-jwt</PackageId>
     <PackageTags>jose;jwt;json;jwa;jwe;jws;aes;cbc;gcm;rsa;hmac;sha;rsassa;pss;rsaes;oaep;pkcs1-v1_5;es;elliptic;curve;diffe;hellman;agreement;ecdsa;key wrap;kw;ecdh;pbes;pbes2;pbkdf;pbkdf2;password based encryption;javascript object signing;two phase validation;netcore;clr;coreclr;portable;fips;compliant;open;banking;detached content;unencoded payload</PackageTags>
@@ -98,6 +98,12 @@ RFC 7516:
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
     <Reference Include="System.Web.Extensions" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>

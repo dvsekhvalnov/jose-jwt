@@ -24,6 +24,10 @@ namespace Jose
         private RSA rsaKey;
         private CngKey eccCngKey;
 
+    #if NETSTANDARD || NET472
+        private ECDsa ecdsaKey;
+    #endif
+
         // General
         public string Kty { get; set; }
         public string Use { get; set; }
@@ -131,6 +135,37 @@ namespace Jose
             return octKey;
         }
 
+     
+        public ECDsa ECDsaKey ()
+        {
+    #if NETSTANDARD || NET472
+            if (ecdsaKey == null && X != null && Y != null && Crv !=null)
+            {
+                ECParameters param = new ECParameters();
+
+                param.Q = new ECPoint();
+                param.Q.X = Base64Url.Decode(X);
+                param.Q.Y = Base64Url.Decode(Y);
+
+                // TODO: fix
+                param.Curve = NameToCurve(Crv);
+
+                if (D != null)
+                {
+                    param.D = Base64Url.Decode(D);
+                }
+
+
+                ecdsaKey = ECDsa.Create();
+                ecdsaKey.ImportParameters(param);
+            }
+
+            return ecdsaKey;
+    #else
+            throw new NotImplementedException("Not supported, requires .NET 4.7.2+ or NETSTANDARD");
+    #endif
+        }
+
         public CngKey CngKey(CngKeyUsages usage = CngKeyUsages.Signing)
         {
             if (eccCngKey == null && X != null && Y != null)
@@ -175,6 +210,29 @@ namespace Jose
             Kty = KeyTypes.OCT;
             K = Base64Url.Encode(key);
             octKey = key;
+        }
+
+        public JWK(ECDsa key, bool isPrivate = true)
+        {
+          #if NETSTANDARD || NET472
+            ecdsaKey = key;
+            Kty = KeyTypes.EC;           
+
+            ECParameters param = key.ExportParameters(isPrivate);
+
+            X = Base64Url.Encode(param.Q.X);
+            Y = Base64Url.Encode(param.Q.Y);
+
+            if (param.D != null)
+            {
+                D = Base64Url.Encode(param.D);
+            }
+
+            Crv = CurveToName(param.Curve);
+
+          #else
+            throw new NotImplementedException("Not supported, requires .NET 4.7.2+ or NETSTANDARD"); 
+          #endif
         }
 
         public JWK(RSA key, bool isPrivate = true)
@@ -227,6 +285,8 @@ namespace Jose
             X = Base64Url.Encode(eccKey.X);
             Y = Base64Url.Encode(eccKey.Y);
             D = Base64Url.Encode(eccKey.D);
+
+            // TODO: Curve?
         }
 
         public IDictionary<string, object> ToDictionary()
@@ -309,6 +369,40 @@ namespace Jose
             return JWK.FromDictionary(
                 mapper.Parse<IDictionary<string, object>>(json)
             );
+        }
+
+        private static string CurveToName(ECCurve curve)
+        {
+            curve.Oid.FriendlyName = curve.Oid.FriendlyName;
+
+            if (ECCurve.NamedCurves.nistP256.Oid.Value == curve.Oid.Value || ECCurve.NamedCurves.nistP256.Oid.FriendlyName == curve.Oid.FriendlyName)
+            {
+                return "P-256";
+            }
+
+            if (ECCurve.NamedCurves.nistP384.Oid.Value == curve.Oid.Value || ECCurve.NamedCurves.nistP384.Oid.FriendlyName == curve.Oid.FriendlyName)
+            {
+                return "P-384";
+            }
+
+            if (ECCurve.NamedCurves.nistP521.Oid.Value == curve.Oid.Value || ECCurve.NamedCurves.nistP521.Oid.FriendlyName == curve.Oid.FriendlyName)
+            {
+                return "P-521";
+            }
+
+            return null;
+        }
+
+        private static ECCurve NameToCurve(string name)
+        {
+            switch (name)
+            {
+                case "P-256": return ECCurve.NamedCurves.nistP256;
+                case "P-284": return ECCurve.NamedCurves.nistP384;
+                case "P-521": return ECCurve.NamedCurves.nistP521;
+            }
+
+            throw new ArgumentException("Unsupported curve: " + name);
         }
     }
 }
