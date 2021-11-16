@@ -371,6 +371,7 @@ namespace Jose
             );
         }
 
+#if NETSTANDARD || NET472
         private static string CurveToName(ECCurve curve)
         {
             curve.Oid.FriendlyName = curve.Oid.FriendlyName;
@@ -404,5 +405,6 @@ namespace Jose
 
             throw new ArgumentException("Unsupported curve: " + name);
         }
+#endif
     }
 }

@@ -407,6 +407,7 @@ namespace UnitTests
             Assert.True(test.IsEphemeral);
         }
 
+#if NETSTANDARD || NET472
         [Fact]
         public void EccKey_ECDsa_Public()
         {
@@ -473,7 +474,7 @@ namespace UnitTests
             Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
             Assert.Equal(test.D, "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4");
         }
-
+#endif
         // TODO: other curves !
 
 
@@ -642,7 +643,7 @@ namespace UnitTests
             Assert.True(key.IsEphemeral);
         }
 
-        #region test utils
+#region test utils
         private RSA PrivRsaKey()
         {
             return X509().GetRSAPrivateKey();
@@ -686,7 +687,7 @@ namespace UnitTests
 
         private ECDsa ECDSa256Private()
         {
-            var x095 = new X509Certificate2("ecc256.p12", "12345", X509KeyStorageFlags.EphemeralKeySet | X509KeyStorageFlags.Exportable);          
+            var x095 = new X509Certificate2("ecc256.p12", "12345", X509KeyStorageFlags.Exportable);          
 
             return Exportable(x095.GetECDsaPrivateKey());            
         }
@@ -705,6 +706,6 @@ namespace UnitTests
             return key;
         }
 
-        #endregion
+#endregion
     }
 }
