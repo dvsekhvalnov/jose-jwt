@@ -276,17 +276,21 @@ namespace Jose
             }
         }
 
-        //TODO: supporting only named keys with export allowed
-        public JWK(CngKey key)
+        public JWK(CngKey key, bool isPrivate = true)
         {
             Kty = JWK.KeyTypes.EC;
-            var eccKey = EccKey.Export(key);
+
+            var eccKey = EccKey.Export(key, isPrivate);
+
+            Crv = eccKey.Curve();
 
             X = Base64Url.Encode(eccKey.X);
             Y = Base64Url.Encode(eccKey.Y);
-            D = Base64Url.Encode(eccKey.D);
 
-            // TODO: Curve?
+            if (eccKey.D != null)
+            { 
+                D = Base64Url.Encode(eccKey.D);
+            }            
         }
 
         public IDictionary<string, object> ToDictionary()

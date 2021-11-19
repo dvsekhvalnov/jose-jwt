@@ -50,7 +50,7 @@ namespace Jose
             epk["kty"] = "EC";
             epk["x"] = Base64Url.Encode(ephemeral.X);
             epk["y"] = Base64Url.Encode(ephemeral.Y);
-            epk["crv"] = Curve(recieverPubKey);
+            epk["crv"] = ephemeral.Curve();
 
             header["epk"] = epk; 
 
@@ -106,15 +106,6 @@ namespace Jose
 
 
             return ConcatKDF.DeriveKey(externalPublicKey, privateKey, cekSizeBits, algorithmId, partyVInfo, partyUInfo, suppPubInfo);
-        }
-
-        private string Curve(CngKey key)
-        {
-            if (key.Algorithm == CngAlgorithm.ECDiffieHellmanP256) return "P-256";
-            if (key.Algorithm == CngAlgorithm.ECDiffieHellmanP384) return "P-384";
-            if (key.Algorithm == CngAlgorithm.ECDiffieHellmanP521) return "P-521";
-
-            throw new ArgumentException("Unknown curve type " + key.Algorithm);
-        }
+        }       
     }
 }

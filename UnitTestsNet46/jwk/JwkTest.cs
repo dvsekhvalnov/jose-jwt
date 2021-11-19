@@ -478,26 +478,33 @@ namespace UnitTests
         // TODO: other curves !
 
 
-        //[Fact]
-        //public void NewEccCngPublicKey()
-        //{
-        //    //given
-        //    var test = new JWK(Ecc256Public());
+        [Fact]
+        public void NewEccCngPublicKey()
+        {
+            //given
+            var test = new JWK(Ecc256Public(), false);
 
-        //    //then
-        //    Assert.Equal(test.Kty, JWK.KeyTypes.EC);
-        //}
+            //then
+            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Crv, "P-256");
+            Assert.Equal(test.X, "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk");
+            Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
+            Assert.Null(test.D);
+        }
 
-        //[Fact]
-        //public void NewEccCngPrivateKey()
-        //{
-        //    //given
-        //    var test = new JWK(Ecc256Private());
+        [Fact]
+        public void NewEccCngPrivateKey()
+        {
+            //given
+            var test = new JWK(Ecc256Private());
 
-        //    //then
-        //    Assert.Equal(test.Kty, JWK.KeyTypes.EC);
-        //}
-
+            //then
+            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Crv, "P-256");
+            Assert.Equal(test.X, "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk");
+            Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
+            Assert.Equal(test.D, "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4");
+        }
 
         [Fact]
         public void ToDictionary_EccPubKey()
@@ -666,7 +673,6 @@ namespace UnitTests
             byte[] d = { 42, 148, 231, 48, 225, 196, 166, 201, 23, 190, 229, 199, 20, 39, 226, 70, 209, 148, 29, 70, 125, 14, 174, 66, 9, 198, 80, 251, 95, 107, 98, 206 };
 
             return EccKey.New(x, y, d, usage);
-
         }
 
         private CngKey Ecc256Public(CngKeyUsages usage = CngKeyUsages.Signing)
