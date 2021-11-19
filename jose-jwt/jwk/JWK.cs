@@ -278,6 +278,8 @@ namespace Jose
 
         public JWK(CngKey key, bool isPrivate = true)
         {
+            eccCngKey = key;
+
             Kty = JWK.KeyTypes.EC;
 
             var eccKey = EccKey.Export(key, isPrivate);

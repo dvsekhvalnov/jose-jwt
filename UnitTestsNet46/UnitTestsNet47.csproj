@@ -91,6 +91,12 @@
     <None Include="ecc256.p12">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="ecc384.p12">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="ecc521.p12">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="jwt-2048.p12">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

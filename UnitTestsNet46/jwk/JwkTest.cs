@@ -448,7 +448,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void NewECDsaPubKey()
+        public void NewECDsa_Public_P256()
         {
             //given
             var test = new JWK(ECDSa256Public(), false);
@@ -462,7 +462,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void NewECDsaPrivKey()
+        public void NewECDsa_Private_P256()
         {
             //given
             var test = new JWK(ECDSa256Private());
@@ -474,12 +474,69 @@ namespace UnitTests
             Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
             Assert.Equal(test.D, "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4");
         }
-#endif
-        // TODO: other curves !
+
+        [Fact]
+        public void NewECDsa_Public_P384()
+        {
+            //given
+            var test = new JWK(ECDSa384Public(), false);
+
+            //then
+            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Crv, "P-384");
+            Assert.Equal(test.X, "Rpfcsz4AT-hyQDpLW9HogAeJlyoNlA-FXdcHA4h8DmXyz8BF1JFYO94hfy4e2q9P");
+            Assert.Equal(test.Y, "vcrEHpk1FnqrBLwqRwIJwb8Rb7ROBm6Z8JPLLZjstZzo3-OURJTdsDmVLMtTVUs3");
+            Assert.Null(test.D);
+        }
 
 
         [Fact]
-        public void NewEccCngPublicKey()
+        public void NewECDsa_Private_P384()
+        {
+            //given
+            var test = new JWK(ECDSa384Private());
+
+            //then
+            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Crv, "P-384");
+            Assert.Equal(test.X, "Rpfcsz4AT-hyQDpLW9HogAeJlyoNlA-FXdcHA4h8DmXyz8BF1JFYO94hfy4e2q9P");
+            Assert.Equal(test.Y, "vcrEHpk1FnqrBLwqRwIJwb8Rb7ROBm6Z8JPLLZjstZzo3-OURJTdsDmVLMtTVUs3");
+            Assert.Equal(test.D, "ice3abxagFJ0L6Fk3WHQQK33CSq6vbVuGOH-iEuc8tFe2joOIb4PUo3uz9afjPeL");
+        }
+
+        [Fact]
+        public void NewECDsa_Public_P521()
+        {
+            //given
+            var test = new JWK(ECDSa521Public(), false);
+
+            //then
+            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Crv, "P-521");
+            Assert.Equal(test.X, "APhJyzW4IkVv2eb_bNTx5V_vXYNkJVaYV2KqKxkjUIk-cMVxinRyN6WACIuU7W15KM0DPX8cwzor5ODkUuDblMxg");
+            Assert.Equal(test.Y, "ADxHYXBqI3lQthSnjwj2bOqgwQoDlC0LOrG-rBqyvPBbGUNPQPHLQd_aDONSskKgE8LZrD36F07agqBp2NDrfC4g");
+            Assert.Null(test.D);
+        }
+
+
+        [Fact]
+        public void NewECDsa_Private_P521()
+        {
+            //given
+            var test = new JWK(ECDSa521Private());
+
+            //then
+            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Crv, "P-521");
+            Assert.Equal(test.X, "APhJyzW4IkVv2eb_bNTx5V_vXYNkJVaYV2KqKxkjUIk-cMVxinRyN6WACIuU7W15KM0DPX8cwzor5ODkUuDblMxg");
+            Assert.Equal(test.Y, "ADxHYXBqI3lQthSnjwj2bOqgwQoDlC0LOrG-rBqyvPBbGUNPQPHLQd_aDONSskKgE8LZrD36F07agqBp2NDrfC4g");
+            Assert.Equal(test.D, "AN6BCYXPe3SwU1-pHXmgiRYVsDvLgT5vE04OrhTTOKBTKkrb0CfnIVRyR2ptoXTzppL854nkY5WYe8mdm4O1arNw");
+        }
+
+#endif
+
+        [Fact]
+        public void NewEccCng_Public_P256()
         {
             //given
             var test = new JWK(Ecc256Public(), false);
@@ -493,7 +550,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void NewEccCngPrivateKey()
+        public void NewEccCng_Private_P256()
         {
             //given
             var test = new JWK(Ecc256Private());
@@ -504,6 +561,62 @@ namespace UnitTests
             Assert.Equal(test.X, "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk");
             Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
             Assert.Equal(test.D, "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4");
+        }
+
+        [Fact]
+        public void NewEccCng_Public_P384()
+        {
+            //given
+            var test = new JWK(Ecc384Public(), false);
+
+            //then
+            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Crv, "P-384");
+            Assert.Equal(test.X, "Rpfcsz4AT-hyQDpLW9HogAeJlyoNlA-FXdcHA4h8DmXyz8BF1JFYO94hfy4e2q9P");
+            Assert.Equal(test.Y, "vcrEHpk1FnqrBLwqRwIJwb8Rb7ROBm6Z8JPLLZjstZzo3-OURJTdsDmVLMtTVUs3");
+            Assert.Null(test.D);
+        }
+
+        [Fact]
+        public void NewEccCng_Private_P384()
+        {
+            //given
+            var test = new JWK(Ecc384Private());
+
+            //then
+            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Crv, "P-384");
+            Assert.Equal(test.X, "Rpfcsz4AT-hyQDpLW9HogAeJlyoNlA-FXdcHA4h8DmXyz8BF1JFYO94hfy4e2q9P");
+            Assert.Equal(test.Y, "vcrEHpk1FnqrBLwqRwIJwb8Rb7ROBm6Z8JPLLZjstZzo3-OURJTdsDmVLMtTVUs3");
+            Assert.Equal(test.D, "ice3abxagFJ0L6Fk3WHQQK33CSq6vbVuGOH-iEuc8tFe2joOIb4PUo3uz9afjPeL");
+        }
+        [Fact]
+
+        public void NewEccCng_Public_P521()
+        {
+            //given
+            var test = new JWK(Ecc512Public(), false);
+
+            //then
+            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Crv, "P-521");
+            Assert.Equal(test.X, "APhJyzW4IkVv2eb_bNTx5V_vXYNkJVaYV2KqKxkjUIk-cMVxinRyN6WACIuU7W15KM0DPX8cwzor5ODkUuDblMxg");
+            Assert.Equal(test.Y, "ADxHYXBqI3lQthSnjwj2bOqgwQoDlC0LOrG-rBqyvPBbGUNPQPHLQd_aDONSskKgE8LZrD36F07agqBp2NDrfC4g");
+            Assert.Null(test.D);
+        }
+
+        [Fact]
+        public void NewEccCng_Private_P521()
+        {
+            //given
+            var test = new JWK(Ecc512Private());
+
+            //then
+            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Crv, "P-521");
+            Assert.Equal(test.X, "APhJyzW4IkVv2eb_bNTx5V_vXYNkJVaYV2KqKxkjUIk-cMVxinRyN6WACIuU7W15KM0DPX8cwzor5ODkUuDblMxg");
+            Assert.Equal(test.Y, "ADxHYXBqI3lQthSnjwj2bOqgwQoDlC0LOrG-rBqyvPBbGUNPQPHLQd_aDONSskKgE8LZrD36F07agqBp2NDrfC4g");
+            Assert.Equal(test.D, "AN6BCYXPe3SwU1-pHXmgiRYVsDvLgT5vE04OrhTTOKBTKkrb0CfnIVRyR2ptoXTzppL854nkY5WYe8mdm4O1arNw");
         }
 
         [Fact]
@@ -684,6 +797,42 @@ namespace UnitTests
             return EccKey.New(x, y, usage: usage);
         }
 
+        private CngKey Ecc384Public()
+        {
+            byte[] x = { 70, 151, 220, 179, 62, 0, 79, 232, 114, 64, 58, 75, 91, 209, 232, 128, 7, 137, 151, 42, 13, 148, 15, 133, 93, 215, 7, 3, 136, 124, 14, 101, 242, 207, 192, 69, 212, 145, 88, 59, 222, 33, 127, 46, 30, 218, 175, 79 };
+            byte[] y = { 189, 202, 196, 30, 153, 53, 22, 122, 171, 4, 188, 42, 71, 2, 9, 193, 191, 17, 111, 180, 78, 6, 110, 153, 240, 147, 203, 45, 152, 236, 181, 156, 232, 223, 227, 148, 68, 148, 221, 176, 57, 149, 44, 203, 83, 85, 75, 55 };
+
+            return EccKey.New(x, y);
+        }
+
+        private CngKey Ecc384Private()
+        {
+            byte[] x = { 70, 151, 220, 179, 62, 0, 79, 232, 114, 64, 58, 75, 91, 209, 232, 128, 7, 137, 151, 42, 13, 148, 15, 133, 93, 215, 7, 3, 136, 124, 14, 101, 242, 207, 192, 69, 212, 145, 88, 59, 222, 33, 127, 46, 30, 218, 175, 79 };
+            byte[] y = { 189, 202, 196, 30, 153, 53, 22, 122, 171, 4, 188, 42, 71, 2, 9, 193, 191, 17, 111, 180, 78, 6, 110, 153, 240, 147, 203, 45, 152, 236, 181, 156, 232, 223, 227, 148, 68, 148, 221, 176, 57, 149, 44, 203, 83, 85, 75, 55 };
+            byte[] d = { 137, 199, 183, 105, 188, 90, 128, 82, 116, 47, 161, 100, 221, 97, 208, 64, 173, 247, 9, 42, 186, 189, 181, 110, 24, 225, 254, 136, 75, 156, 242, 209, 94, 218, 58, 14, 33, 190, 15, 82, 141, 238, 207, 214, 159, 140, 247, 139 };
+
+            return EccKey.New(x, y, d);
+        }
+
+
+        private CngKey Ecc512Public()
+        {
+            byte[] x = { 0, 248, 73, 203, 53, 184, 34, 69, 111, 217, 230, 255, 108, 212, 241, 229, 95, 239, 93, 131, 100, 37, 86, 152, 87, 98, 170, 43, 25, 35, 80, 137, 62, 112, 197, 113, 138, 116, 114, 55, 165, 128, 8, 139, 148, 237, 109, 121, 40, 205, 3, 61, 127, 28, 195, 58, 43, 228, 224, 228, 82, 224, 219, 148, 204, 96 };
+            byte[] y = { 0, 60, 71, 97, 112, 106, 35, 121, 80, 182, 20, 167, 143, 8, 246, 108, 234, 160, 193, 10, 3, 148, 45, 11, 58, 177, 190, 172, 26, 178, 188, 240, 91, 25, 67, 79, 64, 241, 203, 65, 223, 218, 12, 227, 82, 178, 66, 160, 19, 194, 217, 172, 61, 250, 23, 78, 218, 130, 160, 105, 216, 208, 235, 124, 46, 32 };
+
+            return EccKey.New(x, y);
+        }
+
+        private CngKey Ecc512Private()
+        {
+            byte[] x = { 0, 248, 73, 203, 53, 184, 34, 69, 111, 217, 230, 255, 108, 212, 241, 229, 95, 239, 93, 131, 100, 37, 86, 152, 87, 98, 170, 43, 25, 35, 80, 137, 62, 112, 197, 113, 138, 116, 114, 55, 165, 128, 8, 139, 148, 237, 109, 121, 40, 205, 3, 61, 127, 28, 195, 58, 43, 228, 224, 228, 82, 224, 219, 148, 204, 96 };
+            byte[] y = { 0, 60, 71, 97, 112, 106, 35, 121, 80, 182, 20, 167, 143, 8, 246, 108, 234, 160, 193, 10, 3, 148, 45, 11, 58, 177, 190, 172, 26, 178, 188, 240, 91, 25, 67, 79, 64, 241, 203, 65, 223, 218, 12, 227, 82, 178, 66, 160, 19, 194, 217, 172, 61, 250, 23, 78, 218, 130, 160, 105, 216, 208, 235, 124, 46, 32 };
+            byte[] d = { 0, 222, 129, 9, 133, 207, 123, 116, 176, 83, 95, 169, 29, 121, 160, 137, 22, 21, 176, 59, 203, 129, 62, 111, 19, 78, 14, 174, 20, 211, 56, 160, 83, 42, 74, 219, 208, 39, 231, 33, 84, 114, 71, 106, 109, 161, 116, 243, 166, 146, 252, 231, 137, 228, 99, 149, 152, 123, 201, 157, 155, 131, 181, 106, 179, 112 };
+
+            return EccKey.New(x, y, d);
+        }
+
+#if NETSTANDARD || NET472
         private ECDsa ECDSa256Public()
         {
             var x095 = new X509Certificate2("ecc256.p12", "12345");
@@ -693,7 +842,35 @@ namespace UnitTests
 
         private ECDsa ECDSa256Private()
         {
-            var x095 = new X509Certificate2("ecc256.p12", "12345", X509KeyStorageFlags.Exportable);          
+            var x095 = new X509Certificate2("ecc256.p12", "12345", X509KeyStorageFlags.EphemeralKeySet | X509KeyStorageFlags.Exportable);
+
+            return Exportable(x095.GetECDsaPrivateKey());
+        }
+
+        private ECDsa ECDSa384Public()
+        {
+            var x095 = new X509Certificate2("ecc384.p12", "12345");
+    
+            return x095.GetECDsaPublicKey();
+        }
+
+        private ECDsa ECDSa384Private()
+        {
+            var x095 = new X509Certificate2("ecc384.p12", "12345", X509KeyStorageFlags.EphemeralKeySet | X509KeyStorageFlags.Exportable);          
+
+            return Exportable(x095.GetECDsaPrivateKey());            
+        }
+
+        private ECDsa ECDSa521Public()
+        {
+            var x095 = new X509Certificate2("ecc521.p12", "12345");
+    
+            return x095.GetECDsaPublicKey();
+        }
+
+        private ECDsa ECDSa521Private()
+        {
+            var x095 = new X509Certificate2("ecc521.p12", "12345", X509KeyStorageFlags.EphemeralKeySet | X509KeyStorageFlags.Exportable);          
 
             return Exportable(x095.GetECDsaPrivateKey());            
         }
@@ -701,7 +878,6 @@ namespace UnitTests
         // Make key exportable to avoid MS bugs with CNG interop
         private ECDsa Exportable(ECDsa key)
         {
-
             if (key is ECDsaCng)
             {
                 ECDsaCng cng = key as ECDsaCng;
@@ -711,7 +887,7 @@ namespace UnitTests
 
             return key;
         }
-
+#endif
 #endregion
     }
 }
