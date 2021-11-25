@@ -36,6 +36,19 @@ namespace Jose
             return src.TryGetValue(key, out value) ? (V)value : default;
         }
 
+        public static List<V> GetList<V>(IDictionary<string, object> src, string key)
+        {
+            IEnumerable<object> value = Get<IEnumerable<object>>(src, key);
+
+            if (value == null)
+            {
+                return default;
+            }
+
+            return value.Select(i => (V)Convert.ChangeType(i, typeof(V))).ToList();
+        }
+
+
         /// <summary>
         /// Merges the IDictionaries supplied and returns an IDictionary containing the union of key/value pairs of all
         /// supplied IDictionaries.

@@ -1,6 +1,7 @@
 ﻿using Jose.keys;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography;
 
 namespace Jose
@@ -14,10 +15,22 @@ namespace Jose
             public const string RSA = "RSA";
         }
 
-        public static class Usage
+        public static class KeyUsage
         {
             public const string Signature = "sig";
             public const string Encryption = "enc";
+        }
+
+        public static class KeyOperations
+        {
+            public const string Sign = "sign";
+            public const string Verify = "verify";
+            public const string Encrypt = "encrypt";
+            public const string Decrypt = "decrypt";
+            public const string WrapKey = "wrapKey";
+            public const string UnwrapKey = "unwrapKey";
+            public const string DeriveKey = "deriveKey";
+            public const string DeriveBits = "deriveBits";
         }
 
         private byte[] octKey;
@@ -301,6 +314,7 @@ namespace Jose
 
             result["kty"] = Kty;
 
+            if (KeyId != null) { result["kid"] = KeyId; }
             if (Use != null) { result["use"] = Use; }
             if (KeyOps != null) { result["key_ops"] = KeyOps; }
             if (Alg != null) { result["alg"] = Alg; }
@@ -344,7 +358,7 @@ namespace Jose
                 Use = Dictionaries.Get<string>(data, "use"),                
                 Alg = Dictionaries.Get<string>(data, "alg"),
                 KeyId = Dictionaries.Get<string>(data, "kid"),
-                KeyOps = Dictionaries.Get<List<string>>(data, "key_ops"),
+                KeyOps = Dictionaries.GetList<string>(data, "key_ops"),
 
                 K = Dictionaries.Get<string>(data, "k"),  
                 E = Dictionaries.Get<string>(data, "e"),  

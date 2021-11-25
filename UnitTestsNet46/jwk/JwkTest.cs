@@ -19,6 +19,110 @@ namespace UnitTests
         }
 
         [Fact]
+        public void ToDictionary_NamedParams()
+        {
+            //given
+            var key = new JWK();
+            
+            key.KeyId = "AA9D2AB0-20B8-4B04-B111-AE0DC118310F";
+            key.KeyOps = new List<string>();
+            key.KeyOps.Add(JWK.KeyOperations.Decrypt);
+            key.KeyOps.Add(JWK.KeyOperations.DeriveKey);
+            key.KeyOps.Add(JWK.KeyOperations.Sign);
+            key.Alg = "RS256";
+            key.Use = JWK.KeyUsage.Encryption;
+            key.Kty = "OKP";
+
+            //when
+            var test = key.ToDictionary();
+
+            //then
+            Assert.Equal(5, test.Count);            
+            Assert.Equal("OKP", test["kty"]);
+            Assert.Equal("RS256", test["alg"]);
+            Assert.Equal("enc", test["use"]);
+            Assert.Equal("AA9D2AB0-20B8-4B04-B111-AE0DC118310F", test["kid"]);
+            Assert.Equal(new [] { "decrypt", "deriveKey", "sign" }, test["key_ops"]);
+        }
+
+        [Fact]
+        public void ToJson_NamedParams()
+        {
+            //given
+            var key = new JWK();
+
+            key.KeyId = "AA9D2AB0-20B8-4B04-B111-AE0DC118310F";
+            key.KeyOps = new List<string>();
+            key.KeyOps.Add(JWK.KeyOperations.Decrypt);
+            key.KeyOps.Add(JWK.KeyOperations.DeriveKey);
+            key.KeyOps.Add(JWK.KeyOperations.Sign);
+            key.Alg = "RS256";
+            key.Use = JWK.KeyUsage.Encryption;
+            key.Kty = "OKP";
+
+            //when
+            var test = key.ToJson(JWT.DefaultSettings.JsonMapper);
+
+            //then
+            Console.Out.WriteLine(test);
+            Assert.Equal(@"{""kty"":""OKP"",""kid"":""AA9D2AB0-20B8-4B04-B111-AE0DC118310F"",""use"":""enc"",""key_ops"":[""decrypt"",""deriveKey"",""sign""],""alg"":""RS256""}", test);
+        }
+
+        [Fact]
+        public void FromJson_NamedParams()
+        {
+            //given
+            string json = @"
+            {
+	            ""kty"": ""OKP"",
+	            ""kid"": ""AA9D2AB0-20B8-4B04-B111-AE0DC118310F"",
+	            ""use"": ""enc"",
+	            ""key_ops"": [
+		            ""encrypt"",
+		            ""wrapKey"",
+		            ""sign""
+	            ],
+	            ""alg"": ""PS256""
+            }";
+
+            //when
+            var test = JWK.FromJson(json, JWT.DefaultSettings.JsonMapper);
+
+            //then
+            Assert.Equal("OKP", test.Kty);
+            Assert.Equal("AA9D2AB0-20B8-4B04-B111-AE0DC118310F", test.KeyId);
+            Assert.Equal("PS256", test.Alg);
+            Assert.Equal(JWK.KeyUsage.Encryption, test.Use);
+            Assert.Equal(3, test.KeyOps.Count);
+            Assert.Equal(test.KeyOps, new[] { JWK.KeyOperations.Encrypt, JWK.KeyOperations.WrapKey, JWK.KeyOperations.Sign });
+        }
+
+        [Fact]
+        public void FromDictionary_NamedParams()
+        {
+            //given
+            var data = new Dictionary<string, object>
+            {
+                { "kty", "OKP" },                
+                { "use", "sig" },
+                { "alg", "PS256" },
+                { "kid", "AA9D2AB0-20B8-4B04-B111-AE0DC118310F" },
+                { "key_ops", new List<string> { "encrypt", "verify" } },
+            };
+
+            //when
+            var test = JWK.FromDictionary(data);
+
+            //then
+            Assert.Equal("OKP", test.Kty);
+            Assert.Equal("AA9D2AB0-20B8-4B04-B111-AE0DC118310F", test.KeyId);
+            Assert.Equal("PS256", test.Alg);
+            Assert.Equal(JWK.KeyUsage.Signature, test.Use);
+            Assert.Equal(2, test.KeyOps.Count);
+            Assert.Equal(test.KeyOps, new[] { JWK.KeyOperations.Encrypt, JWK.KeyOperations.Verify });
+        }
+
+        [Fact]
         public void ToDictionary_OctKey()
         {
             //given
@@ -172,7 +276,7 @@ namespace UnitTests
 
             //then
             Assert.Equal(test.Kty, JWK.KeyTypes.RSA);
-            Assert.Equal(test.Use, JWK.Usage.Signature);
+            Assert.Equal(test.Use, JWK.KeyUsage.Signature);
             Assert.Equal(test.E, "AQAB");
             Assert.Equal(test.N, "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q");
             Assert.Equal(test.P, "0qaOkT174vRG3E_67gU3lgOgoT6L3pVHuu7wfrIEoxycPa5_mZVG54SgvQUofGUYEGjR0lavUAjClw9tOzcODHX8RAxkuDntAFntBxgRM-IzAy8QzeRl_cbhgVjBTAhBcxg-3VySv5GdxFyrQaIo8Oy_PPI1L4EFKZHmicBd3ts");
@@ -680,7 +784,7 @@ namespace UnitTests
 
             //then
             Assert.Equal(test.Kty, JWK.KeyTypes.EC);
-            Assert.Equal(test.Use, JWK.Usage.Encryption);            
+            Assert.Equal(test.Use, JWK.KeyUsage.Encryption);            
             Assert.Equal(test.Crv, "P-256");            
             Assert.Equal(test.X, "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk");
             Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
@@ -748,7 +852,7 @@ namespace UnitTests
             //then
             Assert.Equal(test.KeyId, "Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc");
             Assert.Equal(test.Kty, JWK.KeyTypes.EC);
-            Assert.Equal(test.Use, JWK.Usage.Encryption);
+            Assert.Equal(test.Use, JWK.KeyUsage.Encryption);
             Assert.Equal(test.Crv, "P-256");
             Assert.Equal(test.X, "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk");
             Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
