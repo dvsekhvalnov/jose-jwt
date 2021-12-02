@@ -95,6 +95,7 @@ namespace UnitTests
             Assert.Equal(JWK.KeyUsage.Encryption, test.Use);
             Assert.Equal(3, test.KeyOps.Count);
             Assert.Equal(test.KeyOps, new[] { JWK.KeyOperations.Encrypt, JWK.KeyOperations.WrapKey, JWK.KeyOperations.Sign });
+            Assert.Null(test.OtherParams);
         }
 
         [Fact]
@@ -120,6 +121,89 @@ namespace UnitTests
             Assert.Equal(JWK.KeyUsage.Signature, test.Use);
             Assert.Equal(2, test.KeyOps.Count);
             Assert.Equal(test.KeyOps, new[] { JWK.KeyOperations.Encrypt, JWK.KeyOperations.Verify });
+            Assert.Null(test.OtherParams);
+        }
+
+        [Fact]
+        public void FromJson_OtherParams()
+        {
+            //given
+            string json = @"
+            {
+	            ""kty"":""PBKDF2"",
+	            ""s"":""2WCTcJZ1Rvd_CJuJripQ1w"",
+	            ""c"":4096
+            }";
+
+            //when
+            var test = JWK.FromJson(json, JWT.DefaultSettings.JsonMapper);
+
+            //then
+            Assert.Equal("PBKDF2", test.Kty);
+            Assert.Equal(2, test.OtherParams.Count);
+            Assert.Equal("2WCTcJZ1Rvd_CJuJripQ1w", test.OtherParams["s"]);
+            Assert.Equal(4096, test.OtherParams["c"]);
+        }
+
+        [Fact]
+        public void FromDictionary_OtherParams()
+        {
+            //given
+            var data = new Dictionary<string, object>
+            {
+                { "kty", "PBKDF2" },
+                { "s", "2WCTcJZ1Rvd_CJuJripQ1w" },
+                { "c", 4096 },
+            };
+
+            //when
+            var test = JWK.FromDictionary(data);
+
+            //then
+            Assert.Equal("PBKDF2", test.Kty);
+            Assert.Equal(2, test.OtherParams.Count);
+            Assert.Equal("2WCTcJZ1Rvd_CJuJripQ1w", test.OtherParams["s"]);
+            Assert.Equal(4096, test.OtherParams["c"]);
+
+        }
+
+        [Fact]
+        public void ToDictionary_OtherParams()
+        {
+            //given
+            var key = new JWK();
+
+            key.Kty = "PBKDF2";
+            key.OtherParams = new Dictionary<string, object>();
+            key.OtherParams["s"] = "2WCTcJZ1Rvd_CJuJripQ1w";
+            key.OtherParams["c"] = 4096;
+
+            //when
+            var test = key.ToDictionary();
+
+            //then
+            Assert.Equal(3, test.Count);
+            Assert.Equal("PBKDF2", test["kty"]);
+            Assert.Equal("2WCTcJZ1Rvd_CJuJripQ1w", test["s"]);
+            Assert.Equal(4096, test["c"]);
+        }
+
+        [Fact]
+        public void ToJson_OtherParams()
+        {
+            //given
+            var key = new JWK();
+
+            key.Kty = "PBKDF2";
+            key.OtherParams = new Dictionary<string, object>();
+            key.OtherParams["s"] = "2WCTcJZ1Rvd_CJuJripQ1w";
+            key.OtherParams["c"] = 4096;
+
+            //when
+            var test = key.ToJson(JWT.DefaultSettings.JsonMapper);
+
+            //then
+            Assert.Equal(@"{""kty"":""PBKDF2"",""s"":""2WCTcJZ1Rvd_CJuJripQ1w"",""c"":4096}", test);
         }
 
         [Fact]

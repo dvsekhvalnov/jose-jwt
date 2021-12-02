@@ -93,6 +93,9 @@ namespace Jose
         // Public part, Y coordinate on curve
         public string Y { get; set; }        
 
+
+        public IDictionary<string, object> OtherParams { get; set; }
+
         public RSA RsaKey()
         {
             if (rsaKey == null && E != null && N != null)
@@ -346,35 +349,45 @@ namespace Jose
                 if (D != null) { result["d"] = D; }
             }
 
+            if (OtherParams != null)
+            {
+                Dictionaries.Append(result, OtherParams);
+            }
 
             return result;
         }
 
         public static JWK FromDictionary(IDictionary<string, object> data)
         {
+            HashSet<String> NamedParams = new HashSet<string>
+            {
+                "kty", "use", "alg", "kid", "key_ops", "k", "e", "n", "d", "p", "q", "dp", "dq", "qi", "crv", "x", "y"
+            };
+
             var key = new JWK
             {
-                Kty = Dictionaries.Get<string>(data, "kty"),                
-                Use = Dictionaries.Get<string>(data, "use"),                
+                Kty = Dictionaries.Get<string>(data, "kty"),
+                Use = Dictionaries.Get<string>(data, "use"),
                 Alg = Dictionaries.Get<string>(data, "alg"),
                 KeyId = Dictionaries.Get<string>(data, "kid"),
                 KeyOps = Dictionaries.GetList<string>(data, "key_ops"),
 
-                K = Dictionaries.Get<string>(data, "k"),  
-                E = Dictionaries.Get<string>(data, "e"),  
-                N = Dictionaries.Get<string>(data, "n"),  
-                D = Dictionaries.Get<string>(data, "d"),  
-                P = Dictionaries.Get<string>(data, "p"),  
-                Q = Dictionaries.Get<string>(data, "q"),  
-                DP = Dictionaries.Get<string>(data, "dp"),  
-                DQ = Dictionaries.Get<string>(data, "dq"),  
+                K = Dictionaries.Get<string>(data, "k"),
+                E = Dictionaries.Get<string>(data, "e"),
+                N = Dictionaries.Get<string>(data, "n"),
+                D = Dictionaries.Get<string>(data, "d"),
+                P = Dictionaries.Get<string>(data, "p"),
+                Q = Dictionaries.Get<string>(data, "q"),
+                DP = Dictionaries.Get<string>(data, "dp"),
+                DQ = Dictionaries.Get<string>(data, "dq"),
                 QI = Dictionaries.Get<string>(data, "qi"),
 
                 Crv = Dictionaries.Get<string>(data, "crv"),
                 X = Dictionaries.Get<string>(data, "x"),
                 Y = Dictionaries.Get<string>(data, "y"),
-            };
-            
+
+                OtherParams = Dictionaries.Except(data, NamedParams)
+            };            
 
             return key;
         }

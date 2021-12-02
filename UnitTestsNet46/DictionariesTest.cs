@@ -78,6 +78,24 @@ namespace UnitTests
         }
 
         [Fact]
+        public void Except()
+        {
+            //given
+            var src = new Dictionary<string, object> { { "one", "1" }, { "two", 2 }, { "four", new double[] { 4.1, 4.2, 4.3 } } };
+
+            //when
+            var test = Dictionaries.Except(src, new HashSet<string> { "two", "four" });
+            var empty = Dictionaries.Except(src, new HashSet<string> { "two", "four", "one" });
+
+            //then
+            Assert.NotSame(test, src);
+            Assert.Equal(1, test.Count);
+            Assert.Equal("1", test["one"]);
+
+            Assert.Null(empty);
+        }
+
+        [Fact]
         public void MergeHeaders_CalledWithOnlyNulls_ReturnsEmptyDictionary()
         {
             //given
