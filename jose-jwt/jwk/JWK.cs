@@ -93,6 +93,11 @@ namespace Jose
         // Public part, Y coordinate on curve
         public string Y { get; set; }        
 
+        // X509
+        public string X5U { get; set; }
+        public string X5T { get; set; }
+        public string X5TSha256 { get; set; }
+
 
         public IDictionary<string, object> OtherParams { get; set; }
 
@@ -349,6 +354,21 @@ namespace Jose
                 if (D != null) { result["d"] = D; }
             }
 
+            if (X5U != null)
+            {
+                result["x5u"] = X5U;
+            }
+
+            if (X5T != null)
+            {
+                result["x5t"] = X5T;
+            }
+
+            if (X5TSha256 != null)
+            {
+                result["x5t#S256"] = X5TSha256;
+            }
+
             if (OtherParams != null)
             {
                 Dictionaries.Append(result, OtherParams);
@@ -361,7 +381,9 @@ namespace Jose
         {
             HashSet<String> NamedParams = new HashSet<string>
             {
-                "kty", "use", "alg", "kid", "key_ops", "k", "e", "n", "d", "p", "q", "dp", "dq", "qi", "crv", "x", "y"
+                "kty", "use", "alg", "kid", "key_ops", 
+                "k", "e", "n", "d", "p", "q", "dp", "dq", "qi", "crv", "x", "y", 
+                "x5u", "x5c", "x5t", "x5t#S256"
             };
 
             var key = new JWK
@@ -386,6 +408,10 @@ namespace Jose
                 X = Dictionaries.Get<string>(data, "x"),
                 Y = Dictionaries.Get<string>(data, "y"),
 
+                X5U = Dictionaries.Get<string>(data, "x5u"),
+                X5T = Dictionaries.Get<string>(data, "x5t"),
+                X5TSha256 = Dictionaries.Get<string>(data, "x5t#S256"),
+               
                 OtherParams = Dictionaries.Except(data, NamedParams)
             };            
 

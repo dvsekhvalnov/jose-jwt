@@ -32,16 +32,22 @@ namespace UnitTests
             key.Alg = "RS256";
             key.Use = JWK.KeyUsage.Encryption;
             key.Kty = "OKP";
+            key.X5U = "https://thetrap.com/main.crt";
+            key.X5T = "5hJMjOCG0aFBwPGVCyAhepsmDwI";
+            key.X5TSha256 = "uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc";
 
             //when
             var test = key.ToDictionary();
 
             //then
-            Assert.Equal(5, test.Count);            
+            Assert.Equal(8, test.Count);            
             Assert.Equal("OKP", test["kty"]);
             Assert.Equal("RS256", test["alg"]);
             Assert.Equal("enc", test["use"]);
             Assert.Equal("AA9D2AB0-20B8-4B04-B111-AE0DC118310F", test["kid"]);
+            Assert.Equal("https://thetrap.com/main.crt", test["x5u"]);
+            Assert.Equal("5hJMjOCG0aFBwPGVCyAhepsmDwI", test["x5t"]);
+            Assert.Equal("uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc", test["x5t#S256"]);
             Assert.Equal(new [] { "decrypt", "deriveKey", "sign" }, test["key_ops"]);
         }
 
@@ -59,21 +65,23 @@ namespace UnitTests
             key.Alg = "RS256";
             key.Use = JWK.KeyUsage.Encryption;
             key.Kty = "OKP";
+            key.X5U = "https://thetrap.com/main.crt";
+            key.X5T = "5hJMjOCG0aFBwPGVCyAhepsmDwI";
+            key.X5TSha256 = "uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc";
 
             //when
             var test = key.ToJson(JWT.DefaultSettings.JsonMapper);
 
             //then
             Console.Out.WriteLine(test);
-            Assert.Equal(@"{""kty"":""OKP"",""kid"":""AA9D2AB0-20B8-4B04-B111-AE0DC118310F"",""use"":""enc"",""key_ops"":[""decrypt"",""deriveKey"",""sign""],""alg"":""RS256""}", test);
+            Assert.Equal(@"{""kty"":""OKP"",""kid"":""AA9D2AB0-20B8-4B04-B111-AE0DC118310F"",""use"":""enc"",""key_ops"":[""decrypt"",""deriveKey"",""sign""],""alg"":""RS256"",""x5u"":""https://thetrap.com/main.crt"",""x5t"":""5hJMjOCG0aFBwPGVCyAhepsmDwI"",""x5t#S256"":""uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc""}", test);
         }
 
         [Fact]
         public void FromJson_NamedParams()
         {
             //given
-            string json = @"
-            {
+            string json = @"{
 	            ""kty"": ""OKP"",
 	            ""kid"": ""AA9D2AB0-20B8-4B04-B111-AE0DC118310F"",
 	            ""use"": ""enc"",
@@ -82,7 +90,10 @@ namespace UnitTests
 		            ""wrapKey"",
 		            ""sign""
 	            ],
-	            ""alg"": ""PS256""
+	            ""alg"": ""PS256"",
+	            ""x5u"": ""https://thetrap.com/main.crt"",
+	            ""x5t"": ""5hJMjOCG0aFBwPGVCyAhepsmDwI"",
+	            ""x5t#S256"": ""uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc""
             }";
 
             //when
@@ -95,6 +106,9 @@ namespace UnitTests
             Assert.Equal(JWK.KeyUsage.Encryption, test.Use);
             Assert.Equal(3, test.KeyOps.Count);
             Assert.Equal(test.KeyOps, new[] { JWK.KeyOperations.Encrypt, JWK.KeyOperations.WrapKey, JWK.KeyOperations.Sign });
+            Assert.Equal("https://thetrap.com/main.crt", test.X5U);
+            Assert.Equal("5hJMjOCG0aFBwPGVCyAhepsmDwI", test.X5T);
+            Assert.Equal("uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc", test.X5TSha256);
             Assert.Null(test.OtherParams);
         }
 
@@ -109,6 +123,9 @@ namespace UnitTests
                 { "alg", "PS256" },
                 { "kid", "AA9D2AB0-20B8-4B04-B111-AE0DC118310F" },
                 { "key_ops", new List<string> { "encrypt", "verify" } },
+                { "x5u", "https://thetrap.com/main.crt" },
+                { "x5t", "5hJMjOCG0aFBwPGVCyAhepsmDwI" },
+                { "x5t#S256", "uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc" },
             };
 
             //when
@@ -121,6 +138,9 @@ namespace UnitTests
             Assert.Equal(JWK.KeyUsage.Signature, test.Use);
             Assert.Equal(2, test.KeyOps.Count);
             Assert.Equal(test.KeyOps, new[] { JWK.KeyOperations.Encrypt, JWK.KeyOperations.Verify });
+            Assert.Equal("https://thetrap.com/main.crt", test.X5U);
+            Assert.Equal("5hJMjOCG0aFBwPGVCyAhepsmDwI", test.X5T);
+            Assert.Equal("uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc", test.X5TSha256);
             Assert.Null(test.OtherParams);
         }
 
