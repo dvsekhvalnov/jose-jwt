@@ -23,7 +23,7 @@ namespace UnitTests
         {
             //given
             var key = new JWK();
-            
+
             key.KeyId = "AA9D2AB0-20B8-4B04-B111-AE0DC118310F";
             key.KeyOps = new List<string>();
             key.KeyOps.Add(JWK.KeyOperations.Decrypt);
@@ -35,12 +35,17 @@ namespace UnitTests
             key.X5U = "https://thetrap.com/main.crt";
             key.X5T = "5hJMjOCG0aFBwPGVCyAhepsmDwI";
             key.X5TSha256 = "uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc";
+            key.X5C = new List<string>
+            {
+                "MIICpTCCAY0CCQDf1xHaEV6D6TANBgkqhkiG9w0BAQsFADAXMRUwEwYDVQQDDAxpbnRlcm1pZGlhdGUwHhcNMjExMjE5MTcxOTE0WhcNMzUwODI4MTcxOTE0WjASMRAwDgYDVQQDDAd0cmFwLm1lMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvys5QMXeOasAgqj+Rg+NBgjIK7fv3BrQPUu5PUu7tD2frWmzCHnBpodq8l5nJ+OiyQIEmLFJ1wuaBnmIJQejiWuRWhhdprFq4gjsC0xgI4oKP7oD3c5XglvazwM8c3AXWqqpEr9RzWR01TOouWYjcVRVHj/xcIzeHgYgmMvIACemBkk5G9T96+RbImmUP2P3KR2uYcXYjMAxegHqRxlcbOrGHOyvwE6qRPEELvOHNxDMd6rstfiaLOpqJ1MMnSM40Ee86NzszKM9oJOr4KJeQ94SdbtsZ+CUCGn+MbXSbu5yVNFSv+YcY6fAgJggauUShcRkH7iQ1OX6qxoO9WNkoQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAi+mkYWKIIbTytJ7M6O7R0Si0wt/yNPUozx02ys/Tmh3ots1nvjXY+bCYDTPsRxwu0QpQA1dt/CNDS5slmvRxpoLs0tE3qfqFzDrPa+IHJ/Pz+UmNHcfSzSH7wP2biWGGOb0MUzS95qYM2U0Y+eNDNgE1FweDUIR8o1HuqomvlO2/qHAzjp+tcO/lJ4JKZRxn4YpiYopT1Xxaxw6fpb2aMbegjZsRtetxoIBekI8VIXgisUKOsYQ9gKqy2i50G9kZJAYllx+A3gg3+95USqUxiVE2lvobaOij4DlQbsGYX0brEym6/broMeZXJnLa0kN8ZcCaos2V/+jY2hQ3Ql/Se",
+                "MIIDpTCCAY0CCQCHPA/pgr0u7jANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdyb290LWNhMB4XDTIxMTIxOTE3MTUwM1oXDTM1MDgyODE3MTUwM1owFzEVMBMGA1UEAwwMaW50ZXJtaWRpYXRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApvJJcp8VR4hvtOME5Z+PYqPb6TL1JFBjnW3Bt+dMnnu3N6uMlIXrIb5ELX55OP3BLDmTJUPm1mEORBcBjuWeWI+CU1ZbF3QEkb+hzzgoRhkiAPDiVdmgA5vbSC0kRJxNJ7kGvLEIGQgVqSfFsuE09RCm6OuS2Qqin2W8pwWk05Ob+3hWW4UWgVhJqNSSONHFNeiRSdMXWQmywY33zosExTM4epJyFSS+dIIhR61zq15bbRXtnwBHBlVY/lT15zuMsu1j9SJ28M2qR14oyBzTdjHPK8pAeJOxK80zVnzlSAUZBhxoZioQyka85Ane+HyNv4A9wOFP/xs2Xot5+jtQowIDAQABMA0GCSqGSIb3DQEBCwUAA4ICAQCCrsC3vu/CW2LJ5WwHgUC4Tr03v4/Sbs7di1GBn+RY2MWWTWnGhanInv0QGJmFsW0YtUNoRZR/qCsx/VCVy0uBfLHDkDFMu+OyGHygv940+ZVNVKB66wNosAkI2WIOFjcxD66o1jQAjJIp9gUOxvOuLh8SPJSBAmDVnhHOMbw+Gzv3F5MS7A6f7GvoIupRruLZtu0rQbOIt3CClsUui6D7A0VxsxJUpExMzn+teoOiquc1kpXhgK2bDlCS6IAGSDtbWXQAn983m1eD72IfM4yCWepOzpFs5OkDEYmBUmpnEQxeLQJH7UHs3/g9nxrC7xMVfOQhhbgWfyAx/TNP7Jt9yq/UOvBMVD05x5R7CJYR0cMi0IHnpSkY8NsiGxgOsWIHkvwc1ox2TVZyjR1zEuEkh0EN4/ur8OgaYSos5JfzSEVS00V9bFJnbhajNI8gkT2D+8zjdJ2FBieH7annnR4nZiYZecLjV605fr3+BeZZ6JRZKgMRQt2JQNA/iqKrHGmpU0REgOUXVrfnlu9KuvPnB4tlsIxRxlh/6o4lXdf9PME5U9t0g7JvH5EIzYyoFrdpSeNiFsg6DwhoXsp2lnUgD7WT27UVQ78PNk3BdqZiuQwSY62QK+xEpNvd8wts3uwFSzTat4QFlWuuT4M/o/NCbOttjGbS4m2t6gWJOFZbvQ=="
+            };
 
             //when
             var test = key.ToDictionary();
 
             //then
-            Assert.Equal(8, test.Count);            
+            Assert.Equal(9, test.Count);            
             Assert.Equal("OKP", test["kty"]);
             Assert.Equal("RS256", test["alg"]);
             Assert.Equal("enc", test["use"]);
@@ -49,6 +54,11 @@ namespace UnitTests
             Assert.Equal("5hJMjOCG0aFBwPGVCyAhepsmDwI", test["x5t"]);
             Assert.Equal("uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc", test["x5t#S256"]);
             Assert.Equal(new [] { "decrypt", "deriveKey", "sign" }, test["key_ops"]);
+            Assert.Equal(new [] 
+            {
+                "MIICpTCCAY0CCQDf1xHaEV6D6TANBgkqhkiG9w0BAQsFADAXMRUwEwYDVQQDDAxpbnRlcm1pZGlhdGUwHhcNMjExMjE5MTcxOTE0WhcNMzUwODI4MTcxOTE0WjASMRAwDgYDVQQDDAd0cmFwLm1lMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvys5QMXeOasAgqj+Rg+NBgjIK7fv3BrQPUu5PUu7tD2frWmzCHnBpodq8l5nJ+OiyQIEmLFJ1wuaBnmIJQejiWuRWhhdprFq4gjsC0xgI4oKP7oD3c5XglvazwM8c3AXWqqpEr9RzWR01TOouWYjcVRVHj/xcIzeHgYgmMvIACemBkk5G9T96+RbImmUP2P3KR2uYcXYjMAxegHqRxlcbOrGHOyvwE6qRPEELvOHNxDMd6rstfiaLOpqJ1MMnSM40Ee86NzszKM9oJOr4KJeQ94SdbtsZ+CUCGn+MbXSbu5yVNFSv+YcY6fAgJggauUShcRkH7iQ1OX6qxoO9WNkoQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAi+mkYWKIIbTytJ7M6O7R0Si0wt/yNPUozx02ys/Tmh3ots1nvjXY+bCYDTPsRxwu0QpQA1dt/CNDS5slmvRxpoLs0tE3qfqFzDrPa+IHJ/Pz+UmNHcfSzSH7wP2biWGGOb0MUzS95qYM2U0Y+eNDNgE1FweDUIR8o1HuqomvlO2/qHAzjp+tcO/lJ4JKZRxn4YpiYopT1Xxaxw6fpb2aMbegjZsRtetxoIBekI8VIXgisUKOsYQ9gKqy2i50G9kZJAYllx+A3gg3+95USqUxiVE2lvobaOij4DlQbsGYX0brEym6/broMeZXJnLa0kN8ZcCaos2V/+jY2hQ3Ql/Se",
+                "MIIDpTCCAY0CCQCHPA/pgr0u7jANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdyb290LWNhMB4XDTIxMTIxOTE3MTUwM1oXDTM1MDgyODE3MTUwM1owFzEVMBMGA1UEAwwMaW50ZXJtaWRpYXRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApvJJcp8VR4hvtOME5Z+PYqPb6TL1JFBjnW3Bt+dMnnu3N6uMlIXrIb5ELX55OP3BLDmTJUPm1mEORBcBjuWeWI+CU1ZbF3QEkb+hzzgoRhkiAPDiVdmgA5vbSC0kRJxNJ7kGvLEIGQgVqSfFsuE09RCm6OuS2Qqin2W8pwWk05Ob+3hWW4UWgVhJqNSSONHFNeiRSdMXWQmywY33zosExTM4epJyFSS+dIIhR61zq15bbRXtnwBHBlVY/lT15zuMsu1j9SJ28M2qR14oyBzTdjHPK8pAeJOxK80zVnzlSAUZBhxoZioQyka85Ane+HyNv4A9wOFP/xs2Xot5+jtQowIDAQABMA0GCSqGSIb3DQEBCwUAA4ICAQCCrsC3vu/CW2LJ5WwHgUC4Tr03v4/Sbs7di1GBn+RY2MWWTWnGhanInv0QGJmFsW0YtUNoRZR/qCsx/VCVy0uBfLHDkDFMu+OyGHygv940+ZVNVKB66wNosAkI2WIOFjcxD66o1jQAjJIp9gUOxvOuLh8SPJSBAmDVnhHOMbw+Gzv3F5MS7A6f7GvoIupRruLZtu0rQbOIt3CClsUui6D7A0VxsxJUpExMzn+teoOiquc1kpXhgK2bDlCS6IAGSDtbWXQAn983m1eD72IfM4yCWepOzpFs5OkDEYmBUmpnEQxeLQJH7UHs3/g9nxrC7xMVfOQhhbgWfyAx/TNP7Jt9yq/UOvBMVD05x5R7CJYR0cMi0IHnpSkY8NsiGxgOsWIHkvwc1ox2TVZyjR1zEuEkh0EN4/ur8OgaYSos5JfzSEVS00V9bFJnbhajNI8gkT2D+8zjdJ2FBieH7annnR4nZiYZecLjV605fr3+BeZZ6JRZKgMRQt2JQNA/iqKrHGmpU0REgOUXVrfnlu9KuvPnB4tlsIxRxlh/6o4lXdf9PME5U9t0g7JvH5EIzYyoFrdpSeNiFsg6DwhoXsp2lnUgD7WT27UVQ78PNk3BdqZiuQwSY62QK+xEpNvd8wts3uwFSzTat4QFlWuuT4M/o/NCbOttjGbS4m2t6gWJOFZbvQ=="
+            }, test["x5c"]);
         }
 
         [Fact]
@@ -68,13 +78,18 @@ namespace UnitTests
             key.X5U = "https://thetrap.com/main.crt";
             key.X5T = "5hJMjOCG0aFBwPGVCyAhepsmDwI";
             key.X5TSha256 = "uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc";
+            key.X5C = new List<string>
+            {
+                "MIICpTCCAY0CCQDf1xHaEV6D6TANBgkqhkiG9w0BAQsFADAXMRUwEwYDVQQDDAxpbnRlcm1pZGlhdGUwHhcNMjExMjE5MTcxOTE0WhcNMzUwODI4MTcxOTE0WjASMRAwDgYDVQQDDAd0cmFwLm1lMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvys5QMXeOasAgqj+Rg+NBgjIK7fv3BrQPUu5PUu7tD2frWmzCHnBpodq8l5nJ+OiyQIEmLFJ1wuaBnmIJQejiWuRWhhdprFq4gjsC0xgI4oKP7oD3c5XglvazwM8c3AXWqqpEr9RzWR01TOouWYjcVRVHj/xcIzeHgYgmMvIACemBkk5G9T96+RbImmUP2P3KR2uYcXYjMAxegHqRxlcbOrGHOyvwE6qRPEELvOHNxDMd6rstfiaLOpqJ1MMnSM40Ee86NzszKM9oJOr4KJeQ94SdbtsZ+CUCGn+MbXSbu5yVNFSv+YcY6fAgJggauUShcRkH7iQ1OX6qxoO9WNkoQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAi+mkYWKIIbTytJ7M6O7R0Si0wt/yNPUozx02ys/Tmh3ots1nvjXY+bCYDTPsRxwu0QpQA1dt/CNDS5slmvRxpoLs0tE3qfqFzDrPa+IHJ/Pz+UmNHcfSzSH7wP2biWGGOb0MUzS95qYM2U0Y+eNDNgE1FweDUIR8o1HuqomvlO2/qHAzjp+tcO/lJ4JKZRxn4YpiYopT1Xxaxw6fpb2aMbegjZsRtetxoIBekI8VIXgisUKOsYQ9gKqy2i50G9kZJAYllx+A3gg3+95USqUxiVE2lvobaOij4DlQbsGYX0brEym6/broMeZXJnLa0kN8ZcCaos2V/+jY2hQ3Ql/Se",
+                "MIIDpTCCAY0CCQCHPA/pgr0u7jANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdyb290LWNhMB4XDTIxMTIxOTE3MTUwM1oXDTM1MDgyODE3MTUwM1owFzEVMBMGA1UEAwwMaW50ZXJtaWRpYXRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApvJJcp8VR4hvtOME5Z+PYqPb6TL1JFBjnW3Bt+dMnnu3N6uMlIXrIb5ELX55OP3BLDmTJUPm1mEORBcBjuWeWI+CU1ZbF3QEkb+hzzgoRhkiAPDiVdmgA5vbSC0kRJxNJ7kGvLEIGQgVqSfFsuE09RCm6OuS2Qqin2W8pwWk05Ob+3hWW4UWgVhJqNSSONHFNeiRSdMXWQmywY33zosExTM4epJyFSS+dIIhR61zq15bbRXtnwBHBlVY/lT15zuMsu1j9SJ28M2qR14oyBzTdjHPK8pAeJOxK80zVnzlSAUZBhxoZioQyka85Ane+HyNv4A9wOFP/xs2Xot5+jtQowIDAQABMA0GCSqGSIb3DQEBCwUAA4ICAQCCrsC3vu/CW2LJ5WwHgUC4Tr03v4/Sbs7di1GBn+RY2MWWTWnGhanInv0QGJmFsW0YtUNoRZR/qCsx/VCVy0uBfLHDkDFMu+OyGHygv940+ZVNVKB66wNosAkI2WIOFjcxD66o1jQAjJIp9gUOxvOuLh8SPJSBAmDVnhHOMbw+Gzv3F5MS7A6f7GvoIupRruLZtu0rQbOIt3CClsUui6D7A0VxsxJUpExMzn+teoOiquc1kpXhgK2bDlCS6IAGSDtbWXQAn983m1eD72IfM4yCWepOzpFs5OkDEYmBUmpnEQxeLQJH7UHs3/g9nxrC7xMVfOQhhbgWfyAx/TNP7Jt9yq/UOvBMVD05x5R7CJYR0cMi0IHnpSkY8NsiGxgOsWIHkvwc1ox2TVZyjR1zEuEkh0EN4/ur8OgaYSos5JfzSEVS00V9bFJnbhajNI8gkT2D+8zjdJ2FBieH7annnR4nZiYZecLjV605fr3+BeZZ6JRZKgMRQt2JQNA/iqKrHGmpU0REgOUXVrfnlu9KuvPnB4tlsIxRxlh/6o4lXdf9PME5U9t0g7JvH5EIzYyoFrdpSeNiFsg6DwhoXsp2lnUgD7WT27UVQ78PNk3BdqZiuQwSY62QK+xEpNvd8wts3uwFSzTat4QFlWuuT4M/o/NCbOttjGbS4m2t6gWJOFZbvQ=="
+            };
 
             //when
             var test = key.ToJson(JWT.DefaultSettings.JsonMapper);
 
             //then
             Console.Out.WriteLine(test);
-            Assert.Equal(@"{""kty"":""OKP"",""kid"":""AA9D2AB0-20B8-4B04-B111-AE0DC118310F"",""use"":""enc"",""key_ops"":[""decrypt"",""deriveKey"",""sign""],""alg"":""RS256"",""x5u"":""https://thetrap.com/main.crt"",""x5t"":""5hJMjOCG0aFBwPGVCyAhepsmDwI"",""x5t#S256"":""uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc""}", test);
+            Assert.Equal(@"{""kty"":""OKP"",""kid"":""AA9D2AB0-20B8-4B04-B111-AE0DC118310F"",""use"":""enc"",""key_ops"":[""decrypt"",""deriveKey"",""sign""],""alg"":""RS256"",""x5u"":""https://thetrap.com/main.crt"",""x5t"":""5hJMjOCG0aFBwPGVCyAhepsmDwI"",""x5t#S256"":""uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc"",""x5c"":[""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""]}", test);
         }
 
         [Fact]
@@ -93,8 +108,13 @@ namespace UnitTests
 	            ""alg"": ""PS256"",
 	            ""x5u"": ""https://thetrap.com/main.crt"",
 	            ""x5t"": ""5hJMjOCG0aFBwPGVCyAhepsmDwI"",
-	            ""x5t#S256"": ""uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc""
+	            ""x5t#S256"": ""uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc"",
+                ""x5c"": [
+	            	""MIICpTCCAY0CCQDf1xHaEV6D6TANBgkqhkiG9w0BAQsFADAXMRUwEwYDVQQDDAxpbnRlcm1pZGlhdGUwHhcNMjExMjE5MTcxOTE0WhcNMzUwODI4MTcxOTE0WjASMRAwDgYDVQQDDAd0cmFwLm1lMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvys5QMXeOasAgqj+Rg+NBgjIK7fv3BrQPUu5PUu7tD2frWmzCHnBpodq8l5nJ+OiyQIEmLFJ1wuaBnmIJQejiWuRWhhdprFq4gjsC0xgI4oKP7oD3c5XglvazwM8c3AXWqqpEr9RzWR01TOouWYjcVRVHj/xcIzeHgYgmMvIACemBkk5G9T96+RbImmUP2P3KR2uYcXYjMAxegHqRxlcbOrGHOyvwE6qRPEELvOHNxDMd6rstfiaLOpqJ1MMnSM40Ee86NzszKM9oJOr4KJeQ94SdbtsZ+CUCGn+MbXSbu5yVNFSv+YcY6fAgJggauUShcRkH7iQ1OX6qxoO9WNkoQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAi+mkYWKIIbTytJ7M6O7R0Si0wt/yNPUozx02ys/Tmh3ots1nvjXY+bCYDTPsRxwu0QpQA1dt/CNDS5slmvRxpoLs0tE3qfqFzDrPa+IHJ/Pz+UmNHcfSzSH7wP2biWGGOb0MUzS95qYM2U0Y+eNDNgE1FweDUIR8o1HuqomvlO2/qHAzjp+tcO/lJ4JKZRxn4YpiYopT1Xxaxw6fpb2aMbegjZsRtetxoIBekI8VIXgisUKOsYQ9gKqy2i50G9kZJAYllx+A3gg3+95USqUxiVE2lvobaOij4DlQbsGYX0brEym6/broMeZXJnLa0kN8ZcCaos2V/+jY2hQ3Ql/Se"",
+    		        ""MIIDpTCCAY0CCQCHPA/pgr0u7jANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdyb290LWNhMB4XDTIxMTIxOTE3MTUwM1oXDTM1MDgyODE3MTUwM1owFzEVMBMGA1UEAwwMaW50ZXJtaWRpYXRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApvJJcp8VR4hvtOME5Z+PYqPb6TL1JFBjnW3Bt+dMnnu3N6uMlIXrIb5ELX55OP3BLDmTJUPm1mEORBcBjuWeWI+CU1ZbF3QEkb+hzzgoRhkiAPDiVdmgA5vbSC0kRJxNJ7kGvLEIGQgVqSfFsuE09RCm6OuS2Qqin2W8pwWk05Ob+3hWW4UWgVhJqNSSONHFNeiRSdMXWQmywY33zosExTM4epJyFSS+dIIhR61zq15bbRXtnwBHBlVY/lT15zuMsu1j9SJ28M2qR14oyBzTdjHPK8pAeJOxK80zVnzlSAUZBhxoZioQyka85Ane+HyNv4A9wOFP/xs2Xot5+jtQowIDAQABMA0GCSqGSIb3DQEBCwUAA4ICAQCCrsC3vu/CW2LJ5WwHgUC4Tr03v4/Sbs7di1GBn+RY2MWWTWnGhanInv0QGJmFsW0YtUNoRZR/qCsx/VCVy0uBfLHDkDFMu+OyGHygv940+ZVNVKB66wNosAkI2WIOFjcxD66o1jQAjJIp9gUOxvOuLh8SPJSBAmDVnhHOMbw+Gzv3F5MS7A6f7GvoIupRruLZtu0rQbOIt3CClsUui6D7A0VxsxJUpExMzn+teoOiquc1kpXhgK2bDlCS6IAGSDtbWXQAn983m1eD72IfM4yCWepOzpFs5OkDEYmBUmpnEQxeLQJH7UHs3/g9nxrC7xMVfOQhhbgWfyAx/TNP7Jt9yq/UOvBMVD05x5R7CJYR0cMi0IHnpSkY8NsiGxgOsWIHkvwc1ox2TVZyjR1zEuEkh0EN4/ur8OgaYSos5JfzSEVS00V9bFJnbhajNI8gkT2D+8zjdJ2FBieH7annnR4nZiYZecLjV605fr3+BeZZ6JRZKgMRQt2JQNA/iqKrHGmpU0REgOUXVrfnlu9KuvPnB4tlsIxRxlh/6o4lXdf9PME5U9t0g7JvH5EIzYyoFrdpSeNiFsg6DwhoXsp2lnUgD7WT27UVQ78PNk3BdqZiuQwSY62QK+xEpNvd8wts3uwFSzTat4QFlWuuT4M/o/NCbOttjGbS4m2t6gWJOFZbvQ==""
+	            ]
             }";
+
 
             //when
             var test = JWK.FromJson(json, JWT.DefaultSettings.JsonMapper);
@@ -109,6 +129,12 @@ namespace UnitTests
             Assert.Equal("https://thetrap.com/main.crt", test.X5U);
             Assert.Equal("5hJMjOCG0aFBwPGVCyAhepsmDwI", test.X5T);
             Assert.Equal("uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc", test.X5TSha256);
+            Assert.Equal(new[]
+            {
+                "MIICpTCCAY0CCQDf1xHaEV6D6TANBgkqhkiG9w0BAQsFADAXMRUwEwYDVQQDDAxpbnRlcm1pZGlhdGUwHhcNMjExMjE5MTcxOTE0WhcNMzUwODI4MTcxOTE0WjASMRAwDgYDVQQDDAd0cmFwLm1lMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvys5QMXeOasAgqj+Rg+NBgjIK7fv3BrQPUu5PUu7tD2frWmzCHnBpodq8l5nJ+OiyQIEmLFJ1wuaBnmIJQejiWuRWhhdprFq4gjsC0xgI4oKP7oD3c5XglvazwM8c3AXWqqpEr9RzWR01TOouWYjcVRVHj/xcIzeHgYgmMvIACemBkk5G9T96+RbImmUP2P3KR2uYcXYjMAxegHqRxlcbOrGHOyvwE6qRPEELvOHNxDMd6rstfiaLOpqJ1MMnSM40Ee86NzszKM9oJOr4KJeQ94SdbtsZ+CUCGn+MbXSbu5yVNFSv+YcY6fAgJggauUShcRkH7iQ1OX6qxoO9WNkoQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAi+mkYWKIIbTytJ7M6O7R0Si0wt/yNPUozx02ys/Tmh3ots1nvjXY+bCYDTPsRxwu0QpQA1dt/CNDS5slmvRxpoLs0tE3qfqFzDrPa+IHJ/Pz+UmNHcfSzSH7wP2biWGGOb0MUzS95qYM2U0Y+eNDNgE1FweDUIR8o1HuqomvlO2/qHAzjp+tcO/lJ4JKZRxn4YpiYopT1Xxaxw6fpb2aMbegjZsRtetxoIBekI8VIXgisUKOsYQ9gKqy2i50G9kZJAYllx+A3gg3+95USqUxiVE2lvobaOij4DlQbsGYX0brEym6/broMeZXJnLa0kN8ZcCaos2V/+jY2hQ3Ql/Se",
+                "MIIDpTCCAY0CCQCHPA/pgr0u7jANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdyb290LWNhMB4XDTIxMTIxOTE3MTUwM1oXDTM1MDgyODE3MTUwM1owFzEVMBMGA1UEAwwMaW50ZXJtaWRpYXRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApvJJcp8VR4hvtOME5Z+PYqPb6TL1JFBjnW3Bt+dMnnu3N6uMlIXrIb5ELX55OP3BLDmTJUPm1mEORBcBjuWeWI+CU1ZbF3QEkb+hzzgoRhkiAPDiVdmgA5vbSC0kRJxNJ7kGvLEIGQgVqSfFsuE09RCm6OuS2Qqin2W8pwWk05Ob+3hWW4UWgVhJqNSSONHFNeiRSdMXWQmywY33zosExTM4epJyFSS+dIIhR61zq15bbRXtnwBHBlVY/lT15zuMsu1j9SJ28M2qR14oyBzTdjHPK8pAeJOxK80zVnzlSAUZBhxoZioQyka85Ane+HyNv4A9wOFP/xs2Xot5+jtQowIDAQABMA0GCSqGSIb3DQEBCwUAA4ICAQCCrsC3vu/CW2LJ5WwHgUC4Tr03v4/Sbs7di1GBn+RY2MWWTWnGhanInv0QGJmFsW0YtUNoRZR/qCsx/VCVy0uBfLHDkDFMu+OyGHygv940+ZVNVKB66wNosAkI2WIOFjcxD66o1jQAjJIp9gUOxvOuLh8SPJSBAmDVnhHOMbw+Gzv3F5MS7A6f7GvoIupRruLZtu0rQbOIt3CClsUui6D7A0VxsxJUpExMzn+teoOiquc1kpXhgK2bDlCS6IAGSDtbWXQAn983m1eD72IfM4yCWepOzpFs5OkDEYmBUmpnEQxeLQJH7UHs3/g9nxrC7xMVfOQhhbgWfyAx/TNP7Jt9yq/UOvBMVD05x5R7CJYR0cMi0IHnpSkY8NsiGxgOsWIHkvwc1ox2TVZyjR1zEuEkh0EN4/ur8OgaYSos5JfzSEVS00V9bFJnbhajNI8gkT2D+8zjdJ2FBieH7annnR4nZiYZecLjV605fr3+BeZZ6JRZKgMRQt2JQNA/iqKrHGmpU0REgOUXVrfnlu9KuvPnB4tlsIxRxlh/6o4lXdf9PME5U9t0g7JvH5EIzYyoFrdpSeNiFsg6DwhoXsp2lnUgD7WT27UVQ78PNk3BdqZiuQwSY62QK+xEpNvd8wts3uwFSzTat4QFlWuuT4M/o/NCbOttjGbS4m2t6gWJOFZbvQ=="
+            }, test.X5C);
+
             Assert.Null(test.OtherParams);
         }
 
@@ -126,6 +152,13 @@ namespace UnitTests
                 { "x5u", "https://thetrap.com/main.crt" },
                 { "x5t", "5hJMjOCG0aFBwPGVCyAhepsmDwI" },
                 { "x5t#S256", "uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc" },
+                { "x5c", new List<string>
+                    {
+                        "MIICpTCCAY0CCQDf1xHaEV6D6TANBgkqhkiG9w0BAQsFADAXMRUwEwYDVQQDDAxpbnRlcm1pZGlhdGUwHhcNMjExMjE5MTcxOTE0WhcNMzUwODI4MTcxOTE0WjASMRAwDgYDVQQDDAd0cmFwLm1lMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvys5QMXeOasAgqj+Rg+NBgjIK7fv3BrQPUu5PUu7tD2frWmzCHnBpodq8l5nJ+OiyQIEmLFJ1wuaBnmIJQejiWuRWhhdprFq4gjsC0xgI4oKP7oD3c5XglvazwM8c3AXWqqpEr9RzWR01TOouWYjcVRVHj/xcIzeHgYgmMvIACemBkk5G9T96+RbImmUP2P3KR2uYcXYjMAxegHqRxlcbOrGHOyvwE6qRPEELvOHNxDMd6rstfiaLOpqJ1MMnSM40Ee86NzszKM9oJOr4KJeQ94SdbtsZ+CUCGn+MbXSbu5yVNFSv+YcY6fAgJggauUShcRkH7iQ1OX6qxoO9WNkoQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAi+mkYWKIIbTytJ7M6O7R0Si0wt/yNPUozx02ys/Tmh3ots1nvjXY+bCYDTPsRxwu0QpQA1dt/CNDS5slmvRxpoLs0tE3qfqFzDrPa+IHJ/Pz+UmNHcfSzSH7wP2biWGGOb0MUzS95qYM2U0Y+eNDNgE1FweDUIR8o1HuqomvlO2/qHAzjp+tcO/lJ4JKZRxn4YpiYopT1Xxaxw6fpb2aMbegjZsRtetxoIBekI8VIXgisUKOsYQ9gKqy2i50G9kZJAYllx+A3gg3+95USqUxiVE2lvobaOij4DlQbsGYX0brEym6/broMeZXJnLa0kN8ZcCaos2V/+jY2hQ3Ql/Se",
+                        "MIIDpTCCAY0CCQCHPA/pgr0u7jANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdyb290LWNhMB4XDTIxMTIxOTE3MTUwM1oXDTM1MDgyODE3MTUwM1owFzEVMBMGA1UEAwwMaW50ZXJtaWRpYXRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApvJJcp8VR4hvtOME5Z+PYqPb6TL1JFBjnW3Bt+dMnnu3N6uMlIXrIb5ELX55OP3BLDmTJUPm1mEORBcBjuWeWI+CU1ZbF3QEkb+hzzgoRhkiAPDiVdmgA5vbSC0kRJxNJ7kGvLEIGQgVqSfFsuE09RCm6OuS2Qqin2W8pwWk05Ob+3hWW4UWgVhJqNSSONHFNeiRSdMXWQmywY33zosExTM4epJyFSS+dIIhR61zq15bbRXtnwBHBlVY/lT15zuMsu1j9SJ28M2qR14oyBzTdjHPK8pAeJOxK80zVnzlSAUZBhxoZioQyka85Ane+HyNv4A9wOFP/xs2Xot5+jtQowIDAQABMA0GCSqGSIb3DQEBCwUAA4ICAQCCrsC3vu/CW2LJ5WwHgUC4Tr03v4/Sbs7di1GBn+RY2MWWTWnGhanInv0QGJmFsW0YtUNoRZR/qCsx/VCVy0uBfLHDkDFMu+OyGHygv940+ZVNVKB66wNosAkI2WIOFjcxD66o1jQAjJIp9gUOxvOuLh8SPJSBAmDVnhHOMbw+Gzv3F5MS7A6f7GvoIupRruLZtu0rQbOIt3CClsUui6D7A0VxsxJUpExMzn+teoOiquc1kpXhgK2bDlCS6IAGSDtbWXQAn983m1eD72IfM4yCWepOzpFs5OkDEYmBUmpnEQxeLQJH7UHs3/g9nxrC7xMVfOQhhbgWfyAx/TNP7Jt9yq/UOvBMVD05x5R7CJYR0cMi0IHnpSkY8NsiGxgOsWIHkvwc1ox2TVZyjR1zEuEkh0EN4/ur8OgaYSos5JfzSEVS00V9bFJnbhajNI8gkT2D+8zjdJ2FBieH7annnR4nZiYZecLjV605fr3+BeZZ6JRZKgMRQt2JQNA/iqKrHGmpU0REgOUXVrfnlu9KuvPnB4tlsIxRxlh/6o4lXdf9PME5U9t0g7JvH5EIzYyoFrdpSeNiFsg6DwhoXsp2lnUgD7WT27UVQ78PNk3BdqZiuQwSY62QK+xEpNvd8wts3uwFSzTat4QFlWuuT4M/o/NCbOttjGbS4m2t6gWJOFZbvQ=="
+
+                    } 
+                }
             };
 
             //when
@@ -141,6 +174,11 @@ namespace UnitTests
             Assert.Equal("https://thetrap.com/main.crt", test.X5U);
             Assert.Equal("5hJMjOCG0aFBwPGVCyAhepsmDwI", test.X5T);
             Assert.Equal("uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc", test.X5TSha256);
+            Assert.Equal(new[]
+            {
+                "MIICpTCCAY0CCQDf1xHaEV6D6TANBgkqhkiG9w0BAQsFADAXMRUwEwYDVQQDDAxpbnRlcm1pZGlhdGUwHhcNMjExMjE5MTcxOTE0WhcNMzUwODI4MTcxOTE0WjASMRAwDgYDVQQDDAd0cmFwLm1lMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvys5QMXeOasAgqj+Rg+NBgjIK7fv3BrQPUu5PUu7tD2frWmzCHnBpodq8l5nJ+OiyQIEmLFJ1wuaBnmIJQejiWuRWhhdprFq4gjsC0xgI4oKP7oD3c5XglvazwM8c3AXWqqpEr9RzWR01TOouWYjcVRVHj/xcIzeHgYgmMvIACemBkk5G9T96+RbImmUP2P3KR2uYcXYjMAxegHqRxlcbOrGHOyvwE6qRPEELvOHNxDMd6rstfiaLOpqJ1MMnSM40Ee86NzszKM9oJOr4KJeQ94SdbtsZ+CUCGn+MbXSbu5yVNFSv+YcY6fAgJggauUShcRkH7iQ1OX6qxoO9WNkoQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAi+mkYWKIIbTytJ7M6O7R0Si0wt/yNPUozx02ys/Tmh3ots1nvjXY+bCYDTPsRxwu0QpQA1dt/CNDS5slmvRxpoLs0tE3qfqFzDrPa+IHJ/Pz+UmNHcfSzSH7wP2biWGGOb0MUzS95qYM2U0Y+eNDNgE1FweDUIR8o1HuqomvlO2/qHAzjp+tcO/lJ4JKZRxn4YpiYopT1Xxaxw6fpb2aMbegjZsRtetxoIBekI8VIXgisUKOsYQ9gKqy2i50G9kZJAYllx+A3gg3+95USqUxiVE2lvobaOij4DlQbsGYX0brEym6/broMeZXJnLa0kN8ZcCaos2V/+jY2hQ3Ql/Se",
+                "MIIDpTCCAY0CCQCHPA/pgr0u7jANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdyb290LWNhMB4XDTIxMTIxOTE3MTUwM1oXDTM1MDgyODE3MTUwM1owFzEVMBMGA1UEAwwMaW50ZXJtaWRpYXRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApvJJcp8VR4hvtOME5Z+PYqPb6TL1JFBjnW3Bt+dMnnu3N6uMlIXrIb5ELX55OP3BLDmTJUPm1mEORBcBjuWeWI+CU1ZbF3QEkb+hzzgoRhkiAPDiVdmgA5vbSC0kRJxNJ7kGvLEIGQgVqSfFsuE09RCm6OuS2Qqin2W8pwWk05Ob+3hWW4UWgVhJqNSSONHFNeiRSdMXWQmywY33zosExTM4epJyFSS+dIIhR61zq15bbRXtnwBHBlVY/lT15zuMsu1j9SJ28M2qR14oyBzTdjHPK8pAeJOxK80zVnzlSAUZBhxoZioQyka85Ane+HyNv4A9wOFP/xs2Xot5+jtQowIDAQABMA0GCSqGSIb3DQEBCwUAA4ICAQCCrsC3vu/CW2LJ5WwHgUC4Tr03v4/Sbs7di1GBn+RY2MWWTWnGhanInv0QGJmFsW0YtUNoRZR/qCsx/VCVy0uBfLHDkDFMu+OyGHygv940+ZVNVKB66wNosAkI2WIOFjcxD66o1jQAjJIp9gUOxvOuLh8SPJSBAmDVnhHOMbw+Gzv3F5MS7A6f7GvoIupRruLZtu0rQbOIt3CClsUui6D7A0VxsxJUpExMzn+teoOiquc1kpXhgK2bDlCS6IAGSDtbWXQAn983m1eD72IfM4yCWepOzpFs5OkDEYmBUmpnEQxeLQJH7UHs3/g9nxrC7xMVfOQhhbgWfyAx/TNP7Jt9yq/UOvBMVD05x5R7CJYR0cMi0IHnpSkY8NsiGxgOsWIHkvwc1ox2TVZyjR1zEuEkh0EN4/ur8OgaYSos5JfzSEVS00V9bFJnbhajNI8gkT2D+8zjdJ2FBieH7annnR4nZiYZecLjV605fr3+BeZZ6JRZKgMRQt2JQNA/iqKrHGmpU0REgOUXVrfnlu9KuvPnB4tlsIxRxlh/6o4lXdf9PME5U9t0g7JvH5EIzYyoFrdpSeNiFsg6DwhoXsp2lnUgD7WT27UVQ78PNk3BdqZiuQwSY62QK+xEpNvd8wts3uwFSzTat4QFlWuuT4M/o/NCbOttjGbS4m2t6gWJOFZbvQ=="
+            }, test.X5C);
             Assert.Null(test.OtherParams);
         }
 
@@ -970,6 +1008,37 @@ namespace UnitTests
             Assert.Equal(key.Algorithm, CngAlgorithm.ECDsaP256);
             Assert.True(key.IsEphemeral);
         }
+
+        [Fact]
+        public void ToDictionary_X5C_AddX509()
+        {
+            //given
+            var jwk = new JWK();
+            jwk.Add(X509());
+
+            //when
+            var test = jwk.ToDictionary();
+
+            //then
+            Assert.Equal(new[] { "MIICnTCCAYUCBEReYeAwDQYJKoZIhvcNAQEFBQAwEzERMA8GA1UEAxMIand0LTIwNDgwHhcNMTQwMTI0MTMwOTE2WhcNMzQwMjIzMjAwMDAwWjATMREwDwYDVQQDEwhqd3QtMjA0ODCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAKhWb9KXmv45+TKOKhFJkrboZbpbKPJ9Yp12xKLXf8060KfStEStIX+7dCuAYylYWoqiGpuLVVUL5JmHgXmK9TJpzv9Dfe3TAc/+35r8r9IYB2gXUOZkebty05R6PLY0RO/hs2ZhrOozHMo+x216Gwz0CWaajcuiY5Yg1V8VvJ1iQ3rcRgZapk49RNX69kQrGS63gzj0gyHnRtbqc/Ua2kobCA83nnznCom3AGinnlSN65AFPP5jmri0l79+4ZZNIerErSW96mUF8jlJFZI1yJIbzbv73tL+y4i0+BvzsWBs6TkHAp4pinaI8zT+hrVQ2jD4fkJEiRN9lAqLPUd8CNkCAwEAATANBgkqhkiG9w0BAQUFAAOCAQEAnqBw3UHOSSHtU7yMi1+HE+9119tMh7X/fCpcpOnjYmhW8uy9SiPBZBl1z6vQYkMPcURnDMGHdA31kPKICZ6GLWGkBLY3BfIQi064e8vWHW7zX6+2Wi1zFWdJlmgQzBhbr8pYh9xjZe6FjPwbSEuS0uE8dWSWHJLdWsA4xNX9k3pr601R2vPVFCDKs3K1a8P/Xi59kYmKMjaX6vYT879ygWt43yhtGTF48y85+eqLdFRFANTbBFSzdRlPQUYa5d9PZGxeBTcg7UBkK/G+d6D5sd78T2ymwlLYrNi+cSDYD6S4hwZaLeEK6h7p/OoG02RBNuT4VqFRu5DJ6Po+C6JhqQ==" }, test["x5c"]);
+        }
+        
+
+        //[Fact]
+        //public void CertChainFromP12()
+        //{
+        //    X509Certificate2Collection collection = new X509Certificate2Collection();
+        //    collection.Import("chain.p12", "1", X509KeyStorageFlags.EphemeralKeySet);
+
+        //    foreach (X509Certificate2 cert in collection)
+        //    {
+        //        Console.Out.WriteLine("Subject is: '{0}'", cert.Subject);
+        //        Console.Out.WriteLine("Issuer is:  '{0}'", cert.Issuer);
+        //        Console.Out.WriteLine("Encoded:  '{0}'", Convert.ToBase64String(cert.RawData));
+
+        //        // Import the certificate into an X509Store object
+        //    }
+        //}
 
 #region test utils
         private RSA PrivRsaKey()

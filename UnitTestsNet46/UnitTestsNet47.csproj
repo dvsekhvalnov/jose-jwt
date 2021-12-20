@@ -88,6 +88,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="chain.p12">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="ecc256.p12">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

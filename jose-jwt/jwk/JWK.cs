@@ -1,8 +1,8 @@
 ﻿using Jose.keys;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Jose
 {
@@ -36,6 +36,7 @@ namespace Jose
         private byte[] octKey;
         private RSA rsaKey;
         private CngKey eccCngKey;
+        private List<X509Certificate2> x509Chain;
 
     #if NETSTANDARD || NET472
         private ECDsa ecdsaKey;
@@ -97,6 +98,7 @@ namespace Jose
         public string X5U { get; set; }
         public string X5T { get; set; }
         public string X5TSha256 { get; set; }
+        public List<string> X5C { get; set; }
 
 
         public IDictionary<string, object> OtherParams { get; set; }
@@ -316,6 +318,45 @@ namespace Jose
             }            
         }
 
+        public void Add(X509Certificate2 cert)
+        {
+            if (x509Chain == null)
+            {
+                x509Chain = new List<X509Certificate2>();
+            }
+
+            x509Chain.Add(cert);
+
+            if (X5C == null)
+            {
+                X5C = new List<string>();
+            }
+
+            X5C.Add(Convert.ToBase64String(cert.RawData));
+        }
+
+        public void SetX509Chain(IEnumerable<X509Certificate2> chain)
+        {
+            x509Chain = new List<X509Certificate2>(chain);        
+            X5C = new List<string>();            
+
+            foreach (X509Certificate2 cert in chain)
+            {
+                X5C.Add(Convert.ToBase64String(cert.RawData));
+            }
+        }
+
+        public IEnumerable<X509Certificate2> GetX509Chain()
+        {
+            if (x509Chain == null && X5C != null)
+            {
+                x509Chain = new List<X509Certificate2>(X5C.Count);
+                // TODO: convert
+            }
+
+            return x509Chain;
+        }
+
         public IDictionary<string, object> ToDictionary()
         {
             var result = new Dictionary<string, object>();
@@ -369,6 +410,11 @@ namespace Jose
                 result["x5t#S256"] = X5TSha256;
             }
 
+            if (X5C !=null)
+            {
+                result["x5c"] = X5C;
+            }
+
             if (OtherParams != null)
             {
                 Dictionaries.Append(result, OtherParams);
@@ -411,6 +457,8 @@ namespace Jose
                 X5U = Dictionaries.Get<string>(data, "x5u"),
                 X5T = Dictionaries.Get<string>(data, "x5t"),
                 X5TSha256 = Dictionaries.Get<string>(data, "x5t#S256"),
+
+                X5C = Dictionaries.GetList<string>(data, "x5c"),
                
                 OtherParams = Dictionaries.Except(data, NamedParams)
             };            
