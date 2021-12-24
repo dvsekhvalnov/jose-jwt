@@ -346,12 +346,16 @@ namespace Jose
             }
         }
 
-        public IEnumerable<X509Certificate2> GetX509Chain()
+        public List<X509Certificate2> GetX509Chain()
         {
             if (x509Chain == null && X5C != null)
             {
                 x509Chain = new List<X509Certificate2>(X5C.Count);
-                // TODO: convert
+                foreach(string raw in X5C)
+                {
+                    X509Certificate2 cert = new X509Certificate2(Convert.FromBase64String(raw));
+                    x509Chain.Add(cert);
+                }
             }
 
             return x509Chain;
