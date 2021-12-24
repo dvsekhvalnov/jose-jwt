@@ -361,6 +361,24 @@ namespace Jose
             return x509Chain;
         }
 
+        public void SetX5T(X509Certificate2 cert)
+        {
+            using (var hasher = SHA1.Create())
+            {               
+                X5T = Base64Url.Encode(
+                    hasher.ComputeHash(cert.RawData));
+            }
+        }
+
+        public void SetX5TSha256(X509Certificate2 cert)
+        {
+            using (var hasher = SHA256.Create())
+            {               
+                X5TSha256 = Base64Url.Encode(
+                    hasher.ComputeHash(cert.RawData));
+            }
+        }
+
         public IDictionary<string, object> ToDictionary()
         {
             var result = new Dictionary<string, object>();
