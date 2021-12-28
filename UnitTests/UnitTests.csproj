@@ -3,17 +3,13 @@
   <PropertyGroup>
     <Description>UnitTests Class Library</Description>
     <Authors>Administrator</Authors>
-    <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net50</TargetFrameworks>
     <AssemblyName>UnitTests</AssemblyName>
     <PackageId>UnitTests</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\jose-jwt\jose-jwt.csproj" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
-    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>
