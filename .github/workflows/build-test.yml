@@ -23,19 +23,19 @@ jobs:
       uses: actions/checkout@v1
 
     - name: Setup .Net 2.1
-      uses: actions/setup-dotnet@v1.8.0
+      uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '2.1.801' # SDK Version to use.
       #if: matrix.framework == 'netcoreapp2.1'
 
     - name: Setup .Net 3.1
-      uses: actions/setup-dotnet@v1.8.0
+      uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '3.1.300' # SDK Version to use.
       #if: matrix.framework == 'netcoreapp3.1'
 
     - name: Setup .Net 5.0
-      uses: actions/setup-dotnet@v1.8.0
+      uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '5.0.x' # SDK Version to use.
       #if: matrix.framework == 'net50'
