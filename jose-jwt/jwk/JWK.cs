@@ -106,8 +106,9 @@ namespace Jose
         public RSA RsaKey()
         {
             if (rsaKey == null && E != null && N != null)
-            {
-                RSAParameters param = new RSAParameters();
+            {                                
+                RSAParameters param = new RSAParameters();                
+
                 param.Modulus = Base64Url.Decode(N);
                 param.Exponent = Base64Url.Decode(E);
 
@@ -141,8 +142,13 @@ namespace Jose
                     param.InverseQ = Base64Url.Decode(QI);
                 }
 
+
+            #if NETSTANDARD
                 rsaKey = RSA.Create();
                 rsaKey.ImportParameters(param);
+            #else
+                rsaKey = new RSACng(Jose.keys.RsaKey.New(param));
+            #endif
             }
 
             return rsaKey;
@@ -161,7 +167,7 @@ namespace Jose
      
         public ECDsa ECDsaKey ()
         {
-    #if NETSTANDARD || NET472
+#if NETSTANDARD || NET472
             if (ecdsaKey == null && X != null && Y != null && Crv !=null)
             {
                 ECParameters param = new ECParameters();
@@ -184,9 +190,9 @@ namespace Jose
             }
 
             return ecdsaKey;
-    #else
+#else
             throw new NotImplementedException("Not supported, requires .NET 4.7.2+ or NETSTANDARD");
-    #endif
+#endif
         }
 
         public CngKey CngKey(CngKeyUsages usage = CngKeyUsages.Signing)
@@ -237,7 +243,7 @@ namespace Jose
 
         public JWK(ECDsa key, bool isPrivate = true)
         {
-          #if NETSTANDARD || NET472
+#if NETSTANDARD || NET472
             ecdsaKey = key;
             Kty = KeyTypes.EC;           
 
@@ -253,9 +259,9 @@ namespace Jose
 
             Crv = CurveToName(param.Curve);
 
-          #else
+#else
             throw new NotImplementedException("Not supported, requires .NET 4.7.2+ or NETSTANDARD"); 
-          #endif
+#endif
         }
 
         public JWK(RSA key, bool isPrivate = true)
