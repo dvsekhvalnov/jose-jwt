@@ -113,7 +113,7 @@ namespace Jose
                 }
             }
 
-            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of RSA type or JWK type with kty='rsa'.");
+            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey, RSACryptoServiceProvider, RSA types or JWK type with kty='rsa'.");
 
 #elif NETSTANDARD
             if (key is RSA)
