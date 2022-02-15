@@ -2207,6 +2207,21 @@ namespace UnitTests
         }
 
         [Fact]
+        public void Decrypt_A256KW_A256CBC_HS512_JsonWebKey()
+        {
+            //given
+            string token = "eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0.91z9VM1VLIA_qyTbqeInFoit7c4PWVuQ5mHcDyNsfofDGXS1qUDdPCWRdLC8ybvJflqHej7SCjEUMxuzOtPOUOgo-8rcdeHi.rsx7FYNTunzditC8XTMJXg.k88BLb0qs8g0UnKjSq9rs2PcrhpafEaUEX2kT-wMdmviZ9UEJrECoQY7MmJgCyQYO30hnnay2psJcr_yaDhV-NpctBZ793Xf9tztLZZndIjz5omV9HjcFgheQZj4g1tbNcRLwxod5uYz-OLrKORzeROEM-wkLgHVEqs90wN98NAiyhGyVMw7CXVX5NdU2KFUacbflkJc5AcaiAZYAts1t9bo2877XLYSO1qBoI5k5QKv6ijjM8I03Uyr3H0p0tdF6EB-cdYNcxq68GvA5CTkOw.DBtOuSJTFu5AAIdcgymUR-JflpwfcXJ2AnZU8LNB3UA";
+
+            //when
+            string json = Jose.JWT.Decode(token, new JWK(aes256Key));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
+        }
+
+        [Fact]
         public void Encrypt_PBES2_HS256_A128KW_A128CBC_HS256()
         {
             //given
@@ -2709,6 +2724,31 @@ namespace UnitTests
 
             //when
             string token = Jose.JWT.Encode(json, aes256Key, JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
+
+            //then
+            Console.Out.WriteLine("A256KW_A256CBC_HS512 = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(parts.Length, 5); //Make sure 5 parts
+            Assert.Equal(parts[0], "eyJhbGciOiJBMjU2S1ciLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0"); //Header is non-encrypted and static text
+            Assert.Equal(parts[1].Length, 96); //CEK size
+            Assert.Equal(parts[2].Length, 22); //IV size
+            Assert.Equal(parts[3].Length, 278); //cipher text size
+            Assert.Equal(parts[4].Length, 43); //auth tag size
+
+            Assert.Equal(Jose.JWT.Decode(token, aes256Key), json);
+        }
+
+        [Fact]
+        public void Encrypt_A256KW_A256CBC_HS512_JsonWebKey()
+        {
+            //given
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, new JWK(aes256Key), JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
 
             //then
             Console.Out.WriteLine("A256KW_A256CBC_HS512 = {0}", token);
