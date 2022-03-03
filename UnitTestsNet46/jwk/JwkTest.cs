@@ -1116,30 +1116,7 @@ namespace UnitTests
 
             //then
             Assert.Equal("uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc", key.X5TSha256);
-        }
-
-        //[Fact]
-        //public void ThumbprintResearch()
-        //{
-        //    X509Certificate2 cert = X509();
-
-        //    Console.Out.WriteLine(cert.Thumbprint);
-        //    Console.Out.WriteLine(cert.GetCertHashString());
-
-        //    using (var hasher = SHA1.Create())
-        //    {
-        //        var hash = hasher.ComputeHash(cert.RawData);
-        //        Console.Out.WriteLine(BitConverter.ToString(hash).Replace("-", ":"));
-        //        Console.Out.WriteLine(Base64Url.Encode(hash));
-        //    }
-
-        //    using (var hasher = SHA256.Create())
-        //    {
-        //        var hash = hasher.ComputeHash(cert.RawData);
-        //        Console.Out.WriteLine(BitConverter.ToString(hash).Replace("-", ":"));
-        //        Console.Out.WriteLine(Base64Url.Encode(hash));
-        //    }
-        //}
+        }        
 
         #region test utils
         private RSA PrivRsaKey()
