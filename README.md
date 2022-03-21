@@ -9,12 +9,13 @@ JWE JSON Serialization cross-tested with [JWCrypto](https://github.com/latchset/
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
+- v4.0 introduced Json Web Key (JWK) support. Latest stable. All new features will most likely appear based on given version.
+
 - v3.2 dropped `Newtonsoft.Json` support in favor of `System.Text.Json` on `netstandard2.1`
 
 - v3.1 introduced JWE JSON Serialization defined in [RFC 7516](https://tools.ietf.org/html/rfc7516)
 
 - v3.0 and above additionally targets `netstandard2.1` to leverage better .net crypto support on *\*nix* systems and enable more supported algorithms.
-All new features will most likely appear based on given version.
 
 - v2.1 and above added extra features support for .NET461+ and coming with 3 version of binaries (`NET4`, `NET461` and `netstandard1.4`).
 
@@ -97,6 +98,10 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 * It appears that Microsoft CNG implementation of BCryptSecretAgreement/NCryptSecretAgreement contains a bug for calculating Elliptic Curve Diffie-Hellman secret agreement
 on keys higher than 256 bit (P-384 and P-521 NIST curves correspondingly). At least produced secret agreements do not match any other implementation in different languages.
 Technically it is possible to use ECDH-ES or ECDH-ES+AES Key Wrap family with A192CBC-HS384 and A256CBC-HS512 but most likely produced JWT tokens will not be compatible with other platforms and therefore can't be decoded correctly.
+
+**Json Web Key (JWK)**
+- RSA, EC, Oct keys
+-
 
 ## Installation
 ### NuGet
