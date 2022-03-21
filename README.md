@@ -9,7 +9,7 @@ JWE JSON Serialization cross-tested with [JWCrypto](https://github.com/latchset/
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
-- v4.0 introduced Json Web Key (JWK) support. Latest stable. All new features will most likely appear based on given version.
+- v4.0 introduced Json Web Key (JWK), [RFC 7517](https://datatracker.ietf.org/doc/html/rfc7517) support. Latest stable. All new features will most likely appear based on given version.
 
 - v3.2 dropped `Newtonsoft.Json` support in favor of `System.Text.Json` on `netstandard2.1`
 
@@ -93,15 +93,18 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 
 - DEFLATE compression
 
+## Json Web Key (JWK)
+
+- RSA, EC, Oct keys
+- X509 Chains, SHA1 & SHA2 thumbprints
+
+
+
 ##### Notes:
 * Types returned by crytographic methods MAY be different on Windows and Linux. e.g. GetRSAPrivateKey() on X509Certificate2 on Windows returns RsaCng and OpenSslRsa on *nix.
 * It appears that Microsoft CNG implementation of BCryptSecretAgreement/NCryptSecretAgreement contains a bug for calculating Elliptic Curve Diffie-Hellman secret agreement
 on keys higher than 256 bit (P-384 and P-521 NIST curves correspondingly). At least produced secret agreements do not match any other implementation in different languages.
 Technically it is possible to use ECDH-ES or ECDH-ES+AES Key Wrap family with A192CBC-HS384 and A256CBC-HS512 but most likely produced JWT tokens will not be compatible with other platforms and therefore can't be decoded correctly.
-
-**Json Web Key (JWK)**
-- RSA, EC, Oct keys
--
 
 ## Installation
 ### NuGet
