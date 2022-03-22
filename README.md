@@ -594,8 +594,11 @@ The two core classes are:
 * `JwkSet` - object model Json Web Key Set
 
 ### Reading JWK
-Both classes offers static methods
-* `Jwk.FromJson(string, IJsonMapper)`, `FromDictionary(IDictionary<string, object>)`, `ToJson(IJsonMapper)`, `ToDictionary()` to read or write model via JSON and `IDictionary<string, object>` respectively.
+Both classes offers set tatic methods to read or write model from JSON string or dictionary object respectively.
+* `Jwk.FromJson(string, IJsonMapper), JwkSet.FromJson(string, IJsonMapper)` - parses json and constructs object model from it
+* `Jwk.FromDictionary(IDictionary<string, object>), JwkSet.FromDictionary(IDictionary<string, object>)` - constructs object model from dictionary
+* `Jwk.ToJson(IJsonMapper), JwkSet.ToJson(IJsonMapper)` - searializes model to json
+* `Jwk.ToDictionary(), JwkSet.ToDictionary()` - writes model as dictionary
 
 ### Constructing JWK
 Set of convinient constructors:
