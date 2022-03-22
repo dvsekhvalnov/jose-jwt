@@ -3,30 +3,30 @@ using System.Collections.Generic;
 
 namespace Jose
 {
-    public class JwkSet : IEnumerable<JWK>
+    public class JwkSet : IEnumerable<Jwk>
     {
-        private List<JWK> keys;
+        private List<Jwk> keys;
 
-        public List<JWK> Keys
+        public List<Jwk> Keys
         {
             get { return keys; }
         }
 
-        public JwkSet(IEnumerable<JWK> keys)
+        public JwkSet(IEnumerable<Jwk> keys)
         {
-            this.keys = new List<JWK>(keys);
+            this.keys = new List<Jwk>(keys);
         }
 
-        public JwkSet(params JWK[] keys)
+        public JwkSet(params Jwk[] keys)
         {
-            this.keys = new List<JWK>(keys);
+            this.keys = new List<Jwk>(keys);
         }
 
-        public void Add(JWK key)
+        public void Add(Jwk key)
         {
             if (keys == null)
             {
-                keys = new List<JWK>();
+                keys = new List<Jwk>();
             }
 
             keys.Add(key);
@@ -40,7 +40,7 @@ namespace Jose
 
             foreach (var key in keyList)
             {
-                result.Add(JWK.FromDictionary((IDictionary<string, object>)key));
+                result.Add(Jwk.FromDictionary((IDictionary<string, object>)key));
             }
 
             return result;
@@ -55,7 +55,7 @@ namespace Jose
 
             if (keys != null)
             {
-                foreach (JWK key in keys)
+                foreach (Jwk key in keys)
                 {
                     keyList.Add(key.ToDictionary());
                 }                
@@ -78,7 +78,7 @@ namespace Jose
             );
         }
 
-        public IEnumerator<JWK> GetEnumerator()
+        public IEnumerator<Jwk> GetEnumerator()
         {
             return keys.GetEnumerator();
         }

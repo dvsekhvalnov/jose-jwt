@@ -22,11 +22,11 @@ namespace Jose
                 }
             }
 
-            if (key is JWK)
+            if (key is Jwk)
             {
-                var jwk = (JWK)key;
+                var jwk = (Jwk)key;
 
-                if (jwk.Kty == JWK.KeyTypes.OCT)
+                if (jwk.Kty == Jwk.KeyTypes.OCT)
                 {
                     using (var sha = KeyedHash(jwk.OctKey()))
                     {

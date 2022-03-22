@@ -87,11 +87,11 @@ namespace Jose
                 return privateKey.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
             }
 
-            if (key is JWK)
+            if (key is Jwk)
             {
-                var privateKey = (JWK)key;
+                var privateKey = (Jwk)key;
 
-                if (privateKey.Kty == JWK.KeyTypes.RSA)
+                if (privateKey.Kty == Jwk.KeyTypes.RSA)
                 {
                      return privateKey.RsaKey().SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
                     //return RsaPss.Sign(securedInput, privateKey.CngKey(), Hash, saltSize);
@@ -195,11 +195,11 @@ namespace Jose
                 return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
             }
 
-            if (key is JWK)
+            if (key is Jwk)
             {
-                var publicKey = (JWK)key;
+                var publicKey = (Jwk)key;
 
-                if (publicKey.Kty == JWK.KeyTypes.RSA)
+                if (publicKey.Kty == Jwk.KeyTypes.RSA)
                 {
                     return publicKey.RsaKey().VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
                 }

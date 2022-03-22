@@ -28,11 +28,11 @@ namespace Jose.netstandard1_4
                     return Sign((ECDsa)key, securedInput);
                 }
 
-                if (key is JWK)
+                if (key is Jwk)
                 {
-                    var jwk = (JWK)key;
+                    var jwk = (Jwk)key;
 
-                    if (jwk.Kty == JWK.KeyTypes.EC)
+                    if (jwk.Kty == Jwk.KeyTypes.EC)
                     {
                       #if NETSTANDARD || NET472
                         return Sign(jwk.ECDsaKey(), securedInput);
@@ -65,11 +65,11 @@ namespace Jose.netstandard1_4
                     return Verify((ECDsa)key, signature, securedInput);
                 }
 
-                if (key is JWK)
+                if (key is Jwk)
                 {
-                    var jwk = (JWK)key;
+                    var jwk = (Jwk)key;
 
-                    if (jwk.Kty == JWK.KeyTypes.EC)
+                    if (jwk.Kty == Jwk.KeyTypes.EC)
                     {
                       #if NETSTANDARD || NET472
                         return Verify(jwk.ECDsaKey(), signature, securedInput);

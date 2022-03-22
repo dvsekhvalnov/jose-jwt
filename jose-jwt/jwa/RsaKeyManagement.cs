@@ -46,11 +46,11 @@ namespace Jose
                 return encrypt(cek, (RSA)key);
             }
 
-            if (key is JWK)
+            if (key is Jwk)
             {
-                var publicKey = (JWK)key;
+                var publicKey = (Jwk)key;
 
-                if (publicKey.Kty == JWK.KeyTypes.RSA)
+                if (publicKey.Kty == Jwk.KeyTypes.RSA)
                 {
                     return encrypt(cek, publicKey.RsaKey());
                 }
@@ -103,11 +103,11 @@ namespace Jose
                 return decrypt(encryptedCek, (RSA)key);
             }
 
-            if (key is JWK)
+            if (key is Jwk)
             {
-                var publicKey = (JWK)key;
+                var publicKey = (Jwk)key;
 
-                if (publicKey.Kty == JWK.KeyTypes.RSA)
+                if (publicKey.Kty == Jwk.KeyTypes.RSA)
                 {
                     return decrypt(encryptedCek, publicKey.RsaKey());
                 }

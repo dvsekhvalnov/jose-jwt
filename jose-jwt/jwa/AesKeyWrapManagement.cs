@@ -44,11 +44,11 @@ namespace Jose
                 return (byte[])key;
             }
 
-            if (key is JWK)
+            if (key is Jwk)
             {
-                var jwk = (JWK)key;
+                var jwk = (Jwk)key;
 
-                if (jwk.Kty == JWK.KeyTypes.OCT)
+                if (jwk.Kty == Jwk.KeyTypes.OCT)
                 {
                     return jwk.OctKey();
                 }

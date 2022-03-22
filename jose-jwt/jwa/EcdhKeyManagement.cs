@@ -32,11 +32,11 @@ namespace Jose
         {
             CngKey recieverPubKey = null;
 
-            if (key is JWK)
+            if (key is Jwk)
             {
-                JWK jwk = (JWK)key;
+                Jwk jwk = (Jwk)key;
 
-                if (jwk.Kty == JWK.KeyTypes.EC)
+                if (jwk.Kty == Jwk.KeyTypes.EC)
                 {
                     recieverPubKey = jwk.CngKey(CngKeyUsages.KeyAgreement);
                 }
@@ -66,11 +66,11 @@ namespace Jose
         {
             CngKey privateKey = null;
 
-            if (key is JWK)
+            if (key is Jwk)
             {
-                JWK jwk = (JWK)key;
+                Jwk jwk = (Jwk)key;
 
-                if (jwk.Kty == JWK.KeyTypes.EC)
+                if (jwk.Kty == Jwk.KeyTypes.EC)
                 {
                     privateKey = jwk.CngKey(CngKeyUsages.KeyAgreement);
                 }

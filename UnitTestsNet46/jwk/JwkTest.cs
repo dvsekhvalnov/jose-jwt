@@ -23,15 +23,15 @@ namespace UnitTests
         public void ToDictionary_NamedParams()
         {
             //given
-            var key = new JWK();
+            var key = new Jwk();
 
             key.KeyId = "AA9D2AB0-20B8-4B04-B111-AE0DC118310F";
             key.KeyOps = new List<string>();
-            key.KeyOps.Add(JWK.KeyOperations.Decrypt);
-            key.KeyOps.Add(JWK.KeyOperations.DeriveKey);
-            key.KeyOps.Add(JWK.KeyOperations.Sign);
+            key.KeyOps.Add(Jwk.KeyOperations.Decrypt);
+            key.KeyOps.Add(Jwk.KeyOperations.DeriveKey);
+            key.KeyOps.Add(Jwk.KeyOperations.Sign);
             key.Alg = "RS256";
-            key.Use = JWK.KeyUsage.Encryption;
+            key.Use = Jwk.KeyUsage.Encryption;
             key.Kty = "OKP";
             key.X5U = "https://thetrap.com/main.crt";
             key.X5T = "5hJMjOCG0aFBwPGVCyAhepsmDwI";
@@ -66,15 +66,15 @@ namespace UnitTests
         public void ToJson_NamedParams()
         {
             //given
-            var key = new JWK();
+            var key = new Jwk();
 
             key.KeyId = "AA9D2AB0-20B8-4B04-B111-AE0DC118310F";
             key.KeyOps = new List<string>();
-            key.KeyOps.Add(JWK.KeyOperations.Decrypt);
-            key.KeyOps.Add(JWK.KeyOperations.DeriveKey);
-            key.KeyOps.Add(JWK.KeyOperations.Sign);
+            key.KeyOps.Add(Jwk.KeyOperations.Decrypt);
+            key.KeyOps.Add(Jwk.KeyOperations.DeriveKey);
+            key.KeyOps.Add(Jwk.KeyOperations.Sign);
             key.Alg = "RS256";
-            key.Use = JWK.KeyUsage.Encryption;
+            key.Use = Jwk.KeyUsage.Encryption;
             key.Kty = "OKP";
             key.X5U = "https://thetrap.com/main.crt";
             key.X5T = "5hJMjOCG0aFBwPGVCyAhepsmDwI";
@@ -118,15 +118,15 @@ namespace UnitTests
 
 
             //when
-            var test = JWK.FromJson(json, JWT.DefaultSettings.JsonMapper);
+            var test = Jwk.FromJson(json, JWT.DefaultSettings.JsonMapper);
 
             //then
             Assert.Equal("OKP", test.Kty);
             Assert.Equal("AA9D2AB0-20B8-4B04-B111-AE0DC118310F", test.KeyId);
             Assert.Equal("PS256", test.Alg);
-            Assert.Equal(JWK.KeyUsage.Encryption, test.Use);
+            Assert.Equal(Jwk.KeyUsage.Encryption, test.Use);
             Assert.Equal(3, test.KeyOps.Count);
-            Assert.Equal(test.KeyOps, new[] { JWK.KeyOperations.Encrypt, JWK.KeyOperations.WrapKey, JWK.KeyOperations.Sign });
+            Assert.Equal(test.KeyOps, new[] { Jwk.KeyOperations.Encrypt, Jwk.KeyOperations.WrapKey, Jwk.KeyOperations.Sign });
             Assert.Equal("https://thetrap.com/main.crt", test.X5U);
             Assert.Equal("5hJMjOCG0aFBwPGVCyAhepsmDwI", test.X5T);
             Assert.Equal("uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc", test.X5TSha256);
@@ -163,15 +163,15 @@ namespace UnitTests
             };
 
             //when
-            var test = JWK.FromDictionary(data);
+            var test = Jwk.FromDictionary(data);
 
             //then
             Assert.Equal("OKP", test.Kty);
             Assert.Equal("AA9D2AB0-20B8-4B04-B111-AE0DC118310F", test.KeyId);
             Assert.Equal("PS256", test.Alg);
-            Assert.Equal(JWK.KeyUsage.Signature, test.Use);
+            Assert.Equal(Jwk.KeyUsage.Signature, test.Use);
             Assert.Equal(2, test.KeyOps.Count);
-            Assert.Equal(test.KeyOps, new[] { JWK.KeyOperations.Encrypt, JWK.KeyOperations.Verify });
+            Assert.Equal(test.KeyOps, new[] { Jwk.KeyOperations.Encrypt, Jwk.KeyOperations.Verify });
             Assert.Equal("https://thetrap.com/main.crt", test.X5U);
             Assert.Equal("5hJMjOCG0aFBwPGVCyAhepsmDwI", test.X5T);
             Assert.Equal("uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc", test.X5TSha256);
@@ -195,7 +195,7 @@ namespace UnitTests
             }";
 
             //when
-            var test = JWK.FromJson(json, JWT.DefaultSettings.JsonMapper);
+            var test = Jwk.FromJson(json, JWT.DefaultSettings.JsonMapper);
 
             //then
             Assert.Equal("PBKDF2", test.Kty);
@@ -216,7 +216,7 @@ namespace UnitTests
             };
 
             //when
-            var test = JWK.FromDictionary(data);
+            var test = Jwk.FromDictionary(data);
 
             //then
             Assert.Equal("PBKDF2", test.Kty);
@@ -230,7 +230,7 @@ namespace UnitTests
         public void ToDictionary_OtherParams()
         {
             //given
-            var key = new JWK();
+            var key = new Jwk();
 
             key.Kty = "PBKDF2";
             key.OtherParams = new Dictionary<string, object>();
@@ -251,7 +251,7 @@ namespace UnitTests
         public void ToJson_OtherParams()
         {
             //given
-            var key = new JWK();
+            var key = new Jwk();
 
             key.Kty = "PBKDF2";
             key.OtherParams = new Dictionary<string, object>();
@@ -269,7 +269,7 @@ namespace UnitTests
         public void ToDictionary_OctKey()
         {
             //given
-            var key = new JWK(new byte[] { 25, 172, 32, 130, 225, 114, 26, 181, 138, 106, 254, 192, 95, 133, 74, 82 });
+            var key = new Jwk(new byte[] { 25, 172, 32, 130, 225, 114, 26, 181, 138, 106, 254, 192, 95, 133, 74, 82 });
 
             //when
             var test = key.ToDictionary();
@@ -292,10 +292,10 @@ namespace UnitTests
             };
 
             //when
-            var test = JWK.FromDictionary(data);
+            var test = Jwk.FromDictionary(data);
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.OCT);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.OCT);
             Assert.Equal(test.K, "GawgguFyGrWKav7AX4VKUg");
             Assert.Equal(test.OctKey(), new byte[] { 25, 172, 32, 130, 225, 114, 26, 181, 138, 106, 254, 192, 95, 133, 74, 82 });
         }
@@ -304,7 +304,7 @@ namespace UnitTests
         public void ToJson_OctKey()
         {
             //given
-            var key = new JWK(new byte[] { 25, 172, 32, 130, 225, 114, 26, 181, 138, 106, 254, 192, 95, 133, 74, 82 });
+            var key = new Jwk(new byte[] { 25, 172, 32, 130, 225, 114, 26, 181, 138, 106, 254, 192, 95, 133, 74, 82 });
 
             //when
             var test = key.ToJson(JWT.DefaultSettings.JsonMapper);
@@ -326,10 +326,10 @@ namespace UnitTests
             }";
 
             //when
-            var test = JWK.FromJson(json, JWT.DefaultSettings.JsonMapper);
+            var test = Jwk.FromJson(json, JWT.DefaultSettings.JsonMapper);
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.OCT);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.OCT);
             Assert.Equal(test.K, "GawgguFyGrWKav7AX4VKUg");
             Assert.Equal(test.OctKey(), new byte[] { 25, 172, 32, 130, 225, 114, 26, 181, 138, 106, 254, 192, 95, 133, 74, 82 });
         }
@@ -338,7 +338,7 @@ namespace UnitTests
         public void OctKey()
         {
             //given
-            var key = new JWK(new byte[] { 25, 172, 32, 130, 225, 114, 26, 181, 138, 106, 254, 192, 95, 133, 74, 82 });
+            var key = new Jwk(new byte[] { 25, 172, 32, 130, 225, 114, 26, 181, 138, 106, 254, 192, 95, 133, 74, 82 });
 
             //then            
             Assert.Equal(key.OctKey(), new byte[] { 25, 172, 32, 130, 225, 114, 26, 181, 138, 106, 254, 192, 95, 133, 74, 82 });
@@ -349,7 +349,7 @@ namespace UnitTests
         public void ToDictionary_RsaPubKey()
         {
             //given
-            var key = new JWK(
+            var key = new Jwk(
                 e: "AQAB",
                 n: "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q"
             );
@@ -368,7 +368,7 @@ namespace UnitTests
         public void ToDictionary_RsaPrivKey()
         {
             //given
-            var key = new JWK(
+            var key = new Jwk(
                 e: "AQAB",
                 n: "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q",
                 p: "0qaOkT174vRG3E_67gU3lgOgoT6L3pVHuu7wfrIEoxycPa5_mZVG54SgvQUofGUYEGjR0lavUAjClw9tOzcODHX8RAxkuDntAFntBxgRM-IzAy8QzeRl_cbhgVjBTAhBcxg-3VySv5GdxFyrQaIo8Oy_PPI1L4EFKZHmicBd3ts",
@@ -415,11 +415,11 @@ namespace UnitTests
             };
 
             //when
-            var test = JWK.FromDictionary(data);
+            var test = Jwk.FromDictionary(data);
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.RSA);
-            Assert.Equal(test.Use, JWK.KeyUsage.Signature);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.RSA);
+            Assert.Equal(test.Use, Jwk.KeyUsage.Signature);
             Assert.Equal(test.E, "AQAB");
             Assert.Equal(test.N, "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q");
             Assert.Equal(test.P, "0qaOkT174vRG3E_67gU3lgOgoT6L3pVHuu7wfrIEoxycPa5_mZVG54SgvQUofGUYEGjR0lavUAjClw9tOzcODHX8RAxkuDntAFntBxgRM-IzAy8QzeRl_cbhgVjBTAhBcxg-3VySv5GdxFyrQaIo8Oy_PPI1L4EFKZHmicBd3ts");
@@ -443,7 +443,7 @@ namespace UnitTests
         public void ToJson_PublicRsaKey()
         {
             //given
-            var key = new JWK(
+            var key = new Jwk(
                 e: "AQAB",
                 n: "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q"
             );
@@ -460,7 +460,7 @@ namespace UnitTests
         public void ToJson_PrivateRsaKey()
         {
             //given
-            var key = new JWK(
+            var key = new Jwk(
                 e: "AQAB",
                 n: "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q",
                 p: "0qaOkT174vRG3E_67gU3lgOgoT6L3pVHuu7wfrIEoxycPa5_mZVG54SgvQUofGUYEGjR0lavUAjClw9tOzcODHX8RAxkuDntAFntBxgRM-IzAy8QzeRl_cbhgVjBTAhBcxg-3VySv5GdxFyrQaIo8Oy_PPI1L4EFKZHmicBd3ts",
@@ -497,10 +497,10 @@ namespace UnitTests
             }";
 
             //when
-            var test = JWK.FromJson(json, JWT.DefaultSettings.JsonMapper);
+            var test = Jwk.FromJson(json, JWT.DefaultSettings.JsonMapper);
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.RSA);            
+            Assert.Equal(test.Kty, Jwk.KeyTypes.RSA);            
             Assert.Equal(test.KeyId, "Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc");
             Assert.Equal(test.E, "AQAB");
             Assert.Equal(test.N, "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q");
@@ -525,10 +525,10 @@ namespace UnitTests
         public void NewRsaPubKey()
         {
             //given
-            var test = new JWK(PubRsaKey(), false);
+            var test = new Jwk(PubRsaKey(), false);
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.RSA);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.RSA);
             Assert.Equal(test.E, "AQAB");
             Assert.Equal(test.N, "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q");
         }
@@ -537,10 +537,10 @@ namespace UnitTests
         public void NewRsaPrivKey()
         {
             //given
-            var test = new JWK(PrivRsaKey());
+            var test = new Jwk(PrivRsaKey());
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.RSA);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.RSA);
             Assert.Equal(test.E, "AQAB");
             Assert.Equal(test.N, "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q");
             Assert.Equal(test.D, "lJhwb0pKlB2ivyDFO6thajotClrMA3nxIiSkIUbvVr-TToFtha36gyF6w6e6YNXQXs4HhMRy1_b-nRQDk8G4_f5urd_q-pOn5u4KfmqN3Xw-lYD3ddi9qF0NLeTVUNVFASeP0FFqbPYfdNwD-LyvwjhtT_ggMOAw3mYvU5cBfz6-3uPdhl3CwQFCTgwOud_BA9p2MPMUHG82wMK_sNO1I0TYpjm7TnwNBwiKbMf-i5CKnuohgoYrEDYLeMg3f32eBljlCFNYaoCtT-mr1Ze0OTJND04vbfLotV-BBKulIpbOOSeVpKG7gJxZHmv7in7PE5_WzaxKFVoHW3wR6v_GzQ");
@@ -555,7 +555,7 @@ namespace UnitTests
         public void RsaKey_Public()
         {
             //given
-            var key = new JWK("AQAB", "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q");
+            var key = new Jwk("AQAB", "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q");
 
             //when
             var test = key.RsaKey();
@@ -571,7 +571,7 @@ namespace UnitTests
         public void RsaKey_Private()
         {
             //given
-            var key = new JWK(
+            var key = new Jwk(
                 e: "AQAB", 
                 n: "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q",
                 p: "0qaOkT174vRG3E_67gU3lgOgoT6L3pVHuu7wfrIEoxycPa5_mZVG54SgvQUofGUYEGjR0lavUAjClw9tOzcODHX8RAxkuDntAFntBxgRM-IzAy8QzeRl_cbhgVjBTAhBcxg-3VySv5GdxFyrQaIo8Oy_PPI1L4EFKZHmicBd3ts",
@@ -602,7 +602,7 @@ namespace UnitTests
         public void EccKey_Cng_Public()
         {
             //given
-            var key = new JWK(crv: "P-256", x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
+            var key = new Jwk(crv: "P-256", x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
 
             //when
             var test = key.CngKey();
@@ -618,7 +618,7 @@ namespace UnitTests
         public void EccKey_Cng_Private()
         {
             //given
-            var key = new JWK(crv: "P-256", 
+            var key = new Jwk(crv: "P-256", 
                               x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", 
                               y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
                               d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
@@ -638,7 +638,7 @@ namespace UnitTests
         public void EccKey_Cng_Private_KeyAgreement()
         {
             //given
-            var key = new JWK(crv: "P-256", 
+            var key = new Jwk(crv: "P-256", 
                               x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", 
                               y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
                               d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
@@ -659,7 +659,7 @@ namespace UnitTests
         public void EccKey_ECDsa_Public()
         {
             //given
-            var key = new JWK(crv: "P-256", x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
+            var key = new Jwk(crv: "P-256", x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
 
             //when
             var test = key.ECDsaKey();
@@ -677,7 +677,7 @@ namespace UnitTests
         public void EccKey_ECDsa_Private()
         {
             //given
-            var key = new JWK(crv: "P-256",
+            var key = new Jwk(crv: "P-256",
                               x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
                               y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
                               d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
@@ -698,10 +698,10 @@ namespace UnitTests
         public void NewECDsa_Public_P256()
         {
             //given
-            var test = new JWK(ECDSa256Public(), false);
+            var test = new Jwk(ECDSa256Public(), false);
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.EC);
             Assert.Equal(test.Crv, "P-256");
             Assert.Equal(test.X, "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk");
             Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
@@ -712,10 +712,10 @@ namespace UnitTests
         public void NewECDsa_Private_P256()
         {
             //given
-            var test = new JWK(ECDSa256Private());
+            var test = new Jwk(ECDSa256Private());
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.EC);
             Assert.Equal(test.Crv, "P-256");
             Assert.Equal(test.X, "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk");
             Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
@@ -726,10 +726,10 @@ namespace UnitTests
         public void NewECDsa_Public_P384()
         {
             //given
-            var test = new JWK(ECDSa384Public(), false);
+            var test = new Jwk(ECDSa384Public(), false);
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.EC);
             Assert.Equal(test.Crv, "P-384");
             Assert.Equal(test.X, "Rpfcsz4AT-hyQDpLW9HogAeJlyoNlA-FXdcHA4h8DmXyz8BF1JFYO94hfy4e2q9P");
             Assert.Equal(test.Y, "vcrEHpk1FnqrBLwqRwIJwb8Rb7ROBm6Z8JPLLZjstZzo3-OURJTdsDmVLMtTVUs3");
@@ -741,10 +741,10 @@ namespace UnitTests
         public void NewECDsa_Private_P384()
         {
             //given
-            var test = new JWK(ECDSa384Private());
+            var test = new Jwk(ECDSa384Private());
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.EC);
             Assert.Equal(test.Crv, "P-384");
             Assert.Equal(test.X, "Rpfcsz4AT-hyQDpLW9HogAeJlyoNlA-FXdcHA4h8DmXyz8BF1JFYO94hfy4e2q9P");
             Assert.Equal(test.Y, "vcrEHpk1FnqrBLwqRwIJwb8Rb7ROBm6Z8JPLLZjstZzo3-OURJTdsDmVLMtTVUs3");
@@ -755,10 +755,10 @@ namespace UnitTests
         public void NewECDsa_Public_P521()
         {
             //given
-            var test = new JWK(ECDSa521Public(), false);
+            var test = new Jwk(ECDSa521Public(), false);
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.EC);
             Assert.Equal(test.Crv, "P-521");
             Assert.Equal(test.X, "APhJyzW4IkVv2eb_bNTx5V_vXYNkJVaYV2KqKxkjUIk-cMVxinRyN6WACIuU7W15KM0DPX8cwzor5ODkUuDblMxg");
             Assert.Equal(test.Y, "ADxHYXBqI3lQthSnjwj2bOqgwQoDlC0LOrG-rBqyvPBbGUNPQPHLQd_aDONSskKgE8LZrD36F07agqBp2NDrfC4g");
@@ -770,10 +770,10 @@ namespace UnitTests
         public void NewECDsa_Private_P521()
         {
             //given
-            var test = new JWK(ECDSa521Private());
+            var test = new Jwk(ECDSa521Private());
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.EC);
             Assert.Equal(test.Crv, "P-521");
             Assert.Equal(test.X, "APhJyzW4IkVv2eb_bNTx5V_vXYNkJVaYV2KqKxkjUIk-cMVxinRyN6WACIuU7W15KM0DPX8cwzor5ODkUuDblMxg");
             Assert.Equal(test.Y, "ADxHYXBqI3lQthSnjwj2bOqgwQoDlC0LOrG-rBqyvPBbGUNPQPHLQd_aDONSskKgE8LZrD36F07agqBp2NDrfC4g");
@@ -786,10 +786,10 @@ namespace UnitTests
         public void NewEccCng_Public_P256()
         {
             //given
-            var test = new JWK(Ecc256Public(), false);
+            var test = new Jwk(Ecc256Public(), false);
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.EC);
             Assert.Equal(test.Crv, "P-256");
             Assert.Equal(test.X, "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk");
             Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
@@ -800,10 +800,10 @@ namespace UnitTests
         public void NewEccCng_Private_P256()
         {
             //given
-            var test = new JWK(Ecc256Private());
+            var test = new Jwk(Ecc256Private());
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.EC);
             Assert.Equal(test.Crv, "P-256");
             Assert.Equal(test.X, "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk");
             Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
@@ -814,10 +814,10 @@ namespace UnitTests
         public void NewEccCng_Public_P384()
         {
             //given
-            var test = new JWK(Ecc384Public(), false);
+            var test = new Jwk(Ecc384Public(), false);
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.EC);
             Assert.Equal(test.Crv, "P-384");
             Assert.Equal(test.X, "Rpfcsz4AT-hyQDpLW9HogAeJlyoNlA-FXdcHA4h8DmXyz8BF1JFYO94hfy4e2q9P");
             Assert.Equal(test.Y, "vcrEHpk1FnqrBLwqRwIJwb8Rb7ROBm6Z8JPLLZjstZzo3-OURJTdsDmVLMtTVUs3");
@@ -828,10 +828,10 @@ namespace UnitTests
         public void NewEccCng_Private_P384()
         {
             //given
-            var test = new JWK(Ecc384Private());
+            var test = new Jwk(Ecc384Private());
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.EC);
             Assert.Equal(test.Crv, "P-384");
             Assert.Equal(test.X, "Rpfcsz4AT-hyQDpLW9HogAeJlyoNlA-FXdcHA4h8DmXyz8BF1JFYO94hfy4e2q9P");
             Assert.Equal(test.Y, "vcrEHpk1FnqrBLwqRwIJwb8Rb7ROBm6Z8JPLLZjstZzo3-OURJTdsDmVLMtTVUs3");
@@ -842,10 +842,10 @@ namespace UnitTests
         public void NewEccCng_Public_P521()
         {
             //given
-            var test = new JWK(Ecc512Public(), false);
+            var test = new Jwk(Ecc512Public(), false);
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.EC);
             Assert.Equal(test.Crv, "P-521");
             Assert.Equal(test.X, "APhJyzW4IkVv2eb_bNTx5V_vXYNkJVaYV2KqKxkjUIk-cMVxinRyN6WACIuU7W15KM0DPX8cwzor5ODkUuDblMxg");
             Assert.Equal(test.Y, "ADxHYXBqI3lQthSnjwj2bOqgwQoDlC0LOrG-rBqyvPBbGUNPQPHLQd_aDONSskKgE8LZrD36F07agqBp2NDrfC4g");
@@ -856,10 +856,10 @@ namespace UnitTests
         public void NewEccCng_Private_P521()
         {
             //given
-            var test = new JWK(Ecc512Private());
+            var test = new Jwk(Ecc512Private());
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.EC);
             Assert.Equal(test.Crv, "P-521");
             Assert.Equal(test.X, "APhJyzW4IkVv2eb_bNTx5V_vXYNkJVaYV2KqKxkjUIk-cMVxinRyN6WACIuU7W15KM0DPX8cwzor5ODkUuDblMxg");
             Assert.Equal(test.Y, "ADxHYXBqI3lQthSnjwj2bOqgwQoDlC0LOrG-rBqyvPBbGUNPQPHLQd_aDONSskKgE8LZrD36F07agqBp2NDrfC4g");
@@ -870,7 +870,7 @@ namespace UnitTests
         public void ToDictionary_EccPubKey()
         {
             //given
-            var key = new JWK(crv: "P-256",
+            var key = new Jwk(crv: "P-256",
                               x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
                               y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"
                            );
@@ -890,7 +890,7 @@ namespace UnitTests
         public void ToDictionary_EccPrivate()
         {
             //given
-            var key = new JWK(crv: "P-256",
+            var key = new Jwk(crv: "P-256",
                               x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
                               y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
                               d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
@@ -923,11 +923,11 @@ namespace UnitTests
             };
 
             //when
-            var test = JWK.FromDictionary(data);
+            var test = Jwk.FromDictionary(data);
 
             //then
-            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
-            Assert.Equal(test.Use, JWK.KeyUsage.Encryption);            
+            Assert.Equal(test.Kty, Jwk.KeyTypes.EC);
+            Assert.Equal(test.Use, Jwk.KeyUsage.Encryption);            
             Assert.Equal(test.Crv, "P-256");            
             Assert.Equal(test.X, "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk");
             Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
@@ -944,7 +944,7 @@ namespace UnitTests
         public void ToJson_EccPubKey()
         {
             //given
-            var key = new JWK(crv: "P-256",
+            var key = new Jwk(crv: "P-256",
                               x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
                               y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"
                            );
@@ -961,7 +961,7 @@ namespace UnitTests
         public void ToJson_EccPrivKey()
         {
             //given
-            var key = new JWK(crv: "P-256",
+            var key = new Jwk(crv: "P-256",
                               x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
                               y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
                               d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
@@ -990,12 +990,12 @@ namespace UnitTests
             }";
 
             //when
-            var test = JWK.FromJson(json, JWT.DefaultSettings.JsonMapper);
+            var test = Jwk.FromJson(json, JWT.DefaultSettings.JsonMapper);
 
             //then
             Assert.Equal(test.KeyId, "Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc");
-            Assert.Equal(test.Kty, JWK.KeyTypes.EC);
-            Assert.Equal(test.Use, JWK.KeyUsage.Encryption);
+            Assert.Equal(test.Kty, Jwk.KeyTypes.EC);
+            Assert.Equal(test.Use, Jwk.KeyUsage.Encryption);
             Assert.Equal(test.Crv, "P-256");
             Assert.Equal(test.X, "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk");
             Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
@@ -1014,7 +1014,7 @@ namespace UnitTests
         public void AddX509()
         {
             //given
-            var jwk = new JWK();
+            var jwk = new Jwk();
 
             var chain = X509Chain();
 
@@ -1050,7 +1050,7 @@ namespace UnitTests
         public void SetX509Chain()
         {
             //given
-            var jwk = new JWK();
+            var jwk = new Jwk();
             var chain = X509Chain();
 
             // let's make sure we not appending here
@@ -1074,7 +1074,7 @@ namespace UnitTests
         public void GetX509Chain()
         {
             //given
-            var key = new JWK();
+            var key = new Jwk();
             key.X5C = new List<string>
             {
                 "MIIEoDCCAogCCQDU5pKjdLHJvzANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdyb290LWNhMB4XDTIxMTIxOTE3MDU0OVoXDTMxMTIxNzE3MDU0OVowEjEQMA4GA1UEAwwHcm9vdC1jYTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBANBiqzJ6O7wLuFE42569qU3pR5CklXWE2XuNnt3LNglYOAOTy8j5xiImiIj+xN4K9qvPu30xbDL1EV83fom5zY2145RFvDc/FKKjmp1RrmL6rErRW2VbppuxSLXgNYUu6cffLbANCJdOmTPkAEwB+8GqnsEou00NFSM6LTJIihfpVln3mOr+wn9bQr7LQ62zdkj0i+rgxojyNhNNWVuGuRNV4kQRPhXMedUbKz73XoGOt3EXsyed81oMfkLZ0mh3Z3hAq0upUaCD6NeydVOTY62RgnUop7EdN+wruW3GRLReRq0ZtRFWNiaNfQA5ffSggzdtk7DDc6IU5vZDc/GZZP2VEZRzQ9HHw6Z6UfeRlL2H1YctGEEDIWX1sUYpHK1zzZtcOjbGsKpJtMuPFkVwJs9QOFEHtncxJaNN73e70/yv65PvuPhuFmKExVqEfu37IxM2Qoilii8/WBK9RonLe0qTLqNH2suXFkBDp9vhhUHGeho+m9ExhDQHpbRiXMw3EZDMICkvujhAqlK8wqcOfN0+urf8tzO9LtwX8czKbUq0R4HuGGdexd06/rK8GuUAr6aDSNdGkREeGl8EceYmBuGTmYRs/SqRRpW+k5O05gK7Nbvo2rU3BKL8y13AF95a5yXIZ3mJarXciv/WCv5sITcUtDIwZa/AkpaIGROQF2ejAgMBAAEwDQYJKoZIhvcNAQELBQADggIBACwqqfzL/irX7xpepIg7sydaC1CpYp86bC+UiG4C7QdKuuDrguY37n38kg5D5x6nOBIAjqgW45hUUcSJBVItS8nLtGrtopnyWJfr/bbfVT7MXMpJKEaDzPYgkAx12ObDMav6O9m+aj9n3zzGyNKDzmwkEk4IVHR1La0FfleTQ57d/gCjxDjgHLa7ayaXUYIyloPg+OdkMTkOTzMiFfVP3dCuXY7YHmNz2WuL8lPAhvVaEAYW4IPN0BZkseHjfxDKxPaAQrOMPSSYn826Y3XTyUGkBqFYu60VvwVawVhN4bn5oCkbfLHg8+wCCzbCrcrTwAC/cZubwO3/Ko3lzO+hxJDkbcHUgm8xYZziztIAxNGHORHF/6zgi6yvwOQfPNSWs4qWOFSBV3+JNRn+lvRRknRdGs0WPGZN9zIV4rRAuz1H+oh1WSfPdfDwf+qPeHME3sN0uUvNysdQPSnhi8crVv1hT1F+fv420olGKy0pnobvOCmw6uaBNInOm+xDHIsDt36t1P9OC3V9QPd4gs8BHRfssHOcTnptY/3cEwhTzW83QsbFgb9aQn/wDve6kKE9+i9Nd3XUeEIQ9E0MM2oI7vLyLDVg/YqBmxwEpfe6k8l4UI1UZlfn9TSBXhcaQ7VPNNeYS0j5lCEBP06LSV0Lx9YF4ad+sXdI0jAflBQodo6r",
@@ -1096,7 +1096,7 @@ namespace UnitTests
         public void SetX5T()
         {
             //given
-            var key = new JWK();
+            var key = new Jwk();
 
             //when
             key.SetX5T(X509());
@@ -1109,7 +1109,7 @@ namespace UnitTests
         public void SetX5TSha256()
         {
             //given
-            var key = new JWK();
+            var key = new Jwk();
 
             //when
             key.SetX5TSha256(X509());

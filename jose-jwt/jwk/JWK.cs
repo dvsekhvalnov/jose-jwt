@@ -6,7 +6,7 @@ using System.Security.Cryptography.X509Certificates;
 
 namespace Jose
 {
-    public class JWK
+    public class Jwk
     {        
         public static class KeyTypes
         {
@@ -207,12 +207,12 @@ namespace Jose
             return eccCngKey;
         }
 
-        public JWK()
+        public Jwk()
         {
 
         }
 
-        public JWK(string crv, string x, string y, string d = null)
+        public Jwk(string crv, string x, string y, string d = null)
         {
             Kty = KeyTypes.EC;
             Crv = crv;
@@ -221,7 +221,7 @@ namespace Jose
             D = d;
         }
 
-        public JWK(string e, string n, string p = null, string q = null, string d = null, string dp = null, string dq = null, string qi = null)
+        public Jwk(string e, string n, string p = null, string q = null, string d = null, string dp = null, string dq = null, string qi = null)
         {
             Kty = KeyTypes.RSA;
             E = e;
@@ -234,14 +234,14 @@ namespace Jose
             QI = qi;
         }
 
-        public JWK(byte[] key)
+        public Jwk(byte[] key)
         {
             Kty = KeyTypes.OCT;
             K = Base64Url.Encode(key);
             octKey = key;
         }
 
-        public JWK(ECDsa key, bool isPrivate = true)
+        public Jwk(ECDsa key, bool isPrivate = true)
         {
 #if NETSTANDARD || NET472
             ecdsaKey = key;
@@ -264,7 +264,7 @@ namespace Jose
 #endif
         }
 
-        public JWK(RSA key, bool isPrivate = true)
+        public Jwk(RSA key, bool isPrivate = true)
         {
             rsaKey = key;
             Kty = KeyTypes.RSA;
@@ -305,11 +305,11 @@ namespace Jose
             }
         }
 
-        public JWK(CngKey key, bool isPrivate = true)
+        public Jwk(CngKey key, bool isPrivate = true)
         {
             eccCngKey = key;
 
-            Kty = JWK.KeyTypes.EC;
+            Kty = Jwk.KeyTypes.EC;
 
             var eccKey = EccKey.Export(key, isPrivate);
 
@@ -396,12 +396,12 @@ namespace Jose
             if (KeyOps != null) { result["key_ops"] = KeyOps; }
             if (Alg != null) { result["alg"] = Alg; }
             
-            if (Kty == JWK.KeyTypes.OCT)
+            if (Kty == Jwk.KeyTypes.OCT)
             {
                 result["k"] = K;
             }     
             
-            if (Kty == JWK.KeyTypes.RSA)
+            if (Kty == Jwk.KeyTypes.RSA)
             {
                 result["e"] = E;
                 result["n"] = N;
@@ -414,7 +414,7 @@ namespace Jose
                 if (QI != null) { result["qi"] = QI; }
             }
 
-            if (Kty == JWK.KeyTypes.EC)
+            if (Kty == Jwk.KeyTypes.EC)
             {                
                 result["crv"] = Crv;
                 result["x"] = X;
@@ -451,7 +451,7 @@ namespace Jose
             return result;
         }
 
-        public static JWK FromDictionary(IDictionary<string, object> data)
+        public static Jwk FromDictionary(IDictionary<string, object> data)
         {
             HashSet<String> NamedParams = new HashSet<string>
             {
@@ -460,7 +460,7 @@ namespace Jose
                 "x5u", "x5c", "x5t", "x5t#S256"
             };
 
-            var key = new JWK
+            var key = new Jwk
             {
                 Kty = Dictionaries.Get<string>(data, "kty"),
                 Use = Dictionaries.Get<string>(data, "use"),
@@ -499,9 +499,9 @@ namespace Jose
             return mapper.Serialize(ToDictionary());
         }
 
-        public static JWK FromJson(string json, IJsonMapper mapper = null)
+        public static Jwk FromJson(string json, IJsonMapper mapper = null)
         {
-            return JWK.FromDictionary(
+            return Jwk.FromDictionary(
                 mapper.Parse<IDictionary<string, object>>(json)
             );
         }

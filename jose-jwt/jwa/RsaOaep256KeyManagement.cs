@@ -59,11 +59,11 @@ namespace Jose
                 return publicKey.Encrypt(cek, RSAEncryptionPadding.OaepSHA256);
             }
 
-            if (key is JWK)
+            if (key is Jwk)
             {
-                var publicKey = (JWK)key;
+                var publicKey = (Jwk)key;
 
-                if (publicKey.Kty == JWK.KeyTypes.RSA)
+                if (publicKey.Kty == Jwk.KeyTypes.RSA)
                 {
                     return publicKey.RsaKey().Encrypt(cek, RSAEncryptionPadding.OaepSHA256);
                 }
@@ -141,11 +141,11 @@ namespace Jose
                 return privateKey.Decrypt(encryptedCek, RSAEncryptionPadding.OaepSHA256);				
             }
 
-            if (key is JWK)
+            if (key is Jwk)
             {
-                var privateKey = (JWK)key;
+                var privateKey = (Jwk)key;
 
-                if (privateKey.Kty == JWK.KeyTypes.RSA)
+                if (privateKey.Kty == Jwk.KeyTypes.RSA)
                 {
                     return privateKey.RsaKey().Decrypt(encryptedCek, RSAEncryptionPadding.OaepSHA256);
                 }
