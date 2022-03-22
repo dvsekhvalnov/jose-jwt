@@ -1,7 +1,7 @@
-# Ultimate Javascript Object Signing and Encryption (JOSE), JSON Web Token (JWT) and JSON Web Encryption (JWE) Implementation for .NET and .NET Core
+# Ultimate Javascript Object Signing and Encryption (JOSE), JSON Web Token (JWT) and JSON Web Encryption (JWE) and JSON Web Keys (JWK) Implementation for .NET and .NET Core
 
 Minimallistic zero-dependency library for generating, decoding and encryption [JSON Web Tokens](http://tools.ietf.org/html/draft-jones-json-web-token-10). Supports full suite
-of [JSON Web Algorithms](https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-31) as of July 4, 2014 version. JSON parsing agnostic, can plug any desired JSON processing library.
+of [JSON Web Algorithms](https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-31) as of July 4, 2014 version and [Json Web Keys](https://datatracker.ietf.org/doc/html/rfc7517) as of March 2022. JSON parsing agnostic, can plug any desired JSON processing library.
 Extensively tested for compatibility with [jose.4.j](https://bitbucket.org/b_c/jose4j/wiki/Home), [Nimbus-JOSE-JWT](https://bitbucket.org/nimbusds/nimbus-jose-jwt/wiki/Home) and [json-jwt](https://github.com/nov/json-jwt) libraries.
 JWE JSON Serialization cross-tested with [JWCrypto](https://github.com/latchset/jwcrypto/).
 
