@@ -583,6 +583,40 @@ string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, aad, unp
 
 ```
 
+### Working with Json Web Keys (JWKs)
+As of v4.0.0 library provides full-blown support for Json Web Keys (aka [RFC 7517](https://datatracker.ietf.org/doc/html/rfc7517)), including parsing, contructing and bridging the gap with different .NET key types to be used in all signing and encryption algorithms.
+
+See [Creating encrypted Tokens](#creating-encrypted-tokens), [Creating signed Tokens](#creating-signed-tokens) and [Verifying and Decoding Tokens](#verifying-and-decoding-tokens) for details on using JWK with different Json Web Tokens algorithms.
+
+The two core classes are:
+
+* `Jwk` - object model for Json Web Key
+* `JwkSet` - object model Json Web Key Set
+
+### Reading JWK
+Both classes offers static methods
+* `Jwk.FromJson(string, IJsonMapper)`, `FromDictionary(IDictionary<string, object>)`, `ToJson(IJsonMapper)`, `ToDictionary()` to read or write model via JSON and `IDictionary<string, object>` respectively.
+
+### Constructing JWK
+Set of convinient constructors:
+
+### Converting between JWK and .NET key types
+
+### Searching JwkSet with Linq
+`JwkSet` is Linq compatible and it is preffered way to locate keys of interest within collection:
+
+``` cs
+JwkSet keySet = new JwkSet(....);
+
+IEnumerable<Jwk> rsaKeys =
+    from key in keySet
+    where key.Alg == "enc" && key.Kty == JWK.KeyTypes.RSA
+    select key;
+```
+
+### Examples
+
+
 ## Additional utilities
 
 ### Unencoded and detached content (aka [RFC 7797](https://tools.ietf.org/html/rfc7797))
