@@ -1,4 +1,4 @@
-# Ultimate Javascript Object Signing and Encryption (JOSE), JSON Web Token (JWT) and JSON Web Encryption (JWE) and JSON Web Keys (JWK) Implementation for .NET and .NET Core
+# Ultimate Javascript Object Signing and Encryption (JOSE), JSON Web Token (JWT), JSON Web Encryption (JWE) and JSON Web Keys (JWK) Implementation for .NET and .NET Core
 
 Minimallistic zero-dependency library for generating, decoding and encryption [JSON Web Tokens](http://tools.ietf.org/html/draft-jones-json-web-token-10). Supports full suite
 of [JSON Web Algorithms](https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-31) as of July 4, 2014 version and [Json Web Keys](https://datatracker.ietf.org/doc/html/rfc7517) as of March 2022. JSON parsing agnostic, can plug any desired JSON processing library.
@@ -594,7 +594,7 @@ The two core classes are:
 * `JwkSet` - object model Json Web Key Set
 
 ### Reading JWK
-Both classes offers set tatic methods to read or write model from JSON string or dictionary object respectively.
+Both classes offers set of static methods to read or write model from JSON string or dictionary object respectively.
 * `Jwk.FromJson(string, IJsonMapper), JwkSet.FromJson(string, IJsonMapper)` - parses json and constructs object model from it
 * `Jwk.FromDictionary(IDictionary<string, object>), JwkSet.FromDictionary(IDictionary<string, object>)` - constructs object model from dictionary
 * `Jwk.ToJson(IJsonMapper), JwkSet.ToJson(IJsonMapper)` - searializes model to json
@@ -626,10 +626,14 @@ Jwk eccKey = new Jwk(
     y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
     d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
 );
+
+// Key sets
+JwkSet keySet = new JwkSet(octKey, rsaKey);
+keySet.Add(eccKey);
 ```
 
-
 ### Converting between JWK and .NET key types
+Library provides 2-way bridging between different .NET key types and
 
 ### Searching JwkSet with Linq
 `JwkSet` is Linq compatible and it is preffered way to locate keys of interest within collection:
