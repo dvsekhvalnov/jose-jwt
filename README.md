@@ -633,7 +633,35 @@ keySet.Add(eccKey);
 ```
 
 ### Converting between JWK and .NET key types
-Library provides 2-way bridging between different .NET key types and
+Library provides 2-way bridging with different .NET key types.
+One can construct `Jwk` from underlying `ECDsa`, `RSA` or `CngKey` (elliptic keys only)
+
+``` cs
+// Cng keys
+CngKey eccCngKey = CngKey.Open(...);
+Jwk jwk = new Jwk(eccCngKey, isPrivate: false); //or 'true' by defaut
+
+// RSA keys
+RSA rsaKey=new X509Certificate2("my-key.p12", "password").GetRSAPublicKey();
+Jwk jwk = new Jwk(rsaKey, isPrivate: false); //or 'true' by defaut
+
+// ECDsa keys
+ECDsa ecdsaKey = new X509Certificate2("ecc521.p12", "12345").GetECDsaPublicKey();
+Jwk jwk = new Jwk(ecdsaKey, isPrivate: false); //or 'true' by defaut
+```
+
+or convert `Jwk` key to corresponding `ECDsa`, `RSA` or `CngKey` (elliptic keys only)
+
+``` cs
+// Returns ephemeral exportable CngKey, handle is cached for subsequent calls
+CngKey cngKey = jwk.CngKey(usage: CngKeyUsages.KeyAgreement); // or 'CngKeyUsages.Signing' by default
+
+// Returns backing ECDsa key, constructs new on demand, cached for subsequent calls
+ECDsa ecdaKey = jwk.ECDsaKey();
+
+// Returns backing RSA key, constructs new on demand, cached for subsequent calls
+RSA rsaKey = jwk.RsaKey();
+```
 
 ### Searching JwkSet with Linq
 `JwkSet` is Linq compatible and it is preffered way to locate keys of interest within collection:
