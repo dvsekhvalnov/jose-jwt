@@ -600,6 +600,8 @@ Both classes offers set of static methods to read or write model from JSON strin
 * `Jwk.ToJson(IJsonMapper), JwkSet.ToJson(IJsonMapper)` - searializes model to json
 * `Jwk.ToDictionary(), JwkSet.ToDictionary()` - writes model as dictionary
 
+See [Examples](#examples) for usage details.
+
 ### Constructing JWK
 Model object can be constructed normal way via setting approporiate properties or calling collection methods, there are also set of convinient constructors:
 
@@ -646,7 +648,7 @@ RSA rsaKey=new X509Certificate2("my-key.p12", "password").GetRSAPublicKey();
 Jwk jwk = new Jwk(rsaKey, isPrivate: false); //or 'true' by defaut
 
 // ECDsa keys
-ECDsa ecdsaKey = new X509Certificate2("ecc521.p12", "12345").GetECDsaPublicKey();
+ECDsa ecdsaKey = new X509Certificate2("ecc521.p12", "password").GetECDsaPublicKey();
 Jwk jwk = new Jwk(ecdsaKey, isPrivate: false); //or 'true' by defaut
 ```
 
@@ -663,6 +665,13 @@ ECDsa ecdaKey = jwk.ECDsaKey();
 RSA rsaKey = jwk.RsaKey();
 ```
 
+### Working with certificate chains & extra params
+Direct interface with `X509Certificate2` class is provided when working with chains in JWK:
+
+``` cs
+
+```
+
 ### Searching JwkSet with Linq
 `JwkSet` is Linq compatible and it is preffered way to locate keys of interest within collection:
 
@@ -671,11 +680,46 @@ JwkSet keySet = new JwkSet(....);
 
 IEnumerable<Jwk> rsaKeys =
     from key in keySet
-    where key.Alg == "enc" && key.Kty == JWK.KeyTypes.RSA
+    where key.Alg == "enc" && key.Kty == Jwk.KeyTypes.RSA
     select key;
 ```
 
 ### Examples
+Decrypt symmetric JWK of Oct type from payload and use it for signing:
+
+``` cs
+    string token = "eyJhbGciOiJQQkVTMi1IUzUxMitBMjU2S1ciLCJwMmMiOjgxOTIsInAycyI6Inp3eUF0TElqTXpQM01pQ0giLCJlbmMiOiJBMjU2R0NNIn0.4geBbNNUErAkSiNmUVL23tnH3Jah0B0QkvhAaEcHeUgxRGKmWvkOjg.CCNy7C1HOH-qq5Lo.Uzi9FZ_b8bHenXF7h-D63gZCASdvLA7WqnKRSXwsr7G94SnB5bHiZrUT.l6D2hJSoFPpnXPXLyOloxg";
+
+    // Decrypt symmetric key in payload with PBES2
+    Jwk key = Jose.JWT.Decode<Jwk>(token, "secret");
+
+    // And use it to sign new messages
+    string signed = JWT.Encode(@"{""hello"": ""world""}", key, JwsAlgorithm.HS512);
+```
+
+2. Fetching key set from jwks endpoint and locating one by thumbprint:
+
+``` cs
+HttpClient client = new HttpClient()
+
+// Grab public keys from partner endpoint
+string keys = await client.GetStringAsync("https://acme.com/.well-known/jwks.json");
+JwkSet jwks = JwkSet.FromJson(keys, JWT.DefaultSettings.JsonMapper);
+
+// Get hint from token headers
+var headers = JWT.Head
+
+// Find matching public key by thumbprint
+IEnumerable<Jwk> rsaKeys =
+    from key in keySet
+    where key.Alg == "sig" &&
+            key.KeyOps.Contains(Jwk.KeyOperations.Verify) &&
+            key.Kty == Jwk.KeyTypes.RSA &&
+            key.X5T = headers["x5t"]
+    select key;
+
+// Verify token
+```
 
 
 ## Additional utilities
