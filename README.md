@@ -669,7 +669,33 @@ RSA rsaKey = jwk.RsaKey();
 Direct interface with `X509Certificate2` class is provided when working with chains in JWK:
 
 ``` cs
+X509Certificate2 root = new X509Certificate2("root.p12");
+X509Certificate2 intermidiary = new X509Certificate2("inter.p12");
+X509Certificate2 signing = new X509Certificate2("signing.p12");
 
+Jwk key = new Jwk();
+
+// set chain at once
+key.SetX509Chain(new List<X509Certificate2>{ root, intermidiary });
+
+// or add one by one
+key.Add(signing);
+
+// Read chain from key as list of certificates
+List<X509Certificate2> test = key.GetX509Chain();
+```
+
+Helpers to set SHA-1 and SHA-256 thumbprints:
+``` cs
+X509Certificate2 signing = new X509Certificate2("signing.p12");
+
+Jwk key = new Jwk();
+
+// Calculate and set certificate SHA-1 thumbprint
+key.SetX5T(signing);
+
+// Calculate and set certificate SHA-256 thumbprint
+key.SetX5TSha256(signing);
 ```
 
 ### Searching JwkSet with Linq
