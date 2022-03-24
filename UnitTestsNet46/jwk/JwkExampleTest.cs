@@ -120,12 +120,12 @@ namespace UnitTests
 
             Jwk pubKey = (
                 from key in jwks
-                where key.Alg == "sig" &&
+                where key.Alg == Jwk.KeyUsage.Signature &&
                         key.KeyOps != null && key.KeyOps.Contains(Jwk.KeyOperations.Verify) &&
                         key.Kty == Jwk.KeyTypes.RSA &&
                         key.X5T == (string)headers["x5t"]
                 select key
-            ).FirstOrDefault();
+            ).First();
 
             var payload = Jose.JWT.Decode(token, pubKey);
             Console.Out.WriteLine(payload);
