@@ -685,7 +685,7 @@ IEnumerable<Jwk> rsaKeys =
 ```
 
 ### Examples
-Decrypt symmetric JWK of Oct type from payload and use it for signing:
+1. Decrypt symmetric JWK of Oct type from payload and use it for further signing:
 
 ``` cs
     string token = "eyJhbGciOiJQQkVTMi1IUzUxMitBMjU2S1ciLCJwMmMiOjgxOTIsInAycyI6Inp3eUF0TElqTXpQM01pQ0giLCJlbmMiOiJBMjU2R0NNIn0.4geBbNNUErAkSiNmUVL23tnH3Jah0B0QkvhAaEcHeUgxRGKmWvkOjg.CCNy7C1HOH-qq5Lo.Uzi9FZ_b8bHenXF7h-D63gZCASdvLA7WqnKRSXwsr7G94SnB5bHiZrUT.l6D2hJSoFPpnXPXLyOloxg";
@@ -708,6 +708,7 @@ HttpClient client = new HttpClient()
 
 // Grab public keys from partner endpoint
 string keys = await client.GetStringAsync("https://acme.com/.well-known/jwks.json");
+
 JwkSet jwks = JwkSet.FromJson(keys, JWT.DefaultSettings.JsonMapper);
 
 // Get hint from token headers
@@ -716,12 +717,12 @@ var headers = Jose.JWT.Headers(token);
 // Find matching public key by thumbprint
 Jwk pubKey = (
     from key in jwks
-    where key.Alg == "sig" &&
+    where key.Alg == Jwk.KeyUsage.Signature &&
             key.KeyOps != null && key.KeyOps.Contains(Jwk.KeyOperations.Verify) &&
             key.Kty == Jwk.KeyTypes.RSA &&
             key.X5T == (string)headers["x5t"]
     select key
-).FirstOrDefault();
+).First();
 
 // Finally verify token
 var payload = Jose.JWT.Decode(token, pubKey);
