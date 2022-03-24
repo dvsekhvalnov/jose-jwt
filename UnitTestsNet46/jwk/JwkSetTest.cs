@@ -186,6 +186,8 @@ namespace UnitTests
                     n: "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q"
             );
             key2.Alg = "enc";
+            key2.KeyOps = new List<string> { "verify", "sign" };
+            key2.X5T = "5hJMjOCG0aFBwPGVCyAhepsmDwI";
 
             Jwk key3 = new Jwk(crv: "P-256",
                               x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
@@ -194,7 +196,9 @@ namespace UnitTests
             key3.Alg = "enc";
 
 
-            JwkSet keySet = new JwkSet(key1, key2);
+            JwkSet keySet = new JwkSet(key1, key2, key3);
+
+            Console.Out.WriteLine(keySet.ToJson(JWT.DefaultSettings.JsonMapper));
 
             //when
             var test = (from key in keySet where key.Alg == "enc" && key.Kty == Jwk.KeyTypes.RSA select key).ToList();
