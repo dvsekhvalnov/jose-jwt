@@ -697,7 +697,11 @@ Decrypt symmetric JWK of Oct type from payload and use it for signing:
     string signed = JWT.Encode(@"{""hello"": ""world""}", key, JwsAlgorithm.HS512);
 ```
 
-2. Fetching key set from jwks endpoint and locating one by thumbprint:
+2. Use Jwk from token header for verification
+``` cs
+```
+
+3. Fetching key set from jwks endpoint and locating verification one by thumbprint:
 
 ``` cs
 HttpClient client = new HttpClient()
@@ -707,18 +711,20 @@ string keys = await client.GetStringAsync("https://acme.com/.well-known/jwks.jso
 JwkSet jwks = JwkSet.FromJson(keys, JWT.DefaultSettings.JsonMapper);
 
 // Get hint from token headers
-var headers = JWT.Head
+var headers = Jose.JWT.Headers(token);
 
 // Find matching public key by thumbprint
-IEnumerable<Jwk> rsaKeys =
-    from key in keySet
+Jwk pubKey = (
+    from key in jwks
     where key.Alg == "sig" &&
-            key.KeyOps.Contains(Jwk.KeyOperations.Verify) &&
+            key.KeyOps != null && key.KeyOps.Contains(Jwk.KeyOperations.Verify) &&
             key.Kty == Jwk.KeyTypes.RSA &&
-            key.X5T = headers["x5t"]
-    select key;
+            key.X5T == (string)headers["x5t"]
+    select key
+).FirstOrDefault();
 
-// Verify token
+// Finally verify token
+var payload = Jose.JWT.Decode(token, pubKey);
 ```
 
 
