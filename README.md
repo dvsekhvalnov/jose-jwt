@@ -740,6 +740,21 @@ IEnumerable<Jwk> rsaKeys =
 
 2. Use Jwk from token header for verification
 ``` cs
+string token = "eyJhbGciOiJSUzI1NiIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsIm4iOiJxRlp2MHBlYV9qbjVNbzRxRVVtU3R1aGx1bHNvOG4xaW5YYkVvdGRfelRyUXA5SzBSSzBoZjd0MEs0QmpLVmhhaXFJYW00dFZWUXZrbVllQmVZcjFNbW5PXzBOOTdkTUJ6XzdmbXZ5djBoZ0hhQmRRNW1SNXUzTFRsSG84dGpSRTctR3pabUdzNmpNY3lqN0hiWG9iRFBRSlpwcU55NkpqbGlEVlh4VzhuV0pEZXR4R0JscW1UajFFMWZyMlJDc1pMcmVET1BTREllZEcxdXB6OVJyYVNoc0lEemVlZk9jS2liY0FhS2VlVkkzcmtBVThfbU9hdUxTWHYzN2hsazBoNnNTdEpiM3FaUVh5T1VrVmtqWElraHZOdV92ZTB2N0xpTFQ0R19PeFlHenBPUWNDbmltS2RvanpOUDZHdFZEYU1QaC1Ra1NKRTMyVUNvczlSM3dJMlEifX0.eyJoZWxsbyI6ICJ3b3JsZCJ9.BX7lG2iQvYM7vO_DTsPPWbuTTpBP9dsDmEITd_Ofq9Ds8ucWrDVUjlMHBXUCfgTuoHHfeNtFE7sfuLxd0RseEY2Q4OnoFyJC_Gc63DwhrEvzY09i_sTTskc5rfQK9s32K595WjIceWnJh6s03dVEPmBWl_xwihV56LRzy4m8c15d1ZMlNByjpLibPGSVoJT4ae64Ux25hhbEageO-6gsTaYH9zofP3WGUzGf5PGq6nBtmrlQgyPhTkxzB1DUUBx0cA5IpnzQLwEDljKrgKRGn86TUrQc5dlIIKETZcTCnF2-CXq3oiqF81oEkFxfcW2yX5H0kmZmY_dQkKs1JR65yA";
+
+// Grab 'jwk' header
+var headers = Jose.JWT.Headers(token);
+
+// And turn it into key
+Jwk publicKey = Jwk.FromDictionary(
+    (IDictionary<string, object>)headers["jwk"]
+);
+
+// ATTENTION: always ensure this is the key you know and expect from partner
+// EnsureKnownKey(publicKey);
+
+// Use it to decode payload and verify signature
+string payload = Jose.JWT.Decode(token, publicKey);
 ```
 
 3. Fetching key set from jwks endpoint and locating verification one by thumbprint:
