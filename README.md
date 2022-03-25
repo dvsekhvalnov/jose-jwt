@@ -665,7 +665,7 @@ ECDsa ecdaKey = jwk.ECDsaKey();
 RSA rsaKey = jwk.RsaKey();
 ```
 
-### Working with certificate chains & extra params
+### Working with certificate chains
 Direct interface with `X509Certificate2` class is provided when working with chains in JWK:
 
 ``` cs
@@ -696,6 +696,21 @@ key.SetX5T(signing);
 
 // Calculate and set certificate SHA-256 thumbprint
 key.SetX5TSha256(signing);
+```
+
+### Extra params
+In addition to named params from [RFC 7517](https://datatracker.ietf.org/doc/html/rfc7517) library allows to include any custom key value params to the key objects:
+
+``` cs
+Jwk key = new Jwk();
+
+// add custom params
+key.OtherParams = new Dictionary<string, object>();
+key.OtherParams["s"] = "2WCTcJZ1Rvd_CJuJripQ1w";
+key.OtherParams["c"] = 4096;
+
+// or read them from the key same way
+string s = (string)key.OtherParams["s"];
 ```
 
 ### Searching JwkSet with Linq
