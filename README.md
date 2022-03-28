@@ -166,7 +166,7 @@ string token=Jose.JWT.Encode(payload, key, JwsAlgorithm.HS256);
 RS256, RS384, RS512 and PS256, PS384, PS512 signatures require `RSACryptoServiceProvider` (usually private) key of corresponding length. CSP need to be forced to use Microsoft Enhanced RSA and AES Cryptographic Provider.
 Which usually can be done be re-importing RSAParameters. See http://clrsecurity.codeplex.com/discussions/243156 for details.
 
-```C#
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -223,7 +223,7 @@ Accepts `RSACryptoServiceProvider`, `RSA` or `Jwk` types of keys.
 ES256, ES384, ES512 ECDSA signatures requires `CngKey` (usually private) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
 But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,d)`.
 
-```C#
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -240,9 +240,9 @@ string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
 ```
 
 **NETCORE**:
-ES256, ES384, ES512 ECDSA signatures can accept either `CngKey`(see above) or `ECDsa` (usually private) elliptic curve key of corresponding length.
+ES256, ES384, ES512 ECDSA signatures can accept either `CngKey`(see above), `ECDsa` (usually private)  or `Jwk` of type `EC` elliptic curve key of corresponding length.
 
-```C#
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -253,8 +253,26 @@ var privateKey=new X509Certificate2("ecc-key.p12", "password").GetECDsaPrivateKe
 
 string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
 ```
-**NET461**:
-Accepts `CngKey` and `ECDsa` types of keys.
+
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
+
+var privateKey = new Jwk(
+    crv: "P-256",
+    x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
+    y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
+    d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
+);
+
+string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
+```
+
+**NET461 and above**:
+Accepts `CngKey`, `ECDsa` and `Jwk` types of keys.
 
 
 ### Creating encrypted Tokens
@@ -622,6 +640,8 @@ string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, aad, unp
 As of v4.0.0 library provides full-blown support for Json Web Keys (aka [RFC 7517](https://datatracker.ietf.org/doc/html/rfc7517)), including parsing, contructing and bridging the gap with different .NET key types to be used in all signing and encryption algorithms.
 
 See [Creating encrypted Tokens](#creating-encrypted-tokens), [Creating signed Tokens](#creating-signed-tokens) and [Verifying and Decoding Tokens](#verifying-and-decoding-tokens) for details on using JWK with different Json Web Tokens algorithms.
+
+Most of JWK support will work on `.NET 4.6.1` and `.NET Core 2.0`. But some key bridging requires `.NET4.7.2` or above.
 
 The two core classes are:
 
