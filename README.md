@@ -322,7 +322,7 @@ string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEnc
 ```
 
 **NET461**:
-Accepts `RSACryptoServiceProvider`, `RSA`, `CngKey` and `Jwk` types of keys.
+Accepts `RSACryptoServiceProvider`, `RSA`, `Jwk` (see above) and `CngKey` types of keys.
 
 ``` cs
 var payload = new Dictionary<string, object>()
