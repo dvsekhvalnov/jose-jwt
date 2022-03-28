@@ -295,9 +295,9 @@ string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEnc
 ```
 
 **NETCORE:**
-RSA-OAEP-256, RSA-OAEP and RSA1_5 key management requires `RSA` (usually public) key of corresponding length.
+RSA-OAEP-256, RSA-OAEP and RSA1_5 key management requires `RSA` (usually public) or `Jwk` key of type `RSA` of corresponding length.
 
-```C#
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -309,9 +309,32 @@ var publicKey=new X509Certificate2("my-key.p12", "password").GetRSAPublicKey();
 string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM);
 ```
 
-**NET461**:
-Accepts `RSACryptoServiceProvider`, `RSA` or `CngKey` types of keys.
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
 
+Jwk publicKey = new Jwk("AQAB", "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q");
+
+string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM);
+```
+
+**NET461**:
+Accepts `RSACryptoServiceProvider`, `RSA`, `CngKey` and `Jwk` types of keys.
+
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
+
+CngKey publicKey = CngKey.Open("connectionKeyId", CngProvider.MicrosoftSoftwareKeyStorageProvider, CngKeyOpenOptions.MachineKey));
+
+string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM);
+```
 
 #### DIR direct pre-shared symmetric key family of algorithms
 Direct key management with pre-shared symmetric keys requires `byte[]` array key of corresponding length
