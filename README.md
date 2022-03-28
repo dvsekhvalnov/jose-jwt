@@ -339,7 +339,7 @@ string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEnc
 #### DIR direct pre-shared symmetric key family of algorithms
 Direct key management with pre-shared symmetric keys requires `byte[]` array key of corresponding length
 
-```C#
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -352,9 +352,9 @@ string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.DIR, JweEncrypti
 ```
 
 #### AES Key Wrap key management family of algorithms
-AES128KW, AES192KW and AES256KW key management requires `byte[]` array key of corresponding length
+AES128KW, AES192KW and AES256KW key management requires `byte[]` array or `Jwk` of type `oct` key of corresponding length
 
-```C#
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -366,10 +366,22 @@ var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,
 string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
 ```
 
-#### AES GCM Key Wrap key management family of algorithms
-AES128GCMKW, AES192GCMKW and AES256GCMKW key management requires `byte[]` array key of corresponding length
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
 
-```C#
+var secretKey = new Jwk(new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234});
+
+string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
+```
+
+#### AES GCM Key Wrap key management family of algorithms
+AES128GCMKW, AES192GCMKW and AES256GCMKW key management requires `byte[]` array or `Jwk` of type `oct` key of corresponding length
+
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -377,6 +389,18 @@ var payload = new Dictionary<string, object>()
 };
 
 var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
+
+string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.A256GCMKW, JweEncryption.A256CBC_HS512);
+```
+
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
+
+var secretKey = new Jwk(new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234});
 
 string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.A256GCMKW, JweEncryption.A256CBC_HS512);
 ```
