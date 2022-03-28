@@ -406,10 +406,12 @@ string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.A256GCMKW, JweEn
 ```
 
 #### ECDH-ES and ECDH-ES with AES Key Wrap key management family of algorithms
-ECDH-ES and ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW key management requires `CngKey` (usually public) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
-But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,usage:CngKeyUsages.KeyAgreement)`.
+ECDH-ES and ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW key management requires `CngKey` (usually public) or `Jwk` of type `EC` elliptic curve key of corresponding length.
 
-```C#
+Normally existing `CngKey` can be loaded via `CngKey.Open(..)` method from Key Storage Provider.
+But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,usage:CngKeyUsages.KeyAgreement)` or use `Jwk` instead.
+
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -424,10 +426,26 @@ var publicKey=EccKey.New(x, y, usage:CngKeyUsages.KeyAgreement);
 string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.ECDH_ES, JweEncryption.A256GCM);
 ```
 
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
+
+var publicKey = new Jwk(
+    crv: "P-256",
+    x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
+    y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"
+);
+
+string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.ECDH_ES, JweEncryption.A256GCM);
+```
+
 #### PBES2 using HMAC SHA with AES Key Wrap key management family of algorithms
 PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW key management requires `string` passphrase from which key will be derived
 
-```C#
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
