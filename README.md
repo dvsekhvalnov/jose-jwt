@@ -557,7 +557,7 @@ string json = Jose.JWT.Decode(token,privateKey);
 **NET40-NET45**: `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
 sure correct `usage:` value is set. Should be `CngKeyUsages.Signing` for ES-* signatures (default value, can be ommited).
 
-```C#
+``` cs
 string token = "eyJhbGciOiJFUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.EVnmDMlz-oi05AQzts-R3aqWvaBlwVZddWkmaaHyMx5Phb2NSLgyI0kccpgjjAyo1S5KCB3LIMPfmxCX_obMKA";
 
 byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
@@ -568,9 +568,9 @@ var publicKey=EccKey.New(x, y);
 string json = Jose.JWT.Decode(token,publicKey);
 ```
 
-**NETCORE**: can accept either `CngKey` (see above) or `ECDsa` as a key, public/private is asymmetric to encoding.
+**NETCORE**: can accept either `CngKey` (see above), `ECDsa` or `Jwk` of type `EC` as a key, public/private is asymmetric to encoding.
 
-```C#
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -582,7 +582,23 @@ var publicKey=new X509Certificate2("ecc-key.p12", "password").GetECDsaPublicKey(
 string token=Jose.JWT.Encode(payload, publicKey, JwsAlgorithm.ES256);
 ```
 
-**NET461**: accepts `CngKey` and `ECDsa` types of keys, public/private is asymmetric to encoding.
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
+
+var publicKey = new Jwk(
+    crv: "P-256",
+    x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
+    y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"
+);
+
+string token=Jose.JWT.Encode(payload, publicKey, JwsAlgorithm.ES256);
+```
+
+**NET461**: accepts `CngKey`, `ECDsa` or `Jwk` or type `EC` types of keys (see examples above), public/private is asymmetric to encoding.
 
 
 **ECDH-ES** and **ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW** key management algorithms expects `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
