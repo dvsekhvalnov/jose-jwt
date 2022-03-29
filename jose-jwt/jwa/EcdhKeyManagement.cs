@@ -42,7 +42,7 @@ namespace Jose
                 }
             }
 
-            recieverPubKey = recieverPubKey ?? Ensure.Type<CngKey>(key, "EcdhKeyManagement alg expects key to be of CngKey or JWK types with kty='EC'.");
+            recieverPubKey = recieverPubKey ?? Ensure.Type<CngKey>(key, "EcdhKeyManagement alg expects key to be of CngKey or Jwk types with kty='EC'.");
             
             EccKey ephemeral=EccKey.Generate(recieverPubKey);
 
@@ -76,7 +76,7 @@ namespace Jose
                 }
             }
 
-            privateKey = privateKey ?? Ensure.Type<CngKey>(key, "EcdhKeyManagement alg expects key to be of CngKey or JWK types with kty='EC'.");            
+            privateKey = privateKey ?? Ensure.Type<CngKey>(key, "EcdhKeyManagement alg expects key to be of CngKey or Jwk types with kty='EC'.");            
 
             Ensure.Contains(header, new[] {"epk"}, "EcdhKeyManagement algorithm expects 'epk' key param in JWT header, but was not found");
             Ensure.Contains(header, new[] {algIdHeader}, "EcdhKeyManagement algorithm expects 'enc' header to be present in JWT header, but was not found");

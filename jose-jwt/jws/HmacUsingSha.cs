@@ -35,7 +35,7 @@ namespace Jose
                 }
             }
 
-            throw new ArgumentException("HmacUsingSha alg expectes key to be byte[] array or JWK with kty='oct'");
+            throw new ArgumentException("HmacUsingSha alg expects key to be byte[] array or Jwk with kty='oct'");
         }
 
         public bool Verify(byte[] signature, byte[] securedInput, object key)

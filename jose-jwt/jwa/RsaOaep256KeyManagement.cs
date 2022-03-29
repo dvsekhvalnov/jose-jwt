@@ -69,7 +69,7 @@ namespace Jose
                 }
             }
             
-            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey, RSACryptoServiceProvider, RSA types or JWK type with kty='rsa'.");
+            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey, RSACryptoServiceProvider, RSA types or Jwk type with kty='rsa'.");
 
 
         #elif NETSTANDARD
@@ -80,17 +80,17 @@ namespace Jose
                 return publicKey.Encrypt(cek, RSAEncryptionPadding.OaepSHA256);
             }
 
-            if (key is JWK)
+            if (key is Jwk)
             {
-                var publicKey = (JWK)key;
+                var publicKey = (Jwk)key;
 
-                if (publicKey.Kty == JWK.KeyTypes.RSA)
+                if (publicKey.Kty == Jwk.KeyTypes.RSA)
                 {
                     return publicKey.RsaKey().Encrypt(cek, RSAEncryptionPadding.OaepSHA256);
                 }
             }
             
-            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of RSA types or JWK type with kty='rsa'.");
+            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of RSA types or Jwk type with kty='rsa'.");
         #endif
 
         }
@@ -151,7 +151,7 @@ namespace Jose
                 }
             }
 
-            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey, RSACryptoServiceProvider, RSA types or JWK type with kty='rsa'.");
+            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey, RSACryptoServiceProvider, RSA types or Jwk type with kty='rsa'.");
 
 #elif NETSTANDARD
             if (key is RSA)
@@ -161,17 +161,17 @@ namespace Jose
                 return privateKey.Decrypt(encryptedCek, RSAEncryptionPadding.OaepSHA256);				
             }
 
-            if (key is JWK)
+            if (key is Jwk)
             {
-                var privateKey = (JWK)key;
+                var privateKey = (Jwk)key;
 
-                if (privateKey.Kty == JWK.KeyTypes.RSA)
+                if (privateKey.Kty == Jwk.KeyTypes.RSA)
                 {
                     return privateKey.RsaKey().Decrypt(encryptedCek, RSAEncryptionPadding.OaepSHA256);
                 }
             }
 
-            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of RSA type or JWK type with kty='rsa'.");
+            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of RSA type or Jwk type with kty='rsa'.");
 #endif
         }
     }

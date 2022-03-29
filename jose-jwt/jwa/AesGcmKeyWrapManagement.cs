@@ -68,7 +68,7 @@ namespace Jose
                 }
             }
 
-            throw new ArgumentException("AesGcmKeyWrapManagement management algorithm expectes key to be byte[] array or JWK with kty='oct'");
+            throw new ArgumentException("AesGcmKeyWrapManagement management algorithm expects key to be byte[] array or Jwk with kty='oct'");
         }
     }
 }

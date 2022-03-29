@@ -1885,6 +1885,21 @@ namespace UnitTests
         }
 
         [Fact]
+        public void Decrypt_DIR_A256GCM_JsonWebKey()
+        {
+            //given
+            string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..Fmz3PLVfv-ySl4IJ.LMZpXMDoBIll5yuEs81Bws2-iUUaBSpucJPL-GtDKXkPhFpJmES2T136Vd8xzvp-3JW-fvpRZtlhluqGHjywPctol71Zuz9uFQjuejIU4axA_XiAy-BadbRUm1-25FRT30WtrrxKltSkulmIS5N-Nsi_zmCz5xicB1ZnzneRXGaXY4B444_IHxGBIS_wdurPAN0OEGw4xIi2DAD1Ikc99a90L7rUZfbHNg_iTBr-OshZqDbR6C5KhmMgk5KqDJEN8Ik-Yw.Jbk8ZmO901fqECYVPKOAzg";
+
+            //when
+            string json = Jose.JWT.Decode(token, new Jwk(aes256Key));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(json, @"{""exp"":1392552841,""sub"":""alice"",""nbf"":1392552241,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""efdfc02f-945e-4e1f-85a6-9f240f6cf153"",""iat"":1392552241}");
+        }
+
+        [Fact]
         public void Decrypt_DIR_A128CBC_HS256()
         {
             //given
@@ -2913,7 +2928,6 @@ namespace UnitTests
             Assert.Equal(Jose.JWT.Decode(token, aes128Key), json);
         }
 
-
         [Fact]
         public void Encrypt_DIR_A256GCM()
         {
@@ -2923,6 +2937,31 @@ namespace UnitTests
 
             //when
             string token = Jose.JWT.Encode(json, aes256Key, JweAlgorithm.DIR, JweEncryption.A256GCM);
+
+            //then
+            Console.Out.WriteLine("DIR_A256GCM = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(parts.Length, 5); //Make sure 5 parts
+            Assert.Equal(parts[0], "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0"); //Header is non-encrypted and static text
+            Assert.Equal(parts[1].Length, 0); //CEK size
+            Assert.Equal(parts[2].Length, 16); //IV size, 96 bits
+            Assert.Equal(parts[3].Length, 262); //cipher text size
+            Assert.Equal(parts[4].Length, 22); //auth tag size
+
+            Assert.Equal(Jose.JWT.Decode(token, aes256Key), json);
+        }
+
+        [Fact]
+        public void Encrypt_DIR_A256GCM_JsonWebKey()
+        {
+            //given
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, new Jwk(aes256Key), JweAlgorithm.DIR, JweEncryption.A256GCM);
 
             //then
             Console.Out.WriteLine("DIR_A256GCM = {0}", token);

@@ -17,7 +17,7 @@ namespace UnitTests
         [Fact]
         public void EncryptedSymmetricKey()
         {
-            JWK shared = new JWK(new byte[] { 25, 172, 32, 130, 225, 114, 26, 181, 138, 106, 254, 192, 95, 133, 74, 82 });
+            Jwk shared = new Jwk(new byte[] { 25, 172, 32, 130, 225, 114, 26, 181, 138, 106, 254, 192, 95, 133, 74, 82 });
 
             var token = Jose.JWT.Encode(shared.ToJson(JWT.DefaultSettings.JsonMapper), "secret", JweAlgorithm.PBES2_HS512_A256KW, JweEncryption.A256GCM);
             Console.Out.WriteLine(token);
@@ -26,7 +26,7 @@ namespace UnitTests
         [Fact]
         public void SymmetricKeyInHeader()
         {
-            JWK shared = new JWK(new byte[] { 25, 172, 32, 130, 225, 114, 26, 181, 138, 106, 254, 192, 95, 133, 74, 82 });
+            Jwk shared = new Jwk(new byte[] { 25, 172, 32, 130, 225, 114, 26, 181, 138, 106, 254, 192, 95, 133, 74, 82 });
 
             var headers = new Dictionary<string, object>
             {
@@ -43,7 +43,7 @@ namespace UnitTests
         {
             var token = "eyJhbGciOiJIUzUxMiIsImp3ayI6eyJrdHkiOiJvY3QiLCJrIjoiR2F3Z2d1RnlHcldLYXY3QVg0VktVZyJ9fQ.eyJoZWxsbyI6ICJ3b3JsZCJ9.d8HO1eSoqgPbVZPXhsds8o_0fqf4gx0fa99UgQtIapojs52jF7xbCQykrls_sDq6J1ltYOFmJ35Hnv9XfryP1A";
 
-            var key = JWK.FromDictionary((IDictionary<string, object>)JWT.Headers(token)["jwk"]);
+            var key = Jwk.FromDictionary((IDictionary<string, object>)JWT.Headers(token)["jwk"]);
 
             JWT.Decode(token, key);
         }
@@ -53,9 +53,9 @@ namespace UnitTests
         {
             string token = "eyJhbGciOiJQQkVTMi1IUzUxMitBMjU2S1ciLCJwMmMiOjgxOTIsInAycyI6Inp3eUF0TElqTXpQM01pQ0giLCJlbmMiOiJBMjU2R0NNIn0.4geBbNNUErAkSiNmUVL23tnH3Jah0B0QkvhAaEcHeUgxRGKmWvkOjg.CCNy7C1HOH-qq5Lo.Uzi9FZ_b8bHenXF7h-D63gZCASdvLA7WqnKRSXwsr7G94SnB5bHiZrUT.l6D2hJSoFPpnXPXLyOloxg";
 
-//            var key = JWK.FromJson(
+//            var key = Jwk.FromJson(
   //                     Jose.JWT.Decode(token, "secret"), JWT.DefaultSettings.JsonMapper);
-            var key = Jose.JWT.Decode<JWK>(token, "secret");
+            var key = Jose.JWT.Decode<Jwk>(token, "secret");
 
             Console.Out.WriteLine("key = {0}", key.Kty);
 

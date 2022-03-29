@@ -94,11 +94,10 @@ namespace Jose
                 if (privateKey.Kty == Jwk.KeyTypes.RSA)
                 {
                      return privateKey.RsaKey().SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
-                    //return RsaPss.Sign(securedInput, privateKey.CngKey(), Hash, saltSize);
                 }
             }
 
-            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either CngKey or RSA types or JWK type with kty='RSA'");
+            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either CngKey or RSA types or Jwk type with kty='RSA'");
 
 #elif NETSTANDARD
             if (key is RSA)
@@ -108,17 +107,17 @@ namespace Jose
                 return privateKey.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
             }
 
-            if (key is JWK)
+            if (key is Jwk)
             {
-                var privateKey = (JWK)key;
+                var privateKey = (Jwk)key;
 
-                if (privateKey.Kty == JWK.KeyTypes.RSA)
+                if (privateKey.Kty == Jwk.KeyTypes.RSA)
                 {
                      return privateKey.RsaKey().SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);                    
                 }
             }
 
-            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either RSA type or JWK type with kty='RSA'");
+            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either RSA type or Jwk type with kty='RSA'");
 #endif
         }
 
@@ -205,7 +204,7 @@ namespace Jose
                 }
             }
 
-            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either CngKey or RSA types or JWK type with kty='RSA'");
+            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either CngKey or RSA types or Jwk type with kty='RSA'");
 
 #elif NETSTANDARD
             if (key is RSA)
@@ -214,17 +213,17 @@ namespace Jose
                 return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
             }
 
-            if (key is JWK)
+            if (key is Jwk)
             {
-                var publicKey = (JWK)key;
+                var publicKey = (Jwk)key;
 
-                if (publicKey.Kty == JWK.KeyTypes.RSA)
+                if (publicKey.Kty == Jwk.KeyTypes.RSA)
                 {
                     return publicKey.RsaKey().VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
                 }
             }  
             
-            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either RSA type or JWK type with kty='RSA'");
+            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either RSA type or Jwk type with kty='RSA'");
 #endif
         }
 
