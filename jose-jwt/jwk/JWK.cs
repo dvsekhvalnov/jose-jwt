@@ -146,8 +146,10 @@ namespace Jose
             #if NETSTANDARD
                 rsaKey = RSA.Create();
                 rsaKey.ImportParameters(param);
-            #else
+            # elif NET461 || NET472
                 rsaKey = new RSACng(Jose.keys.RsaKey.New(param));
+            #else
+                throw new NotImplementedException("Not supported, requires .NET 4.6.1+ or NETSTANDARD");
             #endif
             }
 
@@ -167,7 +169,7 @@ namespace Jose
      
         public ECDsa ECDsaKey ()
         {
-#if NETSTANDARD || NET472
+#if NETSTANDARD2_1 || NET472
             if (ecdsaKey == null && X != null && Y != null && Crv !=null)
             {
                 ECParameters param = new ECParameters();
@@ -243,7 +245,7 @@ namespace Jose
 
         public Jwk(ECDsa key, bool isPrivate = true)
         {
-#if NETSTANDARD || NET472
+#if NETSTANDARD2_1 || NET472
             ecdsaKey = key;
             Kty = KeyTypes.EC;           
 
@@ -506,7 +508,7 @@ namespace Jose
             );
         }
 
-#if NETSTANDARD || NET472
+#if NETSTANDARD2_1 || NET472
         private static string CurveToName(ECCurve curve)
         {
             curve.Oid.FriendlyName = curve.Oid.FriendlyName;
