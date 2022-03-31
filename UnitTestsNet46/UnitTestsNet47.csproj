@@ -78,7 +78,6 @@
     <Compile Include="DictionariesTest.cs" />
     <Compile Include="jwe\JweTest.cs" />
     <Compile Include="jwe\JweTokenTest.cs" />
-    <Compile Include="jwk\JwkExampleTest.cs" />
     <Compile Include="jwk\JwkSetTest.cs" />
     <Compile Include="jwk\JwkTest.cs" />
     <Compile Include="PBKDF2Test.cs" />
