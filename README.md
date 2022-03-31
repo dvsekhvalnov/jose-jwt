@@ -215,7 +215,7 @@ string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.RS256);
 
 ```
 **NET461 and above**:
-Accepts `RSACryptoServiceProvider`, `RSA` or `Jwk` types of keys.
+Accepts `RSACryptoServiceProvider`, `RSA` or `Jwk` types of keys (see above).
 
 
 #### ES-\*  family
