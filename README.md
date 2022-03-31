@@ -777,7 +777,7 @@ As of v4.0.0 library provides full-blown support for Json Web Keys (aka [RFC 751
 
 See [Creating encrypted Tokens](#creating-encrypted-tokens), [Creating signed Tokens](#creating-signed-tokens) and [Verifying and Decoding Tokens](#verifying-and-decoding-tokens) for details on using JWK with different Json Web Tokens algorithms.
 
-Most of JWK support will work on `.NET 4.6.1` and `.NET Core 2.0`. But some key bridging requires `.NET4.7.2` or `NETSTANDARD 2.1` and above.
+Most of JWK support will work on `.NET 4.6.1` and `.NET Core 2.0`. But some key bridging requires `.NET 4.7.2` or `NETSTANDARD 2.1` and above.
 
 The two core classes are:
 
