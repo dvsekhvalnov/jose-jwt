@@ -272,7 +272,7 @@ string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
 ```
 
 **NET461 and above**:
-Accepts `CngKey`, `ECDsa` and `Jwk` types of keys.
+Accepts `CngKey`, `ECDsa` and `Jwk` types of keys (see above).
 
 
 ### Creating encrypted Tokens
