@@ -455,7 +455,7 @@ string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.ECDH_ES, JweEncr
 ```
 
 #### PBES2 using HMAC SHA with AES Key Wrap key management family of algorithms
-PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW key management requires `string` passphrase from which key will be derived
+PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW key management requires `string` passphrase to derive key from
 
 ``` cs
 var payload = new Dictionary<string, object>()
