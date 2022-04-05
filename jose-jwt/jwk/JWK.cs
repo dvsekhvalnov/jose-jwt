@@ -178,7 +178,6 @@ namespace Jose
                 param.Q.X = Base64Url.Decode(X);
                 param.Q.Y = Base64Url.Decode(Y);
 
-                // TODO: fix
                 param.Curve = NameToCurve(Crv);
 
                 if (D != null)
