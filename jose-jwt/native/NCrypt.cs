@@ -15,7 +15,7 @@ namespace Jose.native
         public const uint KDF_SUPPPUBINFO = 11;
         public const uint KDF_SUPPPRIVINFO = 12;
 
-    #if NET40 || NET461
+    #if NET40 || NET461 || NET472
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
     #elif NETSTANDARD
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
@@ -48,7 +48,7 @@ namespace Jose.native
             }
         }
 
-    #if NET40 || NET461
+    #if NET40 || NET461 || NET472
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
     #elif NETSTANDARD
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
@@ -81,14 +81,14 @@ namespace Jose.native
             }
         }
 
-    #if NET40 || NET461
+    #if NET40 || NET461 || NET472
         [DllImport("ncrypt.dll", CharSet = CharSet.Auto, SetLastError = true)]
     #elif NETSTANDARD
         [DllImport("ncrypt.dll", CharSet = CharSet.Unicode, SetLastError = true)]
     #endif
         public static extern uint NCryptSecretAgreement(SafeNCryptKeyHandle hPrivKey,SafeNCryptKeyHandle hPublicKey,out SafeNCryptSecretHandle phSecret,uint flags);
 
-    #if NET40 || NET461
+    #if NET40 || NET461 || NET472
         [DllImport("ncrypt.dll", CharSet = CharSet.Auto, SetLastError = true)]
     #elif NETSTANDARD
         [DllImport("ncrypt.dll", CharSet = CharSet.Unicode, SetLastError = true)]

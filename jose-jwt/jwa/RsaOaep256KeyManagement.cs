@@ -35,7 +35,7 @@ namespace Jose
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey or RSACryptoServiceProvider types.");
 
-        #elif NET461
+        #elif NET461 || NET472
             if (key is CngKey)
             {
                 var publicKey = (CngKey) key;
@@ -59,14 +59,39 @@ namespace Jose
                 return publicKey.Encrypt(cek, RSAEncryptionPadding.OaepSHA256);
             }
 
-            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of either CngKey or RSA types.");
+            if (key is Jwk)
+            {
+                var publicKey = (Jwk)key;
+
+                if (publicKey.Kty == Jwk.KeyTypes.RSA)
+                {
+                    return publicKey.RsaKey().Encrypt(cek, RSAEncryptionPadding.OaepSHA256);
+                }
+            }
+            
+            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey, RSACryptoServiceProvider, RSA types or Jwk type with kty='rsa'.");
 
 
-#elif NETSTANDARD
-            var publicKey = Ensure.Type<RSA>(key, "RsaKeyManagement algorithm expects key to be of RSA type.");
+        #elif NETSTANDARD
+            if (key is RSA)
+            {
+	            var publicKey = (RSA) key;
 
-            return publicKey.Encrypt(cek, RSAEncryptionPadding.OaepSHA256);
-#endif
+                return publicKey.Encrypt(cek, RSAEncryptionPadding.OaepSHA256);
+            }
+
+            if (key is Jwk)
+            {
+                var publicKey = (Jwk)key;
+
+                if (publicKey.Kty == Jwk.KeyTypes.RSA)
+                {
+                    return publicKey.RsaKey().Encrypt(cek, RSAEncryptionPadding.OaepSHA256);
+                }
+            }
+            
+            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of RSA types or Jwk type with kty='rsa'.");
+        #endif
 
         }
 
@@ -92,7 +117,7 @@ namespace Jose
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey type.");
 
-         #elif NET461
+         #elif NET461 || NET472
             if (key is CngKey)
             {
                 var privateKey = (CngKey) key;
@@ -116,13 +141,38 @@ namespace Jose
                 return privateKey.Decrypt(encryptedCek, RSAEncryptionPadding.OaepSHA256);				
             }
 
-            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of either CngKey or RSA types.");
+            if (key is Jwk)
+            {
+                var privateKey = (Jwk)key;
 
-        #elif NETSTANDARD
-            var privateKey = Ensure.Type<RSA>(key, "RsaKeyManagement algorithm expects key to be of RSA type.");
+                if (privateKey.Kty == Jwk.KeyTypes.RSA)
+                {
+                    return privateKey.RsaKey().Decrypt(encryptedCek, RSAEncryptionPadding.OaepSHA256);
+                }
+            }
 
-            return privateKey.Decrypt(encryptedCek, RSAEncryptionPadding.OaepSHA256);
-        #endif
+            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey, RSACryptoServiceProvider, RSA types or Jwk type with kty='rsa'.");
+
+#elif NETSTANDARD
+            if (key is RSA)
+            {
+                var privateKey = (RSA) key;
+
+                return privateKey.Decrypt(encryptedCek, RSAEncryptionPadding.OaepSHA256);				
+            }
+
+            if (key is Jwk)
+            {
+                var privateKey = (Jwk)key;
+
+                if (privateKey.Kty == Jwk.KeyTypes.RSA)
+                {
+                    return privateKey.RsaKey().Decrypt(encryptedCek, RSAEncryptionPadding.OaepSHA256);
+                }
+            }
+
+            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of RSA type or Jwk type with kty='rsa'.");
+#endif
         }
     }
 }

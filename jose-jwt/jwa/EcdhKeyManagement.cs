@@ -30,7 +30,19 @@ namespace Jose
 
         private byte[] NewKey(int keyLength, object key, IDictionary<string, object> header)
         {
-            var recieverPubKey = Ensure.Type<CngKey>(key, "EcdhKeyManagement alg expects key to be of CngKey type.");
+            CngKey recieverPubKey = null;
+
+            if (key is Jwk)
+            {
+                Jwk jwk = (Jwk)key;
+
+                if (jwk.Kty == Jwk.KeyTypes.EC)
+                {
+                    recieverPubKey = jwk.CngKey(CngKeyUsages.KeyAgreement);
+                }
+            }
+
+            recieverPubKey = recieverPubKey ?? Ensure.Type<CngKey>(key, "EcdhKeyManagement alg expects key to be of CngKey or Jwk types with kty='EC'.");
             
             EccKey ephemeral=EccKey.Generate(recieverPubKey);
 
@@ -38,7 +50,7 @@ namespace Jose
             epk["kty"] = "EC";
             epk["x"] = Base64Url.Encode(ephemeral.X);
             epk["y"] = Base64Url.Encode(ephemeral.Y);
-            epk["crv"] = Curve(recieverPubKey);
+            epk["crv"] = ephemeral.Curve();
 
             header["epk"] = epk; 
 
@@ -52,7 +64,19 @@ namespace Jose
 
         public virtual byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string,object> header)
         {
-            var privateKey = Ensure.Type<CngKey>(key, "EcdhKeyManagement alg expects key to be of CngKey type.");
+            CngKey privateKey = null;
+
+            if (key is Jwk)
+            {
+                Jwk jwk = (Jwk)key;
+
+                if (jwk.Kty == Jwk.KeyTypes.EC)
+                {
+                    privateKey = jwk.CngKey(CngKeyUsages.KeyAgreement);
+                }
+            }
+
+            privateKey = privateKey ?? Ensure.Type<CngKey>(key, "EcdhKeyManagement alg expects key to be of CngKey or Jwk types with kty='EC'.");            
 
             Ensure.Contains(header, new[] {"epk"}, "EcdhKeyManagement algorithm expects 'epk' key param in JWT header, but was not found");
             Ensure.Contains(header, new[] {algIdHeader}, "EcdhKeyManagement algorithm expects 'enc' header to be present in JWT header, but was not found");
@@ -82,15 +106,6 @@ namespace Jose
 
 
             return ConcatKDF.DeriveKey(externalPublicKey, privateKey, cekSizeBits, algorithmId, partyVInfo, partyUInfo, suppPubInfo);
-        }
-
-        private string Curve(CngKey key)
-        {
-            if (key.Algorithm == CngAlgorithm.ECDiffieHellmanP256) return "P-256";
-            if (key.Algorithm == CngAlgorithm.ECDiffieHellmanP384) return "P-384";
-            if (key.Algorithm == CngAlgorithm.ECDiffieHellmanP521) return "P-521";
-
-            throw new ArgumentException("Unknown curve type " + key.Algorithm);
-        }
+        }       
     }
 }

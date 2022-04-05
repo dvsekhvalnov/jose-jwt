@@ -1,10 +1,10 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Javascript Object Signing and Encryption (JOSE), JSON Web Token (JWT) and JSON Web Encryption (JWE) Implementation for .NET 
+    <Description>Javascript Object Signing and Encryption (JOSE), JSON Web Token (JWT), JSON Web Encryption (JWE) and JSON Web Key (JWK) Implementation for .NET 
 
-Ultimate Javascript Object Signing and Encryption (JOSE), JSON Web Token (JWT) and JSON Web Encryption (JWE) Implementation for .NET. Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms. 
-Supports generating, decoding, encryption and compression of JSON Web Tokens. JSON parsing agnostic. Supports two-phase validation. FIPS compliant. Unencoded payload and detached content support (RFC 7797). 
+Ultimate Javascript Object Signing and Encryption (JOSE), JSON Web Token (JWT), JSON Web Encryption (JWE) and JSON Web Key (JWK) Implementation for .NET. Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms. 
+Supports generating, decoding, encryption and compression of JSON Web Tokens. Full-blown support for JSON Web Keys (RFC 7517) and two way bridging with .NET core cryptography. JSON parsing agnostic. Supports two-phase validation. FIPS compliant. Unencoded payload and detached content support (RFC 7797). 
 JSON Web Encryption (JWE, RFC 7516) support.
 
 CLR (.net framework 4.0+) supported algorithms 
@@ -67,17 +67,21 @@ RFC 7797:
 
 RFC 7516: 
   - JSON Web Encryption (JWE) support
+
+JSON Web Key (RFC 7517):
+  - RSA, EC, oct keys
+  - X509 Chains, SHA1 &amp; SHA2 thumbprints
 </Description>
-    <Copyright>Copyright dvsekhvalnov 2014-2021</Copyright>
+    <Copyright>Copyright dvsekhvalnov 2014-2022</Copyright>
     <AssemblyTitle>Jose JWT</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <VersionPrefix>3.2.0</VersionPrefix>
+    <VersionPrefix>4.0.0</VersionPrefix>
     <Authors>Dmitry Vsekhvalnov</Authors>
-    <TargetFrameworks>net40;net461;netstandard1.4;netstandard2.1</TargetFrameworks>
+    <TargetFrameworks>net40;net461;net472;netstandard1.4;netstandard2.1</TargetFrameworks>
     <AssemblyName>jose-jwt</AssemblyName>
     <PackageId>jose-jwt</PackageId>
-    <PackageTags>jose;jwt;json;jwa;jwe;jws;aes;cbc;gcm;rsa;hmac;sha;rsassa;pss;rsaes;oaep;pkcs1-v1_5;es;elliptic;curve;diffe;hellman;agreement;ecdsa;key wrap;kw;ecdh;pbes;pbes2;pbkdf;pbkdf2;password based encryption;javascript object signing;two phase validation;netcore;clr;coreclr;portable;fips;compliant;open;banking;detached content;unencoded payload</PackageTags>
-    <PackageReleaseNotes>Switching to System.Text.Json for netstandard2.1</PackageReleaseNotes>
+    <PackageTags>jose;jwt;json;jwa;jwe;jws;jwk;aes;cbc;gcm;rsa;hmac;sha;rsassa;pss;rsaes;oaep;pkcs1-v1_5;es;elliptic;curve;diffe;hellman;agreement;ecdsa;key wrap;kw;ecdh;pbes;pbes2;pbkdf;pbkdf2;password based encryption;javascript object signing;two phase validation;netcore;clr;coreclr;portable;fips;compliant;open;banking;detached content;unencoded payload;json web key;</PackageTags>
+    <PackageReleaseNotes>Json Web Keys (JWK) RFC 7517 support.</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/dvsekhvalnov/jose-jwt</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.github.com/dvsekhvalnov/jose-jwt/master/LICENSE</PackageLicenseUrl>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
@@ -97,6 +101,12 @@ RFC 7516:
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net461' ">
+    <Reference Include="System.Web.Extensions" />
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net472' ">
     <Reference Include="System.Web.Extensions" />
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />

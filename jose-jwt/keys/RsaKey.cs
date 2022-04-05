@@ -30,7 +30,17 @@ namespace Jose.keys
 
             var format = pubOnly ? CngKeyBlobFormat.GenericPublicBlob : CngKeyBlobFormat.GenericPrivateBlob;
 
-            return CngKey.Import(blob, format);
+            CngKey key = CngKey.Import(blob, format);
+
+            CngProperty exportable = new CngProperty(
+                "Export Policy",
+                BitConverter.GetBytes((int)(CngExportPolicies.AllowPlaintextExport)),
+                CngPropertyOptions.Persist
+            );
+
+            key.SetProperty(exportable);
+
+            return key;
         }
     }
 }
