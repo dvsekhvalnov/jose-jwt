@@ -53,6 +53,48 @@ namespace UnitTests
         }
 
         [Fact]
+        public void GetList()
+        {
+            //given
+            var src = new Dictionary<string, object> 
+            {
+                { "list", new List<object>{ "1", 2 }  },
+                { "array", new object[] { "2", 1 } } 
+            };
+
+            //when
+            var listOfStrings = Dictionaries.GetList<string>(src, "list");
+            var arrOfStrings = Dictionaries.GetList<string>(src, "array");
+            var listOfInts = Dictionaries.GetList<int>(src, "list");
+            var arrOfInts = Dictionaries.GetList<int>(src, "array");
+            var unknown = Dictionaries.GetList<int>(src, "not me");
+            
+            Assert.Equal(listOfStrings, new[] { "1", "2" });
+            Assert.Equal(arrOfStrings, new[] { "2", "1" });
+            Assert.Equal(listOfInts, new[] { 1, 2 });
+            Assert.Equal(arrOfInts, new[] { 2, 1 });
+            Assert.Null(unknown);
+        }
+
+        [Fact]
+        public void Except()
+        {
+            //given
+            var src = new Dictionary<string, object> { { "one", "1" }, { "two", 2 }, { "four", new double[] { 4.1, 4.2, 4.3 } } };
+
+            //when
+            var test = Dictionaries.Except(src, new HashSet<string> { "two", "four" });
+            var empty = Dictionaries.Except(src, new HashSet<string> { "two", "four", "one" });
+
+            //then
+            Assert.NotSame(test, src);
+            Assert.Equal(1, test.Count);
+            Assert.Equal("1", test["one"]);
+
+            Assert.Null(empty);
+        }
+
+        [Fact]
         public void MergeHeaders_CalledWithOnlyNulls_ReturnsEmptyDictionary()
         {
             //given

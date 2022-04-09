@@ -27,10 +27,23 @@ namespace Jose
                 return pkcs1.CreateSignature(sha.ComputeHash(securedInput));                    
             }
 
-#elif NETSTANDARD || NET461
-            var privateKey = Ensure.Type<RSA>(key, "RsaUsingSha alg expects key to be of RSA type.");   
-                         
-            return privateKey.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pkcs1);
+#elif NETSTANDARD || NET461 || NET472
+            if (key is RSA)
+            {                
+                return ((RSA)key).SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pkcs1);
+            }
+
+            if (key is Jwk)
+            {
+                var privateKey = (Jwk)key;
+
+                if (privateKey.Kty == Jwk.KeyTypes.RSA)
+                {
+                    return privateKey.RsaKey().SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pkcs1);
+                }
+            }
+
+            throw new ArgumentException("RsaUsingSha alg expects key to be of RSA type or Jwk type with kty='RSA'");
 #endif
         }
 
@@ -47,10 +60,24 @@ namespace Jose
 
                 return pkcs1.VerifySignature(hash, signature);
             }
-#elif NETSTANDARD || NET461
-            var publicKey = Ensure.Type<RSA>(key, "RsaUsingSha alg expects key to be of RSA type.");   
-                      
-            return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pkcs1);
+#elif NETSTANDARD || NET461 || NET472
+            if (key is RSA)
+            {
+                var publicKey = (RSA)key;
+                return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pkcs1);
+            }
+
+            if (key is Jwk)
+            {
+                var publicKey = (Jwk)key;
+
+                if (publicKey.Kty == Jwk.KeyTypes.RSA)
+                {
+                    return publicKey.RsaKey().VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pkcs1);
+                }
+            }            
+
+            throw new ArgumentException("RsaUsingSha alg expects key to be of RSA type or Jwk type with kty='rsa'");
 #endif
         }
 
@@ -69,7 +96,7 @@ namespace Jose
         throw new ArgumentException("Unsupported hashing algorithm: '{0}'", hashMethod);
             }
         }
-#elif NETSTANDARD || NET461
+#elif NETSTANDARD || NET461 || NET472
         private HashAlgorithmName HashAlgorithm
         {
             get

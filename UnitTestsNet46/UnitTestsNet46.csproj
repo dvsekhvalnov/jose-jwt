@@ -8,7 +8,7 @@
     <ProjectGuid>{DA58DD81-3539-4F03-A08C-AF239451D8D7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UnitTestsNet46</RootNamespace>
+    <RootNamespace>UnitTests</RootNamespace>
     <AssemblyName>UnitTestsNet46</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -81,6 +81,8 @@
     <Compile Include="DictionariesTest.cs" />
     <Compile Include="jwe\JweTest.cs" />
     <Compile Include="jwe\JweTokenTest.cs" />
+    <Compile Include="jwk\JwkSetTest.cs" />
+    <Compile Include="jwk\JwkTest.cs" />
     <Compile Include="PBKDF2Test.cs" />
     <Compile Include="SecurityVulnerabilitiesTest.cs" />
     <Compile Include="SettingsTest.cs" />
@@ -90,6 +92,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="ecc256.p12">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="ecc384.p12">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="ecc521.p12">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="jwt-2048.p12">

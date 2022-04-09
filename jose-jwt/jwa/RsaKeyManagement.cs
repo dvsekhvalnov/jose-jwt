@@ -28,15 +28,10 @@ namespace Jose
             var publicKey = Ensure.Type<RSACryptoServiceProvider>(key, "RsaKeyManagement alg expects key to be of RSACryptoServiceProvider type.");
 
             return publicKey.Encrypt(cek, useRsaOaepPadding);
-#elif NET461
+#elif NET461 || NET472
             if (key is CngKey)
             {
-                var publicKey = new RSACng((CngKey) key);
-
-                var padding = useRsaOaepPadding ? RSAEncryptionPadding.OaepSHA1 :
-                                                  RSAEncryptionPadding.Pkcs1;
-
-                return publicKey.Encrypt(cek, padding);
+                return encrypt(cek, new RSACng((CngKey)key));
             }
 
             if (key is RSACryptoServiceProvider)
@@ -48,23 +43,39 @@ namespace Jose
 
             if (key is RSA)
             {
-                var publicKey = (RSA) key;
-
-                var padding = useRsaOaepPadding ? RSAEncryptionPadding.OaepSHA1 :
-                                                  RSAEncryptionPadding.Pkcs1;
-
-                return publicKey.Encrypt(cek, padding);
+                return encrypt(cek, (RSA)key);
             }
 
-            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of either CngKey, RSACryptoServiceProvider or RSA types.");
+            if (key is Jwk)
+            {
+                var publicKey = (Jwk)key;
+
+                if (publicKey.Kty == Jwk.KeyTypes.RSA)
+                {
+                    return encrypt(cek, publicKey.RsaKey());
+                }
+            }
+
+
+            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey, RSACryptoServiceProvider, RSA types or Jwk type with kty='rsa'.");
 
 #elif NETSTANDARD
-            var publicKey = Ensure.Type<RSA>(key, "RsaKeyManagement alg expects key to be of RSA type.");
+            if (key is RSA)
+            {
+                return encrypt(cek, (RSA)key);
+            }
 
-            var padding = useRsaOaepPadding ? RSAEncryptionPadding.OaepSHA1 :
-                                              RSAEncryptionPadding.Pkcs1;
+            if (key is Jwk)
+            {
+                var publicKey = (Jwk)key;
 
-            return publicKey.Encrypt(cek, padding);
+                if (publicKey.Kty == Jwk.KeyTypes.RSA)
+                {
+                    return encrypt(cek, publicKey.RsaKey());
+                }
+            }
+
+            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of RSA type or Jwk type with kty='rsa'.");
 #endif
         }
 
@@ -74,15 +85,10 @@ namespace Jose
             var privateKey = Ensure.Type<RSACryptoServiceProvider>(key, "RsaKeyManagement alg expects key to be of RSACryptoServiceProvider type.");
 
             return privateKey.Decrypt(encryptedCek, useRsaOaepPadding);
-#elif NET461
+#elif NET461 || NET472
             if (key is CngKey)
             {
-                var privateKey = new RSACng((CngKey)key);
-
-                var padding = useRsaOaepPadding ? RSAEncryptionPadding.OaepSHA1 :
-                                                  RSAEncryptionPadding.Pkcs1;
-
-                return privateKey.Decrypt(encryptedCek, padding);
+                return decrypt(encryptedCek, new RSACng((CngKey)key));
             }
 
             if (key is RSACryptoServiceProvider)
@@ -94,23 +100,56 @@ namespace Jose
 
             if (key is RSA)
             {
-                var privateKey = (RSA) key;
-
-                var padding = useRsaOaepPadding ? RSAEncryptionPadding.OaepSHA1 :
-                                                  RSAEncryptionPadding.Pkcs1;
-
-                return privateKey.Decrypt(encryptedCek, padding);
+                return decrypt(encryptedCek, (RSA)key);
             }
 
-            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of either CngKey, RSACryptoServiceProvider or RSA types.");
+            if (key is Jwk)
+            {
+                var publicKey = (Jwk)key;
+
+                if (publicKey.Kty == Jwk.KeyTypes.RSA)
+                {
+                    return decrypt(encryptedCek, publicKey.RsaKey());
+                }
+            }
+
+            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey, RSACryptoServiceProvider, RSA types or Jwk type with kty='rsa'.");
+
 #elif NETSTANDARD
-            var privateKey = Ensure.Type<RSA>(key, "RsaKeyManagement algorithm expects key to be of RSA type.");
+            if (key is RSA)
+            {
+                return decrypt(encryptedCek, (RSA)key); 
+            }
 
-            var padding = useRsaOaepPadding ? RSAEncryptionPadding.OaepSHA1 :
-                                              RSAEncryptionPadding.Pkcs1;
+            if (key is Jwk)
+            {
+                var privateKey = (Jwk)key;
 
-            return privateKey.Decrypt(encryptedCek, padding);
-#endif
+                if (privateKey.Kty == Jwk.KeyTypes.RSA)
+                {
+                    return decrypt(encryptedCek, privateKey.RsaKey());
+                }
+            }
+
+            throw new ArgumentException("RsaKeyManagement algorithm expects key to be of RSA type or Jwk type with kty='rsa'.");
+#endif        
         }
+
+#if NET461 || NET472 || NETSTANDARD
+        private byte[] decrypt(byte[] content, RSA privateKey)
+        {
+            RSAEncryptionPadding padding = useRsaOaepPadding ? RSAEncryptionPadding.OaepSHA1 :
+                                                               RSAEncryptionPadding.Pkcs1;
+            
+            return privateKey.Decrypt(content, padding);
+        }
+        private byte[] encrypt(byte[] content, RSA publicKey)
+        {
+            RSAEncryptionPadding padding = useRsaOaepPadding ? RSAEncryptionPadding.OaepSHA1 :
+                                                               RSAEncryptionPadding.Pkcs1;
+
+            return publicKey.Encrypt(content, padding);
+        }
+#endif
     }
 }

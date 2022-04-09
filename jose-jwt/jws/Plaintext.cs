@@ -9,7 +9,7 @@ namespace Jose
 
         public bool Verify(byte[] signature, byte[] securedInput, object key)
         {
-            Ensure.IsNull(key, "Plaintext alg expectes key to be null.");
+            Ensure.IsNull(key, "Plaintext alg expects key to be null.");
 
             return signature.Length == 0;
         }

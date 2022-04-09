@@ -36,6 +36,38 @@ namespace Jose
             return src.TryGetValue(key, out value) ? (V)value : default;
         }
 
+        public static List<V> GetList<V>(IDictionary<string, object> src, string key)
+        {
+            IEnumerable<object> value = Get<IEnumerable<object>>(src, key);
+
+            if (value == null)
+            {
+                return default;
+            }
+
+            return value.Select(i => (V)Convert.ChangeType(i, typeof(V))).ToList();
+        }
+
+        public static IDictionary<string, object> Except(IDictionary<string, object> src, HashSet<string> keys)
+        {
+            IDictionary<string, object> result = null;
+
+            foreach (var kp in src)
+            {
+                if (!keys.Contains(kp.Key))
+                {
+                    if (result == null)
+                    {
+                        result = new Dictionary<string, object>();
+                    }
+
+                    result[kp.Key] = kp.Value;
+                }
+            }
+
+            return result;
+        }
+
         /// <summary>
         /// Merges the IDictionaries supplied and returns an IDictionary containing the union of key/value pairs of all
         /// supplied IDictionaries.
