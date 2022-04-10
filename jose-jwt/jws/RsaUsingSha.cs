@@ -25,10 +25,20 @@ namespace Jose
                 return pkcs1.CreateSignature(sha.ComputeHash(securedInput));
             }
 
-#elif NETSTANDARD || NET461
-            var privateKey = Ensure.Type<RSA>(key, "RsaUsingSha alg expects key to be of RSA type.");
+#elif NETSTANDARD || NET461 || NET472
+            if (key is RSA rsa)
+            {
+                return rsa.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pkcs1);
+            }
+            else if (key is Jwk jwk)
+            {
+                if (jwk.Kty == Jwk.KeyTypes.RSA)
+                {
+                    return jwk.RsaKey().SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pkcs1);
+                }
+            }
 
-            return privateKey.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pkcs1);
+            throw new ArgumentException("RsaUsingSha alg expects key to be of RSA type or Jwk type with kty='RSA'");
 #endif
         }
 
@@ -45,10 +55,20 @@ namespace Jose
 
                 return pkcs1.VerifySignature(hash, signature);
             }
-#elif NETSTANDARD || NET461
-            var publicKey = Ensure.Type<RSA>(key, "RsaUsingSha alg expects key to be of RSA type.");
+#elif NETSTANDARD || NET461 || NET472
+            if (key is RSA rsa)
+            {
+                return rsa.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pkcs1);
+            }
+            else if (key is Jwk jwk)
+            {
+                if (jwk.Kty == Jwk.KeyTypes.RSA)
+                {
+                    return jwk.RsaKey().VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pkcs1);
+                }
+            }
 
-            return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pkcs1);
+            throw new ArgumentException("RsaUsingSha alg expects key to be of RSA type or Jwk type with kty='rsa'");
 #endif
         }
 
@@ -67,7 +87,7 @@ namespace Jose
                     throw new ArgumentException("Unsupported hashing algorithm: '{0}'", hashMethod);
             }
         }
-#elif NETSTANDARD || NET461
+#elif NETSTANDARD || NET461 || NET472
         private HashAlgorithmName HashAlgorithm
         {
             get

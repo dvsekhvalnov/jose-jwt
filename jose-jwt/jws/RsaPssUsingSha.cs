@@ -45,7 +45,7 @@ namespace Jose
 
             throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of CngKey type.");
 
-#elif NET461
+#elif NET461 || NET472
             if (key is CngKey cngKey)
             {
                 try
@@ -76,13 +76,30 @@ namespace Jose
             {
                 return rsa.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
             }
+            else if (key is Jwk jwk)
+            {
+                if (jwk.Kty == Jwk.KeyTypes.RSA)
+                {
+                     return jwk.RsaKey().SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
+                }
+            }
 
-            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either CngKey or RSA types.");
+            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either CngKey or RSA types or Jwk type with kty='RSA'");
 
 #elif NETSTANDARD
-            var privateKey = Ensure.Type<RSA>(key, "RsaUsingSha with PSS padding alg expects key to be of RSA type.");
+            if (key is RSA rsa)
+            {
+                return rsa.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
+            }
+            else if (key is Jwk jwk)
+            {
+                if (jwk.Kty == Jwk.KeyTypes.RSA)
+                {
+                     return jwk.RsaKey().SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);                    
+                }
+            }
 
-            return privateKey.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
+            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either RSA type or Jwk type with kty='RSA'");
 #endif
         }
 
@@ -118,7 +135,7 @@ namespace Jose
 
             throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of CngKey type.");
 
-#elif NET461
+#elif NET461 || NET472
             if (key is CngKey cngKey)
             {
                 try
@@ -149,16 +166,34 @@ namespace Jose
             {
                 return rsa.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
             }
+            else if (key is Jwk jwk)
+            {
+                if (jwk.Kty == Jwk.KeyTypes.RSA)
+                {
+                    return jwk.RsaKey().VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
+                }
+            }
 
-            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either CngKey or RSA types.");
+            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either CngKey or RSA types or Jwk type with kty='RSA'");
 
 #elif NETSTANDARD
-            var publicKey = Ensure.Type<RSA>(key, "RsaUsingSha with PSS padding alg expects key to be of RSA type.");
-            return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
+            if (key is RSA rsa)
+            {
+                return rsa.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
+            }
+            else if (key is Jwk jwk)
+            {
+                if (jwk.Kty == Jwk.KeyTypes.RSA)
+                {
+                    return jwk.RsaKey().VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
+                }
+            }  
+            
+            throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either RSA type or Jwk type with kty='RSA'");
 #endif
         }
 
-#if NETSTANDARD || NET461
+#if NETSTANDARD || NET461 || NET472
         private HashAlgorithmName HashAlgorithm
         {
             get

@@ -17,10 +17,15 @@ namespace Jose
         {
             SerializeOptions = new JsonSerializerOptions
             {
-                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+                Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
 
-            DeserializeOptions = new JsonSerializerOptions();
+            DeserializeOptions = new JsonSerializerOptions() 
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            };
+
             DeserializeOptions.Converters.Add(new NestedDictionariesConverter());
         }
 
@@ -44,7 +49,7 @@ namespace Jose
                 return JsonSerializer.Deserialize<T>(json, DeserializeOptions);
             }
 
-            return JsonSerializer.Deserialize<T>(json);
+            return JsonSerializer.Deserialize<T>(json, DeserializeOptions);
         }
     }
 

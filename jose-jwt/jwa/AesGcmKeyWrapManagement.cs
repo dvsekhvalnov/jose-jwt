@@ -21,7 +21,8 @@ namespace Jose
 
         public byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header)
         {
-            byte[] sharedKey = Ensure.Type<byte[]>(key, "AesGcmKeyWrapManagement alg expectes key to be byte[] array.");
+            byte[] sharedKey = byteKey(key);            
+
             Ensure.BitSize(sharedKey, keyLengthBits, string.Format("AesGcmKeyWrapManagement management algorithm expected key of size {0} bits, but was given {1} bits", keyLengthBits, sharedKey.Length * 8L));
 
             byte[] iv = Arrays.Random(96);
@@ -36,7 +37,8 @@ namespace Jose
 
         public byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
         {
-            byte[] sharedKey = Ensure.Type<byte[]>(key, "AesGcmKeyWrapManagement alg expectes key to be byte[] array.");
+            byte[] sharedKey = byteKey(key);
+
             Ensure.BitSize(sharedKey, keyLengthBits, string.Format("AesGcmKeyWrapManagement management algorithm expected key of size {0} bits, but was given {1} bits", keyLengthBits, sharedKey.Length * 8L));
 
             Ensure.Contains(header, new[] { "iv" }, "AesGcmKeyWrapManagement algorithm expects 'iv' param in JWT header, but was not found");
@@ -46,6 +48,23 @@ namespace Jose
             byte[] authTag = Base64Url.Decode((string)header["tag"]);
 
             return AesGcm.Decrypt(sharedKey, iv, null, encryptedCek, authTag);
+        }
+
+        private byte[] byteKey(object key)
+        {
+            if (key is byte[] arr)
+            {
+                return arr;
+            }
+            else if (key is Jwk jwk)
+            {
+                if (jwk.Kty == Jwk.KeyTypes.OCT)
+                {
+                    return jwk.OctKey();
+                }
+            }
+
+            throw new ArgumentException("AesGcmKeyWrapManagement management algorithm expects key to be byte[] array or Jwk with kty='oct'");
         }
     }
 }

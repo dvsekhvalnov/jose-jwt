@@ -27,7 +27,7 @@ namespace Jose
             { JwsAlgorithm.ES256, new EcdsaUsingSha(256) },
             { JwsAlgorithm.ES384, new EcdsaUsingSha(384) },
             { JwsAlgorithm.ES512, new EcdsaUsingSha(521) }
-#elif NETSTANDARD || NET461
+#elif NETSTANDARD || NET461 || NET472
             { JwsAlgorithm.ES256, new Jose.netstandard1_4.EcdsaUsingSha(256) },
             { JwsAlgorithm.ES384, new Jose.netstandard1_4.EcdsaUsingSha(384) },
             { JwsAlgorithm.ES512, new Jose.netstandard1_4.EcdsaUsingSha(521) }
@@ -132,7 +132,7 @@ namespace Jose
 
         private readonly Dictionary<string, JweCompression> compressionAlgorithmsAliases = new Dictionary<string, JweCompression>();
 
-#if NET40 || NET461
+#if NET40 || NET461  || NET472
         private IJsonMapper jsMapper = new JSSerializerMapper();
 #elif NETSTANDARD1_4
         private IJsonMapper jsMapper = new NewtonsoftMapper();

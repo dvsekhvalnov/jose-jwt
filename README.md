@@ -1,7 +1,7 @@
-# Ultimate Javascript Object Signing and Encryption (JOSE), JSON Web Token (JWT) and JSON Web Encryption (JWE) Implementation for .NET and .NET Core
+# Ultimate Javascript Object Signing and Encryption (JOSE), JSON Web Token (JWT), JSON Web Encryption (JWE) and JSON Web Keys (JWK) Implementation for .NET and .NET Core
 
 Minimallistic zero-dependency library for generating, decoding and encryption [JSON Web Tokens](http://tools.ietf.org/html/draft-jones-json-web-token-10). Supports full suite
-of [JSON Web Algorithms](https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-31) as of July 4, 2014 version. JSON parsing agnostic, can plug any desired JSON processing library.
+of [JSON Web Algorithms](https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-31) and [Json Web Keys](https://datatracker.ietf.org/doc/html/rfc7517). JSON parsing agnostic, can plug any desired JSON processing library.
 Extensively tested for compatibility with [jose.4.j](https://bitbucket.org/b_c/jose4j/wiki/Home), [Nimbus-JOSE-JWT](https://bitbucket.org/nimbusds/nimbus-jose-jwt/wiki/Home) and [json-jwt](https://github.com/nov/json-jwt) libraries.
 JWE JSON Serialization cross-tested with [JWCrypto](https://github.com/latchset/jwcrypto/).
 
@@ -9,12 +9,13 @@ JWE JSON Serialization cross-tested with [JWCrypto](https://github.com/latchset/
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
+- v4.0 introduced Json Web Key (JWK), [RFC 7517](https://datatracker.ietf.org/doc/html/rfc7517) support. Latest stable. All new features will most likely appear based on given version.
+
 - v3.2 dropped `Newtonsoft.Json` support in favor of `System.Text.Json` on `netstandard2.1`
 
 - v3.1 introduced JWE JSON Serialization defined in [RFC 7516](https://tools.ietf.org/html/rfc7516)
 
 - v3.0 and above additionally targets `netstandard2.1` to leverage better .net crypto support on *\*nix* systems and enable more supported algorithms.
-All new features will most likely appear based on given version.
 
 - v2.1 and above added extra features support for .NET461+ and coming with 3 version of binaries (`NET4`, `NET461` and `netstandard1.4`).
 
@@ -92,6 +93,13 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 
 - DEFLATE compression
 
+## Json Web Key (JWK)
+
+- RSA, EC, Oct keys
+- X509 Chains, SHA1 & SHA2 thumbprints
+
+
+
 ##### Notes:
 * Types returned by crytographic methods MAY be different on Windows and Linux. e.g. GetRSAPrivateKey() on X509Certificate2 on Windows returns RsaCng and OpenSslRsa on *nix.
 * It appears that Microsoft CNG implementation of BCryptSecretAgreement/NCryptSecretAgreement contains a bug for calculating Elliptic Curve Diffie-Hellman secret agreement
@@ -126,9 +134,9 @@ string token = Jose.JWT.Encode(payload, null, JwsAlgorithm.none);
 
 ### Creating signed Tokens
 #### HS-\* family
-HS256, HS384, HS512 signatures require `byte[]` array key of corresponding length
+HS256, HS384, HS512 signatures require `byte[]` array key or `Jwk` key of type `oct` of corresponding length
 
-```C#
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -139,13 +147,26 @@ var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,
 
 string token=Jose.JWT.Encode(payload, secretKey, JwsAlgorithm.HS256);
 ```
+
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
+
+Jwk key = new Jwk(new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234});
+
+string token=Jose.JWT.Encode(payload, key, JwsAlgorithm.HS256);
+```
+
 #### RS-\* and PS-\* family
 **NET40-NET45**:
 
 RS256, RS384, RS512 and PS256, PS384, PS512 signatures require `RSACryptoServiceProvider` (usually private) key of corresponding length. CSP need to be forced to use Microsoft Enhanced RSA and AES Cryptographic Provider.
 Which usually can be done be re-importing RSAParameters. See http://clrsecurity.codeplex.com/discussions/243156 for details.
 
-```C#
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -158,9 +179,9 @@ string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.RS256);
 ```
 
 **NETCORE**:
-RS256, RS384, RS512 and PS256, PS384, PS512 signatures require `RSA` (usually private) key of corresponding length.
+RS256, RS384, RS512 and PS256, PS384, PS512 signatures require `RSA` (usually private) or `Jwk` key of type `RSA` of corresponding length.
 
-```C#
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -171,8 +192,30 @@ var privateKey=new X509Certificate2("my-key.p12", "password").GetRSAPrivateKey()
 
 string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.RS256);
 ```
-**NET461**:
-Accepts `RSACryptoServiceProvider`, `RSA` or `CngKey` types of keys.
+
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
+
+Jwk privateKey = new Jwk(
+    e: "AQAB",
+    n: "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q",
+    p: "0qaOkT174vRG3E_67gU3lgOgoT6L3pVHuu7wfrIEoxycPa5_mZVG54SgvQUofGUYEGjR0lavUAjClw9tOzcODHX8RAxkuDntAFntBxgRM-IzAy8QzeRl_cbhgVjBTAhBcxg-3VySv5GdxFyrQaIo8Oy_PPI1L4EFKZHmicBd3ts",
+    q: "zJPqCDKqaJH9TAGfzt6b4aNt9fpirEcdpAF1bCedFfQmUZM0LG3rMtOAIhjEXgADt5GB8ZNK3BQl8BJyMmKs57oKmbVcODERCtPqjECXXsxH-az9nzxatPvcb7imFW8OlWslwr4IIRKdEjzEYs4syQJz7k2ktqOpYI5_UfYnw1s",
+    d: "lJhwb0pKlB2ivyDFO6thajotClrMA3nxIiSkIUbvVr-TToFtha36gyF6w6e6YNXQXs4HhMRy1_b-nRQDk8G4_f5urd_q-pOn5u4KfmqN3Xw-lYD3ddi9qF0NLeTVUNVFASeP0FFqbPYfdNwD-LyvwjhtT_ggMOAw3mYvU5cBfz6-3uPdhl3CwQFCTgwOud_BA9p2MPMUHG82wMK_sNO1I0TYpjm7TnwNBwiKbMf-i5CKnuohgoYrEDYLeMg3f32eBljlCFNYaoCtT-mr1Ze0OTJND04vbfLotV-BBKulIpbOOSeVpKG7gJxZHmv7in7PE5_WzaxKFVoHW3wR6v_GzQ",
+    dp: "KTWmTGmf092AA1euOmRQ5IsfIIxQ5qGDn-FgsRh4acSOGE8L7WrTrTU4EOJyciuA0qz-50xIDbs4_j5pWx1BJVTrnhBin9vNLrVo9mtR6jmFS0ko226kOUpwEVLgtdQjobWLjtiuaMW-_Iw4gKWNptxZ6T1lBD8UWHaPiEFW2-M",
+    dq: "Jn0lqMkvemENEMG1eUw0c601wPOMoPD4SKTlnKWPTlQS6YISbNF5UKSuFLwoJa9HA8BifDrD-Mfpo1M1HPmnoilEWUrfwMqqdCkOlbiJQhKY8AZ16QGH50kDXhmVVa8BRWdVQWBTUzWXS5kXMaeskVzextTgymPcOAhXN-ph7MU",
+    qi: "sRAPigJpl8S_vsf1zhJTrHM97xRwuB26R6Tm-J8sKRPb7p5xxNlmOBBFvWmWxdto8dBElNlydSZan373yBLxzW-bZgVp-B2RKT1B3WhTYW_Vo5DLhWi84XMncJxH7avtxtF9yksaeKe0e2n3J6TTan53mDg4KF8U0OEO2ciqO9g"
+);
+
+string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.RS256);
+
+```
+**NET461 and above**:
+Accepts `RSACryptoServiceProvider`, `RSA` or `Jwk` types of keys (see above).
 
 
 #### ES-\*  family
@@ -180,7 +223,7 @@ Accepts `RSACryptoServiceProvider`, `RSA` or `CngKey` types of keys.
 ES256, ES384, ES512 ECDSA signatures requires `CngKey` (usually private) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
 But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,d)`.
 
-```C#
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -197,9 +240,9 @@ string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
 ```
 
 **NETCORE**:
-ES256, ES384, ES512 ECDSA signatures can accept either `CngKey`(see above) or `ECDsa` (usually private) elliptic curve key of corresponding length.
+ES256, ES384, ES512 ECDSA signatures can accept either `CngKey`(see above), `ECDsa` (usually private)  or `Jwk` of type `EC` elliptic curve key of corresponding length.
 
-```C#
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -210,8 +253,26 @@ var privateKey=new X509Certificate2("ecc-key.p12", "password").GetECDsaPrivateKe
 
 string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
 ```
-**NET461**:
-Accepts `CngKey` and `ECDsa` types of keys.
+
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
+
+var privateKey = new Jwk(
+    crv: "P-256",
+    x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
+    y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
+    d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
+);
+
+string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
+```
+
+**NET461 and above**:
+Accepts `CngKey`, `ECDsa` and `Jwk` types of keys (see above).
 
 
 ### Creating encrypted Tokens
@@ -234,9 +295,9 @@ string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEnc
 ```
 
 **NETCORE:**
-RSA-OAEP-256, RSA-OAEP and RSA1_5 key management requires `RSA` (usually public) key of corresponding length.
+RSA-OAEP-256, RSA-OAEP and RSA1_5 key management requires `RSA` (usually public) or `Jwk` key of type `RSA` of corresponding length.
 
-```C#
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -248,14 +309,37 @@ var publicKey=new X509Certificate2("my-key.p12", "password").GetRSAPublicKey();
 string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM);
 ```
 
-**NET461**:
-Accepts `RSACryptoServiceProvider`, `RSA` or `CngKey` types of keys.
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
 
+Jwk publicKey = new Jwk("AQAB", "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q");
+
+string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM);
+```
+
+**NET461**:
+Accepts `RSACryptoServiceProvider`, `RSA`, `Jwk` (see above) and `CngKey` types of keys.
+
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
+
+CngKey publicKey = CngKey.Open("connectionKeyId", CngProvider.MicrosoftSoftwareKeyStorageProvider, CngKeyOpenOptions.MachineKey));
+
+string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM);
+```
 
 #### DIR direct pre-shared symmetric key family of algorithms
-Direct key management with pre-shared symmetric keys requires `byte[]` array key of corresponding length
+Direct key management with pre-shared symmetric keys requires `byte[]` array or `Jwk` of type `oct` key of corresponding length
 
-```C#
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -267,10 +351,22 @@ var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,
 string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.DIR, JweEncryption.A128CBC_HS256);
 ```
 
-#### AES Key Wrap key management family of algorithms
-AES128KW, AES192KW and AES256KW key management requires `byte[]` array key of corresponding length
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
 
-```C#
+var secretKey = new Jwk(new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234});
+
+string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.DIR, JweEncryption.A128CBC_HS256);
+```
+
+#### AES Key Wrap key management family of algorithms
+AES128KW, AES192KW and AES256KW key management requires `byte[]` array or `Jwk` of type `oct` key of corresponding length
+
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -282,10 +378,22 @@ var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,
 string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
 ```
 
-#### AES GCM Key Wrap key management family of algorithms
-AES128GCMKW, AES192GCMKW and AES256GCMKW key management requires `byte[]` array key of corresponding length
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
 
-```C#
+var secretKey = new Jwk(new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234});
+
+string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
+```
+
+#### AES GCM Key Wrap key management family of algorithms
+AES128GCMKW, AES192GCMKW and AES256GCMKW key management requires `byte[]` array or `Jwk` of type `oct` key of corresponding length
+
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -297,11 +405,25 @@ var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,
 string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.A256GCMKW, JweEncryption.A256CBC_HS512);
 ```
 
-#### ECDH-ES and ECDH-ES with AES Key Wrap key management family of algorithms
-ECDH-ES and ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW key management requires `CngKey` (usually public) elliptic curve key of corresponding length. Normally existing `CngKey` loaded via `CngKey.Open(..)` method from Key Storage Provider.
-But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,usage:CngKeyUsages.KeyAgreement)`.
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
 
-```C#
+var secretKey = new Jwk(new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234});
+
+string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.A256GCMKW, JweEncryption.A256CBC_HS512);
+```
+
+#### ECDH-ES and ECDH-ES with AES Key Wrap key management family of algorithms
+ECDH-ES and ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW key management requires `CngKey` (usually public) or `Jwk` of type `EC` elliptic curve key of corresponding length.
+
+Normally existing `CngKey` can be loaded via `CngKey.Open(..)` method from Key Storage Provider.
+But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,usage:CngKeyUsages.KeyAgreement)` or use `Jwk` instead.
+
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -316,10 +438,26 @@ var publicKey=EccKey.New(x, y, usage:CngKeyUsages.KeyAgreement);
 string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.ECDH_ES, JweEncryption.A256GCM);
 ```
 
-#### PBES2 using HMAC SHA with AES Key Wrap key management family of algorithms
-PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW key management requires `string` passphrase from which key will be derived
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
 
-```C#
+var publicKey = new Jwk(
+    crv: "P-256",
+    x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
+    y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"
+);
+
+string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.ECDH_ES, JweEncryption.A256GCM);
+```
+
+#### PBES2 using HMAC SHA with AES Key Wrap key management family of algorithms
+PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW key management requires `string` passphrase to derive key from
+
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -339,7 +477,7 @@ var headers = new Dictionary<string, object>
 string token = Jose.JWT.Encode(payload, "top secret", JweAlgorithm.PBES2_HS256_A128KW, JweEncryption.A256CBC_HS512, extraHeaders: headers);
 ```
 
-Please see https://github.com/dvsekhvalnov/jose-jwt#adding-extra-headers for additional details.
+Please see [Adding extra headers](#adding-extra-headers) for additional details.
 
 
 #### Optional compressing payload before encrypting
@@ -360,12 +498,20 @@ string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA1_5, JweEncry
 ### Verifying and Decoding Tokens
 Decoding json web tokens is fully symmetric to creating signed or encrypted tokens:
 
-**HS256, HS384, HS512** signatures, **A128KW, A192KW, A256KW**, **A128GCMKW, A192GCMKW, A256GCMKW** and **DIR** key management algorithms expects `byte[]` array key
+**HS256, HS384, HS512** signatures, **A128KW, A192KW, A256KW**, **A128GCMKW, A192GCMKW, A256GCMKW** and **DIR** key management algorithms expects `byte[]` array or `Jwk` of type `oct` key
 
-```C#
+``` cs
 string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..Fmz3PLVfv-ySl4IJ.LMZpXMDoBIll5yuEs81Bws2-iUUaBSpucJPL-GtDKXkPhFpJmES2T136Vd8xzvp-3JW-fvpRZtlhluqGHjywPctol71Zuz9uFQjuejIU4axA_XiAy-BadbRUm1-25FRT30WtrrxKltSkulmIS5N-Nsi_zmCz5xicB1ZnzneRXGaXY4B444_IHxGBIS_wdurPAN0OEGw4xIi2DAD1Ikc99a90L7rUZfbHNg_iTBr-OshZqDbR6C5KhmMgk5KqDJEN8Ik-Yw.Jbk8ZmO901fqECYVPKOAzg";
 
 byte[] secretKey=new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
+
+string json = Jose.JWT.Decode(token, secretKey);
+```
+
+``` cs
+string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..Fmz3PLVfv-ySl4IJ.LMZpXMDoBIll5yuEs81Bws2-iUUaBSpucJPL-GtDKXkPhFpJmES2T136Vd8xzvp-3JW-fvpRZtlhluqGHjywPctol71Zuz9uFQjuejIU4axA_XiAy-BadbRUm1-25FRT30WtrrxKltSkulmIS5N-Nsi_zmCz5xicB1ZnzneRXGaXY4B444_IHxGBIS_wdurPAN0OEGw4xIi2DAD1Ikc99a90L7rUZfbHNg_iTBr-OshZqDbR6C5KhmMgk5KqDJEN8Ik-Yw.Jbk8ZmO901fqECYVPKOAzg";
+
+byte[] secretKey=new Jwk(new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234});
 
 string json = Jose.JWT.Decode(token, secretKey);
 ```
@@ -374,7 +520,7 @@ string json = Jose.JWT.Decode(token, secretKey);
 
 **NET40-NET45**: `RSACryptoServiceProvider` as a key, public/private is asymmetric to encoding:
 
-```C#
+``` cs
 string token = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bx_4TL7gh14IeM3EClP3iVfY9pbT81pflXd1lEZOVPJR6PaewRFXWmiJcaqH9fcU9IjGGQ19BS-UPtpErenL5kw7KORFgIBm4hObCYxLoAadMy8A-qQeOWyjnxbE0mbQIdoFI4nGK5qWTEQUWZCMwosvyeHLqEZDzr9CNLAAFTujvsZJJ7NLTkA0cTUzz64b57uSvMTaOK6j7Ap9ZaAgF2uaqBdZ1NzqofLeU4XYCG8pWc5Qd-Ri_1KsksjaDHk12ZU4vKIJWJ-puEnpXBLoHuko92BnN8_LXx4sfDdK7wRiXk0LU_iwoT5zb1ro7KaM0hcfidWoz95vfhPhACIsXQ.YcVAPLJ061gvPpVB-zMm4A.PveUBLejLzMjA4tViHTRXbYnxMHFu8W2ECwj9b6sF2u2azi0TbxxMhs65j-t3qm-8EKBJM7LKIlkAtQ1XBeZl4zuTeMFxsQ0VShQfwlN2r8dPFgUzb4f_MzBuFFYfP5hBs-jugm89l2ZTj8oAOOSpAlC7uTmwha3dNaDOzlJniqAl_729q5EvSjaYXMtaET9wSTNSDfMUVFcMERbB50VOhc134JDUVPTuriD0rd4tQm8Do8obFKtFeZ5l3jT73-f1tPZwZ6CmFVxUMh6gSdY5A.tR8bNx9WErquthpWZBeMaw";
 
 var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet).PrivateKey as RSACryptoServiceProvider;
@@ -382,24 +528,48 @@ var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlag
 string json = Jose.JWT.Decode(token,privateKey);
 ```
 
-**NETCORE**: `RSA` as a key, public/private is asymmetric to encoding:
-```C#
+**NETCORE**: `RSA` or `Jwk` of type `RSA` as a key, public/private is asymmetric to encoding:
+``` cs
 string token = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bx_4TL7gh14IeM3EClP3iVfY9pbT81pflXd1lEZOVPJR6PaewRFXWmiJcaqH9fcU9IjGGQ19BS-UPtpErenL5kw7KORFgIBm4hObCYxLoAadMy8A-qQeOWyjnxbE0mbQIdoFI4nGK5qWTEQUWZCMwosvyeHLqEZDzr9CNLAAFTujvsZJJ7NLTkA0cTUzz64b57uSvMTaOK6j7Ap9ZaAgF2uaqBdZ1NzqofLeU4XYCG8pWc5Qd-Ri_1KsksjaDHk12ZU4vKIJWJ-puEnpXBLoHuko92BnN8_LXx4sfDdK7wRiXk0LU_iwoT5zb1ro7KaM0hcfidWoz95vfhPhACIsXQ.YcVAPLJ061gvPpVB-zMm4A.PveUBLejLzMjA4tViHTRXbYnxMHFu8W2ECwj9b6sF2u2azi0TbxxMhs65j-t3qm-8EKBJM7LKIlkAtQ1XBeZl4zuTeMFxsQ0VShQfwlN2r8dPFgUzb4f_MzBuFFYfP5hBs-jugm89l2ZTj8oAOOSpAlC7uTmwha3dNaDOzlJniqAl_729q5EvSjaYXMtaET9wSTNSDfMUVFcMERbB50VOhc134JDUVPTuriD0rd4tQm8Do8obFKtFeZ5l3jT73-f1tPZwZ6CmFVxUMh6gSdY5A.tR8bNx9WErquthpWZBeMaw";
 
 var privateKey=new X509Certificate2("my-key.p12", "password").GetRSAPrivateKey();
 
 string json = Jose.JWT.Decode(token,privateKey);
 ```
-**NET461**: `RSACryptoServiceProvider`, `RSA` or `CngKey` types of keys, public/private is asymmetric to encoding.
 
+``` cs
+string token = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bx_4TL7gh14IeM3EClP3iVfY9pbT81pflXd1lEZOVPJR6PaewRFXWmiJcaqH9fcU9IjGGQ19BS-UPtpErenL5kw7KORFgIBm4hObCYxLoAadMy8A-qQeOWyjnxbE0mbQIdoFI4nGK5qWTEQUWZCMwosvyeHLqEZDzr9CNLAAFTujvsZJJ7NLTkA0cTUzz64b57uSvMTaOK6j7Ap9ZaAgF2uaqBdZ1NzqofLeU4XYCG8pWc5Qd-Ri_1KsksjaDHk12ZU4vKIJWJ-puEnpXBLoHuko92BnN8_LXx4sfDdK7wRiXk0LU_iwoT5zb1ro7KaM0hcfidWoz95vfhPhACIsXQ.YcVAPLJ061gvPpVB-zMm4A.PveUBLejLzMjA4tViHTRXbYnxMHFu8W2ECwj9b6sF2u2azi0TbxxMhs65j-t3qm-8EKBJM7LKIlkAtQ1XBeZl4zuTeMFxsQ0VShQfwlN2r8dPFgUzb4f_MzBuFFYfP5hBs-jugm89l2ZTj8oAOOSpAlC7uTmwha3dNaDOzlJniqAl_729q5EvSjaYXMtaET9wSTNSDfMUVFcMERbB50VOhc134JDUVPTuriD0rd4tQm8Do8obFKtFeZ5l3jT73-f1tPZwZ6CmFVxUMh6gSdY5A.tR8bNx9WErquthpWZBeMaw";
 
+Jwk privateKey = new Jwk(
+    e: "AQAB",
+    n: "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q",
+    p: "0qaOkT174vRG3E_67gU3lgOgoT6L3pVHuu7wfrIEoxycPa5_mZVG54SgvQUofGUYEGjR0lavUAjClw9tOzcODHX8RAxkuDntAFntBxgRM-IzAy8QzeRl_cbhgVjBTAhBcxg-3VySv5GdxFyrQaIo8Oy_PPI1L4EFKZHmicBd3ts",
+    q: "zJPqCDKqaJH9TAGfzt6b4aNt9fpirEcdpAF1bCedFfQmUZM0LG3rMtOAIhjEXgADt5GB8ZNK3BQl8BJyMmKs57oKmbVcODERCtPqjECXXsxH-az9nzxatPvcb7imFW8OlWslwr4IIRKdEjzEYs4syQJz7k2ktqOpYI5_UfYnw1s",
+    d: "lJhwb0pKlB2ivyDFO6thajotClrMA3nxIiSkIUbvVr-TToFtha36gyF6w6e6YNXQXs4HhMRy1_b-nRQDk8G4_f5urd_q-pOn5u4KfmqN3Xw-lYD3ddi9qF0NLeTVUNVFASeP0FFqbPYfdNwD-LyvwjhtT_ggMOAw3mYvU5cBfz6-3uPdhl3CwQFCTgwOud_BA9p2MPMUHG82wMK_sNO1I0TYpjm7TnwNBwiKbMf-i5CKnuohgoYrEDYLeMg3f32eBljlCFNYaoCtT-mr1Ze0OTJND04vbfLotV-BBKulIpbOOSeVpKG7gJxZHmv7in7PE5_WzaxKFVoHW3wR6v_GzQ",
+    dp: "KTWmTGmf092AA1euOmRQ5IsfIIxQ5qGDn-FgsRh4acSOGE8L7WrTrTU4EOJyciuA0qz-50xIDbs4_j5pWx1BJVTrnhBin9vNLrVo9mtR6jmFS0ko226kOUpwEVLgtdQjobWLjtiuaMW-_Iw4gKWNptxZ6T1lBD8UWHaPiEFW2-M",
+    dq: "Jn0lqMkvemENEMG1eUw0c601wPOMoPD4SKTlnKWPTlQS6YISbNF5UKSuFLwoJa9HA8BifDrD-Mfpo1M1HPmnoilEWUrfwMqqdCkOlbiJQhKY8AZ16QGH50kDXhmVVa8BRWdVQWBTUzWXS5kXMaeskVzextTgymPcOAhXN-ph7MU",
+    qi: "sRAPigJpl8S_vsf1zhJTrHM97xRwuB26R6Tm-J8sKRPb7p5xxNlmOBBFvWmWxdto8dBElNlydSZan373yBLxzW-bZgVp-B2RKT1B3WhTYW_Vo5DLhWi84XMncJxH7avtxtF9yksaeKe0e2n3J6TTan53mDg4KF8U0OEO2ciqO9g"
+);
+
+string json = Jose.JWT.Decode(token,privateKey);
+```
+
+**NET461**: `RSACryptoServiceProvider`, `RSA`, `Jwk` of type `RSA` (see above) or `CngKey` types of keys, public/private is asymmetric to encoding.
+
+``` cs
+string token = "eyJhbGciOiJSU0ExXzUiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bx_4TL7gh14IeM3EClP3iVfY9pbT81pflXd1lEZOVPJR6PaewRFXWmiJcaqH9fcU9IjGGQ19BS-UPtpErenL5kw7KORFgIBm4hObCYxLoAadMy8A-qQeOWyjnxbE0mbQIdoFI4nGK5qWTEQUWZCMwosvyeHLqEZDzr9CNLAAFTujvsZJJ7NLTkA0cTUzz64b57uSvMTaOK6j7Ap9ZaAgF2uaqBdZ1NzqofLeU4XYCG8pWc5Qd-Ri_1KsksjaDHk12ZU4vKIJWJ-puEnpXBLoHuko92BnN8_LXx4sfDdK7wRiXk0LU_iwoT5zb1ro7KaM0hcfidWoz95vfhPhACIsXQ.YcVAPLJ061gvPpVB-zMm4A.PveUBLejLzMjA4tViHTRXbYnxMHFu8W2ECwj9b6sF2u2azi0TbxxMhs65j-t3qm-8EKBJM7LKIlkAtQ1XBeZl4zuTeMFxsQ0VShQfwlN2r8dPFgUzb4f_MzBuFFYfP5hBs-jugm89l2ZTj8oAOOSpAlC7uTmwha3dNaDOzlJniqAl_729q5EvSjaYXMtaET9wSTNSDfMUVFcMERbB50VOhc134JDUVPTuriD0rd4tQm8Do8obFKtFeZ5l3jT73-f1tPZwZ6CmFVxUMh6gSdY5A.tR8bNx9WErquthpWZBeMaw";
+
+CngKey privateKey = CngKey.Open("decryptionKeyId", CngProvider.MicrosoftSoftwareKeyStorageProvider, CngKeyOpenOptions.MachineKey));
+
+string json = Jose.JWT.Decode(token,privateKey);
+```
 
 **ES256, ES284, ES512** signatures expects
 
 **NET40-NET45**: `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
 sure correct `usage:` value is set. Should be `CngKeyUsages.Signing` for ES-* signatures (default value, can be ommited).
 
-```C#
+``` cs
 string token = "eyJhbGciOiJFUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.EVnmDMlz-oi05AQzts-R3aqWvaBlwVZddWkmaaHyMx5Phb2NSLgyI0kccpgjjAyo1S5KCB3LIMPfmxCX_obMKA";
 
 byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
@@ -407,12 +577,12 @@ byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159
 
 var publicKey=EccKey.New(x, y);
 
-string json = Jose.JWT.Decode(token,publicKey);
+string json = Jose.JWT.Decode(token, publicKey);
 ```
 
-**NETCORE**: can accept either `CngKey` (see above) or `ECDsa` as a key, public/private is asymmetric to encoding.
+**NETCORE**: can accept either `CngKey` (see above), `ECDsa` or `Jwk` of type `EC` as a key, public/private is asymmetric to encoding.
 
-```C#
+``` cs
 var payload = new Dictionary<string, object>()
 {
     { "sub", "mr.x@contoso.com" },
@@ -421,16 +591,32 @@ var payload = new Dictionary<string, object>()
 
 var publicKey=new X509Certificate2("ecc-key.p12", "password").GetECDsaPublicKey();
 
-string token=Jose.JWT.Encode(payload, publicKey, JwsAlgorithm.ES256);
+string token=Jose.JWT.Decode(payload, publicKey, JwsAlgorithm.ES256);
 ```
 
-**NET461**: accepts `CngKey` and `ECDsa` types of keys, public/private is asymmetric to encoding.
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
+
+var publicKey = new Jwk(
+    crv: "P-256",
+    x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
+    y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"
+);
+
+string token=Jose.JWT.Decode(payload, publicKey, JwsAlgorithm.ES256);
+```
+
+**NET461**: accepts `CngKey`, `ECDsa` or `Jwk` of type `EC` types of keys (see examples above), public/private is asymmetric to encoding.
 
 
-**ECDH-ES** and **ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW** key management algorithms expects `CngKey` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
+**ECDH-ES** and **ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW** key management algorithms expects `CngKey` or `Jwk` of type `EC` as a key, public/private is asymmetric to encoding. If `EccKey.New(...)` wrapper is used, make
 sure correct `usage:` value is set. Should be `CngKeyUsages.KeyAgreement` for ECDH-ES.
 
-```C#
+``` cs
 string token = "eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOEdDTSIsImVwayI6eyJrdHkiOiJFQyIsIngiOiJPbDdqSWk4SDFpRTFrcnZRTmFQeGp5LXEtY3pQME40RVdPM1I3NTg0aEdVIiwieSI6Ik1kU2V1OVNudWtwOWxLZGU5clVuYmp4a3ozbV9kTWpqQXc5NFd3Q0xaa3MiLCJjcnYiOiJQLTI1NiJ9fQ..E4XwpWZ2kO-Vg0xb.lP5LWPlabtmzS-m2EPGhlPGgllLNhI5OF2nAbbV9tVvtCckKpt358IQNRk-W8-JNL9SsLdWmVUMplrw-GO-KA2qwxEeh_8-muYCw3qfdhVVhLnOF-kL4mW9a00Xls_6nIZponGrqpHCwRQM5aSr365kqTNpfOnXgJTKG2459nqv8n4oSfmwV2iRUBlXEgTO-1Tvrq9doDwZCCHj__JKvbuPfyRBp5T7d-QJio0XRF1TO4QY36GtKMXWR264lS7g-T1xxtA.vFevA9zsyOnNA5RZanKqHA";
 
 byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
@@ -440,9 +626,20 @@ byte[] d = { 42, 148, 231, 48, 225, 196, 166, 201, 23, 190, 229, 199, 20, 39, 22
 var privateKey=EccKey.New(x, y, d, CngKeyUsages.KeyAgreement);
 
 string json = Jose.JWT.Decode(token, privateKey);
-
 ```
 
+``` cs
+string token = "eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOEdDTSIsImVwayI6eyJrdHkiOiJFQyIsIngiOiJPbDdqSWk4SDFpRTFrcnZRTmFQeGp5LXEtY3pQME40RVdPM1I3NTg0aEdVIiwieSI6Ik1kU2V1OVNudWtwOWxLZGU5clVuYmp4a3ozbV9kTWpqQXc5NFd3Q0xaa3MiLCJjcnYiOiJQLTI1NiJ9fQ..E4XwpWZ2kO-Vg0xb.lP5LWPlabtmzS-m2EPGhlPGgllLNhI5OF2nAbbV9tVvtCckKpt358IQNRk-W8-JNL9SsLdWmVUMplrw-GO-KA2qwxEeh_8-muYCw3qfdhVVhLnOF-kL4mW9a00Xls_6nIZponGrqpHCwRQM5aSr365kqTNpfOnXgJTKG2459nqv8n4oSfmwV2iRUBlXEgTO-1Tvrq9doDwZCCHj__JKvbuPfyRBp5T7d-QJio0XRF1TO4QY36GtKMXWR264lS7g-T1xxtA.vFevA9zsyOnNA5RZanKqHA";
+
+var privateKey = new Jwk(
+        crv: "P-256",
+        x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
+        y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
+        d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
+);
+
+string json = Jose.JWT.Decode(token, privateKey);
+```
 
 **PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW** key management algorithms expects `string` passpharase as a key
 
@@ -574,6 +771,210 @@ var preSharedKey = LoadKey();
 string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM, aad, unprotectedHeaders: unprotected);
 
 ```
+
+### Working with Json Web Keys (JWKs)
+As of v4.0.0 library provides full-blown support for Json Web Keys (aka [RFC 7517](https://datatracker.ietf.org/doc/html/rfc7517)), including parsing, contructing and bridging the gap with different .NET key types to be used in all signing and encryption algorithms.
+
+See [Creating encrypted Tokens](#creating-encrypted-tokens), [Creating signed Tokens](#creating-signed-tokens) and [Verifying and Decoding Tokens](#verifying-and-decoding-tokens) for details on using JWK with different Json Web Tokens algorithms.
+
+Most of JWK support will work on `.NET 4.6.1` and `.NET Core 2.0`. But some key bridging requires `.NET 4.7.2` or `NETSTANDARD 2.1` and above.
+
+The two core classes are:
+
+* `Jwk` - object model for Json Web Key
+* `JwkSet` - object model Json Web Key Set
+
+### Reading JWK
+Both classes offers set of static methods to read or write model from JSON string or dictionary object respectively.
+* `Jwk.FromJson(string, IJsonMapper), JwkSet.FromJson(string, IJsonMapper)` - parses json and constructs object model from it
+* `Jwk.FromDictionary(IDictionary<string, object>), JwkSet.FromDictionary(IDictionary<string, object>)` - constructs object model from dictionary
+* `Jwk.ToJson(IJsonMapper), JwkSet.ToJson(IJsonMapper)` - searializes model to json
+* `Jwk.ToDictionary(), JwkSet.ToDictionary()` - writes model as dictionary
+
+See [Examples](#examples) for usage details.
+
+### Constructing JWK
+Model object can be constructed normal way via setting approporiate properties or calling collection methods, there are also set of convinient constructors:
+
+``` cs
+// Oct key
+Jwk octKey = new Jwk(new byte[] { 25, 172, 32, 130, 225, 114, 26, 181, 138, 106, 254, 192, 95, 133, 74, 82 });
+
+// RSA key
+Jwk rsaKey = new Jwk(
+    e: "AQAB",
+    n: "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q",
+    p: "0qaOkT174vRG3E_67gU3lgOgoT6L3pVHuu7wfrIEoxycPa5_mZVG54SgvQUofGUYEGjR0lavUAjClw9tOzcODHX8RAxkuDntAFntBxgRM-IzAy8QzeRl_cbhgVjBTAhBcxg-3VySv5GdxFyrQaIo8Oy_PPI1L4EFKZHmicBd3ts",
+    q: "zJPqCDKqaJH9TAGfzt6b4aNt9fpirEcdpAF1bCedFfQmUZM0LG3rMtOAIhjEXgADt5GB8ZNK3BQl8BJyMmKs57oKmbVcODERCtPqjECXXsxH-az9nzxatPvcb7imFW8OlWslwr4IIRKdEjzEYs4syQJz7k2ktqOpYI5_UfYnw1s",
+    d: "lJhwb0pKlB2ivyDFO6thajotClrMA3nxIiSkIUbvVr-TToFtha36gyF6w6e6YNXQXs4HhMRy1_b-nRQDk8G4_f5urd_q-pOn5u4KfmqN3Xw-lYD3ddi9qF0NLeTVUNVFASeP0FFqbPYfdNwD-LyvwjhtT_ggMOAw3mYvU5cBfz6-3uPdhl3CwQFCTgwOud_BA9p2MPMUHG82wMK_sNO1I0TYpjm7TnwNBwiKbMf-i5CKnuohgoYrEDYLeMg3f32eBljlCFNYaoCtT-mr1Ze0OTJND04vbfLotV-BBKulIpbOOSeVpKG7gJxZHmv7in7PE5_WzaxKFVoHW3wR6v_GzQ",
+    dp: "KTWmTGmf092AA1euOmRQ5IsfIIxQ5qGDn-FgsRh4acSOGE8L7WrTrTU4EOJyciuA0qz-50xIDbs4_j5pWx1BJVTrnhBin9vNLrVo9mtR6jmFS0ko226kOUpwEVLgtdQjobWLjtiuaMW-_Iw4gKWNptxZ6T1lBD8UWHaPiEFW2-M",
+    dq: "Jn0lqMkvemENEMG1eUw0c601wPOMoPD4SKTlnKWPTlQS6YISbNF5UKSuFLwoJa9HA8BifDrD-Mfpo1M1HPmnoilEWUrfwMqqdCkOlbiJQhKY8AZ16QGH50kDXhmVVa8BRWdVQWBTUzWXS5kXMaeskVzextTgymPcOAhXN-ph7MU",
+    qi: "sRAPigJpl8S_vsf1zhJTrHM97xRwuB26R6Tm-J8sKRPb7p5xxNlmOBBFvWmWxdto8dBElNlydSZan373yBLxzW-bZgVp-B2RKT1B3WhTYW_Vo5DLhWi84XMncJxH7avtxtF9yksaeKe0e2n3J6TTan53mDg4KF8U0OEO2ciqO9g"
+);
+
+// EC key
+Jwk eccKey = new Jwk(
+    crv: "P-256",
+    x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
+    y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
+    d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
+);
+
+// Key sets
+JwkSet keySet = new JwkSet(octKey, rsaKey);
+keySet.Add(eccKey);
+```
+
+### Converting between JWK and .NET key types
+Library provides two way bridging with different .NET key types.
+One can construct `Jwk` from underlying `ECDsa`, `RSA` or `CngKey` (elliptic keys only)
+
+``` cs
+// Cng keys
+CngKey eccCngKey = CngKey.Open(...);
+Jwk jwk = new Jwk(eccCngKey, isPrivate: false); //or 'true' by defaut
+
+// RSA keys
+RSA rsaKey=new X509Certificate2("my-key.p12", "password").GetRSAPublicKey();
+Jwk jwk = new Jwk(rsaKey, isPrivate: false); //or 'true' by defaut
+
+// ECDsa keys
+ECDsa ecdsaKey = new X509Certificate2("ecc521.p12", "password").GetECDsaPublicKey();
+Jwk jwk = new Jwk(ecdsaKey, isPrivate: false); //or 'true' by defaut
+```
+
+or convert `Jwk` key to corresponding `ECDsa`, `RSA` or `CngKey` (elliptic keys only)
+
+``` cs
+// Returns ephemeral exportable CngKey, handle is cached for subsequent calls
+CngKey cngKey = jwk.CngKey(usage: CngKeyUsages.KeyAgreement); // or 'CngKeyUsages.Signing' by default
+
+// Returns backing ECDsa key, constructs new on demand, cached for subsequent calls
+ECDsa ecdaKey = jwk.ECDsaKey();
+
+// Returns backing RSA key, constructs new on demand, cached for subsequent calls
+RSA rsaKey = jwk.RsaKey();
+```
+
+### Working with certificate chains
+Direct interface with `X509Certificate2` class is provided when working with chains in JWK:
+
+``` cs
+X509Certificate2 root = new X509Certificate2("root.p12");
+X509Certificate2 intermidiary = new X509Certificate2("inter.p12");
+X509Certificate2 signing = new X509Certificate2("signing.p12");
+
+Jwk key = new Jwk();
+
+// set chain at once
+key.SetX509Chain(new List<X509Certificate2>{ root, intermidiary });
+
+// or add one by one
+key.Add(signing);
+
+// Read chain from key as list of certificates
+List<X509Certificate2> test = key.GetX509Chain();
+```
+
+Helpers to set SHA-1 and SHA-256 thumbprints:
+``` cs
+X509Certificate2 signing = new X509Certificate2("signing.p12");
+
+Jwk key = new Jwk();
+
+// Calculate and set certificate SHA-1 thumbprint
+key.SetX5T(signing);
+
+// Calculate and set certificate SHA-256 thumbprint
+key.SetX5TSha256(signing);
+```
+
+### Extra params
+In addition to named params from [RFC 7517](https://datatracker.ietf.org/doc/html/rfc7517) library allows to include any custom key value params to the key objects:
+
+``` cs
+Jwk key = new Jwk();
+
+// add custom params
+key.OtherParams = new Dictionary<string, object>();
+key.OtherParams["s"] = "2WCTcJZ1Rvd_CJuJripQ1w";
+key.OtherParams["c"] = 4096;
+
+// or read them from the key same way
+string s = (string)key.OtherParams["s"];
+```
+
+### Searching JwkSet with Linq
+`JwkSet` is Linq compatible and it is preffered way to locate keys of interest within collection:
+
+``` cs
+JwkSet keySet = new JwkSet(....);
+
+IEnumerable<Jwk> rsaKeys =
+    from key in keySet
+    where key.Alg == "enc" && key.Kty == Jwk.KeyTypes.RSA
+    select key;
+```
+
+### Examples
+1. Decrypt symmetric JWK of Oct type from payload and use it for further signing:
+
+``` cs
+    string token = "eyJhbGciOiJQQkVTMi1IUzUxMitBMjU2S1ciLCJwMmMiOjgxOTIsInAycyI6Inp3eUF0TElqTXpQM01pQ0giLCJlbmMiOiJBMjU2R0NNIn0.4geBbNNUErAkSiNmUVL23tnH3Jah0B0QkvhAaEcHeUgxRGKmWvkOjg.CCNy7C1HOH-qq5Lo.Uzi9FZ_b8bHenXF7h-D63gZCASdvLA7WqnKRSXwsr7G94SnB5bHiZrUT.l6D2hJSoFPpnXPXLyOloxg";
+
+    // Decrypt symmetric key in payload with PBES2
+    Jwk key = Jose.JWT.Decode<Jwk>(token, "secret");
+
+    // And use it to sign new messages
+    string signed = JWT.Encode(@"{""hello"": ""world""}", key, JwsAlgorithm.HS512);
+```
+
+2. Use Jwk from token header for verification
+``` cs
+string token = "eyJhbGciOiJSUzI1NiIsImp3ayI6eyJrdHkiOiJSU0EiLCJlIjoiQVFBQiIsIm4iOiJxRlp2MHBlYV9qbjVNbzRxRVVtU3R1aGx1bHNvOG4xaW5YYkVvdGRfelRyUXA5SzBSSzBoZjd0MEs0QmpLVmhhaXFJYW00dFZWUXZrbVllQmVZcjFNbW5PXzBOOTdkTUJ6XzdmbXZ5djBoZ0hhQmRRNW1SNXUzTFRsSG84dGpSRTctR3pabUdzNmpNY3lqN0hiWG9iRFBRSlpwcU55NkpqbGlEVlh4VzhuV0pEZXR4R0JscW1UajFFMWZyMlJDc1pMcmVET1BTREllZEcxdXB6OVJyYVNoc0lEemVlZk9jS2liY0FhS2VlVkkzcmtBVThfbU9hdUxTWHYzN2hsazBoNnNTdEpiM3FaUVh5T1VrVmtqWElraHZOdV92ZTB2N0xpTFQ0R19PeFlHenBPUWNDbmltS2RvanpOUDZHdFZEYU1QaC1Ra1NKRTMyVUNvczlSM3dJMlEifX0.eyJoZWxsbyI6ICJ3b3JsZCJ9.BX7lG2iQvYM7vO_DTsPPWbuTTpBP9dsDmEITd_Ofq9Ds8ucWrDVUjlMHBXUCfgTuoHHfeNtFE7sfuLxd0RseEY2Q4OnoFyJC_Gc63DwhrEvzY09i_sTTskc5rfQK9s32K595WjIceWnJh6s03dVEPmBWl_xwihV56LRzy4m8c15d1ZMlNByjpLibPGSVoJT4ae64Ux25hhbEageO-6gsTaYH9zofP3WGUzGf5PGq6nBtmrlQgyPhTkxzB1DUUBx0cA5IpnzQLwEDljKrgKRGn86TUrQc5dlIIKETZcTCnF2-CXq3oiqF81oEkFxfcW2yX5H0kmZmY_dQkKs1JR65yA";
+
+// Grab 'jwk' header
+var headers = Jose.JWT.Headers(token);
+
+// And turn it into key
+Jwk publicKey = Jwk.FromDictionary(
+    (IDictionary<string, object>)headers["jwk"]
+);
+
+// ATTENTION: always ensure this is the key you know and expect from partner
+// EnsureKnownKey(publicKey);
+
+// Use it to decode payload and verify signature
+string payload = Jose.JWT.Decode(token, publicKey);
+```
+
+3. Fetching key set from jwks endpoint and locating verification one by thumbprint:
+
+``` cs
+HttpClient client = new HttpClient()
+
+// Grab public keys from partner endpoint
+string keys = await client.GetStringAsync("https://acme.com/.well-known/jwks.json");
+
+JwkSet jwks = JwkSet.FromJson(keys, JWT.DefaultSettings.JsonMapper);
+
+// Get hint from token headers
+var headers = Jose.JWT.Headers(token);
+
+// Find matching public key by thumbprint
+Jwk pubKey = (
+    from key in jwks
+    where key.Alg == Jwk.KeyUsage.Signature &&
+            key.KeyOps != null && key.KeyOps.Contains(Jwk.KeyOperations.Verify) &&
+            key.Kty == Jwk.KeyTypes.RSA &&
+            key.X5T == (string)headers["x5t"]
+    select key
+).First();
+
+// Finally verify token
+var payload = Jose.JWT.Decode(token, pubKey);
+```
+
 
 ## Additional utilities
 

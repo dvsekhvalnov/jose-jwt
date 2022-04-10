@@ -26,7 +26,7 @@ namespace Jose
 
         public byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header)
         {
-            var sharedPassphrase = Ensure.Type<string>(key, "Pbse2HmacShaKeyManagementWithAesKeyWrap management algorithm expectes key to be string.");
+            var sharedPassphrase = Ensure.Type<string>(key, "Pbse2HmacShaKeyManagementWithAesKeyWrap management algorithm expects key to be string.");
 
             byte[] sharedKey = Encoding.UTF8.GetBytes(sharedPassphrase);
             byte[] algId = Encoding.UTF8.GetBytes((string)header["alg"]);
@@ -34,7 +34,7 @@ namespace Jose
             int iterationCount = 8192;
             if (header.TryGetValue("p2c", out var iterationCountObj))
             {
-                iterationCount = Ensure.Type<int>(iterationCountObj, "Pbse2HmacShaKeyManagementWithAesKeyWrap management algorithm expectes p2c to be int.");
+                iterationCount = Ensure.Type<int>(iterationCountObj, "Pbse2HmacShaKeyManagementWithAesKeyWrap management algorithm expects p2c to be int.");
             }
 
             byte[] saltInput = Arrays.Random(96); //12 bytes
@@ -56,7 +56,7 @@ namespace Jose
 
         public byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
         {
-            var sharedPassphrase = Ensure.Type<string>(key, "Pbse2HmacShaKeyManagementWithAesKeyWrap management algorithm expectes key to be string.");
+            var sharedPassphrase = Ensure.Type<string>(key, "Pbse2HmacShaKeyManagementWithAesKeyWrap management algorithm expects key to be string.");
 
             byte[] sharedKey = Encoding.UTF8.GetBytes(sharedPassphrase);
 

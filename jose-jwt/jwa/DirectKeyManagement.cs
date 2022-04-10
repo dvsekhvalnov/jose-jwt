@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Jose
@@ -6,7 +7,7 @@ namespace Jose
     {
         public byte[][] WrapNewKey(int cekSizeBits, object key, IDictionary<string, object> header)
         {
-            return new[] { Ensure.Type<byte[]>(key, "DirectKeyManagement alg expectes key to be byte[] array."), Arrays.Empty };
+            return new [] { byteKey(key), Arrays.Empty};
         }
 
         public byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header)
@@ -18,7 +19,24 @@ namespace Jose
         {
             Ensure.IsEmpty(encryptedCek, "DirectKeyManagement expects empty content encryption key.");
 
-            return Ensure.Type<byte[]>(key, "DirectKeyManagement alg expectes key to be byte[] array.");
+            return byteKey(key);
+        }
+
+        private byte[] byteKey(object key)
+        {
+            if (key is byte[] arr)
+            {
+                return arr;
+            }
+            else if (key is Jwk jwk)
+            {
+                if (jwk.Kty == Jwk.KeyTypes.OCT)
+                {
+                    return jwk.OctKey();
+                }
+            }
+
+            throw new ArgumentException("DirectKeyManagement alg expects key to be byte[] array or Jwk with kty='oct'");
         }
     }
 }

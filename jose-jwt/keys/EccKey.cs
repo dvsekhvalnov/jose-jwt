@@ -21,6 +21,7 @@ namespace Jose.keys
         public static readonly byte[] BCRYPT_ECDH_PRIVATE_P521_MAGIC = BitConverter.GetBytes(0x364B4345);
 
         private CngKey key;
+        private bool isPrivate = true;
 
         private byte[] x;
         private byte[] y;
@@ -50,7 +51,7 @@ namespace Jose.keys
         {
             get
             {
-                if (d == null) ExportKey();
+                if (d == null && isPrivate) ExportKey();
 
                 return d;
             }
@@ -125,7 +126,17 @@ namespace Jose.keys
                 blobType = CngKeyBlobFormat.EccPrivateBlob;
             }
 
-            return CngKey.Import(blob, blobType);
+            CngKey key = CngKey.Import(blob, blobType);
+
+            CngProperty exportable = new CngProperty (
+                "Export Policy", 
+                BitConverter.GetBytes((int)(CngExportPolicies.AllowPlaintextExport)),
+                CngPropertyOptions.Persist
+            );
+
+            key.SetProperty(exportable);
+
+            return key;
         }
 
         public static EccKey Generate(CngKey receiverPubKey)
@@ -135,23 +146,50 @@ namespace Jose.keys
             return new EccKey { key = cngKey };
         }
 
-        public static EccKey Export(CngKey _key)
+        public static EccKey Export(CngKey _key, bool isPrivate = true)
         {
-            return new EccKey { key = _key };
+            return new EccKey { key = _key, isPrivate = isPrivate };
+        }
+
+        public string Curve()
+        {
+            if (key.Algorithm == CngAlgorithm.ECDiffieHellmanP256 || key.Algorithm == CngAlgorithm.ECDsaP256)
+            {
+                return "P-256";
+            }
+
+            if (key.Algorithm == CngAlgorithm.ECDiffieHellmanP384 || key.Algorithm == CngAlgorithm.ECDsaP384)
+            {
+                return "P-384";
+            }
+
+            if (key.Algorithm == CngAlgorithm.ECDiffieHellmanP521 || key.Algorithm == CngAlgorithm.ECDsaP521)
+            {
+                return "P-521";
+            }
+
+            throw new ArgumentException("Unknown curve type " + key.Algorithm);
         }
 
         private void ExportKey()
         {
-            byte[] blob = key.Export(CngKeyBlobFormat.EccPrivateBlob);
+            CngKeyBlobFormat format = isPrivate ? CngKeyBlobFormat.EccPrivateBlob : CngKeyBlobFormat.EccPublicBlob;
+
+            byte[] blob = key.Export(format);
             byte[] length = new[] { blob[4], blob[5], blob[6], blob[7] };
 
             int partSize = BitConverter.ToInt32(length, 0);
+            int partCount = isPrivate ? 24 : 16;
 
-            byte[][] keyParts = Arrays.Slice(Arrays.RightmostBits(blob, partSize * 24), partSize);
+            byte[][] keyParts = Arrays.Slice(Arrays.RightmostBits(blob, partSize * partCount), partSize);
 
             x = keyParts[0];
             y = keyParts[1];
-            d = keyParts[2];
+
+            if (isPrivate)
+            {
+                d = keyParts[2];
+            }
         }
     }
 }

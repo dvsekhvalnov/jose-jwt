@@ -14,12 +14,25 @@ namespace Jose
 
         public byte[] Sign(byte[] securedInput, object key)
         {
-            var sharedKey = Ensure.Type<byte[]>(key, "HmacUsingSha alg expectes key to be byte[] array.");
-
-            using (var sha = KeyedHash(sharedKey))
+            if (key is byte[] keyBytes)
             {
-                return sha.ComputeHash(securedInput);
+                using (var sha = KeyedHash(keyBytes))
+                {
+                    return sha.ComputeHash(securedInput);
+                }
             }
+            else if (key is Jwk jwk)
+            {
+                if (jwk.Kty == Jwk.KeyTypes.OCT)
+                {
+                    using (var sha = KeyedHash(jwk.OctKey()))
+                    {
+                        return sha.ComputeHash(securedInput);
+                    }
+                }
+            }
+
+            throw new ArgumentException("HmacUsingSha alg expects key to be byte[] array or Jwk with kty='oct'");
         }
 
         public bool Verify(byte[] signature, byte[] securedInput, object key)
