@@ -8,7 +8,7 @@ namespace UnitTests
 {
     public class JwkSetTest
     {
-        private TestConsole Console;
+        private readonly TestConsole Console;
 
         public JwkSetTest(ITestOutputHelper output)
         {
