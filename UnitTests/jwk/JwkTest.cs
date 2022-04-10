@@ -7,6 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
+using System.Runtime.InteropServices;
 
 namespace UnitTests
 {
@@ -595,9 +596,11 @@ namespace UnitTests
             Assert.Equal(p.DQ, new byte[] { 38, 125, 37, 168, 201, 47, 122, 97, 13, 16, 193, 181, 121, 76, 52, 115, 173, 53, 192, 243, 140, 160, 240, 248, 72, 164, 229, 156, 165, 143, 78, 84, 18, 233, 130, 18, 108, 209, 121, 80, 164, 174, 20, 188, 40, 37, 175, 71, 3, 192, 98, 124, 58, 195, 248, 199, 233, 163, 83, 53, 28, 249, 167, 162, 41, 68, 89, 74, 223, 192, 202, 170, 116, 41, 14, 149, 184, 137, 66, 18, 152, 240, 6, 117, 233, 1, 135, 231, 73, 3, 94, 25, 149, 85, 175, 1, 69, 103, 85, 65, 96, 83, 83, 53, 151, 75, 153, 23, 49, 167, 172, 145, 92, 222, 198, 212, 224, 202, 99, 220, 56, 8, 87, 55, 234, 97, 236, 197 } );
         }
 
-        [Fact]
+        [SkippableFact]
         public void EccKey_Cng_Public()
         {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+
             //given
             var key = new Jwk(crv: "P-256", x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
 
@@ -611,9 +614,11 @@ namespace UnitTests
             Assert.True(test.IsEphemeral);
         }
 
-        [Fact]
+        [SkippableFact]
         public void EccKey_Cng_Private()
         {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+
             //given
             var key = new Jwk(crv: "P-256",
                               x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
@@ -631,9 +636,11 @@ namespace UnitTests
             Assert.True(test.IsEphemeral);
         }
 
-        [Fact]
+        [SkippableFact]
         public void EccKey_Cng_Private_KeyAgreement()
         {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+
             //given
             var key = new Jwk(crv: "P-256",
                               x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
@@ -777,9 +784,11 @@ namespace UnitTests
 
 //#endif
 
-        [Fact]
+        [SkippableFact]
         public void NewEccCng_Public_P256()
         {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+
             //given
             var test = new Jwk(Ecc256Public(), false);
 
@@ -791,9 +800,11 @@ namespace UnitTests
             Assert.Null(test.D);
         }
 
-        [Fact]
+        [SkippableFact]
         public void NewEccCng_Private_P256()
         {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+
             //given
             var test = new Jwk(Ecc256Private());
 
@@ -805,9 +816,11 @@ namespace UnitTests
             Assert.Equal("KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4", test.D);
         }
 
-        [Fact]
+        [SkippableFact]
         public void NewEccCng_Public_P384()
         {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+
             //given
             var test = new Jwk(Ecc384Public(), false);
 
@@ -819,9 +832,11 @@ namespace UnitTests
             Assert.Null(test.D);
         }
 
-        [Fact]
+        [SkippableFact]
         public void NewEccCng_Private_P384()
         {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+
             //given
             var test = new Jwk(Ecc384Private());
 
@@ -833,9 +848,11 @@ namespace UnitTests
             Assert.Equal("ice3abxagFJ0L6Fk3WHQQK33CSq6vbVuGOH-iEuc8tFe2joOIb4PUo3uz9afjPeL", test.D);
         }
 
-        [Fact]
+        [SkippableFact]
         public void NewEccCng_Public_P521()
         {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+
             //given
             var test = new Jwk(Ecc512Public(), false);
 
@@ -847,9 +864,11 @@ namespace UnitTests
             Assert.Null(test.D);
         }
 
-        [Fact]
+        [SkippableFact]
         public void NewEccCng_Private_P521()
         {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+
             //given
             var test = new Jwk(Ecc512Private());
 
@@ -903,9 +922,11 @@ namespace UnitTests
             Assert.Equal("KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4", test["d"]);
         }
 
-        [Fact]
+        [SkippableFact]
         public void FromDictionary_EccKey()
         {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+
             //given
             var data = new Dictionary<string, object>
             {
@@ -970,9 +991,11 @@ namespace UnitTests
             Assert.Equal(@"{""kty"":""EC"",""crv"":""P-256"",""x"":""BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk"",""y"":""g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"",""d"":""KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4""}", test);
         }
 
-        [Fact]
+        [SkippableFact]
         public void FromJson_EccKey()
         {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+
             //given
             var json = @"{
                 ""kty"": ""EC"",
