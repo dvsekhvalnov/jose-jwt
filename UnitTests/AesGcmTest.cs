@@ -6,22 +6,22 @@ namespace UnitTests
 {
     public class AesGcmTest
     {
-        private byte[] aes128Key = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
+        private static readonly byte[] aes128Key = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
 
         [Fact]
         public void Encrypt()
         {
             //given
             byte[] iv = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
-            byte[] aad = Encoding.UTF8.GetBytes("secre"); 
-            byte[] text = Encoding.UTF8.GetBytes("hellow aes !"); 
-            
-            //when
-            byte[][] test=AesGcm.Encrypt(aes128Key, iv, aad, text);
+            byte[] aad = Encoding.UTF8.GetBytes("secre");
+            byte[] text = Encoding.UTF8.GetBytes("hellow aes !");
 
-            //then  
-            Assert.Equal(test[0], new byte[] { 245, 242, 160, 166, 250, 62, 102, 211, 158, 42, 62, 73 });
-            Assert.Equal(test[1], new byte[] { 195, 69, 216, 140, 118, 58, 48, 131, 47, 225, 205, 198, 78, 12, 180, 76 });
+            //when
+            byte[][] test = AesGcm.Encrypt(aes128Key, iv, aad, text);
+
+            //then
+            Assert.Equal(new byte[] { 245, 242, 160, 166, 250, 62, 102, 211, 158, 42, 62, 73 }, test[0]);
+            Assert.Equal(new byte[] { 195, 69, 216, 140, 118, 58, 48, 131, 47, 225, 205, 198, 78, 12, 180, 76 }, test[1]);
         }
 
         [Fact]
@@ -34,10 +34,10 @@ namespace UnitTests
             byte[] aad = Encoding.UTF8.GetBytes("top secret");
 
             //when
-            byte[] test=AesGcm.Decrypt(aes128Key, iv, aad, cipher, tag);
+            byte[] test = AesGcm.Decrypt(aes128Key, iv, aad, cipher, tag);
 
             //then
-            Assert.Equal(test, Encoding.UTF8.GetBytes("decrypt me"));
+            Assert.Equal(Encoding.UTF8.GetBytes("decrypt me"), test);
         }
     }
 }
