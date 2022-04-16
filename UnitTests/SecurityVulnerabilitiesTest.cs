@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using Jose;
 using Jose.keys;
@@ -7,19 +8,24 @@ using Xunit;
 namespace UnitTests
 {
     /// <summary>
+    /// <para>
     /// Contains tests for potential security vulnerabilities/attacks found by security researchers in different JWT/JOSE
     /// implementations.
-    /// 
+    /// </para>
+    /// <para>
     /// Idea is to track all found security issues and have bullet proof tests against them to mitigate ongoing security
     /// risks for library.
+    /// </para>
     /// </summary>
     public class SecurityVulnerabilitiesTest
     {
-        [Fact]
+        [SkippableFact]
         public void InvalidCurveAttack()
         {
+            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+
             // https://www.cs.bris.ac.uk/Research/CryptographySecurity/RWC/2017/nguyen.quan.pdf
-            // Attack exploits some ECDH implementations which do not check 
+            // Attack exploits some ECDH implementations which do not check
             // that ephemeral public key is on the private key's curve.
 
             byte[] x = Base64Url.Decode("weNJy2HscCSM6AEDTDg04biOvhFhyyWvOHQfeF_PxMQ");
