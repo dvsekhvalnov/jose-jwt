@@ -6,7 +6,7 @@ namespace UnitTests
     using Newtonsoft.Json.Linq;
     using System;
     using System.Collections.Generic;
-    using System.Linq;    
+    using System.Linq;
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
     using System.Text;
@@ -15,7 +15,7 @@ namespace UnitTests
 
     public class JweTest
     {
-        private TestConsole Console;
+        private readonly TestConsole Console;
 
         public JweTest(ITestOutputHelper output)
         {
@@ -83,7 +83,7 @@ namespace UnitTests
             var jwe = JWE.EncryptBytes(
                 plaintext: payload,
                 recipients: recipients,
-                JweEncryption.A256GCM,                
+                JweEncryption.A256GCM,
                 extraProtectedHeaders: sharedProtectedHeaders);
 
             var decrypted = JWE.Decrypt(jwe, decryptKey);
@@ -326,7 +326,7 @@ namespace UnitTests
         public void Encrypt_WithAdditionalAuthenticatedData_PopulatesAad()
         {
             //given
-            var key = GetLegacyKeyObjectFromJwk(new JsonWebKey(Rfc7520_5_8_1_Figure151_ExampleJwk));            
+            var key = GetLegacyKeyObjectFromJwk(new JsonWebKey(Rfc7520_5_8_1_Figure151_ExampleJwk));
 
             //when
             var jwe = JWE.EncryptBytes(
@@ -350,7 +350,7 @@ namespace UnitTests
 
         [Fact]
         public void EncryptDecrypt_WithAdditionalAuthenticatedData_RoundtripOk()
-        {            
+        {
             //given
             var key = GetLegacyKeyObjectFromJwk(new JsonWebKey(Rfc7520_5_8_1_Figure151_ExampleJwk));
             var plaintext = Rfc7520_Figure72_ExamplePlaintext;
@@ -360,14 +360,14 @@ namespace UnitTests
                 UTF8Encoding.UTF8.GetBytes(Rfc7520_Figure72_ExamplePlaintext),
                 new JweRecipient[] { new JweRecipient(JweAlgorithm.A128KW, key) },
                 JweEncryption.A128CBC_HS256,
-                aad: Base64Url.Decode(Rfc7520_Figure176_ExampleBase64UrlEncodedAad)            
+                aad: Base64Url.Decode(Rfc7520_Figure176_ExampleBase64UrlEncodedAad)
             );
 
             //then
             var decrypted = JWE.Decrypt(jwe, key);
 
             Assert.Equal(plaintext, decrypted.Plaintext);
-        }        
+        }
 
         [Fact]
         public void Decrypt_WithAdditionalAuthenticatedDataOk_ReturnsExpectedResults()
@@ -415,10 +415,9 @@ namespace UnitTests
                 new object[] { new JweRecipient[] { recipientDirectEncyption1, recipientAes256KW1 }, null }, // (Direct recipient currently allowed as first receipient)
                 new object[] { new JweRecipient[] { recipientAes256KW1, recipientDirectEncyption1 }, "Direct Encryption not supported for multi-recipient JWE.", }, // (Direct recipient in multi not supported)
             };
-           
+
             return ret;
         }
-
 
         [Theory()]
         [MemberData(nameof(TestDataMultipleRecipientDirectEncryption))]
@@ -472,7 +471,7 @@ namespace UnitTests
                             { "example.com:extra_recipient_header", "value1" },
                         })
                 },
-                JweEncryption.A128CBC_HS256,                
+                JweEncryption.A128CBC_HS256,
                 extraProtectedHeaders: new Dictionary<string, object>
                 {
                     { "cty", "text/plain" },
@@ -605,26 +604,26 @@ namespace UnitTests
         public void DecodeMultipleRecipientsNoProtectedHeader()
         {
             var token = @"{
-	            ""ciphertext"": ""zKxWBKEUDF4cucE"",
-	            ""iv"": ""vEF_GqDbgyblOZ-i"",
-	            ""recipients"": [
-		            {
-			            ""encrypted_key"": ""UDhZR9USzDByzrhxFtKYxzi5lUVvsze7kpjdfxMhDxyG5cKf2ldmqQ"",
-			            ""header"": {
-				            ""alg"": ""A256KW"",
-				            ""enc"": ""A256GCM""
-			            }
-		            },
-		            {
-			            ""encrypted_key"": ""euWT-ji1Iud_oCCvnTrHTSZ37kh_6cUNaGXLqCQWClCNRksCkcFUasoDWwQBby_kpOihe0yoc-AL3Jm_jrdO1YyovumKLBgygwDyBttdl5sBW9EvabyJWu9Q6tAv_fJYhx-icOJyTtG133zHeymx_vTyBKtJ9-S3zCfMPBFl2Yy0mn34f9EIxfENBuYmpKyEcTvXO9LXpjQuTyBpxxTd6jjoMjESHzH0xL4WWugQCGpgY2zilW_bOBZRmZ8wxEhB0oKSCjY13b9ZeGcWgK0rQAt-ekw9dKAp2rz7jOLceFwyvbhpKrtBgbWHiaMBKNoRb6djRX0Z_Tn79Fc-VUvVBA"",
-			            ""header"": {
-				            ""alg"": ""RSA-OAEP-256"",
-				            ""enc"": ""A256GCM"",
-				            ""typ"": ""JWE""
-			            }
-		            }
-	            ],
-	            ""tag"": ""9UFM1EdyzU3ExyrtLaWaQg""
+                ""ciphertext"": ""zKxWBKEUDF4cucE"",
+                ""iv"": ""vEF_GqDbgyblOZ-i"",
+                ""recipients"": [
+                    {
+                        ""encrypted_key"": ""UDhZR9USzDByzrhxFtKYxzi5lUVvsze7kpjdfxMhDxyG5cKf2ldmqQ"",
+                        ""header"": {
+                            ""alg"": ""A256KW"",
+                            ""enc"": ""A256GCM""
+                        }
+                    },
+                    {
+                        ""encrypted_key"": ""euWT-ji1Iud_oCCvnTrHTSZ37kh_6cUNaGXLqCQWClCNRksCkcFUasoDWwQBby_kpOihe0yoc-AL3Jm_jrdO1YyovumKLBgygwDyBttdl5sBW9EvabyJWu9Q6tAv_fJYhx-icOJyTtG133zHeymx_vTyBKtJ9-S3zCfMPBFl2Yy0mn34f9EIxfENBuYmpKyEcTvXO9LXpjQuTyBpxxTd6jjoMjESHzH0xL4WWugQCGpgY2zilW_bOBZRmZ8wxEhB0oKSCjY13b9ZeGcWgK0rQAt-ekw9dKAp2rz7jOLceFwyvbhpKrtBgbWHiaMBKNoRb6djRX0Z_Tn79Fc-VUvVBA"",
+                        ""header"": {
+                            ""alg"": ""RSA-OAEP-256"",
+                            ""enc"": ""A256GCM"",
+                            ""typ"": ""JWE""
+                        }
+                    }
+                ],
+                ""tag"": ""9UFM1EdyzU3ExyrtLaWaQg""
             }";
 
             var firstRecipient = Jose.JWE.Decrypt(token, sharedKey);
@@ -649,26 +648,26 @@ namespace UnitTests
         public void DecodeMultipleRecipientsWithProtectedHeader()
         {
             var token = @"{
-				""ciphertext"": ""gVZ-iyqX3o8xlFzZD3e58g"",
-				""iv"": ""iv7cQBIEzM5Jdvt1nakgvw"",
-				""protected"": ""eyJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwidHlwIjoiSldFIn0"",
-				""recipients"": [
-					{
-						""encrypted_key"": ""5xCobIXzGwDTSITcStYvDc8C636p4i4PjHsvfTCD2yaHjXuA-0YDxRj6tPDTn2rkhnRII3hhDC6XO0b_ir-OZ2FWKr01nC3a"",
-						""header"": {
-							""alg"": ""A256KW""
-						}
-					},
-					{
-						""encrypted_key"": ""Vx6HmM8aoem03w67iQOGiBI2B-thcLwVIZWLZavwDWRub3yZNTHlsM0FNGXhX9qhenJ-3eIBbsAwQnbdkBQaOugxHANp-xoYbWqq1FXcHiaQSRs9K1vCd-xgyJbNuqJHD3h1gEupIoxCJNAu6dypzrUcC_nLX8L6Y-H4ST_18bPFfSMbD3YatvS9k879NJzru_gigvaoyCrwW0LD1Fry05cPEl9hkyiKpnr63MmOVfGHYQvqO_xAKq02w5-LcYmuloPfpFOZEAoF3OB_4zKAcEEhEmRujSvIPrsaG3mJiRRchryiRSt5TIDO_gOkaySGQ8JFULt8zK_k5Sl0SdhZ-Q"",
-						""header"": {
-							""alg"": ""RSA-OAEP-256"",
-							""kid"": ""Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc""
-						}
-					}
-				],
-				""tag"": ""UxOqwzlsIQsbR3W0nin1EAtez0MMgJbuNr2ZjCtmMIE""
-			}";
+                ""ciphertext"": ""gVZ-iyqX3o8xlFzZD3e58g"",
+                ""iv"": ""iv7cQBIEzM5Jdvt1nakgvw"",
+                ""protected"": ""eyJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwidHlwIjoiSldFIn0"",
+                ""recipients"": [
+                    {
+                        ""encrypted_key"": ""5xCobIXzGwDTSITcStYvDc8C636p4i4PjHsvfTCD2yaHjXuA-0YDxRj6tPDTn2rkhnRII3hhDC6XO0b_ir-OZ2FWKr01nC3a"",
+                        ""header"": {
+                            ""alg"": ""A256KW""
+                        }
+                    },
+                    {
+                        ""encrypted_key"": ""Vx6HmM8aoem03w67iQOGiBI2B-thcLwVIZWLZavwDWRub3yZNTHlsM0FNGXhX9qhenJ-3eIBbsAwQnbdkBQaOugxHANp-xoYbWqq1FXcHiaQSRs9K1vCd-xgyJbNuqJHD3h1gEupIoxCJNAu6dypzrUcC_nLX8L6Y-H4ST_18bPFfSMbD3YatvS9k879NJzru_gigvaoyCrwW0LD1Fry05cPEl9hkyiKpnr63MmOVfGHYQvqO_xAKq02w5-LcYmuloPfpFOZEAoF3OB_4zKAcEEhEmRujSvIPrsaG3mJiRRchryiRSt5TIDO_gOkaySGQ8JFULt8zK_k5Sl0SdhZ-Q"",
+                        ""header"": {
+                            ""alg"": ""RSA-OAEP-256"",
+                            ""kid"": ""Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc""
+                        }
+                    }
+                ],
+                ""tag"": ""UxOqwzlsIQsbR3W0nin1EAtez0MMgJbuNr2ZjCtmMIE""
+            }";
 
             var firstRecipient = Jose.JWE.Decrypt(token, sharedKey);
 
@@ -694,36 +693,36 @@ namespace UnitTests
         public void DecodeMultipleRecipientsWithUnprotectedHeader()
         {
             var token = @"{
-				""ciphertext"": ""wnecd9ceRDb0PqFdvNkjUw"",
-				""iv"": ""d-F9AVZ7W6M5bWp45G_okw"",
-				""protected"": ""eyJ0eXAiOiJKV0UifQ"",
-				""recipients"": [
-					{
-						""encrypted_key"": ""gk0a-lu_f588KjKomSl8v4ULeNEXktECpLWkTyxpmtFXMDyO-BtARt1fuBkFJsYqAwUNxz4uh1u4i3QCpKxdl01tZRW1yyxR"",
-						""header"": {
-							""alg"": ""PBES2-HS256+A128KW"",
-							""p2c"": 8192,
-							""p2s"": ""kpL8s71MjhPnBExCF-cIMA""
-						}
-					},
-					{
-						""encrypted_key"": ""WDt1HtoyK0lazAF84EBoL7OWtkCyKBEj2hG_QEgX0hx2QDAgFh7HGiR5NnnChFTwdpXIA-8tBDzhWFLd6aEU8w8sqjC4txoc"",
-						""header"": {
-							""alg"": ""ECDH-ES+A128KW"",
-							""epk"": {
-								""crv"": ""P-256"",
-								""kty"": ""EC"",
-								""x"": ""WOqJxZwzivLSO-r3qRkBVDd9uA_de_AIu3G3hkIQg1M"",
-								""y"": ""aFbCEl231v5IeA_Zjg8kMVJXxZWhpEHibtvHnq7Kk9k""
-							}
-						}
-					}
-				],
-				""tag"": ""zJxGA445Q4LBp4WAXo0vdCfD8ZdrWVLGRPkUH8Sv_6I"",
-				""unprotected"": {
-					""enc"": ""A256CBC-HS512""
-				}
-			}";
+                ""ciphertext"": ""wnecd9ceRDb0PqFdvNkjUw"",
+                ""iv"": ""d-F9AVZ7W6M5bWp45G_okw"",
+                ""protected"": ""eyJ0eXAiOiJKV0UifQ"",
+                ""recipients"": [
+                    {
+                        ""encrypted_key"": ""gk0a-lu_f588KjKomSl8v4ULeNEXktECpLWkTyxpmtFXMDyO-BtARt1fuBkFJsYqAwUNxz4uh1u4i3QCpKxdl01tZRW1yyxR"",
+                        ""header"": {
+                            ""alg"": ""PBES2-HS256+A128KW"",
+                            ""p2c"": 8192,
+                            ""p2s"": ""kpL8s71MjhPnBExCF-cIMA""
+                        }
+                    },
+                    {
+                        ""encrypted_key"": ""WDt1HtoyK0lazAF84EBoL7OWtkCyKBEj2hG_QEgX0hx2QDAgFh7HGiR5NnnChFTwdpXIA-8tBDzhWFLd6aEU8w8sqjC4txoc"",
+                        ""header"": {
+                            ""alg"": ""ECDH-ES+A128KW"",
+                            ""epk"": {
+                                ""crv"": ""P-256"",
+                                ""kty"": ""EC"",
+                                ""x"": ""WOqJxZwzivLSO-r3qRkBVDd9uA_de_AIu3G3hkIQg1M"",
+                                ""y"": ""aFbCEl231v5IeA_Zjg8kMVJXxZWhpEHibtvHnq7Kk9k""
+                            }
+                        }
+                    }
+                ],
+                ""tag"": ""zJxGA445Q4LBp4WAXo0vdCfD8ZdrWVLGRPkUH8Sv_6I"",
+                ""unprotected"": {
+                    ""enc"": ""A256CBC-HS512""
+                }
+            }";
 
             var firstRecipient = Jose.JWE.Decrypt(token, "secret");
 
@@ -758,26 +757,26 @@ namespace UnitTests
         public void DecodeDuplicateKeys_ProtectedHeader_ReceipientHeader()
         {
             var token = @"{
-	            ""ciphertext"": ""hPHYxxZWLWxI5g224mPnAA"",
-	            ""iv"": ""r_DCANXTkVo1TEwkd-Cx1w"",
-	            ""protected"": ""eyJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwidHlwIjoiSldFIn0"",
-	            ""recipients"": [
-		            {
-			            ""encrypted_key"": ""KqEaCvRWCxZW9kG3eaf4ekL1nf5YWjv_m96QVjOaSV0H5O1lORQkDCkuNrWYwHLMGAEgXSaGGRXFIdFuG68zgVQJ5u1I7Ona"",
-			            ""header"": {
-				            ""alg"": ""A256KW"",
+                ""ciphertext"": ""hPHYxxZWLWxI5g224mPnAA"",
+                ""iv"": ""r_DCANXTkVo1TEwkd-Cx1w"",
+                ""protected"": ""eyJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwidHlwIjoiSldFIn0"",
+                ""recipients"": [
+                    {
+                        ""encrypted_key"": ""KqEaCvRWCxZW9kG3eaf4ekL1nf5YWjv_m96QVjOaSV0H5O1lORQkDCkuNrWYwHLMGAEgXSaGGRXFIdFuG68zgVQJ5u1I7Ona"",
+                        ""header"": {
+                            ""alg"": ""A256KW"",
                             ""typ"": ""JWE""
                         }
-		            },
-		            {
-			            ""encrypted_key"": ""EYPZerMlLRu0LU1yfNiNNnl92Stz36hzM-NMNiBHmBLyysg6JTOi8PB2QOh4FUKO-YWpq80iacMiUniGmEnRrK8x4n4_acYADtj_36aKf5guJ3XOWjpm8BfTRtLJ-D7OlrDlLnn23pQHYlYHAXZMEky1JRbUbpt-1Jf1raHUUZIxSS2s2aZxkxpQR8lgfId3aPwzGdIqPWgWvKsNtR510E8RSKJVatNL5uGwDDo1F5gpxIThdUcNAAoINaBlpbBUWQvefRAQYzOT25jcmCuNQmKMPJrhsZZpyC4QVvjJ5nXqi027xHKelOIaUkpliPFmnq2rFp0RDFe_Kcq7_hk86A"",
-			            ""header"": {
-				            ""alg"": ""RSA-OAEP-256"",
-				            ""kid"": ""Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc""
-			            }
-		            }
-	            ],
-	            ""tag"": ""q_8tx6Ud3q-X1K6NKaYF_qfUriicAm8M4eRX7H75N04""
+                    },
+                    {
+                        ""encrypted_key"": ""EYPZerMlLRu0LU1yfNiNNnl92Stz36hzM-NMNiBHmBLyysg6JTOi8PB2QOh4FUKO-YWpq80iacMiUniGmEnRrK8x4n4_acYADtj_36aKf5guJ3XOWjpm8BfTRtLJ-D7OlrDlLnn23pQHYlYHAXZMEky1JRbUbpt-1Jf1raHUUZIxSS2s2aZxkxpQR8lgfId3aPwzGdIqPWgWvKsNtR510E8RSKJVatNL5uGwDDo1F5gpxIThdUcNAAoINaBlpbBUWQvefRAQYzOT25jcmCuNQmKMPJrhsZZpyC4QVvjJ5nXqi027xHKelOIaUkpliPFmnq2rFp0RDFe_Kcq7_hk86A"",
+                        ""header"": {
+                            ""alg"": ""RSA-OAEP-256"",
+                            ""kid"": ""Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc""
+                        }
+                    }
+                ],
+                ""tag"": ""q_8tx6Ud3q-X1K6NKaYF_qfUriicAm8M4eRX7H75N04""
             }";
 
             //then
@@ -788,37 +787,37 @@ namespace UnitTests
         public void DecodeDuplicateKeys_ProtectedHeader_UnprotectedHeader()
         {
             var token = @"{
-	            ""ciphertext"": ""z95vPJ_gXxejpFsno9EBCQ"",
-	            ""iv"": ""jGdsbNjl-_uHT4V86MdFBA"",
-	            ""protected"": ""eyJ0eXAiOiJKV0UifQ"",
-	            ""recipients"": [
-		            {
-			            ""encrypted_key"": ""Kpr6FHWViJNnGCuDEEl27dsCiyWHRjiYuB2dOque06oqJZGVYgu9yif0L6OKd9gWvltrGJdo_byafGF5lwIvcl6ZGCNfRF3s"",
-			            ""header"": {
-				            ""alg"": ""PBES2-HS256+A128KW"",
-				            ""p2c"": 8192,
-				            ""p2s"": ""C5Hn0y-ho1mwygXPVfDynQ""
-			            }
-		            },
-		            {
-			            ""encrypted_key"": ""VuzPor1OEenPP-w0qg__uGS0w4h6Yt7K2ZHtzjqj0mnAzhNzTHumYFjaivk0dUwk1H2jxieEO9FYdC48BOMMjMcylnVGTgAV"",
-			            ""header"": {
-				            ""alg"": ""ECDH-ES+A128KW"",
-				            ""epk"": {
-					            ""crv"": ""P-256"",
-					            ""kty"": ""EC"",
-					            ""x"": ""LqM-HYhs3GcIPKRdiR2R7CuPx-aPVwBohgzP9l2WdfA"",
-					            ""y"": ""0hP45SduS8HPQaZ8RAyikZTuvYCjKaknhcCSVK_tIIY""
-				            }
-			            }
-		            }
-	            ],
-	            ""tag"": ""cbKJYp4ZRWWPWVHDyL2vuUjAZ3oAHXT1I75t1j9rCKI"",
-	            ""unprotected"": {
-		            ""enc"": ""A256CBC-HS512"",
+                ""ciphertext"": ""z95vPJ_gXxejpFsno9EBCQ"",
+                ""iv"": ""jGdsbNjl-_uHT4V86MdFBA"",
+                ""protected"": ""eyJ0eXAiOiJKV0UifQ"",
+                ""recipients"": [
+                    {
+                        ""encrypted_key"": ""Kpr6FHWViJNnGCuDEEl27dsCiyWHRjiYuB2dOque06oqJZGVYgu9yif0L6OKd9gWvltrGJdo_byafGF5lwIvcl6ZGCNfRF3s"",
+                        ""header"": {
+                            ""alg"": ""PBES2-HS256+A128KW"",
+                            ""p2c"": 8192,
+                            ""p2s"": ""C5Hn0y-ho1mwygXPVfDynQ""
+                        }
+                    },
+                    {
+                        ""encrypted_key"": ""VuzPor1OEenPP-w0qg__uGS0w4h6Yt7K2ZHtzjqj0mnAzhNzTHumYFjaivk0dUwk1H2jxieEO9FYdC48BOMMjMcylnVGTgAV"",
+                        ""header"": {
+                            ""alg"": ""ECDH-ES+A128KW"",
+                            ""epk"": {
+                                ""crv"": ""P-256"",
+                                ""kty"": ""EC"",
+                                ""x"": ""LqM-HYhs3GcIPKRdiR2R7CuPx-aPVwBohgzP9l2WdfA"",
+                                ""y"": ""0hP45SduS8HPQaZ8RAyikZTuvYCjKaknhcCSVK_tIIY""
+                            }
+                        }
+                    }
+                ],
+                ""tag"": ""cbKJYp4ZRWWPWVHDyL2vuUjAZ3oAHXT1I75t1j9rCKI"",
+                ""unprotected"": {
+                    ""enc"": ""A256CBC-HS512"",
                     ""typ"": ""JWE""
 
-	            }
+                }
             }";
             //then
             Assert.Throws<JoseException>(() => Jose.JWE.Decrypt(token, sharedKey));
@@ -828,37 +827,37 @@ namespace UnitTests
         public void DecodeDuplicateKeys_UnprotectedHeader_RecipientHeader()
         {
             var token = @"{
-	            ""ciphertext"": ""z95vPJ_gXxejpFsno9EBCQ"",
-	            ""iv"": ""jGdsbNjl-_uHT4V86MdFBA"",
-	            ""protected"": ""eyJ0eXAiOiJKV0UifQ"",
-	            ""recipients"": [
-		            {
-			            ""encrypted_key"": ""Kpr6FHWViJNnGCuDEEl27dsCiyWHRjiYuB2dOque06oqJZGVYgu9yif0L6OKd9gWvltrGJdo_byafGF5lwIvcl6ZGCNfRF3s"",
-			            ""header"": {
-				            ""alg"": ""PBES2-HS256+A128KW"",
-				            ""p2c"": 8192,
-				            ""p2s"": ""C5Hn0y-ho1mwygXPVfDynQ""
-			            }
-		            },
-		            {
-			            ""encrypted_key"": ""VuzPor1OEenPP-w0qg__uGS0w4h6Yt7K2ZHtzjqj0mnAzhNzTHumYFjaivk0dUwk1H2jxieEO9FYdC48BOMMjMcylnVGTgAV"",
-			            ""header"": {
-				            ""alg"": ""ECDH-ES+A128KW"",
-				            ""epk"": {
-					            ""crv"": ""P-256"",
-					            ""kty"": ""EC"",
-					            ""x"": ""LqM-HYhs3GcIPKRdiR2R7CuPx-aPVwBohgzP9l2WdfA"",
-					            ""y"": ""0hP45SduS8HPQaZ8RAyikZTuvYCjKaknhcCSVK_tIIY""
-				            }
-			            }
-		            }
-	            ],
-	            ""tag"": ""cbKJYp4ZRWWPWVHDyL2vuUjAZ3oAHXT1I75t1j9rCKI"",
-	            ""unprotected"": {
-		            ""enc"": ""A256CBC-HS512"",
+                ""ciphertext"": ""z95vPJ_gXxejpFsno9EBCQ"",
+                ""iv"": ""jGdsbNjl-_uHT4V86MdFBA"",
+                ""protected"": ""eyJ0eXAiOiJKV0UifQ"",
+                ""recipients"": [
+                    {
+                        ""encrypted_key"": ""Kpr6FHWViJNnGCuDEEl27dsCiyWHRjiYuB2dOque06oqJZGVYgu9yif0L6OKd9gWvltrGJdo_byafGF5lwIvcl6ZGCNfRF3s"",
+                        ""header"": {
+                            ""alg"": ""PBES2-HS256+A128KW"",
+                            ""p2c"": 8192,
+                            ""p2s"": ""C5Hn0y-ho1mwygXPVfDynQ""
+                        }
+                    },
+                    {
+                        ""encrypted_key"": ""VuzPor1OEenPP-w0qg__uGS0w4h6Yt7K2ZHtzjqj0mnAzhNzTHumYFjaivk0dUwk1H2jxieEO9FYdC48BOMMjMcylnVGTgAV"",
+                        ""header"": {
+                            ""alg"": ""ECDH-ES+A128KW"",
+                            ""epk"": {
+                                ""crv"": ""P-256"",
+                                ""kty"": ""EC"",
+                                ""x"": ""LqM-HYhs3GcIPKRdiR2R7CuPx-aPVwBohgzP9l2WdfA"",
+                                ""y"": ""0hP45SduS8HPQaZ8RAyikZTuvYCjKaknhcCSVK_tIIY""
+                            }
+                        }
+                    }
+                ],
+                ""tag"": ""cbKJYp4ZRWWPWVHDyL2vuUjAZ3oAHXT1I75t1j9rCKI"",
+                ""unprotected"": {
+                    ""enc"": ""A256CBC-HS512"",
                     ""alg"": ""ECDH-ES+A128KW""
 
-	            }
+                }
             }";
             //then
             Assert.Throws<JoseException>(() => Jose.JWE.Decrypt(token, Ecc256Private()));
@@ -886,7 +885,6 @@ namespace UnitTests
             Assert.Equal(16, ((string)deserialized["iv"]).Length); //IV size
             Assert.Equal(18, ((string)deserialized["ciphertext"]).Length); //cipher text size
             Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
-
 
             var decoded = JWE.Decrypt(token, sharedKey);
             Assert.Equal(decoded.Plaintext, payload);
@@ -917,7 +915,6 @@ namespace UnitTests
             Assert.Equal(18, ((string)deserialized["ciphertext"]).Length); //cipher text size
             Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
 
-
             var decoded = JWE.Decrypt(token, sharedKey);
             Assert.Equal(decoded.Plaintext, payload);
         }
@@ -938,7 +935,6 @@ namespace UnitTests
 
             Assert.Equal("{\"enc\":\"A256GCM\"}",
                              UTF8Encoding.UTF8.GetString(Base64Url.Decode((string)deserialized["protected"])));
-
 
             Assert.Equal(16, ((string)deserialized["iv"]).Length); //IV size
             Assert.Equal(18, ((string)deserialized["ciphertext"]).Length); //cipher text size
@@ -1112,7 +1108,6 @@ namespace UnitTests
                 { "jku", "https://server.example.com/keys.jwks" }
             };
 
-
             JweRecipient r = new JweRecipient(JweAlgorithm.RSA_OAEP_256, PubKey(), headers);
 
             //then
@@ -1223,7 +1218,6 @@ namespace UnitTests
             ""Mz-VPPyU4RlcuYv1IwIvzw""
         }";
 
-
         private static string Rfc7516_A_2_3_ExampleJwk = @"
             {""kty"":""RSA"",
                 ""n"":""sXchDaQebHnPiGvyDOAT4saGEUetSyo9MKLOoWFsueri23bOdgWp4Dy1WlUzewbgBHod5pcM9H95GQRV3JDXboIRROSBigeC5yjU1hGzHHyXss8UDprecbAYxknTcQkhslANGRUZmdTOQ5qTRsLAt6BTYuyvVRdhS8exSZEy_c4gs_7svlJJQ4H9_NxsiIoLwAEk7-Q3UXERGYw_75IDrGA84-lA_-Ct4eTlXHBIY2EaV7t7LjJaynVJCpkv4LKjTTAumiGUIuQhrNhZLuF_RJLqHpM2kgWFLU7-VTdL1VbC2tejvcI2BlMkEpk1BzBZI0KQB0GaDWFLN-aEAw3vRw"",
@@ -1270,7 +1264,6 @@ namespace UnitTests
                + "keep any secret of yours\x2013closer than you keep it "
                + "yourself. But you cannot trust us to let you face trouble "
                + "alone, and go off without a word. We are your friends, Frodo.";
-
 
         private static string Rfc7520_Figure176_ExampleBase64UrlEncodedAad =
             "WyJ2Y2FyZCIsW1sidmVyc2lvbiIse30sInRleHQiLCI0LjAiXSxbImZuIix7fS"

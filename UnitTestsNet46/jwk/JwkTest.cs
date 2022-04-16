@@ -12,7 +12,7 @@ namespace UnitTests
 {
     public class JwkTest
     {
-        private TestConsole Console;
+        private readonly TestConsole Console;
 
         public JwkTest(ITestOutputHelper output)
         {
@@ -46,7 +46,7 @@ namespace UnitTests
             var test = key.ToDictionary();
 
             //then
-            Assert.Equal(9, test.Count);            
+            Assert.Equal(9, test.Count);
             Assert.Equal("OKP", test["kty"]);
             Assert.Equal("RS256", test["alg"]);
             Assert.Equal("enc", test["use"]);
@@ -55,7 +55,7 @@ namespace UnitTests
             Assert.Equal("5hJMjOCG0aFBwPGVCyAhepsmDwI", test["x5t"]);
             Assert.Equal("uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc", test["x5t#S256"]);
             Assert.Equal(new [] { "decrypt", "deriveKey", "sign" }, test["key_ops"]);
-            Assert.Equal(new List<string> 
+            Assert.Equal(new List<string>
             {
                 "MIICpTCCAY0CCQDf1xHaEV6D6TANBgkqhkiG9w0BAQsFADAXMRUwEwYDVQQDDAxpbnRlcm1pZGlhdGUwHhcNMjExMjE5MTcxOTE0WhcNMzUwODI4MTcxOTE0WjASMRAwDgYDVQQDDAd0cmFwLm1lMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvys5QMXeOasAgqj+Rg+NBgjIK7fv3BrQPUu5PUu7tD2frWmzCHnBpodq8l5nJ+OiyQIEmLFJ1wuaBnmIJQejiWuRWhhdprFq4gjsC0xgI4oKP7oD3c5XglvazwM8c3AXWqqpEr9RzWR01TOouWYjcVRVHj/xcIzeHgYgmMvIACemBkk5G9T96+RbImmUP2P3KR2uYcXYjMAxegHqRxlcbOrGHOyvwE6qRPEELvOHNxDMd6rstfiaLOpqJ1MMnSM40Ee86NzszKM9oJOr4KJeQ94SdbtsZ+CUCGn+MbXSbu5yVNFSv+YcY6fAgJggauUShcRkH7iQ1OX6qxoO9WNkoQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAi+mkYWKIIbTytJ7M6O7R0Si0wt/yNPUozx02ys/Tmh3ots1nvjXY+bCYDTPsRxwu0QpQA1dt/CNDS5slmvRxpoLs0tE3qfqFzDrPa+IHJ/Pz+UmNHcfSzSH7wP2biWGGOb0MUzS95qYM2U0Y+eNDNgE1FweDUIR8o1HuqomvlO2/qHAzjp+tcO/lJ4JKZRxn4YpiYopT1Xxaxw6fpb2aMbegjZsRtetxoIBekI8VIXgisUKOsYQ9gKqy2i50G9kZJAYllx+A3gg3+95USqUxiVE2lvobaOij4DlQbsGYX0brEym6/broMeZXJnLa0kN8ZcCaos2V/+jY2hQ3Ql/Se",
                 "MIIDpTCCAY0CCQCHPA/pgr0u7jANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdyb290LWNhMB4XDTIxMTIxOTE3MTUwM1oXDTM1MDgyODE3MTUwM1owFzEVMBMGA1UEAwwMaW50ZXJtaWRpYXRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApvJJcp8VR4hvtOME5Z+PYqPb6TL1JFBjnW3Bt+dMnnu3N6uMlIXrIb5ELX55OP3BLDmTJUPm1mEORBcBjuWeWI+CU1ZbF3QEkb+hzzgoRhkiAPDiVdmgA5vbSC0kRJxNJ7kGvLEIGQgVqSfFsuE09RCm6OuS2Qqin2W8pwWk05Ob+3hWW4UWgVhJqNSSONHFNeiRSdMXWQmywY33zosExTM4epJyFSS+dIIhR61zq15bbRXtnwBHBlVY/lT15zuMsu1j9SJ28M2qR14oyBzTdjHPK8pAeJOxK80zVnzlSAUZBhxoZioQyka85Ane+HyNv4A9wOFP/xs2Xot5+jtQowIDAQABMA0GCSqGSIb3DQEBCwUAA4ICAQCCrsC3vu/CW2LJ5WwHgUC4Tr03v4/Sbs7di1GBn+RY2MWWTWnGhanInv0QGJmFsW0YtUNoRZR/qCsx/VCVy0uBfLHDkDFMu+OyGHygv940+ZVNVKB66wNosAkI2WIOFjcxD66o1jQAjJIp9gUOxvOuLh8SPJSBAmDVnhHOMbw+Gzv3F5MS7A6f7GvoIupRruLZtu0rQbOIt3CClsUui6D7A0VxsxJUpExMzn+teoOiquc1kpXhgK2bDlCS6IAGSDtbWXQAn983m1eD72IfM4yCWepOzpFs5OkDEYmBUmpnEQxeLQJH7UHs3/g9nxrC7xMVfOQhhbgWfyAx/TNP7Jt9yq/UOvBMVD05x5R7CJYR0cMi0IHnpSkY8NsiGxgOsWIHkvwc1ox2TVZyjR1zEuEkh0EN4/ur8OgaYSos5JfzSEVS00V9bFJnbhajNI8gkT2D+8zjdJ2FBieH7annnR4nZiYZecLjV605fr3+BeZZ6JRZKgMRQt2JQNA/iqKrHGmpU0REgOUXVrfnlu9KuvPnB4tlsIxRxlh/6o4lXdf9PME5U9t0g7JvH5EIzYyoFrdpSeNiFsg6DwhoXsp2lnUgD7WT27UVQ78PNk3BdqZiuQwSY62QK+xEpNvd8wts3uwFSzTat4QFlWuuT4M/o/NCbOttjGbS4m2t6gWJOFZbvQ=="
@@ -98,24 +98,23 @@ namespace UnitTests
         {
             //given
             string json = @"{
-	            ""kty"": ""OKP"",
-	            ""kid"": ""AA9D2AB0-20B8-4B04-B111-AE0DC118310F"",
-	            ""use"": ""enc"",
-	            ""key_ops"": [
-		            ""encrypt"",
-		            ""wrapKey"",
-		            ""sign""
-	            ],
-	            ""alg"": ""PS256"",
-	            ""x5u"": ""https://thetrap.com/main.crt"",
-	            ""x5t"": ""5hJMjOCG0aFBwPGVCyAhepsmDwI"",
-	            ""x5t#S256"": ""uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc"",
+                ""kty"": ""OKP"",
+                ""kid"": ""AA9D2AB0-20B8-4B04-B111-AE0DC118310F"",
+                ""use"": ""enc"",
+                ""key_ops"": [
+                    ""encrypt"",
+                    ""wrapKey"",
+                    ""sign""
+                ],
+                ""alg"": ""PS256"",
+                ""x5u"": ""https://thetrap.com/main.crt"",
+                ""x5t"": ""5hJMjOCG0aFBwPGVCyAhepsmDwI"",
+                ""x5t#S256"": ""uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc"",
                 ""x5c"": [
-	            	""MIICpTCCAY0CCQDf1xHaEV6D6TANBgkqhkiG9w0BAQsFADAXMRUwEwYDVQQDDAxpbnRlcm1pZGlhdGUwHhcNMjExMjE5MTcxOTE0WhcNMzUwODI4MTcxOTE0WjASMRAwDgYDVQQDDAd0cmFwLm1lMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvys5QMXeOasAgqj+Rg+NBgjIK7fv3BrQPUu5PUu7tD2frWmzCHnBpodq8l5nJ+OiyQIEmLFJ1wuaBnmIJQejiWuRWhhdprFq4gjsC0xgI4oKP7oD3c5XglvazwM8c3AXWqqpEr9RzWR01TOouWYjcVRVHj/xcIzeHgYgmMvIACemBkk5G9T96+RbImmUP2P3KR2uYcXYjMAxegHqRxlcbOrGHOyvwE6qRPEELvOHNxDMd6rstfiaLOpqJ1MMnSM40Ee86NzszKM9oJOr4KJeQ94SdbtsZ+CUCGn+MbXSbu5yVNFSv+YcY6fAgJggauUShcRkH7iQ1OX6qxoO9WNkoQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAi+mkYWKIIbTytJ7M6O7R0Si0wt/yNPUozx02ys/Tmh3ots1nvjXY+bCYDTPsRxwu0QpQA1dt/CNDS5slmvRxpoLs0tE3qfqFzDrPa+IHJ/Pz+UmNHcfSzSH7wP2biWGGOb0MUzS95qYM2U0Y+eNDNgE1FweDUIR8o1HuqomvlO2/qHAzjp+tcO/lJ4JKZRxn4YpiYopT1Xxaxw6fpb2aMbegjZsRtetxoIBekI8VIXgisUKOsYQ9gKqy2i50G9kZJAYllx+A3gg3+95USqUxiVE2lvobaOij4DlQbsGYX0brEym6/broMeZXJnLa0kN8ZcCaos2V/+jY2hQ3Ql/Se"",
-    		        ""MIIDpTCCAY0CCQCHPA/pgr0u7jANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdyb290LWNhMB4XDTIxMTIxOTE3MTUwM1oXDTM1MDgyODE3MTUwM1owFzEVMBMGA1UEAwwMaW50ZXJtaWRpYXRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApvJJcp8VR4hvtOME5Z+PYqPb6TL1JFBjnW3Bt+dMnnu3N6uMlIXrIb5ELX55OP3BLDmTJUPm1mEORBcBjuWeWI+CU1ZbF3QEkb+hzzgoRhkiAPDiVdmgA5vbSC0kRJxNJ7kGvLEIGQgVqSfFsuE09RCm6OuS2Qqin2W8pwWk05Ob+3hWW4UWgVhJqNSSONHFNeiRSdMXWQmywY33zosExTM4epJyFSS+dIIhR61zq15bbRXtnwBHBlVY/lT15zuMsu1j9SJ28M2qR14oyBzTdjHPK8pAeJOxK80zVnzlSAUZBhxoZioQyka85Ane+HyNv4A9wOFP/xs2Xot5+jtQowIDAQABMA0GCSqGSIb3DQEBCwUAA4ICAQCCrsC3vu/CW2LJ5WwHgUC4Tr03v4/Sbs7di1GBn+RY2MWWTWnGhanInv0QGJmFsW0YtUNoRZR/qCsx/VCVy0uBfLHDkDFMu+OyGHygv940+ZVNVKB66wNosAkI2WIOFjcxD66o1jQAjJIp9gUOxvOuLh8SPJSBAmDVnhHOMbw+Gzv3F5MS7A6f7GvoIupRruLZtu0rQbOIt3CClsUui6D7A0VxsxJUpExMzn+teoOiquc1kpXhgK2bDlCS6IAGSDtbWXQAn983m1eD72IfM4yCWepOzpFs5OkDEYmBUmpnEQxeLQJH7UHs3/g9nxrC7xMVfOQhhbgWfyAx/TNP7Jt9yq/UOvBMVD05x5R7CJYR0cMi0IHnpSkY8NsiGxgOsWIHkvwc1ox2TVZyjR1zEuEkh0EN4/ur8OgaYSos5JfzSEVS00V9bFJnbhajNI8gkT2D+8zjdJ2FBieH7annnR4nZiYZecLjV605fr3+BeZZ6JRZKgMRQt2JQNA/iqKrHGmpU0REgOUXVrfnlu9KuvPnB4tlsIxRxlh/6o4lXdf9PME5U9t0g7JvH5EIzYyoFrdpSeNiFsg6DwhoXsp2lnUgD7WT27UVQ78PNk3BdqZiuQwSY62QK+xEpNvd8wts3uwFSzTat4QFlWuuT4M/o/NCbOttjGbS4m2t6gWJOFZbvQ==""
-	            ]
+                    ""MIICpTCCAY0CCQDf1xHaEV6D6TANBgkqhkiG9w0BAQsFADAXMRUwEwYDVQQDDAxpbnRlcm1pZGlhdGUwHhcNMjExMjE5MTcxOTE0WhcNMzUwODI4MTcxOTE0WjASMRAwDgYDVQQDDAd0cmFwLm1lMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvys5QMXeOasAgqj+Rg+NBgjIK7fv3BrQPUu5PUu7tD2frWmzCHnBpodq8l5nJ+OiyQIEmLFJ1wuaBnmIJQejiWuRWhhdprFq4gjsC0xgI4oKP7oD3c5XglvazwM8c3AXWqqpEr9RzWR01TOouWYjcVRVHj/xcIzeHgYgmMvIACemBkk5G9T96+RbImmUP2P3KR2uYcXYjMAxegHqRxlcbOrGHOyvwE6qRPEELvOHNxDMd6rstfiaLOpqJ1MMnSM40Ee86NzszKM9oJOr4KJeQ94SdbtsZ+CUCGn+MbXSbu5yVNFSv+YcY6fAgJggauUShcRkH7iQ1OX6qxoO9WNkoQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAi+mkYWKIIbTytJ7M6O7R0Si0wt/yNPUozx02ys/Tmh3ots1nvjXY+bCYDTPsRxwu0QpQA1dt/CNDS5slmvRxpoLs0tE3qfqFzDrPa+IHJ/Pz+UmNHcfSzSH7wP2biWGGOb0MUzS95qYM2U0Y+eNDNgE1FweDUIR8o1HuqomvlO2/qHAzjp+tcO/lJ4JKZRxn4YpiYopT1Xxaxw6fpb2aMbegjZsRtetxoIBekI8VIXgisUKOsYQ9gKqy2i50G9kZJAYllx+A3gg3+95USqUxiVE2lvobaOij4DlQbsGYX0brEym6/broMeZXJnLa0kN8ZcCaos2V/+jY2hQ3Ql/Se"",
+                    ""MIIDpTCCAY0CCQCHPA/pgr0u7jANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdyb290LWNhMB4XDTIxMTIxOTE3MTUwM1oXDTM1MDgyODE3MTUwM1owFzEVMBMGA1UEAwwMaW50ZXJtaWRpYXRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApvJJcp8VR4hvtOME5Z+PYqPb6TL1JFBjnW3Bt+dMnnu3N6uMlIXrIb5ELX55OP3BLDmTJUPm1mEORBcBjuWeWI+CU1ZbF3QEkb+hzzgoRhkiAPDiVdmgA5vbSC0kRJxNJ7kGvLEIGQgVqSfFsuE09RCm6OuS2Qqin2W8pwWk05Ob+3hWW4UWgVhJqNSSONHFNeiRSdMXWQmywY33zosExTM4epJyFSS+dIIhR61zq15bbRXtnwBHBlVY/lT15zuMsu1j9SJ28M2qR14oyBzTdjHPK8pAeJOxK80zVnzlSAUZBhxoZioQyka85Ane+HyNv4A9wOFP/xs2Xot5+jtQowIDAQABMA0GCSqGSIb3DQEBCwUAA4ICAQCCrsC3vu/CW2LJ5WwHgUC4Tr03v4/Sbs7di1GBn+RY2MWWTWnGhanInv0QGJmFsW0YtUNoRZR/qCsx/VCVy0uBfLHDkDFMu+OyGHygv940+ZVNVKB66wNosAkI2WIOFjcxD66o1jQAjJIp9gUOxvOuLh8SPJSBAmDVnhHOMbw+Gzv3F5MS7A6f7GvoIupRruLZtu0rQbOIt3CClsUui6D7A0VxsxJUpExMzn+teoOiquc1kpXhgK2bDlCS6IAGSDtbWXQAn983m1eD72IfM4yCWepOzpFs5OkDEYmBUmpnEQxeLQJH7UHs3/g9nxrC7xMVfOQhhbgWfyAx/TNP7Jt9yq/UOvBMVD05x5R7CJYR0cMi0IHnpSkY8NsiGxgOsWIHkvwc1ox2TVZyjR1zEuEkh0EN4/ur8OgaYSos5JfzSEVS00V9bFJnbhajNI8gkT2D+8zjdJ2FBieH7annnR4nZiYZecLjV605fr3+BeZZ6JRZKgMRQt2JQNA/iqKrHGmpU0REgOUXVrfnlu9KuvPnB4tlsIxRxlh/6o4lXdf9PME5U9t0g7JvH5EIzYyoFrdpSeNiFsg6DwhoXsp2lnUgD7WT27UVQ78PNk3BdqZiuQwSY62QK+xEpNvd8wts3uwFSzTat4QFlWuuT4M/o/NCbOttjGbS4m2t6gWJOFZbvQ==""
+                ]
             }";
-
 
             //when
             var test = Jwk.FromJson(json, JWT.DefaultSettings.JsonMapper);
@@ -145,7 +144,7 @@ namespace UnitTests
             //given
             var data = new Dictionary<string, object>
             {
-                { "kty", "OKP" },                
+                { "kty", "OKP" },
                 { "use", "sig" },
                 { "alg", "PS256" },
                 { "kid", "AA9D2AB0-20B8-4B04-B111-AE0DC118310F" },
@@ -157,8 +156,7 @@ namespace UnitTests
                     {
                         "MIICpTCCAY0CCQDf1xHaEV6D6TANBgkqhkiG9w0BAQsFADAXMRUwEwYDVQQDDAxpbnRlcm1pZGlhdGUwHhcNMjExMjE5MTcxOTE0WhcNMzUwODI4MTcxOTE0WjASMRAwDgYDVQQDDAd0cmFwLm1lMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvys5QMXeOasAgqj+Rg+NBgjIK7fv3BrQPUu5PUu7tD2frWmzCHnBpodq8l5nJ+OiyQIEmLFJ1wuaBnmIJQejiWuRWhhdprFq4gjsC0xgI4oKP7oD3c5XglvazwM8c3AXWqqpEr9RzWR01TOouWYjcVRVHj/xcIzeHgYgmMvIACemBkk5G9T96+RbImmUP2P3KR2uYcXYjMAxegHqRxlcbOrGHOyvwE6qRPEELvOHNxDMd6rstfiaLOpqJ1MMnSM40Ee86NzszKM9oJOr4KJeQ94SdbtsZ+CUCGn+MbXSbu5yVNFSv+YcY6fAgJggauUShcRkH7iQ1OX6qxoO9WNkoQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAi+mkYWKIIbTytJ7M6O7R0Si0wt/yNPUozx02ys/Tmh3ots1nvjXY+bCYDTPsRxwu0QpQA1dt/CNDS5slmvRxpoLs0tE3qfqFzDrPa+IHJ/Pz+UmNHcfSzSH7wP2biWGGOb0MUzS95qYM2U0Y+eNDNgE1FweDUIR8o1HuqomvlO2/qHAzjp+tcO/lJ4JKZRxn4YpiYopT1Xxaxw6fpb2aMbegjZsRtetxoIBekI8VIXgisUKOsYQ9gKqy2i50G9kZJAYllx+A3gg3+95USqUxiVE2lvobaOij4DlQbsGYX0brEym6/broMeZXJnLa0kN8ZcCaos2V/+jY2hQ3Ql/Se",
                         "MIIDpTCCAY0CCQCHPA/pgr0u7jANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdyb290LWNhMB4XDTIxMTIxOTE3MTUwM1oXDTM1MDgyODE3MTUwM1owFzEVMBMGA1UEAwwMaW50ZXJtaWRpYXRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApvJJcp8VR4hvtOME5Z+PYqPb6TL1JFBjnW3Bt+dMnnu3N6uMlIXrIb5ELX55OP3BLDmTJUPm1mEORBcBjuWeWI+CU1ZbF3QEkb+hzzgoRhkiAPDiVdmgA5vbSC0kRJxNJ7kGvLEIGQgVqSfFsuE09RCm6OuS2Qqin2W8pwWk05Ob+3hWW4UWgVhJqNSSONHFNeiRSdMXWQmywY33zosExTM4epJyFSS+dIIhR61zq15bbRXtnwBHBlVY/lT15zuMsu1j9SJ28M2qR14oyBzTdjHPK8pAeJOxK80zVnzlSAUZBhxoZioQyka85Ane+HyNv4A9wOFP/xs2Xot5+jtQowIDAQABMA0GCSqGSIb3DQEBCwUAA4ICAQCCrsC3vu/CW2LJ5WwHgUC4Tr03v4/Sbs7di1GBn+RY2MWWTWnGhanInv0QGJmFsW0YtUNoRZR/qCsx/VCVy0uBfLHDkDFMu+OyGHygv940+ZVNVKB66wNosAkI2WIOFjcxD66o1jQAjJIp9gUOxvOuLh8SPJSBAmDVnhHOMbw+Gzv3F5MS7A6f7GvoIupRruLZtu0rQbOIt3CClsUui6D7A0VxsxJUpExMzn+teoOiquc1kpXhgK2bDlCS6IAGSDtbWXQAn983m1eD72IfM4yCWepOzpFs5OkDEYmBUmpnEQxeLQJH7UHs3/g9nxrC7xMVfOQhhbgWfyAx/TNP7Jt9yq/UOvBMVD05x5R7CJYR0cMi0IHnpSkY8NsiGxgOsWIHkvwc1ox2TVZyjR1zEuEkh0EN4/ur8OgaYSos5JfzSEVS00V9bFJnbhajNI8gkT2D+8zjdJ2FBieH7annnR4nZiYZecLjV605fr3+BeZZ6JRZKgMRQt2JQNA/iqKrHGmpU0REgOUXVrfnlu9KuvPnB4tlsIxRxlh/6o4lXdf9PME5U9t0g7JvH5EIzYyoFrdpSeNiFsg6DwhoXsp2lnUgD7WT27UVQ78PNk3BdqZiuQwSY62QK+xEpNvd8wts3uwFSzTat4QFlWuuT4M/o/NCbOttjGbS4m2t6gWJOFZbvQ=="
-
-                    } 
+                    }
                 }
             };
 
@@ -189,9 +187,9 @@ namespace UnitTests
             //given
             string json = @"
             {
-	            ""kty"":""PBKDF2"",
-	            ""s"":""2WCTcJZ1Rvd_CJuJripQ1w"",
-	            ""c"":4096
+                ""kty"":""PBKDF2"",
+                ""s"":""2WCTcJZ1Rvd_CJuJripQ1w"",
+                ""c"":4096
             }";
 
             //when
@@ -223,7 +221,6 @@ namespace UnitTests
             Assert.Equal(2, test.OtherParams.Count);
             Assert.Equal("2WCTcJZ1Rvd_CJuJripQ1w", test.OtherParams["s"]);
             Assert.Equal(4096, test.OtherParams["c"]);
-
         }
 
         [Fact]
@@ -285,10 +282,10 @@ namespace UnitTests
         {
             //given
             var data = new Dictionary<string, object>
-            { 
-                { "kty", "oct" }, 
-                { "k", "GawgguFyGrWKav7AX4VKUg" }, 
-                { "use", "sig" }, 
+            {
+                { "kty", "oct" },
+                { "k", "GawgguFyGrWKav7AX4VKUg" },
+                { "use", "sig" },
             };
 
             //when
@@ -401,8 +398,8 @@ namespace UnitTests
         {
             //given
             var data = new Dictionary<string, object>
-            { 
-                { "kty", "RSA" },                 
+            {
+                { "kty", "RSA" },
                 { "use", "sig" },
                 { "e", "AQAB" },
                 { "n", "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q" },
@@ -449,7 +446,7 @@ namespace UnitTests
             );
 
             //when
-            var test = key.ToJson(JWT.DefaultSettings.JsonMapper); 
+            var test = key.ToJson(JWT.DefaultSettings.JsonMapper);
 
             //then
             Console.Out.WriteLine(test);
@@ -472,7 +469,7 @@ namespace UnitTests
             );
 
             //when
-            var test = key.ToJson(JWT.DefaultSettings.JsonMapper); 
+            var test = key.ToJson(JWT.DefaultSettings.JsonMapper);
 
             //then
             Console.Out.WriteLine(test);
@@ -484,23 +481,23 @@ namespace UnitTests
         {
             //given
             var json = @"{
-	            ""d"": ""lJhwb0pKlB2ivyDFO6thajotClrMA3nxIiSkIUbvVr-TToFtha36gyF6w6e6YNXQXs4HhMRy1_b-nRQDk8G4_f5urd_q-pOn5u4KfmqN3Xw-lYD3ddi9qF0NLeTVUNVFASeP0FFqbPYfdNwD-LyvwjhtT_ggMOAw3mYvU5cBfz6-3uPdhl3CwQFCTgwOud_BA9p2MPMUHG82wMK_sNO1I0TYpjm7TnwNBwiKbMf-i5CKnuohgoYrEDYLeMg3f32eBljlCFNYaoCtT-mr1Ze0OTJND04vbfLotV-BBKulIpbOOSeVpKG7gJxZHmv7in7PE5_WzaxKFVoHW3wR6v_GzQ"",
-	            ""dp"": ""KTWmTGmf092AA1euOmRQ5IsfIIxQ5qGDn-FgsRh4acSOGE8L7WrTrTU4EOJyciuA0qz-50xIDbs4_j5pWx1BJVTrnhBin9vNLrVo9mtR6jmFS0ko226kOUpwEVLgtdQjobWLjtiuaMW-_Iw4gKWNptxZ6T1lBD8UWHaPiEFW2-M"",
-	            ""dq"": ""Jn0lqMkvemENEMG1eUw0c601wPOMoPD4SKTlnKWPTlQS6YISbNF5UKSuFLwoJa9HA8BifDrD-Mfpo1M1HPmnoilEWUrfwMqqdCkOlbiJQhKY8AZ16QGH50kDXhmVVa8BRWdVQWBTUzWXS5kXMaeskVzextTgymPcOAhXN-ph7MU"",
-	            ""e"": ""AQAB"",
-	            ""kid"": ""Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc"",
-	            ""kty"": ""RSA"",
-	            ""n"": ""qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q"",
-	            ""p"": ""0qaOkT174vRG3E_67gU3lgOgoT6L3pVHuu7wfrIEoxycPa5_mZVG54SgvQUofGUYEGjR0lavUAjClw9tOzcODHX8RAxkuDntAFntBxgRM-IzAy8QzeRl_cbhgVjBTAhBcxg-3VySv5GdxFyrQaIo8Oy_PPI1L4EFKZHmicBd3ts"",
-	            ""q"": ""zJPqCDKqaJH9TAGfzt6b4aNt9fpirEcdpAF1bCedFfQmUZM0LG3rMtOAIhjEXgADt5GB8ZNK3BQl8BJyMmKs57oKmbVcODERCtPqjECXXsxH-az9nzxatPvcb7imFW8OlWslwr4IIRKdEjzEYs4syQJz7k2ktqOpYI5_UfYnw1s"",
-	            ""qi"": ""sRAPigJpl8S_vsf1zhJTrHM97xRwuB26R6Tm-J8sKRPb7p5xxNlmOBBFvWmWxdto8dBElNlydSZan373yBLxzW-bZgVp-B2RKT1B3WhTYW_Vo5DLhWi84XMncJxH7avtxtF9yksaeKe0e2n3J6TTan53mDg4KF8U0OEO2ciqO9g""
+                ""d"": ""lJhwb0pKlB2ivyDFO6thajotClrMA3nxIiSkIUbvVr-TToFtha36gyF6w6e6YNXQXs4HhMRy1_b-nRQDk8G4_f5urd_q-pOn5u4KfmqN3Xw-lYD3ddi9qF0NLeTVUNVFASeP0FFqbPYfdNwD-LyvwjhtT_ggMOAw3mYvU5cBfz6-3uPdhl3CwQFCTgwOud_BA9p2MPMUHG82wMK_sNO1I0TYpjm7TnwNBwiKbMf-i5CKnuohgoYrEDYLeMg3f32eBljlCFNYaoCtT-mr1Ze0OTJND04vbfLotV-BBKulIpbOOSeVpKG7gJxZHmv7in7PE5_WzaxKFVoHW3wR6v_GzQ"",
+                ""dp"": ""KTWmTGmf092AA1euOmRQ5IsfIIxQ5qGDn-FgsRh4acSOGE8L7WrTrTU4EOJyciuA0qz-50xIDbs4_j5pWx1BJVTrnhBin9vNLrVo9mtR6jmFS0ko226kOUpwEVLgtdQjobWLjtiuaMW-_Iw4gKWNptxZ6T1lBD8UWHaPiEFW2-M"",
+                ""dq"": ""Jn0lqMkvemENEMG1eUw0c601wPOMoPD4SKTlnKWPTlQS6YISbNF5UKSuFLwoJa9HA8BifDrD-Mfpo1M1HPmnoilEWUrfwMqqdCkOlbiJQhKY8AZ16QGH50kDXhmVVa8BRWdVQWBTUzWXS5kXMaeskVzextTgymPcOAhXN-ph7MU"",
+                ""e"": ""AQAB"",
+                ""kid"": ""Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc"",
+                ""kty"": ""RSA"",
+                ""n"": ""qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q"",
+                ""p"": ""0qaOkT174vRG3E_67gU3lgOgoT6L3pVHuu7wfrIEoxycPa5_mZVG54SgvQUofGUYEGjR0lavUAjClw9tOzcODHX8RAxkuDntAFntBxgRM-IzAy8QzeRl_cbhgVjBTAhBcxg-3VySv5GdxFyrQaIo8Oy_PPI1L4EFKZHmicBd3ts"",
+                ""q"": ""zJPqCDKqaJH9TAGfzt6b4aNt9fpirEcdpAF1bCedFfQmUZM0LG3rMtOAIhjEXgADt5GB8ZNK3BQl8BJyMmKs57oKmbVcODERCtPqjECXXsxH-az9nzxatPvcb7imFW8OlWslwr4IIRKdEjzEYs4syQJz7k2ktqOpYI5_UfYnw1s"",
+                ""qi"": ""sRAPigJpl8S_vsf1zhJTrHM97xRwuB26R6Tm-J8sKRPb7p5xxNlmOBBFvWmWxdto8dBElNlydSZan373yBLxzW-bZgVp-B2RKT1B3WhTYW_Vo5DLhWi84XMncJxH7avtxtF9yksaeKe0e2n3J6TTan53mDg4KF8U0OEO2ciqO9g""
             }";
 
             //when
             var test = Jwk.FromJson(json, JWT.DefaultSettings.JsonMapper);
 
             //then
-            Assert.Equal(test.Kty, Jwk.KeyTypes.RSA);            
+            Assert.Equal(test.Kty, Jwk.KeyTypes.RSA);
             Assert.Equal(test.KeyId, "Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc");
             Assert.Equal(test.E, "AQAB");
             Assert.Equal(test.N, "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q");
@@ -572,7 +569,7 @@ namespace UnitTests
         {
             //given
             var key = new Jwk(
-                e: "AQAB", 
+                e: "AQAB",
                 n: "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q",
                 p: "0qaOkT174vRG3E_67gU3lgOgoT6L3pVHuu7wfrIEoxycPa5_mZVG54SgvQUofGUYEGjR0lavUAjClw9tOzcODHX8RAxkuDntAFntBxgRM-IzAy8QzeRl_cbhgVjBTAhBcxg-3VySv5GdxFyrQaIo8Oy_PPI1L4EFKZHmicBd3ts",
                 q: "zJPqCDKqaJH9TAGfzt6b4aNt9fpirEcdpAF1bCedFfQmUZM0LG3rMtOAIhjEXgADt5GB8ZNK3BQl8BJyMmKs57oKmbVcODERCtPqjECXXsxH-az9nzxatPvcb7imFW8OlWslwr4IIRKdEjzEYs4syQJz7k2ktqOpYI5_UfYnw1s",
@@ -618,8 +615,8 @@ namespace UnitTests
         public void EccKey_Cng_Private()
         {
             //given
-            var key = new Jwk(crv: "P-256", 
-                              x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", 
+            var key = new Jwk(crv: "P-256",
+                              x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
                               y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
                               d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
                            );
@@ -638,8 +635,8 @@ namespace UnitTests
         public void EccKey_Cng_Private_KeyAgreement()
         {
             //given
-            var key = new Jwk(crv: "P-256", 
-                              x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", 
+            var key = new Jwk(crv: "P-256",
+                              x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
                               y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
                               d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
                            );
@@ -883,7 +880,7 @@ namespace UnitTests
             Assert.Equal("EC", test["kty"]);
             Assert.Equal("P-256", test["crv"]);
             Assert.Equal("BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", test["x"]);
-            Assert.Equal("g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU", test["y"]);            
+            Assert.Equal("g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU", test["y"]);
         }
 
         [Fact]
@@ -904,8 +901,8 @@ namespace UnitTests
             Assert.Equal("EC", test["kty"]);
             Assert.Equal("P-256", test["crv"]);
             Assert.Equal("BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", test["x"]);
-            Assert.Equal("g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU", test["y"]);            
-            Assert.Equal("KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4", test["d"]);            
+            Assert.Equal("g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU", test["y"]);
+            Assert.Equal("KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4", test["d"]);
         }
 
         [Fact]
@@ -927,15 +924,15 @@ namespace UnitTests
 
             //then
             Assert.Equal(test.Kty, Jwk.KeyTypes.EC);
-            Assert.Equal(test.Use, Jwk.KeyUsage.Encryption);            
-            Assert.Equal(test.Crv, "P-256");            
+            Assert.Equal(test.Use, Jwk.KeyUsage.Encryption);
+            Assert.Equal(test.Crv, "P-256");
             Assert.Equal(test.X, "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk");
             Assert.Equal(test.Y, "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
             Assert.Equal(test.D, "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4");
 
             var key = test.CngKey();
 
-            Assert.NotNull(key);            
+            Assert.NotNull(key);
             Assert.Equal(key.Algorithm, CngAlgorithm.ECDsaP256);
             Assert.True(key.IsEphemeral);
         }
@@ -980,13 +977,13 @@ namespace UnitTests
         {
             //given
             var json = @"{
-	            ""kty"": ""EC"",
+                ""kty"": ""EC"",
                 ""kid"": ""Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc"",
-	            ""crv"": ""P-256"",
-	            ""use"": ""enc"",
-	            ""x"": ""BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk"",
-	            ""y"": ""g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"",
-	            ""d"": ""KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4""
+                ""crv"": ""P-256"",
+                ""use"": ""enc"",
+                ""x"": ""BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk"",
+                ""y"": ""g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"",
+                ""d"": ""KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4""
             }";
 
             //when
@@ -1028,7 +1025,6 @@ namespace UnitTests
                 "MIIEoDCCAogCCQDU5pKjdLHJvzANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdyb290LWNhMB4XDTIxMTIxOTE3MDU0OVoXDTMxMTIxNzE3MDU0OVowEjEQMA4GA1UEAwwHcm9vdC1jYTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBANBiqzJ6O7wLuFE42569qU3pR5CklXWE2XuNnt3LNglYOAOTy8j5xiImiIj+xN4K9qvPu30xbDL1EV83fom5zY2145RFvDc/FKKjmp1RrmL6rErRW2VbppuxSLXgNYUu6cffLbANCJdOmTPkAEwB+8GqnsEou00NFSM6LTJIihfpVln3mOr+wn9bQr7LQ62zdkj0i+rgxojyNhNNWVuGuRNV4kQRPhXMedUbKz73XoGOt3EXsyed81oMfkLZ0mh3Z3hAq0upUaCD6NeydVOTY62RgnUop7EdN+wruW3GRLReRq0ZtRFWNiaNfQA5ffSggzdtk7DDc6IU5vZDc/GZZP2VEZRzQ9HHw6Z6UfeRlL2H1YctGEEDIWX1sUYpHK1zzZtcOjbGsKpJtMuPFkVwJs9QOFEHtncxJaNN73e70/yv65PvuPhuFmKExVqEfu37IxM2Qoilii8/WBK9RonLe0qTLqNH2suXFkBDp9vhhUHGeho+m9ExhDQHpbRiXMw3EZDMICkvujhAqlK8wqcOfN0+urf8tzO9LtwX8czKbUq0R4HuGGdexd06/rK8GuUAr6aDSNdGkREeGl8EceYmBuGTmYRs/SqRRpW+k5O05gK7Nbvo2rU3BKL8y13AF95a5yXIZ3mJarXciv/WCv5sITcUtDIwZa/AkpaIGROQF2ejAgMBAAEwDQYJKoZIhvcNAQELBQADggIBACwqqfzL/irX7xpepIg7sydaC1CpYp86bC+UiG4C7QdKuuDrguY37n38kg5D5x6nOBIAjqgW45hUUcSJBVItS8nLtGrtopnyWJfr/bbfVT7MXMpJKEaDzPYgkAx12ObDMav6O9m+aj9n3zzGyNKDzmwkEk4IVHR1La0FfleTQ57d/gCjxDjgHLa7ayaXUYIyloPg+OdkMTkOTzMiFfVP3dCuXY7YHmNz2WuL8lPAhvVaEAYW4IPN0BZkseHjfxDKxPaAQrOMPSSYn826Y3XTyUGkBqFYu60VvwVawVhN4bn5oCkbfLHg8+wCCzbCrcrTwAC/cZubwO3/Ko3lzO+hxJDkbcHUgm8xYZziztIAxNGHORHF/6zgi6yvwOQfPNSWs4qWOFSBV3+JNRn+lvRRknRdGs0WPGZN9zIV4rRAuz1H+oh1WSfPdfDwf+qPeHME3sN0uUvNysdQPSnhi8crVv1hT1F+fv420olGKy0pnobvOCmw6uaBNInOm+xDHIsDt36t1P9OC3V9QPd4gs8BHRfssHOcTnptY/3cEwhTzW83QsbFgb9aQn/wDve6kKE9+i9Nd3XUeEIQ9E0MM2oI7vLyLDVg/YqBmxwEpfe6k8l4UI1UZlfn9TSBXhcaQ7VPNNeYS0j5lCEBP06LSV0Lx9YF4ad+sXdI0jAflBQodo6r"
             }, jwk.X5C);
 
-
             //when 
             //add two more
 
@@ -1036,7 +1032,7 @@ namespace UnitTests
             jwk.Add(chain[2]);
 
             //then we got all three
-            Assert.Equal(new List<string> 
+            Assert.Equal(new List<string>
             {
                 "MIIEoDCCAogCCQDU5pKjdLHJvzANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdyb290LWNhMB4XDTIxMTIxOTE3MDU0OVoXDTMxMTIxNzE3MDU0OVowEjEQMA4GA1UEAwwHcm9vdC1jYTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBANBiqzJ6O7wLuFE42569qU3pR5CklXWE2XuNnt3LNglYOAOTy8j5xiImiIj+xN4K9qvPu30xbDL1EV83fom5zY2145RFvDc/FKKjmp1RrmL6rErRW2VbppuxSLXgNYUu6cffLbANCJdOmTPkAEwB+8GqnsEou00NFSM6LTJIihfpVln3mOr+wn9bQr7LQ62zdkj0i+rgxojyNhNNWVuGuRNV4kQRPhXMedUbKz73XoGOt3EXsyed81oMfkLZ0mh3Z3hAq0upUaCD6NeydVOTY62RgnUop7EdN+wruW3GRLReRq0ZtRFWNiaNfQA5ffSggzdtk7DDc6IU5vZDc/GZZP2VEZRzQ9HHw6Z6UfeRlL2H1YctGEEDIWX1sUYpHK1zzZtcOjbGsKpJtMuPFkVwJs9QOFEHtncxJaNN73e70/yv65PvuPhuFmKExVqEfu37IxM2Qoilii8/WBK9RonLe0qTLqNH2suXFkBDp9vhhUHGeho+m9ExhDQHpbRiXMw3EZDMICkvujhAqlK8wqcOfN0+urf8tzO9LtwX8czKbUq0R4HuGGdexd06/rK8GuUAr6aDSNdGkREeGl8EceYmBuGTmYRs/SqRRpW+k5O05gK7Nbvo2rU3BKL8y13AF95a5yXIZ3mJarXciv/WCv5sITcUtDIwZa/AkpaIGROQF2ejAgMBAAEwDQYJKoZIhvcNAQELBQADggIBACwqqfzL/irX7xpepIg7sydaC1CpYp86bC+UiG4C7QdKuuDrguY37n38kg5D5x6nOBIAjqgW45hUUcSJBVItS8nLtGrtopnyWJfr/bbfVT7MXMpJKEaDzPYgkAx12ObDMav6O9m+aj9n3zzGyNKDzmwkEk4IVHR1La0FfleTQ57d/gCjxDjgHLa7ayaXUYIyloPg+OdkMTkOTzMiFfVP3dCuXY7YHmNz2WuL8lPAhvVaEAYW4IPN0BZkseHjfxDKxPaAQrOMPSSYn826Y3XTyUGkBqFYu60VvwVawVhN4bn5oCkbfLHg8+wCCzbCrcrTwAC/cZubwO3/Ko3lzO+hxJDkbcHUgm8xYZziztIAxNGHORHF/6zgi6yvwOQfPNSWs4qWOFSBV3+JNRn+lvRRknRdGs0WPGZN9zIV4rRAuz1H+oh1WSfPdfDwf+qPeHME3sN0uUvNysdQPSnhi8crVv1hT1F+fv420olGKy0pnobvOCmw6uaBNInOm+xDHIsDt36t1P9OC3V9QPd4gs8BHRfssHOcTnptY/3cEwhTzW83QsbFgb9aQn/wDve6kKE9+i9Nd3XUeEIQ9E0MM2oI7vLyLDVg/YqBmxwEpfe6k8l4UI1UZlfn9TSBXhcaQ7VPNNeYS0j5lCEBP06LSV0Lx9YF4ad+sXdI0jAflBQodo6r",
                 "MIIDpTCCAY0CCQCHPA/pgr0u7jANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdyb290LWNhMB4XDTIxMTIxOTE3MTUwM1oXDTM1MDgyODE3MTUwM1owFzEVMBMGA1UEAwwMaW50ZXJtaWRpYXRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApvJJcp8VR4hvtOME5Z+PYqPb6TL1JFBjnW3Bt+dMnnu3N6uMlIXrIb5ELX55OP3BLDmTJUPm1mEORBcBjuWeWI+CU1ZbF3QEkb+hzzgoRhkiAPDiVdmgA5vbSC0kRJxNJ7kGvLEIGQgVqSfFsuE09RCm6OuS2Qqin2W8pwWk05Ob+3hWW4UWgVhJqNSSONHFNeiRSdMXWQmywY33zosExTM4epJyFSS+dIIhR61zq15bbRXtnwBHBlVY/lT15zuMsu1j9SJ28M2qR14oyBzTdjHPK8pAeJOxK80zVnzlSAUZBhxoZioQyka85Ane+HyNv4A9wOFP/xs2Xot5+jtQowIDAQABMA0GCSqGSIb3DQEBCwUAA4ICAQCCrsC3vu/CW2LJ5WwHgUC4Tr03v4/Sbs7di1GBn+RY2MWWTWnGhanInv0QGJmFsW0YtUNoRZR/qCsx/VCVy0uBfLHDkDFMu+OyGHygv940+ZVNVKB66wNosAkI2WIOFjcxD66o1jQAjJIp9gUOxvOuLh8SPJSBAmDVnhHOMbw+Gzv3F5MS7A6f7GvoIupRruLZtu0rQbOIt3CClsUui6D7A0VxsxJUpExMzn+teoOiquc1kpXhgK2bDlCS6IAGSDtbWXQAn983m1eD72IfM4yCWepOzpFs5OkDEYmBUmpnEQxeLQJH7UHs3/g9nxrC7xMVfOQhhbgWfyAx/TNP7Jt9yq/UOvBMVD05x5R7CJYR0cMi0IHnpSkY8NsiGxgOsWIHkvwc1ox2TVZyjR1zEuEkh0EN4/ur8OgaYSos5JfzSEVS00V9bFJnbhajNI8gkT2D+8zjdJ2FBieH7annnR4nZiYZecLjV605fr3+BeZZ6JRZKgMRQt2JQNA/iqKrHGmpU0REgOUXVrfnlu9KuvPnB4tlsIxRxlh/6o4lXdf9PME5U9t0g7JvH5EIzYyoFrdpSeNiFsg6DwhoXsp2lnUgD7WT27UVQ78PNk3BdqZiuQwSY62QK+xEpNvd8wts3uwFSzTat4QFlWuuT4M/o/NCbOttjGbS4m2t6gWJOFZbvQ==",
@@ -1044,7 +1040,7 @@ namespace UnitTests
             }, jwk.X5C);
 
             Assert.Equal(chain, jwk.GetX509Chain());
-        }        
+        }
 
         [Fact]
         public void SetX509Chain()
@@ -1116,7 +1112,7 @@ namespace UnitTests
 
             //then
             Assert.Equal("uyIuvRrCqDBYz5XIDMk5z1CT5_Gpel_8GylIAFZxRVc", key.X5TSha256);
-        }        
+        }
 
         #region test utils
         private RSA PrivRsaKey()
@@ -1184,7 +1180,6 @@ namespace UnitTests
 
             return EccKey.New(x, y, d);
         }
-
 
         private CngKey Ecc512Public()
         {

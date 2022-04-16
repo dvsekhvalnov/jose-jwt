@@ -12,18 +12,18 @@ using Xunit.Abstractions;
 namespace UnitTests
 {
     public class TestSuite
-    {       
-        private TestConsole Console;
+    {
+        private readonly TestConsole Console;
 
-        private string key = "a0a2abd8-6162-41c3-83d6-1cf559b46afc";
-        private byte[] aes128Key = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
-        private byte[] aes192Key = new byte[] { 139, 156, 136, 148, 17, 147, 27, 233, 145, 80, 115, 197, 223, 11, 100, 221, 5, 50, 155, 226, 136, 222, 216, 14 };
-        private byte[] aes256Key = new byte[] { 164, 60, 194, 0, 161, 189, 41, 38, 130, 89, 141, 164, 45, 170, 159, 209, 69, 137, 243, 216, 191, 131, 47, 250, 32, 107, 231, 117, 37, 158, 225, 234 };
-        private byte[] aes384Key = new byte[] { 185, 30, 233, 199, 32, 98, 209, 3, 114, 250, 30, 124, 207, 173, 227, 152, 243, 202, 238, 165, 227, 199, 202, 230, 218, 185, 216, 113, 13, 53, 40, 100, 100, 20, 59, 67, 88, 97, 191, 3, 161, 37, 147, 223, 149, 237, 190, 156 };
-        private byte[] aes512Key = new byte[] { 238, 71, 183, 66, 57, 207, 194, 93, 82, 80, 80, 152, 92, 242, 84, 206, 194, 46, 67, 43, 231, 118, 208, 168, 156, 212, 33, 105, 27, 45, 60, 160, 232, 63, 61, 235, 68, 171, 206, 35, 152, 11, 142, 121, 174, 165, 140, 11, 172, 212, 13, 101, 13, 190, 82, 244, 109, 113, 70, 150, 251, 82, 215, 226 };
+        private const string key = "a0a2abd8-6162-41c3-83d6-1cf559b46afc";
+        private static readonly byte[] aes128Key = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
+        private static readonly byte[] aes192Key = new byte[] { 139, 156, 136, 148, 17, 147, 27, 233, 145, 80, 115, 197, 223, 11, 100, 221, 5, 50, 155, 226, 136, 222, 216, 14 };
+        private static readonly byte[] aes256Key = new byte[] { 164, 60, 194, 0, 161, 189, 41, 38, 130, 89, 141, 164, 45, 170, 159, 209, 69, 137, 243, 216, 191, 131, 47, 250, 32, 107, 231, 117, 37, 158, 225, 234 };
+        private static readonly byte[] aes384Key = new byte[] { 185, 30, 233, 199, 32, 98, 209, 3, 114, 250, 30, 124, 207, 173, 227, 152, 243, 202, 238, 165, 227, 199, 202, 230, 218, 185, 216, 113, 13, 53, 40, 100, 100, 20, 59, 67, 88, 97, 191, 3, 161, 37, 147, 223, 149, 237, 190, 156 };
+        private static readonly byte[] aes512Key = new byte[] { 238, 71, 183, 66, 57, 207, 194, 93, 82, 80, 80, 152, 92, 242, 84, 206, 194, 46, 67, 43, 231, 118, 208, 168, 156, 212, 33, 105, 27, 45, 60, 160, 232, 63, 61, 235, 68, 171, 206, 35, 152, 11, 142, 121, 174, 165, 140, 11, 172, 212, 13, 101, 13, 190, 82, 244, 109, 113, 70, 150, 251, 82, 215, 226 };
 
         // The binary payload is a blob consisting of all possible byte values.
-        private byte[] BinaryPayload = Enumerable.Range(byte.MinValue, byte.MaxValue + 1).Select(i => (byte)i).ToArray();
+        private static readonly byte[] BinaryPayload = Enumerable.Range(byte.MinValue, byte.MaxValue + 1).Select(i => (byte)i).ToArray();
 
         public TestSuite(ITestOutputHelper output)
         {
@@ -58,7 +58,7 @@ namespace UnitTests
 
             //then
             Assert.Equal(token, "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.");
-        }        
+        }
 
         [Fact]
         public void EncodeBytesHS512()
@@ -162,7 +162,7 @@ namespace UnitTests
             string token = "eyJhbGciOiJIUzUxMiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.9KirTNe8IRwFCBLjO8BZuXf3U2ZVagdsg7F9ZsvMwG3FuqY9W0vqwjzPOjLqPN-GkjPm6C3qWPnINhpr5bEDJQ";
 
             //when            
-            string json = Jose.JWT.Decode(token, new Jwk(Encoding.UTF8.GetBytes(key)));            
+            string json = Jose.JWT.Decode(token, new Jwk(Encoding.UTF8.GetBytes(key)));
 
             //then
             Console.Out.WriteLine("json = {0}", json);
@@ -175,7 +175,6 @@ namespace UnitTests
         {
             //given
             string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
-
 
             //when
             string json = Jose.JWT.Decode(token, PubKey());
@@ -194,7 +193,7 @@ namespace UnitTests
 
             //when
             string json = Jose.JWT.Decode(
-                token, 
+                token,
                 new Jwk("AQAB", "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q"));
 
             Console.Out.WriteLine("json = {0}", json);
@@ -208,7 +207,6 @@ namespace UnitTests
         {
             //given
             string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
-
 
             //when
             string json = Jose.JWT.Decode(token, PubRsaKey());
@@ -464,7 +462,6 @@ namespace UnitTests
             Assert.Equal(Jose.JWT.Decode(token, PubKey()), json);
         }
 
-
         [Fact]
         public void EncodePS256_JsonWebKey()
         {
@@ -654,7 +651,7 @@ namespace UnitTests
 
         [Fact]
         public void EncodeRS256_RSAKey()
-        {   
+        {
             //given
             string json = @"{""hello"": ""world""}";
 
@@ -670,7 +667,7 @@ namespace UnitTests
 
         [Fact]
         public void EncodeRS256_JsonWebKey()
-        {   
+        {
             //given
             var key = new Jwk(
                 e: "AQAB",
@@ -895,8 +892,6 @@ namespace UnitTests
             Assert.Equal(json, @"{""exp"":1392963710,""sub"":""alice"",""nbf"":1392963110,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""9fa7a38a-28fd-421c-825c-8fab3bbf3fb4"",""iat"":1392963110}");
         }
 
-
-
         [Fact]
         public void Decrypt_RSA_OAEP_A256CBC_HS512()
         {
@@ -984,7 +979,6 @@ namespace UnitTests
             Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
         }
 
-
         [Fact]
         public void Decrypt_RSA_OAEP_256_A128CBC_HS256_RsaCryptoProvider()
         {
@@ -1000,7 +994,6 @@ namespace UnitTests
 
             Assert.Equal(json, @"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}");
         }
-
 
         [Fact]
         public void Decrypt_RSA_OAEP_256_A192CBC_HS384()
@@ -1038,7 +1031,6 @@ namespace UnitTests
             //given
             string json = @"{""hello"": ""world""}";
 
-
             //when
             string token = Jose.JWT.Encode(json, RsaKey.New(PubKey().ExportParameters(false)), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM);
 
@@ -1062,7 +1054,6 @@ namespace UnitTests
         {
             //given
             string json = @"{""hello"": ""world""}";
-
 
             //when
             string token = Jose.JWT.Encode(json, PubRsaKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM);
@@ -1113,7 +1104,6 @@ namespace UnitTests
             //given
             string json = @"{""hello"": ""world""}";
 
-
             //when
             string token = Jose.JWT.Encode(json, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM);
 
@@ -1137,7 +1127,6 @@ namespace UnitTests
         {
             //given
             string json = @"{""hello"": ""world""}";
-
 
             //when
             string token = Jose.JWT.Encode(json, RsaKey.New(PubKey().ExportParameters(false)), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
@@ -1762,7 +1751,6 @@ namespace UnitTests
             Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
         }
 
-
         [Fact]
         public void Encrypt_RSA1_5_A128GCM()
         {
@@ -1787,7 +1775,6 @@ namespace UnitTests
 
             Assert.Equal(Jose.JWT.Decode(token, PrivKey()), json);
         }
-
 
         [Fact]
         public void Encrypt_RSA1_5_A192GCM()
@@ -2137,7 +2124,6 @@ namespace UnitTests
             Assert.Equal(json, @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}");
         }
 
-
         [Fact]
         public void Decrypt_A128GCMKW_A128CBC_HS256()
         {
@@ -2410,7 +2396,6 @@ namespace UnitTests
 
             Assert.Equal(Jose.JWT.Decode(token, "top secret"), json);
         }
-
 
         [Fact]
         public void Encrypt_A128GCMKW_A128CBC_HS256()
@@ -2872,7 +2857,6 @@ namespace UnitTests
             Assert.Equal(Jose.JWT.Decode(token, aes256Key), json);
         }
 
-
         [Fact]
         public void Decrypt_DIR_A192CBC_HS384()
         {
@@ -3119,7 +3103,7 @@ namespace UnitTests
             Assert.Equal(test["p2c"], 8192);
             Assert.Equal(test["p2s"], "NkXji1947fRsKTlB");
             Assert.Equal(test["exp"], 1363284000);
-            Assert.Equal(test["crit"], new[] { "exp"});
+            Assert.Equal(test["crit"], new[] { "exp" });
         }
 
         [Fact]
@@ -3205,10 +3189,9 @@ namespace UnitTests
             //then
             Console.Out.WriteLine("HS256 Detached = {0}", token);
 
-           Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..VleAUqv_-nc6dwZ9xQ8-4NiOpVRdSSrCCPCQl-7HQ2k");
-           Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key), payload: @"{""hello"": ""world""}"), json);
+            Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..VleAUqv_-nc6dwZ9xQ8-4NiOpVRdSSrCCPCQl-7HQ2k");
+            Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key), payload: @"{""hello"": ""world""}"), json);
         }
-
 
         [Fact]
         public void EncodeWithUnencodedPayload()
@@ -3233,7 +3216,7 @@ namespace UnitTests
             string json = @"{""hello"": ""world""}";
 
             //when
-            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256, options: new JwtOptions { DetachPayload = true, EncodePayload = false});
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256, options: new JwtOptions { DetachPayload = true, EncodePayload = false });
 
             //then
             Console.Out.WriteLine("HS256 Unencoded & Detached = {0}", token);
@@ -3253,11 +3236,11 @@ namespace UnitTests
                 { "exp", 1363284000 },
                 { "crit", new [] {"exp"} },
             };
-                
+
             //when
-            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256, 
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256,
                 extraHeaders: headers,
-                options: new JwtOptions { DetachPayload = true, EncodePayload = false});
+                options: new JwtOptions { DetachPayload = true, EncodePayload = false });
 
             //then
             Console.Out.WriteLine("HS256 Unencoded & Detached & Extra headers = {0}", token);
@@ -3265,12 +3248,12 @@ namespace UnitTests
             Assert.Equal(token, "eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0IiwiZXhwIl0sImV4cCI6MTM2MzI4NDAwMH0..9nZCB1H_OMmoTRBe2p5qeq38cyzcjJ6FzUZ9SkeZ4TU");
             Assert.Equal(Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key), payload: @"{""hello"": ""world""}"), json);
             var tokenHeaders = Jose.JWT.Headers(token);
-            
+
             Assert.Equal(tokenHeaders.Count(), 4);
             Assert.Equal(tokenHeaders["alg"], "HS256");
             Assert.Equal(tokenHeaders["b64"], false);
             Assert.Equal(tokenHeaders["exp"], 1363284000);
-            Assert.Equal(tokenHeaders["crit"], new [] {"b64", "exp"});
+            Assert.Equal(tokenHeaders["crit"], new[] { "b64", "exp" });
         }
 
         [Fact]
@@ -3311,12 +3294,12 @@ namespace UnitTests
 
         [Fact]
         public void DecodeBytesUnencodedDetached()
-        {            
+        {
             //given
             string token = "eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJSUzI1NiJ9..ToCewDcERVLuqImwDkOd9iSxvTC8vzh-HrhuohOIjWMrGpTZi2FdzVN4Ll3fb2Iz3s_hj-Lno_c6m_7VcmOHfRLC9sPjSu2q9dbNkKo8Zc2FQmsCBdQi06XGAEJZW2M9380pxoYKiJ51a4EbGl4Ag7lX3hXeTPYRMVifacgdlpg2SYZzDPZQbWvibgtXFsBsIqPd-8i6ucE2eMdaNeWMLsHv-b5s7uWn8hN2nMKHj000Qce5rSbpK58l2LNeWw4IR6wNOqSZfbeerMxq1u0p-ZKIQxP24MltaPjZtqMdD4AzjrP4UCEf7VaLSkSuNVSf6ZmLmE_OYgQuQe7adFdoPg";
 
             //when
-            byte[] test = Jose.JWT.DecodeBytes(token, PubKey(), payload:BinaryPayload);
+            byte[] test = Jose.JWT.DecodeBytes(token, PubKey(), payload: BinaryPayload);
 
             //then
             Assert.Equal(test, BinaryPayload);
@@ -3342,7 +3325,7 @@ namespace UnitTests
             string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
 
             // then
-            Assert.Throws<InvalidAlgorithmException>(()=>Jose.JWT.Decode(token, PubKey(), JwsAlgorithm.RS512));
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, PubKey(), JwsAlgorithm.RS512));
         }
 
         [Fact]
@@ -3367,7 +3350,7 @@ namespace UnitTests
             string token = Jose.JWT.Encode(json, RsaKey.New(PubKey().ExportParameters(false)), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
 
             // then
-            Assert.Throws<InvalidAlgorithmException>(()=>Jose.JWT.Decode(token, PrivKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A192GCM));
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, PrivKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A192GCM));
             Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, PrivKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128CBC_HS256));
         }
 
@@ -3405,10 +3388,10 @@ namespace UnitTests
             string token = "eyJhbGciOiJfUlMyNTYiLCJ0eXAiOiJKV1QifQ.eyJoZWxsbyI6ICJ3b3JsZCJ9.HhLwe11JpybXCXDqneSyG8V2pG38pZ2RzgPF3kT7CpHmYL-jmDfwn9ChNig7gmpWkhc4SZO7KNl2-dGOo8wfC7ITg9rZimjac6dMF5m7668Q8OyePiaICzGUCUPOVZ30ty6QSyH3aDVQgbh57jUTlbdXyE1-CmdhF2_b_2YA940Qm8YLeIXYP5pO-5OLKeWlzF2tXX9kEytWsa1WxrlUs4pHInMO1iA9GoE_NLa99p200L2kBwknsRlU3qzTzCs_ez_XvFhd0rq2AE9GhATNi4LZbNnkx0F3rD5ivskeFnO23AlTzjnV0wguRoNtweGyC-5tFHsVan3_1KFf7USZKg";
 
             //then
-            Assert.Throws<InvalidAlgorithmException>(()=>Jose.JWT.Decode(token, PubKey()));
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, PubKey()));
         }
 
-        [Fact]        
+        [Fact]
         public void UnknownJweAlg()
         {
             //given
@@ -3512,12 +3495,12 @@ namespace UnitTests
             var headers = new Dictionary<string, object>
             {
                  {"typ", "JWT"},
-                 {"kid", 0xFFFFFFFF}      
+                 {"kid", 0xFFFFFFFF}
             };
 
             var payload = new Dictionary<string, object>
             {
-                 {"sub", 0xFFFFFFFF},   
+                 {"sub", 0xFFFFFFFF},
                  {"iss", "JustAName"},
                  {"iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds() },
                  {"exp", DateTimeOffset.UtcNow.AddMinutes(30).ToUnixTimeSeconds() }
@@ -3537,11 +3520,11 @@ namespace UnitTests
             {
                 jti = "7eb8f0e3-1144-4ed2-b4d9-be266f68f212",
                 iss = "My Application",
-                iat = 1617749964L, 
+                iat = 1617749964L,
                 aud = "https://example.com",
                 sub = "testperson@example.com"
             };
-            
+
             var token = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI3ZWI4ZjBlMy0xMTQ0LTRlZDItYjRkOS1iZTI2NmY2OGYyMTIiLCJpc3MiOiJNeSBBcHBsaWNhdGlvbiIsImlhdCI6MTYxNzc0OTk2NCwiYXVkIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsInN1YiI6InRlc3RwZXJzb25AZXhhbXBsZS5jb20ifQ.U1O2Yy9HZNz7H83x6vgpzF7C0IkCZsI2DFIsf48V8CNDZUIh12tH2WH0yd3ck7D-u3biqoux2MppOFoKlC_XqhQBmKJRo4RkKdTmIUdTBNULC7kfcL5327iYCg0mHVR4HQbuPA2v2_vcPv0wsTSvo6-0Dj8AZGHZ2Qzmb22dc3WD0YCbDI24sXjAlCBBtpogYmSNHC-WtzQJVTf8hLu1n9h9W0gQ9D1hq6LnkyWTuXS-Mr3vzWvxILnrhErTseC9z2Xl-gOUUq_h_Y-DeRXirzhTq2a6wXfD5M7Jw6axjWI41VX8cCJ5WitfzMgOhjOO4NWY1mQZImPz0q7Q1zNdAg";
             TestPayloadModel test = JWT.Decode<TestPayloadModel>(token, PubRsaKey());
 
@@ -3551,7 +3534,7 @@ namespace UnitTests
             Assert.Equal(test.aud, "https://example.com");
             Assert.Equal(test.sub, "testperson@example.com");
         }
-            
+
         #region test utils
 
         private RSACryptoServiceProvider PrivKey()
@@ -3631,7 +3614,6 @@ namespace UnitTests
             byte[] d = { 42, 148, 231, 48, 225, 196, 166, 201, 23, 190, 229, 199, 20, 39, 226, 70, 209, 148, 29, 70, 125, 14, 174, 66, 9, 198, 80, 251, 95, 107, 98, 206 };
 
             return EccKey.New(x, y, d, usage);
-
         }
 
         private CngKey Ecc512Public()

@@ -23,7 +23,7 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Wrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.Equal(expected, test);
         }
 
         [Fact]
@@ -44,7 +44,7 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Unwrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.Equal(expected, test);
         }
 
         [Fact]
@@ -65,7 +65,7 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Wrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.Equal(expected, test);
         }
 
         [Fact]
@@ -86,7 +86,7 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Unwrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.Equal(expected, test);
         }
 
         [Fact]
@@ -107,7 +107,7 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Wrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.Equal(expected, test);
         }
 
         [Fact]
@@ -128,7 +128,7 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Unwrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.Equal(expected, test);
         }
 
         [Fact]
@@ -149,7 +149,7 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Wrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.Equal(expected, test);
         }
 
         [Fact]
@@ -170,7 +170,7 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Unwrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.Equal(expected, test);
         }
 
         [Fact]
@@ -191,7 +191,7 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Wrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.Equal(expected, test);
         }
 
         [Fact]
@@ -212,7 +212,7 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Unwrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.Equal(expected, test);
         }
 
         [Fact]
@@ -233,7 +233,7 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Wrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.Equal(expected, test);
         }
 
         [Fact]
@@ -254,7 +254,7 @@ namespace UnitTests
             byte[] test = AesKeyWrap.Unwrap(key, kek);
 
             //then
-            Assert.Equal(test, expected);
+            Assert.Equal(expected, test);
         }
     }
 }
