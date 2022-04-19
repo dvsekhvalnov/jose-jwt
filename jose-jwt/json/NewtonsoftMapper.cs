@@ -6,7 +6,6 @@ using Newtonsoft.Json.Converters;
 
 namespace Jose
 {
-
     public class NewtonsoftMapper : IJsonMapper
     {
         public string Serialize(object obj)
@@ -27,7 +26,7 @@ namespace Jose
         }
     }
 
-    class NestedDictionariesConverter : CustomCreationConverter<object>
+    internal class NestedDictionariesConverter : CustomCreationConverter<object>
     {
         public override object Create(Type objectType)
         {
@@ -54,20 +53,20 @@ namespace Jose
             {
                 return base.ReadJson(reader, objectType, existingValue, serializer);
             }
-
-            if (reader.TokenType == JsonToken.StartArray)
+            else if (reader.TokenType == JsonToken.StartArray)
             {
                 return base.ReadJson(reader, typeof(IEnumerable<>), existingValue, serializer);
             }
-
-            if (reader.TokenType == JsonToken.Integer)
+            else if (reader.TokenType == JsonToken.Integer)
             {
                 return Convert.ToInt64(reader.Value);
             }
-
-            // if the next token is not an object
-            // then fall back on standard deserializer (strings, numbers etc.)
-            return serializer.Deserialize(reader);
+            else
+            {
+                // if the next token is not an object
+                // then fall back on standard deserializer (strings, numbers etc.)
+                return serializer.Deserialize(reader);
+            }
         }
     }
 }

@@ -5,7 +5,7 @@ namespace Jose
 {
     public class HmacUsingSha : IJwsAlgorithm
     {
-        private string hashMethod;
+        private readonly string hashMethod;
 
         public HmacUsingSha(string hashMethod)
         {
@@ -14,18 +14,15 @@ namespace Jose
 
         public byte[] Sign(byte[] securedInput, object key)
         {
-            if (key is byte[])
+            if (key is byte[] keyBytes)
             {
-                using (var sha = KeyedHash((byte[])key))
+                using (var sha = KeyedHash(keyBytes))
                 {
                     return sha.ComputeHash(securedInput);
                 }
             }
-
-            if (key is Jwk)
+            else if (key is Jwk jwk)
             {
-                var jwk = (Jwk)key;
-
                 if (jwk.Kty == Jwk.KeyTypes.OCT)
                 {
                     using (var sha = KeyedHash(jwk.OctKey()))
@@ -42,19 +39,19 @@ namespace Jose
         {
             byte[] expected = Sign(securedInput, key);
 
-            return Arrays.ConstantTimeEquals(signature, expected);            
+            return Arrays.ConstantTimeEquals(signature, expected);
         }
 
         private KeyedHashAlgorithm KeyedHash(byte[] key)
         {
             if ("SHA256".Equals(hashMethod))
                 return new HMACSHA256(key);
-            if ("SHA384".Equals(hashMethod))
+            else if ("SHA384".Equals(hashMethod))
                 return new HMACSHA384(key);
-            if ("SHA512".Equals(hashMethod))
+            else if ("SHA512".Equals(hashMethod))
                 return new HMACSHA512(key);
-
-            throw new ArgumentException("Unsupported hashing algorithm: '{0}'", hashMethod);
+            else
+                throw new ArgumentException("Unsupported hashing algorithm: '{0}'", hashMethod);
         }
     }
 }

@@ -4,18 +4,17 @@ using Jose;
 
 namespace Jose.keys
 {
-    public class RsaKey
+    public static class RsaKey
     {
         public static readonly byte[] BCRYPT_RSAPUBLIC_MAGIC = BitConverter.GetBytes(0x31415352);
         public static readonly byte[] BCRYPT_RSAPRIVATE_MAGIC = BitConverter.GetBytes(0x32415352);
-        
-         
+
         public static CngKey New(RSAParameters parameters)
         {
             return New(parameters.Exponent, parameters.Modulus, parameters.P, parameters.Q);
         }
 
-        public static CngKey New(byte[] exponent, byte[] modulus, byte[] p=null, byte[] q=null)
+        public static CngKey New(byte[] exponent, byte[] modulus, byte[] p = null, byte[] q = null)
         {
             bool pubOnly = (p == null) || (q == null);
 

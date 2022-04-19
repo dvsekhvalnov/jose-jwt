@@ -5,18 +5,18 @@ using System.Text;
 
 namespace Jose
 {
-    public class Arrays
+    public static class Arrays
     {
-        public readonly static byte[] Empty=new byte[0];
+        public readonly static byte[] Empty = new byte[0];
         public readonly static byte[] Zero = new byte[] { 0 };
 
-        private static RandomNumberGenerator rng;
+        private static readonly RandomNumberGenerator rng = RandomNumberGenerator.Create();
 
         public static byte[] FirstHalf(byte[] arr)
         {
             Ensure.Divisible(arr.Length, 2, "Arrays.FirstHalf() expects even number of element in array.");
 
-            int halfIndex = arr.Length/2;
+            int halfIndex = arr.Length / 2;
 
             byte[] result = new byte[halfIndex];
 
@@ -29,7 +29,7 @@ namespace Jose
         {
             Ensure.Divisible(arr.Length, 2, "Arrays.SecondHalf() expects even number of element in array.");
 
-            int halfIndex = arr.Length/2;
+            int halfIndex = arr.Length / 2;
 
             byte[] result = new byte[halfIndex];
 
@@ -40,12 +40,12 @@ namespace Jose
 
         public static byte[] Concat(params byte[][] arrays)
         {
-            byte[] result = new byte[arrays.Sum(a => (a==null) ? 0 : a.Length )];
+            byte[] result = new byte[arrays.Sum(a => (a?.Length ?? 0))];
             int offset = 0;
 
             foreach (byte[] array in arrays)
             {
-                if(array==null) continue;
+                if (array == null) continue;
 
                 Buffer.BlockCopy(array, 0, result, offset, array.Length);
                 offset += array.Length;
@@ -63,12 +63,11 @@ namespace Jose
 
             byte[][] result = new byte[sliceCount][];
 
-
             for (int i = 0; i < sliceCount; i++)
             {
-                byte[] slice=new byte[count];
-    
-                Buffer.BlockCopy(array,i*count,slice,0,count);
+                byte[] slice = new byte[count];
+
+                Buffer.BlockCopy(array, i * count, slice, 0, count);
 
                 result[i] = slice;
             }
@@ -86,13 +85,13 @@ namespace Jose
 
         public static byte[] Xor(byte[] left, byte[] right)
         {
-            Ensure.SameSize(left,right,"Arrays.Xor(byte[], byte[]) expects both arrays to be same legnth, but was given {0} and {1}",left.Length,right.Length);
+            Ensure.SameSize(left, right, "Arrays.Xor(byte[], byte[]) expects both arrays to be same legnth, but was given {0} and {1}", left.Length, right.Length);
 
-            byte[] result=new byte[left.Length];
+            byte[] result = new byte[left.Length];
 
-            for(int i=0;i<left.Length;i++)
+            for (int i = 0; i < left.Length; i++)
             {
-                result[i] = (byte) (left[i] ^ right[i]);
+                result[i] = (byte)(left[i] ^ right[i]);
             }
 
             return result;
@@ -106,7 +105,7 @@ namespace Jose
             if (expected == null || actual == null)
                 return false;
 
-            if (expected.Length != actual.Length) 
+            if (expected.Length != actual.Length)
                 return false;
 
             byte result = 0;
@@ -118,9 +117,9 @@ namespace Jose
 
         public static string Dump(byte[] arr, string label = "")
         {
-            var builder=new StringBuilder();
+            var builder = new StringBuilder();
 
-            builder.Append(string.Format("{0}({1} bytes): [", label+" ", arr.Length).Trim());
+            builder.Append(string.Format("{0}({1} bytes): [", label + " ", arr.Length).Trim());
 
             foreach (var b in arr)
             {
@@ -129,27 +128,19 @@ namespace Jose
             }
 
             builder.Remove(builder.Length - 1, 1);
-            builder.Append("] Hex:[").Append(BitConverter.ToString(arr).Replace("-"," "));
+            builder.Append("] Hex:[").Append(BitConverter.ToString(arr).Replace("-", " "));
             builder.Append("] Base64Url:").Append(Base64Url.Encode(arr)).Append("\n");
 
             return builder.ToString();
-        }        
+        }
 
-        public static byte[] Random(int sizeBits=128)
+        public static byte[] Random(int sizeBits = 128)
         {
             byte[] data = new byte[sizeBits / 8];
 
-            RNG.GetBytes(data);
+            rng.GetBytes(data);
 
-            return data;      
-        }
-
-        internal static RandomNumberGenerator RNG
-        {        
-            get
-            {                            
-                return rng ?? (rng = RandomNumberGenerator.Create());
-            }
+            return data;
         }
 
         public static byte[] IntToBytes(int value)
@@ -163,23 +154,23 @@ namespace Jose
 
         public static byte[] LongToBytes(long value)
         {
-            ulong _value = (ulong) value;
+            ulong _value = (ulong)value;
 
-            return BitConverter.IsLittleEndian 
-                ? new[] { (byte)((_value >> 56) & 0xFF), (byte)((_value >> 48) & 0xFF), (byte)((_value >> 40) & 0xFF), (byte)((_value >> 32) & 0xFF), (byte)((_value >> 24) & 0xFF), (byte)((_value >> 16) & 0xFF), (byte)((_value >> 8) & 0xFF), (byte)(_value & 0xFF) } 
-                : new[] { (byte)(_value & 0xFF), (byte)((_value >> 8) & 0xFF), (byte)((_value >> 16) & 0xFF), (byte)((_value >> 24) & 0xFF), (byte)((_value >> 32) & 0xFF), (byte)((_value >> 40) & 0xFF), (byte)((_value >> 48) & 0xFF) , (byte)((_value >> 56) & 0xFF) };
+            return BitConverter.IsLittleEndian
+                ? new[] { (byte)((_value >> 56) & 0xFF), (byte)((_value >> 48) & 0xFF), (byte)((_value >> 40) & 0xFF), (byte)((_value >> 32) & 0xFF), (byte)((_value >> 24) & 0xFF), (byte)((_value >> 16) & 0xFF), (byte)((_value >> 8) & 0xFF), (byte)(_value & 0xFF) }
+                : new[] { (byte)(_value & 0xFF), (byte)((_value >> 8) & 0xFF), (byte)((_value >> 16) & 0xFF), (byte)((_value >> 24) & 0xFF), (byte)((_value >> 32) & 0xFF), (byte)((_value >> 40) & 0xFF), (byte)((_value >> 48) & 0xFF), (byte)((_value >> 56) & 0xFF) };
         }
 
         public static long BytesToLong(byte[] array)
         {
-            long msb = BitConverter.IsLittleEndian 
+            long msb = BitConverter.IsLittleEndian
                         ? (long)(array[0] << 24 | array[1] << 16 | array[2] << 8 | array[3]) << 32
-                        : (long)(array[7] << 24 | array[6] << 16 | array[5] << 8 | array[4]) << 32;;
+                        : (long)(array[7] << 24 | array[6] << 16 | array[5] << 8 | array[4]) << 32;
 
             long lsb = BitConverter.IsLittleEndian
                            ? (array[4] << 24 | array[5] << 16 | array[6] << 8 | array[7]) & 0x00000000ffffffff
                            : (array[3] << 24 | array[2] << 16 | array[1] << 8 | array[0]) & 0x00000000ffffffff;
-            
+
             return msb | lsb;
         }
 
@@ -187,7 +178,7 @@ namespace Jose
         {
             Ensure.Divisible(lengthBits, 8, "LeftmostBits() expects length in bits divisible by 8, but was given {0}", lengthBits);
 
-            int byteCount = lengthBits/8;            
+            int byteCount = lengthBits / 8;
 
             var result = new byte[byteCount];
 
@@ -204,10 +195,9 @@ namespace Jose
 
             var result = new byte[byteCount];
 
-            Buffer.BlockCopy(data, data.Length-byteCount, result, 0, byteCount);
+            Buffer.BlockCopy(data, data.Length - byteCount, result, 0, byteCount);
 
             return result;
-
         }
     }
 }

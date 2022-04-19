@@ -7,7 +7,7 @@ namespace Jose.netstandard1_4
 {
     public class EcdsaUsingSha : IJwsAlgorithm
     {
-        private int keySize;
+        private readonly int keySize;
 
         public EcdsaUsingSha(int keySize)
         {
@@ -18,27 +18,23 @@ namespace Jose.netstandard1_4
         {
             try
             {
-                if (key is CngKey)
+                if (key is CngKey cngKey)
                 {
-                    return Sign((CngKey)key, securedInput);
+                    return Sign(cngKey, securedInput);
                 }
-
-                if (key is ECDsa)
+                else if (key is ECDsa ecDsa)
                 {
-                    return Sign((ECDsa)key, securedInput);
+                    return Sign(ecDsa, securedInput);
                 }
-
-                if (key is Jwk)
+                else if (key is Jwk jwk)
                 {
-                    var jwk = (Jwk)key;
-
                     if (jwk.Kty == Jwk.KeyTypes.EC)
                     {
-                      #if NETSTANDARD || NET472
+#if NETSTANDARD || NET472
                         return Sign(jwk.ECDsaKey(), securedInput);
-                      #else
+#else
                         return Sign(jwk.CngKey(), securedInput);
-                      #endif
+#endif
                     }
                 }
 
@@ -55,27 +51,23 @@ namespace Jose.netstandard1_4
         {
             try
             {
-                if (key is CngKey)
+                if (key is CngKey cngKey)
                 {
-                    return Verify((CngKey)key, signature, securedInput);
+                    return Verify(cngKey, signature, securedInput);
                 }
-
-                if (key is ECDsa)
+                else if (key is ECDsa ecDsa)
                 {
-                    return Verify((ECDsa)key, signature, securedInput);
+                    return Verify(ecDsa, signature, securedInput);
                 }
-
-                if (key is Jwk)
+                else if (key is Jwk jwk)
                 {
-                    var jwk = (Jwk)key;
-
                     if (jwk.Kty == Jwk.KeyTypes.EC)
                     {
-                      #if NETSTANDARD || NET472
+#if NETSTANDARD || NET472
                         return Verify(jwk.ECDsaKey(), signature, securedInput);
-                      #else
+#else
                         return Verify(jwk.CngKey(), signature, securedInput);
-                      #endif
+#endif
                     }
                 }
 
@@ -91,14 +83,17 @@ namespace Jose.netstandard1_4
         {
             get
             {
-                if (keySize == 256)
-                    return HashAlgorithmName.SHA256;
-                if (keySize == 384)
-                    return HashAlgorithmName.SHA384;
-                if (keySize == 521)
-                    return HashAlgorithmName.SHA512;
-
-                throw new ArgumentException(string.Format("Unsupported key size: '{0} bytes'", keySize));
+                switch (keySize)
+                {
+                    case 256:
+                        return HashAlgorithmName.SHA256;
+                    case 384:
+                        return HashAlgorithmName.SHA384;
+                    case 521:
+                        return HashAlgorithmName.SHA512;
+                    default:
+                        throw new ArgumentException(string.Format("Unsupported key size: '{0} bytes'", keySize));
+                }
             }
         }
 

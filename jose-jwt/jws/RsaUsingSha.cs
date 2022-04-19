@@ -5,7 +5,7 @@ namespace Jose
 {
     public class RsaUsingSha : IJwsAlgorithm
     {
-        private string hashMethod;
+        private readonly string hashMethod;
 
         public RsaUsingSha(string hashMethod)
         {
@@ -19,27 +19,22 @@ namespace Jose
 
             using (var sha = HashAlgorithm)
             {
-                
-
                 var pkcs1 = new RSAPKCS1SignatureFormatter(privateKey);
                 pkcs1.SetHashAlgorithm(hashMethod);
 
-                return pkcs1.CreateSignature(sha.ComputeHash(securedInput));                    
+                return pkcs1.CreateSignature(sha.ComputeHash(securedInput));
             }
 
 #elif NETSTANDARD || NET461 || NET472
-            if (key is RSA)
-            {                
-                return ((RSA)key).SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pkcs1);
-            }
-
-            if (key is Jwk)
+            if (key is RSA rsa)
             {
-                var privateKey = (Jwk)key;
-
-                if (privateKey.Kty == Jwk.KeyTypes.RSA)
+                return rsa.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pkcs1);
+            }
+            else if (key is Jwk jwk)
+            {
+                if (jwk.Kty == Jwk.KeyTypes.RSA)
                 {
-                    return privateKey.RsaKey().SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pkcs1);
+                    return jwk.RsaKey().SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pkcs1);
                 }
             }
 
@@ -52,8 +47,8 @@ namespace Jose
 #if NET40
             using (var sha = HashAlgorithm)
             {
-                var publicKey = Ensure.Type<AsymmetricAlgorithm>(key, "RsaUsingSha alg expects key to be of AsymmetricAlgorithm type."); 
-                
+                var publicKey = Ensure.Type<AsymmetricAlgorithm>(key, "RsaUsingSha alg expects key to be of AsymmetricAlgorithm type.");
+
                 byte[] hash = sha.ComputeHash(securedInput);
                 var pkcs1 = new RSAPKCS1SignatureDeformatter(publicKey);
                 pkcs1.SetHashAlgorithm(hashMethod);
@@ -61,21 +56,17 @@ namespace Jose
                 return pkcs1.VerifySignature(hash, signature);
             }
 #elif NETSTANDARD || NET461 || NET472
-            if (key is RSA)
+            if (key is RSA rsa)
             {
-                var publicKey = (RSA)key;
-                return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pkcs1);
+                return rsa.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pkcs1);
             }
-
-            if (key is Jwk)
+            else if (key is Jwk jwk)
             {
-                var publicKey = (Jwk)key;
-
-                if (publicKey.Kty == Jwk.KeyTypes.RSA)
+                if (jwk.Kty == Jwk.KeyTypes.RSA)
                 {
-                    return publicKey.RsaKey().VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pkcs1);
+                    return jwk.RsaKey().VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pkcs1);
                 }
-            }            
+            }
 
             throw new ArgumentException("RsaUsingSha alg expects key to be of RSA type or Jwk type with kty='rsa'");
 #endif
@@ -83,17 +74,17 @@ namespace Jose
 
 #if NET40
         private HashAlgorithm HashAlgorithm
-        {        
+        {
             get
             {
                 if (hashMethod.Equals("SHA256"))
                     return new SHA256CryptoServiceProvider();
-                if (hashMethod.Equals("SHA384"))
+                else if (hashMethod.Equals("SHA384"))
                     return new SHA384CryptoServiceProvider();
-                if (hashMethod.Equals("SHA512"))
+                else if (hashMethod.Equals("SHA512"))
                     return new SHA512CryptoServiceProvider();
-
-        throw new ArgumentException("Unsupported hashing algorithm: '{0}'", hashMethod);
+                else
+                    throw new ArgumentException("Unsupported hashing algorithm: '{0}'", hashMethod);
             }
         }
 #elif NETSTANDARD || NET461 || NET472
@@ -103,12 +94,12 @@ namespace Jose
             {
                 if (hashMethod.Equals("SHA256"))
                     return HashAlgorithmName.SHA256;
-                if (hashMethod.Equals("SHA384"))
+                else if (hashMethod.Equals("SHA384"))
                     return HashAlgorithmName.SHA384;
-                if (hashMethod.Equals("SHA512"))
+                else if (hashMethod.Equals("SHA512"))
                     return HashAlgorithmName.SHA512;
-
-                throw new ArgumentException("Unsupported hashing algorithm: '{0}'", hashMethod);
+                else
+                    throw new ArgumentException("Unsupported hashing algorithm: '{0}'", hashMethod);
             }
         }
 #endif

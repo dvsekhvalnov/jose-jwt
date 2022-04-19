@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Jose
 {
-    public class Dictionaries
+    public static class Dictionaries
     {
         /// <summary>
         /// Appends `other` key/value pairs to 'src'. Conflicting keys are not appended (e.g. 'src' keys has priority).

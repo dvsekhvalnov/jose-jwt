@@ -39,15 +39,12 @@ namespace Jose
 
         private byte[] byteKey(object key)
         {
-            if (key is byte[])
+            if (key is byte[] arr)
             {
-                return (byte[])key;
+                return arr;
             }
-
-            if (key is Jwk)
+            else if (key is Jwk jwk)
             {
-                var jwk = (Jwk)key;
-
                 if (jwk.Kty == Jwk.KeyTypes.OCT)
                 {
                     return jwk.OctKey();

@@ -18,12 +18,12 @@ namespace Jose
             SerializeOptions = new JsonSerializerOptions
             {
                 Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
-		PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
 
             DeserializeOptions = new JsonSerializerOptions() 
             {
-		PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };
 
             DeserializeOptions.Converters.Add(new NestedDictionariesConverter());

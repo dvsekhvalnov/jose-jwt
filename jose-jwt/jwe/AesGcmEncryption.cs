@@ -5,7 +5,7 @@ namespace Jose
 {
     public class AesGcmEncryption : IJweAlgorithm
     {
-        private int keyLength;
+        private readonly int keyLength;
 
         public AesGcmEncryption(int keyLength)
         {
@@ -14,25 +14,25 @@ namespace Jose
 
         public byte[][] Encrypt(byte[] aad, byte[] plainText, byte[] cek)
         {
-            Ensure.BitSize(cek, keyLength, string.Format("AES-GCM algorithm expected key of size {0} bits, but was given {1} bits",keyLength, cek.Length * 8L));
+            Ensure.BitSize(cek, keyLength, string.Format("AES-GCM algorithm expected key of size {0} bits, but was given {1} bits", keyLength, cek.Length * 8L));
 
             byte[] iv = Arrays.Random(96);
 
             try
             {
-                byte[][] cipherAndTag=AesGcm.Encrypt(cek, iv, aad, plainText);
+                byte[][] cipherAndTag = AesGcm.Encrypt(cek, iv, aad, plainText);
 
                 return new[] { iv, cipherAndTag[0], cipherAndTag[1] };
             }
             catch (CryptographicException e)
             {
-                throw new EncryptionException("Unable to encrypt content.",e);    
-            }            
+                throw new EncryptionException("Unable to encrypt content.", e);
+            }
         }
 
         public byte[] Decrypt(byte[] aad, byte[] cek, byte[] iv, byte[] cipherText, byte[] authTag)
         {
-            Ensure.BitSize(cek, keyLength, string.Format("AES-GCM algorithm expected key of size {0} bits, but was given {1} bits",keyLength, cek.Length * 8L));
+            Ensure.BitSize(cek, keyLength, string.Format("AES-GCM algorithm expected key of size {0} bits, but was given {1} bits", keyLength, cek.Length * 8L));
 
             try
             {

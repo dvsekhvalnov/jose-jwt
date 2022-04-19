@@ -8,8 +8,8 @@ namespace Jose
 {
     public class Pbse2HmacShaKeyManagementWithAesKeyWrap : IKeyManagement
     {
-        private AesKeyWrapManagement aesKW;
-        private int keyLengthBits;
+        private readonly AesKeyWrapManagement aesKW;
+        private readonly int keyLengthBits;
 
         public Pbse2HmacShaKeyManagementWithAesKeyWrap(int keyLengthBits, AesKeyWrapManagement aesKw)
         {
@@ -63,17 +63,17 @@ namespace Jose
             Ensure.Contains(header, new[] { "p2c" }, "Pbse2HmacShaKeyManagementWithAesKeyWrap algorithm expects 'p2c' param in JWT header, but was not found");
             Ensure.Contains(header, new[] { "p2s" }, "Pbse2HmacShaKeyManagementWithAesKeyWrap algorithm expects 'p2s' param in JWT header, but was not found");
 
-            byte[] algId=Encoding.UTF8.GetBytes((string) header["alg"]);
-            int iterationCount= Convert.ToInt32(header["p2c"]);
-            byte[] saltInput = Base64Url.Decode((string) header["p2s"]);
+            byte[] algId = Encoding.UTF8.GetBytes((string)header["alg"]);
+            int iterationCount = Convert.ToInt32(header["p2c"]);
+            byte[] saltInput = Base64Url.Decode((string)header["p2s"]);
 
             byte[] salt = Arrays.Concat(algId, Arrays.Zero, saltInput);
 
-            byte[] kek; 
+            byte[] kek;
 
-            using(var prf=PRF)
-            {                
-                kek=PBKDF2.DeriveKey(sharedKey, salt, iterationCount, keyLengthBits, prf);
+            using (var prf = PRF)
+            {
+                kek = PBKDF2.DeriveKey(sharedKey, salt, iterationCount, keyLengthBits, prf);
             }
 
             return aesKW.Unwrap(encryptedCek, kek, cekSizeBits, header);
@@ -83,14 +83,17 @@ namespace Jose
         {
             get
             {
-                if (keyLengthBits == 128)
-                    return new HMACSHA256();
-                if (keyLengthBits == 192)
-                    return new HMACSHA384();
-                if (keyLengthBits == 256)
-                    return new HMACSHA512();
-
-                throw new ArgumentException(string.Format("Unsupported key size: '{0}'", keyLengthBits));
+                switch (keyLengthBits)
+                {
+                    case 128:
+                        return new HMACSHA256();
+                    case 192:
+                        return new HMACSHA384();
+                    case 256:
+                        return new HMACSHA512();
+                    default:
+                        throw new ArgumentException(string.Format("Unsupported key size: '{0}'", keyLengthBits));
+                }
             }
         }
     }

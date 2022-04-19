@@ -5,13 +5,12 @@ namespace Jose
 {
     public class AesGcmKeyWrapManagement : IKeyManagement
     {
-        private int keyLengthBits;
+        private readonly int keyLengthBits;
 
         public AesGcmKeyWrapManagement(int keyLengthBits)
         {
             this.keyLengthBits = keyLengthBits;
         }
-
 
         public byte[][] WrapNewKey(int cekSizeBits, object key, IDictionary<string, object> header)
         {
@@ -29,7 +28,7 @@ namespace Jose
             byte[] iv = Arrays.Random(96);
 
             byte[][] cipherAndTag = AesGcm.Encrypt(sharedKey, iv, null, cek);
-            
+
             header["iv"] = Base64Url.Encode(iv);
             header["tag"] = Base64Url.Encode(cipherAndTag[1]);
 
@@ -45,23 +44,20 @@ namespace Jose
             Ensure.Contains(header, new[] { "iv" }, "AesGcmKeyWrapManagement algorithm expects 'iv' param in JWT header, but was not found");
             Ensure.Contains(header, new[] { "tag" }, "AesGcmKeyWrapManagement algorithm expects 'tag' param in JWT header, but was not found");
 
-            byte[] iv = Base64Url.Decode((string) header["iv"]);
-            byte[] authTag = Base64Url.Decode((string) header["tag"]);
+            byte[] iv = Base64Url.Decode((string)header["iv"]);
+            byte[] authTag = Base64Url.Decode((string)header["tag"]);
 
             return AesGcm.Decrypt(sharedKey, iv, null, encryptedCek, authTag);
         }
 
         private byte[] byteKey(object key)
         {
-            if (key is byte[])
+            if (key is byte[] arr)
             {
-                return (byte[])key;
+                return arr;
             }
-
-            if (key is Jwk)
+            else if (key is Jwk jwk)
             {
-                var jwk = (Jwk)key;
-
                 if (jwk.Kty == Jwk.KeyTypes.OCT)
                 {
                     return jwk.OctKey();

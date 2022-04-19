@@ -53,7 +53,7 @@ namespace Jose
             Marshal.FreeHGlobal(keyDataBuffer);
             BCrypt.BCryptCloseAlgorithmProvider(hAlg, 0x0);
 
-            return new[] {cipher, tag};
+            return new[] { cipher, tag };
         }
 
         /// <summary>
@@ -68,7 +68,7 @@ namespace Jose
         public static byte[] Decrypt(byte[] key, byte[] iv, byte[] aad, byte[] cipherText, byte[] authTag)
         {
             IntPtr hAlg = OpenAlgorithmProvider(BCrypt.BCRYPT_AES_ALGORITHM, BCrypt.MS_PRIMITIVE_PROVIDER, BCrypt.BCRYPT_CHAIN_MODE_GCM);
-            IntPtr hKey,keyDataBuffer = ImportKey(hAlg, key, out hKey);
+            IntPtr hKey, keyDataBuffer = ImportKey(hAlg, key, out hKey);
 
             byte[] plainText;
 
@@ -88,11 +88,11 @@ namespace Jose
 
                 status = BCrypt.BCryptDecrypt(hKey, cipherText, cipherText.Length, ref authInfo, ivData, ivData.Length, plainText, plainText.Length, ref plainTextSize, 0x0);
 
-                if(status==BCrypt.STATUS_AUTH_TAG_MISMATCH)
+                if (status == BCrypt.STATUS_AUTH_TAG_MISMATCH)
                     throw new CryptographicException("BCrypt.BCryptDecrypt(): authentication tag mismatch");
 
                 if (status != BCrypt.ERROR_SUCCESS)
-                    throw new CryptographicException(string.Format("BCrypt.BCryptDecrypt() failed with status code:{0}", status));                
+                    throw new CryptographicException(string.Format("BCrypt.BCryptDecrypt() failed with status code:{0}", status));
             }
 
             BCrypt.BCryptDestroyKey(hKey);
@@ -145,7 +145,6 @@ namespace Jose
             return keyDataBuffer;
         }
 
-
         private static byte[] GetProperty(IntPtr hAlg, string name)
         {
             int size = 0;
@@ -157,7 +156,7 @@ namespace Jose
 
             byte[] value = new byte[size];
 
-            status=BCrypt.BCryptGetProperty(hAlg, name, value, value.Length, ref size, 0x0);
+            status = BCrypt.BCryptGetProperty(hAlg, name, value, value.Length, ref size, 0x0);
 
             if (status != BCrypt.ERROR_SUCCESS)
                 throw new CryptographicException(string.Format("BCrypt.BCryptGetProperty() failed with status code:{0}", status));

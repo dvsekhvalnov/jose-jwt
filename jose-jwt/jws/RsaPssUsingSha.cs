@@ -6,7 +6,7 @@ namespace Jose
 {
     public class RsaPssUsingSha : IJwsAlgorithm
     {
-        private int saltSize;
+        private readonly int saltSize;
 
         public RsaPssUsingSha(int saltSize)
         {
@@ -15,26 +15,23 @@ namespace Jose
 
         public byte[] Sign(byte[] securedInput, object key)
         {
-    #if NET40
-            if (key is CngKey)
+#if NET40
+            if (key is CngKey cngKey)
             {
-                var privateKey = (CngKey)key;
-
                 try
                 {
-                    return RsaPss.Sign(securedInput, privateKey, Hash, saltSize);
+                    return RsaPss.Sign(securedInput, cngKey, Hash, saltSize);
                 }
                 catch (CryptographicException e)
                 {
-                    throw new JoseException("Unable to sign content.", e);    
+                    throw new JoseException("Unable to sign content.", e);
                 }
             }
-
-            else if (key is RSACryptoServiceProvider)
+            else if (key is RSACryptoServiceProvider rsaKey)
             {
-                //This is for backward compatibility only with 2.x 
-                //To be removed in 3.x 
-                var privateKey = RsaKey.New(((RSACryptoServiceProvider)key).ExportParameters(true));
+                //This is for backward compatibility only with 2.x
+                //To be removed in 3.x
+                var privateKey = RsaKey.New(rsaKey.ExportParameters(true));
 
                 try
                 {
@@ -42,17 +39,29 @@ namespace Jose
                 }
                 catch (CryptographicException e)
                 {
-	            throw new JoseException("Unable to sign content.", e);    
+                    throw new JoseException("Unable to sign content.", e);
                 }
-
             }
 
             throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of CngKey type.");
-    
-    #elif NET461 || NET472
-            if (key is CngKey)
+
+#elif NET461 || NET472
+            if (key is CngKey cngKey)
             {
-                var privateKey = (CngKey)key;
+                try
+                {
+                    return RsaPss.Sign(securedInput, cngKey, Hash, saltSize);
+                }
+                catch (CryptographicException e)
+                {
+                    throw new JoseException("Unable to sign content.", e);
+                }
+            }
+            else if (key is RSACryptoServiceProvider rsaKey)
+            {
+                //This is for backward compatibility only with 2.x
+                //To be removed in 3.x
+                var privateKey = RsaKey.New(rsaKey.ExportParameters(true));
 
                 try
                 {
@@ -60,60 +69,33 @@ namespace Jose
                 }
                 catch (CryptographicException e)
                 {
-                    throw new JoseException("Unable to sign content.", e);    
+                    throw new JoseException("Unable to sign content.", e);
                 }
             }
-
-            if (key is RSACryptoServiceProvider)
+            else if (key is RSA rsa)
             {
-                //This is for backward compatibility only with 2.x 
-                //To be removed in 3.x 
-                var privateKey = RsaKey.New(((RSACryptoServiceProvider)key).ExportParameters(true));
-
-                try
-                {
-                    return RsaPss.Sign(securedInput, privateKey, Hash, saltSize);
-                }
-                catch (CryptographicException e)
-                {
-                    throw new JoseException("Unable to sign content.", e);    
-                }
+                return rsa.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
             }
-
-            if (key is RSA)
+            else if (key is Jwk jwk)
             {
-                var privateKey = (RSA) key;
-
-                return privateKey.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
-            }
-
-            if (key is Jwk)
-            {
-                var privateKey = (Jwk)key;
-
-                if (privateKey.Kty == Jwk.KeyTypes.RSA)
+                if (jwk.Kty == Jwk.KeyTypes.RSA)
                 {
-                     return privateKey.RsaKey().SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
+                     return jwk.RsaKey().SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
                 }
             }
 
             throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either CngKey or RSA types or Jwk type with kty='RSA'");
 
 #elif NETSTANDARD
-            if (key is RSA)
+            if (key is RSA rsa)
             {
-                var privateKey = (RSA) key;
-
-                return privateKey.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
+                return rsa.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
             }
-
-            if (key is Jwk)
+            else if (key is Jwk jwk)
             {
-                var privateKey = (Jwk)key;
-
-                if (privateKey.Kty == Jwk.KeyTypes.RSA)
+                if (jwk.Kty == Jwk.KeyTypes.RSA)
                 {
-                     return privateKey.RsaKey().SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);                    
+                     return jwk.RsaKey().SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);                    
                 }
             }
 
@@ -123,26 +105,23 @@ namespace Jose
 
         public bool Verify(byte[] signature, byte[] securedInput, object key)
         {
-    #if NET40
-            if (key is CngKey)
+#if NET40
+            if (key is CngKey cngKey)
             {
-                var publicKey = (CngKey)key;
-
                 try
                 {
-                    return RsaPss.Verify(securedInput, signature, publicKey, Hash, saltSize);
+                    return RsaPss.Verify(securedInput, signature, cngKey, Hash, saltSize);
                 }
                 catch (CryptographicException e)
                 {
                     return false;
                 }
             }
-
-            if (key is RSACryptoServiceProvider)
+            else if (key is RSACryptoServiceProvider rsaKey)
             {
-                //This is for backward compatibility only with 2.x 
-                //To be removed in 3.x 
-                var publicKey = RsaKey.New(((RSACryptoServiceProvider)key).ExportParameters(false));
+                //This is for backward compatibility only with 2.x
+                //To be removed in 3.x
+                var publicKey = RsaKey.New(rsaKey.ExportParameters(false));
 
                 try
                 {
@@ -156,10 +135,23 @@ namespace Jose
 
             throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of CngKey type.");
 
-    #elif NET461 || NET472
-            if (key is CngKey)
+#elif NET461 || NET472
+            if (key is CngKey cngKey)
             {
-                var publicKey = (CngKey)key;
+                try
+                {
+                    return RsaPss.Verify(securedInput, signature, cngKey, Hash, saltSize);
+                }
+                catch (CryptographicException e)
+                {
+                    return false;
+                }
+            }
+            else if (key is RSACryptoServiceProvider rsaKey)
+            {
+                //This is for backward compatibility only with 2.x
+                //To be removed in 3.x
+                var publicKey = RsaKey.New(rsaKey.ExportParameters(false));
 
                 try
                 {
@@ -170,56 +162,30 @@ namespace Jose
                     return false;
                 }
             }
-
-            if (key is RSACryptoServiceProvider)
+            else if (key is RSA rsa)
             {
-                //This is for backward compatibility only with 2.x 
-                //To be removed in 3.x 
-                var publicKey = RsaKey.New(((RSACryptoServiceProvider)key).ExportParameters(false));
-
-                try
-                {
-                    return RsaPss.Verify(securedInput, signature, publicKey, Hash, saltSize);
-                }
-                catch (CryptographicException e)
-                {
-                    return false;
-                }
+                return rsa.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
             }
-
-            if (key is RSA)
+            else if (key is Jwk jwk)
             {
-                var publicKey = (RSA) key;
-
-                return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
-            }
-
-            if (key is Jwk)
-            {
-                var publicKey = (Jwk)key;
-
-                if (publicKey.Kty == Jwk.KeyTypes.RSA)
+                if (jwk.Kty == Jwk.KeyTypes.RSA)
                 {
-                    return publicKey.RsaKey().VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
+                    return jwk.RsaKey().VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
                 }
             }
 
             throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either CngKey or RSA types or Jwk type with kty='RSA'");
 
 #elif NETSTANDARD
-            if (key is RSA)
+            if (key is RSA rsa)
             {
-                var publicKey = (RSA)key;
-                return publicKey.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
+                return rsa.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
             }
-
-            if (key is Jwk)
+            else if (key is Jwk jwk)
             {
-                var publicKey = (Jwk)key;
-
-                if (publicKey.Kty == Jwk.KeyTypes.RSA)
+                if (jwk.Kty == Jwk.KeyTypes.RSA)
                 {
-                    return publicKey.RsaKey().VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
+                    return jwk.RsaKey().VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
                 }
             }  
             
@@ -232,32 +198,37 @@ namespace Jose
         {
             get
             {
-                if (saltSize == 32)
-                    return HashAlgorithmName.SHA256;
-                if (saltSize == 48)
-                    return HashAlgorithmName.SHA384;
-                if (saltSize == 64)
-                    return HashAlgorithmName.SHA512;
-
-                throw new ArgumentException(string.Format("Unsupported salt size: '{0} bytes'", saltSize));
+                switch (saltSize)
+                {
+                    case 32:
+                        return HashAlgorithmName.SHA256;
+                    case 48:
+                        return HashAlgorithmName.SHA384;
+                    case 64:
+                        return HashAlgorithmName.SHA512;
+                    default:
+                        throw new ArgumentException(string.Format("Unsupported salt size: '{0} bytes'", saltSize));
+                }
             }
         }
-    #endif
+#endif
 
         private CngAlgorithm Hash
         {
             get
             {
-                if (saltSize == 32)
-                    return CngAlgorithm.Sha256;
-                if (saltSize == 48)
-                    return CngAlgorithm.Sha384;
-                if (saltSize == 64)
-                    return CngAlgorithm.Sha512;
-
-                throw new ArgumentException(string.Format("Unsupported salt size: '{0} bytes'", saltSize));
+                switch (saltSize)
+                {
+                    case 32:
+                        return CngAlgorithm.Sha256;
+                    case 48:
+                        return CngAlgorithm.Sha384;
+                    case 64:
+                        return CngAlgorithm.Sha512;
+                    default:
+                        throw new ArgumentException(string.Format("Unsupported salt size: '{0} bytes'", saltSize));
+                }
             }
         }
-
     }
 }

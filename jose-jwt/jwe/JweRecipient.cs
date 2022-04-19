@@ -19,7 +19,7 @@ namespace Jose
             Header = header;
         }
 
-        /// <summary
+        /// <summary>
         /// Constructs recipient for JWE encryption with desired KEK and key management algorithm
         /// </summary
         /// <param name="alg">algorithm to be used to encrypt the CEK (Content Encryption Key).</param>

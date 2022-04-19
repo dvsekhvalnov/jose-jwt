@@ -9,127 +9,128 @@ namespace Jose
     /// </summary>
     public class JwtSettings
     {
-        private Dictionary<JwsAlgorithm, IJwsAlgorithm> jwsAlgorithms = new Dictionary<JwsAlgorithm, IJwsAlgorithm>
-            {
-                { JwsAlgorithm.none, new Plaintext()},
-                { JwsAlgorithm.HS256, new HmacUsingSha("SHA256") },
-                { JwsAlgorithm.HS384, new HmacUsingSha("SHA384") },
-                { JwsAlgorithm.HS512, new HmacUsingSha("SHA512") },
+        private readonly Dictionary<JwsAlgorithm, IJwsAlgorithm> jwsAlgorithms = new Dictionary<JwsAlgorithm, IJwsAlgorithm>
+        {
+            { JwsAlgorithm.none, new Plaintext()},
+            { JwsAlgorithm.HS256, new HmacUsingSha("SHA256") },
+            { JwsAlgorithm.HS384, new HmacUsingSha("SHA384") },
+            { JwsAlgorithm.HS512, new HmacUsingSha("SHA512") },
 
-                { JwsAlgorithm.RS256, new RsaUsingSha("SHA256") },
-                { JwsAlgorithm.RS384, new RsaUsingSha("SHA384") },
-                { JwsAlgorithm.RS512, new RsaUsingSha("SHA512") },
+            { JwsAlgorithm.RS256, new RsaUsingSha("SHA256") },
+            { JwsAlgorithm.RS384, new RsaUsingSha("SHA384") },
+            { JwsAlgorithm.RS512, new RsaUsingSha("SHA512") },
 
-                { JwsAlgorithm.PS256, new RsaPssUsingSha(32) },
-                { JwsAlgorithm.PS384, new RsaPssUsingSha(48) },
-                { JwsAlgorithm.PS512, new RsaPssUsingSha(64) },
+            { JwsAlgorithm.PS256, new RsaPssUsingSha(32) },
+            { JwsAlgorithm.PS384, new RsaPssUsingSha(48) },
+            { JwsAlgorithm.PS512, new RsaPssUsingSha(64) },
 #if NET40
-                { JwsAlgorithm.ES256, new EcdsaUsingSha(256) },
-                { JwsAlgorithm.ES384, new EcdsaUsingSha(384) },
-                { JwsAlgorithm.ES512, new EcdsaUsingSha(521) }
+            { JwsAlgorithm.ES256, new EcdsaUsingSha(256) },
+            { JwsAlgorithm.ES384, new EcdsaUsingSha(384) },
+            { JwsAlgorithm.ES512, new EcdsaUsingSha(521) }
 #elif NETSTANDARD || NET461 || NET472
-                { JwsAlgorithm.ES256, new Jose.netstandard1_4.EcdsaUsingSha(256) },
-                { JwsAlgorithm.ES384, new Jose.netstandard1_4.EcdsaUsingSha(384) },
-                { JwsAlgorithm.ES512, new Jose.netstandard1_4.EcdsaUsingSha(521) }
+            { JwsAlgorithm.ES256, new Jose.netstandard1_4.EcdsaUsingSha(256) },
+            { JwsAlgorithm.ES384, new Jose.netstandard1_4.EcdsaUsingSha(384) },
+            { JwsAlgorithm.ES512, new Jose.netstandard1_4.EcdsaUsingSha(521) }
 #endif
-            };
+        };
 
-        private Dictionary<JwsAlgorithm, string> jwsAlgorithmsHeaderValue = new Dictionary<JwsAlgorithm, string>
-            {
-                { JwsAlgorithm.none, "none" },
-                { JwsAlgorithm.HS256, "HS256" },
-                { JwsAlgorithm.HS384, "HS384" },
-                { JwsAlgorithm.HS512, "HS512" },
-                { JwsAlgorithm.RS256, "RS256" },
-                { JwsAlgorithm.RS384, "RS384" },
-                { JwsAlgorithm.RS512, "RS512" },
-                { JwsAlgorithm.ES256, "ES256" },
-                { JwsAlgorithm.ES384, "ES384" },
-                { JwsAlgorithm.ES512, "ES512" },
-                { JwsAlgorithm.PS256, "PS256" },
-                { JwsAlgorithm.PS384, "PS384" },
-                { JwsAlgorithm.PS512, "PS512" },
-            };
+        private readonly Dictionary<JwsAlgorithm, string> jwsAlgorithmsHeaderValue = new Dictionary<JwsAlgorithm, string>
+        {
+            { JwsAlgorithm.none, "none" },
+            { JwsAlgorithm.HS256, "HS256" },
+            { JwsAlgorithm.HS384, "HS384" },
+            { JwsAlgorithm.HS512, "HS512" },
+            { JwsAlgorithm.RS256, "RS256" },
+            { JwsAlgorithm.RS384, "RS384" },
+            { JwsAlgorithm.RS512, "RS512" },
+            { JwsAlgorithm.ES256, "ES256" },
+            { JwsAlgorithm.ES384, "ES384" },
+            { JwsAlgorithm.ES512, "ES512" },
+            { JwsAlgorithm.PS256, "PS256" },
+            { JwsAlgorithm.PS384, "PS384" },
+            { JwsAlgorithm.PS512, "PS512" },
+        };
 
-        private Dictionary<string, JwsAlgorithm> jwsAlgorithmsAliases = new Dictionary<string, JwsAlgorithm>();
+        private readonly Dictionary<string, JwsAlgorithm> jwsAlgorithmsAliases = new Dictionary<string, JwsAlgorithm>();
 
-        private Dictionary<JweEncryption, IJweAlgorithm> encAlgorithms = new Dictionary<JweEncryption, IJweAlgorithm>
-            {
-                { JweEncryption.A128CBC_HS256, new AesCbcHmacEncryption(new HmacUsingSha("SHA256"), 256) },
-                { JweEncryption.A192CBC_HS384, new AesCbcHmacEncryption(new HmacUsingSha("SHA384"), 384) },
-                { JweEncryption.A256CBC_HS512, new AesCbcHmacEncryption(new HmacUsingSha("SHA512"), 512) },
+        private readonly Dictionary<JweEncryption, IJweAlgorithm> encAlgorithms = new Dictionary<JweEncryption, IJweAlgorithm>
+        {
+            { JweEncryption.A128CBC_HS256, new AesCbcHmacEncryption(new HmacUsingSha("SHA256"), 256) },
+            { JweEncryption.A192CBC_HS384, new AesCbcHmacEncryption(new HmacUsingSha("SHA384"), 384) },
+            { JweEncryption.A256CBC_HS512, new AesCbcHmacEncryption(new HmacUsingSha("SHA512"), 512) },
 
-                { JweEncryption.A128GCM, new AesGcmEncryption(128) },
-                { JweEncryption.A192GCM, new AesGcmEncryption(192) },
-                { JweEncryption.A256GCM, new AesGcmEncryption(256) }
-            };
+            { JweEncryption.A128GCM, new AesGcmEncryption(128) },
+            { JweEncryption.A192GCM, new AesGcmEncryption(192) },
+            { JweEncryption.A256GCM, new AesGcmEncryption(256) }
+        };
 
-        private Dictionary<JweEncryption, string> encAlgorithmsHeaderValue = new Dictionary<JweEncryption, string>
-            {
-                { JweEncryption.A128CBC_HS256, "A128CBC-HS256" },
-                { JweEncryption.A192CBC_HS384, "A192CBC-HS384" },
-                { JweEncryption.A256CBC_HS512, "A256CBC-HS512" },
-                { JweEncryption.A128GCM, "A128GCM" },
-                { JweEncryption.A192GCM, "A192GCM" },
-                { JweEncryption.A256GCM, "A256GCM" },
-            };
+        private readonly Dictionary<JweEncryption, string> encAlgorithmsHeaderValue = new Dictionary<JweEncryption, string>
+        {
+            { JweEncryption.A128CBC_HS256, "A128CBC-HS256" },
+            { JweEncryption.A192CBC_HS384, "A192CBC-HS384" },
+            { JweEncryption.A256CBC_HS512, "A256CBC-HS512" },
+            { JweEncryption.A128GCM, "A128GCM" },
+            { JweEncryption.A192GCM, "A192GCM" },
+            { JweEncryption.A256GCM, "A256GCM" },
+        };
 
-        private Dictionary<string, JweEncryption> encAlgorithmsAliases = new Dictionary<string, JweEncryption>();
+        private readonly Dictionary<string, JweEncryption> encAlgorithmsAliases = new Dictionary<string, JweEncryption>();
 
-        private Dictionary<JweAlgorithm, IKeyManagement> keyAlgorithms = new Dictionary<JweAlgorithm, IKeyManagement>
-            {
-                { JweAlgorithm.RSA_OAEP, new RsaKeyManagement(true) },
-                { JweAlgorithm.RSA_OAEP_256, new RsaOaep256KeyManagement() },
-                { JweAlgorithm.RSA1_5, new RsaKeyManagement(false) },
-                { JweAlgorithm.DIR, new DirectKeyManagement() },
-                { JweAlgorithm.A128KW, new AesKeyWrapManagement(128) },
-                { JweAlgorithm.A192KW, new AesKeyWrapManagement(192) },
-                { JweAlgorithm.A256KW, new AesKeyWrapManagement(256) },
-                { JweAlgorithm.ECDH_ES, new EcdhKeyManagement(true) },
-                { JweAlgorithm.ECDH_ES_A128KW, new EcdhKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128)) },
-                { JweAlgorithm.ECDH_ES_A192KW, new EcdhKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192)) },
-                { JweAlgorithm.ECDH_ES_A256KW, new EcdhKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256)) },
-                { JweAlgorithm.PBES2_HS256_A128KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128)) },
-                { JweAlgorithm.PBES2_HS384_A192KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192)) },
-                { JweAlgorithm.PBES2_HS512_A256KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256)) },
-                { JweAlgorithm.A128GCMKW, new AesGcmKeyWrapManagement(128) },
-                { JweAlgorithm.A192GCMKW, new AesGcmKeyWrapManagement(192) },
-                { JweAlgorithm.A256GCMKW, new AesGcmKeyWrapManagement(256) }
-            };
-        private Dictionary<JweAlgorithm, string> keyAlgorithmsHeaderValue = new Dictionary<JweAlgorithm, string>
-            {
-                { JweAlgorithm.RSA1_5, "RSA1_5" },
-                { JweAlgorithm.RSA_OAEP, "RSA-OAEP" },
-                { JweAlgorithm.RSA_OAEP_256, "RSA-OAEP-256" },
-                { JweAlgorithm.DIR, "dir" },
-                { JweAlgorithm.A128KW, "A128KW" },
-                { JweAlgorithm.A256KW, "A256KW" },
-                { JweAlgorithm.A192KW, "A192KW" },
-                { JweAlgorithm.ECDH_ES, "ECDH-ES" },
-                { JweAlgorithm.ECDH_ES_A128KW, "ECDH-ES+A128KW" },
-                { JweAlgorithm.ECDH_ES_A192KW, "ECDH-ES+A192KW" },
-                { JweAlgorithm.ECDH_ES_A256KW, "ECDH-ES+A256KW" },
-                { JweAlgorithm.PBES2_HS256_A128KW, "PBES2-HS256+A128KW" },
-                { JweAlgorithm.PBES2_HS384_A192KW, "PBES2-HS384+A192KW" },
-                { JweAlgorithm.PBES2_HS512_A256KW, "PBES2-HS512+A256KW" },
-                { JweAlgorithm.A128GCMKW, "A128GCMKW" },
-                { JweAlgorithm.A192GCMKW, "A192GCMKW" },
-                { JweAlgorithm.A256GCMKW, "A256GCMKW" },
-            };
+        private readonly Dictionary<JweAlgorithm, IKeyManagement> keyAlgorithms = new Dictionary<JweAlgorithm, IKeyManagement>
+        {
+            { JweAlgorithm.RSA_OAEP, new RsaKeyManagement(true) },
+            { JweAlgorithm.RSA_OAEP_256, new RsaOaep256KeyManagement() },
+            { JweAlgorithm.RSA1_5, new RsaKeyManagement(false) },
+            { JweAlgorithm.DIR, new DirectKeyManagement() },
+            { JweAlgorithm.A128KW, new AesKeyWrapManagement(128) },
+            { JweAlgorithm.A192KW, new AesKeyWrapManagement(192) },
+            { JweAlgorithm.A256KW, new AesKeyWrapManagement(256) },
+            { JweAlgorithm.ECDH_ES, new EcdhKeyManagement(true) },
+            { JweAlgorithm.ECDH_ES_A128KW, new EcdhKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128)) },
+            { JweAlgorithm.ECDH_ES_A192KW, new EcdhKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192)) },
+            { JweAlgorithm.ECDH_ES_A256KW, new EcdhKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256)) },
+            { JweAlgorithm.PBES2_HS256_A128KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128)) },
+            { JweAlgorithm.PBES2_HS384_A192KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192)) },
+            { JweAlgorithm.PBES2_HS512_A256KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256)) },
+            { JweAlgorithm.A128GCMKW, new AesGcmKeyWrapManagement(128) },
+            { JweAlgorithm.A192GCMKW, new AesGcmKeyWrapManagement(192) },
+            { JweAlgorithm.A256GCMKW, new AesGcmKeyWrapManagement(256) }
+        };
 
-        private Dictionary<string, JweAlgorithm> keyAlgorithmsAliases = new Dictionary<string, JweAlgorithm>();
+        private readonly Dictionary<JweAlgorithm, string> keyAlgorithmsHeaderValue = new Dictionary<JweAlgorithm, string>
+        {
+            { JweAlgorithm.RSA1_5, "RSA1_5" },
+            { JweAlgorithm.RSA_OAEP, "RSA-OAEP" },
+            { JweAlgorithm.RSA_OAEP_256, "RSA-OAEP-256" },
+            { JweAlgorithm.DIR, "dir" },
+            { JweAlgorithm.A128KW, "A128KW" },
+            { JweAlgorithm.A256KW, "A256KW" },
+            { JweAlgorithm.A192KW, "A192KW" },
+            { JweAlgorithm.ECDH_ES, "ECDH-ES" },
+            { JweAlgorithm.ECDH_ES_A128KW, "ECDH-ES+A128KW" },
+            { JweAlgorithm.ECDH_ES_A192KW, "ECDH-ES+A192KW" },
+            { JweAlgorithm.ECDH_ES_A256KW, "ECDH-ES+A256KW" },
+            { JweAlgorithm.PBES2_HS256_A128KW, "PBES2-HS256+A128KW" },
+            { JweAlgorithm.PBES2_HS384_A192KW, "PBES2-HS384+A192KW" },
+            { JweAlgorithm.PBES2_HS512_A256KW, "PBES2-HS512+A256KW" },
+            { JweAlgorithm.A128GCMKW, "A128GCMKW" },
+            { JweAlgorithm.A192GCMKW, "A192GCMKW" },
+            { JweAlgorithm.A256GCMKW, "A256GCMKW" },
+        };
 
-        private Dictionary<JweCompression, ICompression> compressionAlgorithms = new Dictionary<JweCompression, ICompression>
+        private readonly Dictionary<string, JweAlgorithm> keyAlgorithmsAliases = new Dictionary<string, JweAlgorithm>();
+
+        private readonly Dictionary<JweCompression, ICompression> compressionAlgorithms = new Dictionary<JweCompression, ICompression>
         {
             { JweCompression.DEF, new DeflateCompression() }
         };
 
-        private Dictionary<JweCompression, string> jweCompressionHeaderValue = new Dictionary<JweCompression, string>
+        private readonly Dictionary<JweCompression, string> jweCompressionHeaderValue = new Dictionary<JweCompression, string>
         {
             { JweCompression.DEF, "DEF" }
         };
 
-        private Dictionary<string, JweCompression> compressionAlgorithmsAliases = new Dictionary<string, JweCompression>();
+        private readonly Dictionary<string, JweCompression> compressionAlgorithmsAliases = new Dictionary<string, JweCompression>();
 
 #if NET40 || NET461  || NET472
         private IJsonMapper jsMapper = new JSSerializerMapper();
@@ -188,14 +189,13 @@ namespace Jose
             return this;
         }
 
-
         public JwtSettings RegisterJws(JwsAlgorithm alg, IJwsAlgorithm impl)
         {
             jwsAlgorithms[alg] = impl;
 
             return this;
         }
-        
+
         /// <summary>
         /// Register an alias for the "alg" header that should point to a standard JWS signing algorithm
         /// </summary>
@@ -252,7 +252,7 @@ namespace Jose
         public IJweAlgorithm Jwe(JweEncryption alg)
         {
             IJweAlgorithm impl;
-            return encAlgorithms.TryGetValue(alg, out impl) ? impl : null; ;
+            return encAlgorithms.TryGetValue(alg, out impl) ? impl : null;
         }
 
         public string JweHeaderValue(JweEncryption algorithm)

@@ -15,11 +15,11 @@ namespace Jose.native
         public const uint KDF_SUPPPUBINFO = 11;
         public const uint KDF_SUPPPRIVINFO = 12;
 
-    #if NET40 || NET461 || NET472
+#if NET40 || NET461 || NET472
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-    #elif NETSTANDARD
+#elif NETSTANDARD
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    #endif
+#endif
         public class NCryptBufferDesc : IDisposable
         {
             public uint ulVersion;
@@ -28,7 +28,7 @@ namespace Jose.native
 
             public NCryptBufferDesc(params NCryptBuffer[] buffers)
             {
-                cBuffers = (uint) buffers.Length; //number of elements in pBuffer
+                cBuffers = (uint)buffers.Length; //number of elements in pBuffer
                 ulVersion = 0;
 
                 pBuffers = Marshal.AllocHGlobal(buffers.Sum(buf => Marshal.SizeOf(buf)));
@@ -37,7 +37,7 @@ namespace Jose.native
 
                 foreach (var buf in buffers)
                 {
-                    Marshal.StructureToPtr(buf, pBuffers+totalSizeBytes, false);
+                    Marshal.StructureToPtr(buf, pBuffers + totalSizeBytes, false);
                     totalSizeBytes += Marshal.SizeOf(buf);
                 }
             }
@@ -50,9 +50,9 @@ namespace Jose.native
 
     #if NET40 || NET461 || NET472
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-    #elif NETSTANDARD
+#elif NETSTANDARD
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-    #endif
+#endif
         public class NCryptBuffer : IDisposable
         {
             public uint cbBuffer;
@@ -83,16 +83,16 @@ namespace Jose.native
 
     #if NET40 || NET461 || NET472
         [DllImport("ncrypt.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    #elif NETSTANDARD
+#elif NETSTANDARD
         [DllImport("ncrypt.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    #endif
-        public static extern uint NCryptSecretAgreement(SafeNCryptKeyHandle hPrivKey,SafeNCryptKeyHandle hPublicKey,out SafeNCryptSecretHandle phSecret,uint flags);
+#endif
+        public static extern uint NCryptSecretAgreement(SafeNCryptKeyHandle hPrivKey, SafeNCryptKeyHandle hPublicKey, out SafeNCryptSecretHandle phSecret, uint flags);
 
     #if NET40 || NET461 || NET472
         [DllImport("ncrypt.dll", CharSet = CharSet.Auto, SetLastError = true)]
-    #elif NETSTANDARD
+#elif NETSTANDARD
         [DllImport("ncrypt.dll", CharSet = CharSet.Unicode, SetLastError = true)]
-    #endif
+#endif
         public static extern uint NCryptDeriveKey(SafeNCryptSecretHandle hSharedSecret,
                                                   string kdf,
                                                   NCryptBufferDesc parameterList,

@@ -88,10 +88,10 @@ namespace Jose.native
 
             public void Dispose()
             {
-                if(pbNonce!=IntPtr.Zero)      Marshal.FreeHGlobal(pbNonce);
-                if(pbTag!=IntPtr.Zero)        Marshal.FreeHGlobal(pbTag);
-                if(pbAuthData!=IntPtr.Zero)   Marshal.FreeHGlobal(pbAuthData);
-                if(pbMacContext!=IntPtr.Zero) Marshal.FreeHGlobal(pbMacContext);
+                if (pbNonce != IntPtr.Zero) Marshal.FreeHGlobal(pbNonce);
+                if (pbTag != IntPtr.Zero) Marshal.FreeHGlobal(pbTag);
+                if (pbAuthData != IntPtr.Zero) Marshal.FreeHGlobal(pbAuthData);
+                if (pbMacContext != IntPtr.Zero) Marshal.FreeHGlobal(pbMacContext);
             }
         }
 
@@ -109,7 +109,7 @@ namespace Jose.native
             public BCRYPT_OAEP_PADDING_INFO(string alg)
             {
                 pszAlgId = alg;
-                pbLabel=IntPtr.Zero;
+                pbLabel = IntPtr.Zero;
                 cbLabel = 0;
             }
 
@@ -129,22 +129,21 @@ namespace Jose.native
         public static extern uint BCryptCloseAlgorithmProvider(IntPtr hAlgorithm, uint flags);
 
         [DllImport("bcrypt.dll", EntryPoint = "BCryptGetProperty")]
-        public static extern uint BCryptGetProperty(IntPtr hObject,[MarshalAs(UnmanagedType.LPWStr)] string pszProperty,byte[] pbOutput,int cbOutput,ref int pcbResult,uint flags);
+        public static extern uint BCryptGetProperty(IntPtr hObject, [MarshalAs(UnmanagedType.LPWStr)] string pszProperty, byte[] pbOutput, int cbOutput, ref int pcbResult, uint flags);
 
         [DllImport("bcrypt.dll", EntryPoint = "BCryptSetProperty")]
-        internal static extern uint BCryptSetAlgorithmProperty(IntPtr hObject,[MarshalAs(UnmanagedType.LPWStr)] string pszProperty,byte[] pbInput,int cbInput,int dwFlags);
-
+        internal static extern uint BCryptSetAlgorithmProperty(IntPtr hObject, [MarshalAs(UnmanagedType.LPWStr)] string pszProperty, byte[] pbInput, int cbInput, int dwFlags);
 
         [DllImport("bcrypt.dll")]
         public static extern uint BCryptImportKey(IntPtr hAlgorithm,
-                                                         IntPtr hImportKey,
-                                                         [MarshalAs(UnmanagedType.LPWStr)] string pszBlobType,
-                                                         out IntPtr phKey,
-                                                         IntPtr pbKeyObject,
-                                                         int cbKeyObject,
-                                                         byte[] pbInput, //blob of type BCRYPT_KEY_DATA_BLOB + raw key data = (dwMagic (4 bytes) | uint dwVersion (4 bytes) | cbKeyData (4 bytes) | data)
-                                                         int cbInput,
-                                                         uint dwFlags);
+                                                  IntPtr hImportKey,
+                                                  [MarshalAs(UnmanagedType.LPWStr)] string pszBlobType,
+                                                  out IntPtr phKey,
+                                                  IntPtr pbKeyObject,
+                                                  int cbKeyObject,
+                                                  byte[] pbInput, //blob of type BCRYPT_KEY_DATA_BLOB + raw key data = (dwMagic (4 bytes) | uint dwVersion (4 bytes) | cbKeyData (4 bytes) | data)
+                                                  int cbInput,
+                                                  uint dwFlags);
 
         [DllImport("bcrypt.dll")]
         public static extern uint BCryptDestroyKey(IntPtr hKey);

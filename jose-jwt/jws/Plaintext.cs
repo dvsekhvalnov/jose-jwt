@@ -1,6 +1,6 @@
 namespace Jose
 {
-    public class Plaintext:IJwsAlgorithm
+    public class Plaintext : IJwsAlgorithm
     {
         public byte[] Sign(byte[] securedInput, object key)
         {
