@@ -12,7 +12,7 @@ namespace UnitTests
             byte[] data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
             //then
-            Assert.Equal(Arrays.FirstHalf(data), new byte[] { 0, 1, 2, 3, 4 });
+            Assert.Equal(new byte[] { 0, 1, 2, 3, 4 }, Arrays.FirstHalf(data));
         }
 
         [Fact]
@@ -22,7 +22,7 @@ namespace UnitTests
             byte[] data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
             //then
-            Assert.Equal(Arrays.SecondHalf(data), new byte[] { 5, 6, 7, 8, 9 });
+            Assert.Equal(new byte[] { 5, 6, 7, 8, 9 }, Arrays.SecondHalf(data));
         }
 
         [Fact]
@@ -36,7 +36,7 @@ namespace UnitTests
             byte[] forth = null;
 
             //then
-            Assert.Equal(Arrays.Concat(zeros, first, second, third, forth), new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+            Assert.Equal(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }, Arrays.Concat(zeros, first, second, third, forth));
         }
 
         [Fact]
@@ -49,30 +49,30 @@ namespace UnitTests
             byte[][] test = Arrays.Slice(data, 3);
 
             //then
-            Assert.Equal(test[0], new byte[] { 0, 1, 2 });
-            Assert.Equal(test[1], new byte[] { 3, 4, 5 });
-            Assert.Equal(test[2], new byte[] { 6, 7, 8 });
+            Assert.Equal(new byte[] { 0, 1, 2 }, test[0]);
+            Assert.Equal(new byte[] { 3, 4, 5 }, test[1]);
+            Assert.Equal(new byte[] { 6, 7, 8 }, test[2]);
         }
 
         [Fact]
         public void LongToBytes()
         {
-            Assert.Equal(Arrays.LongToBytes(255), new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF });
-            Assert.Equal(Arrays.LongToBytes(-2), new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE });
+            Assert.Equal(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF }, Arrays.LongToBytes(255));
+            Assert.Equal(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE }, Arrays.LongToBytes(-2));
         }
 
         [Fact]
         public void BytesToLong()
         {
-            Assert.Equal(Arrays.BytesToLong(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF }), 255);
-            Assert.Equal(Arrays.BytesToLong(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE }), -2);
+            Assert.Equal(255, Arrays.BytesToLong(new byte[] { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF }));
+            Assert.Equal(-2, Arrays.BytesToLong(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFE }));
         }
 
         [Fact]
         public void IntToBytes()
         {
-            Assert.Equal(Arrays.IntToBytes(255), new byte[] { 0x00, 0x00, 0x00, 0xFF });
-            Assert.Equal(Arrays.IntToBytes(-2), new byte[] { 0xFF, 0xFF, 0xFF, 0xFE });
+            Assert.Equal(new byte[] { 0x00, 0x00, 0x00, 0xFF }, Arrays.IntToBytes(255));
+            Assert.Equal(new byte[] { 0xFF, 0xFF, 0xFF, 0xFE }, Arrays.IntToBytes(-2));
         }
 
         [Fact]
@@ -86,8 +86,8 @@ namespace UnitTests
             byte[] test2 = Arrays.Xor(data, -1);
 
             //then
-            Assert.Equal(test, new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
-            Assert.Equal(test2, new byte[] { 0x00, 0xFF, 0x0F, 0xF0, 0xAA, 0x55, 0x44, 0x33 });
+            Assert.Equal(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, test);
+            Assert.Equal(new byte[] { 0x00, 0xFF, 0x0F, 0xF0, 0xAA, 0x55, 0x44, 0x33 }, test2);
         }
 
         [Fact]
@@ -101,8 +101,8 @@ namespace UnitTests
             byte[] test2 = Arrays.Xor(data, new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
 
             //then
-            Assert.Equal(test, new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF });
-            Assert.Equal(test2, new byte[] { 0x00, 0xFF, 0x0F, 0xF0, 0xAA, 0x55, 0x44, 0x33 });
+            Assert.Equal(new byte[] { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF }, test);
+            Assert.Equal(new byte[] { 0x00, 0xFF, 0x0F, 0xF0, 0xAA, 0x55, 0x44, 0x33 }, test2);
         }
 
         [Fact]
@@ -112,8 +112,8 @@ namespace UnitTests
             byte[] data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
             //then
-            Assert.Equal(Arrays.LeftmostBits(data, 16), new byte[] { 0, 1 });
-            Assert.Equal(Arrays.LeftmostBits(data, 72), new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 });
+            Assert.Equal(new byte[] { 0, 1 }, Arrays.LeftmostBits(data, 16));
+            Assert.Equal(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8 }, Arrays.LeftmostBits(data, 72));
         }
 
         [Fact]
@@ -123,8 +123,8 @@ namespace UnitTests
             byte[] data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
             //then
-            Assert.Equal(Arrays.RightmostBits(data, 16), new byte[] { 8, 9 });
-            Assert.Equal(Arrays.RightmostBits(data, 72), new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 });
+            Assert.Equal(new byte[] { 8, 9 }, Arrays.RightmostBits(data, 16));
+            Assert.Equal(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }, Arrays.RightmostBits(data, 72));
         }
     }
 }

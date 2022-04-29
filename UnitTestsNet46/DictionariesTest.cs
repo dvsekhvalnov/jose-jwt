@@ -18,10 +18,10 @@ namespace UnitTests
             Dictionaries.Append(src, other);
 
             //then
-            Assert.Equal(src.Count, 3);
-            Assert.Equal(src["one"], "1");
-            Assert.Equal(src["two"], "2");
-            Assert.Equal(src["three"], "3");
+            Assert.Equal(3, src.Count);
+            Assert.Equal("1", src["one"]);
+            Assert.Equal("2", src["two"]);
+            Assert.Equal("3", src["three"]);
         }
 
         [Fact]
@@ -34,9 +34,9 @@ namespace UnitTests
             Dictionaries.Append(src, null);
 
             //then
-            Assert.Equal(src.Count, 2);
-            Assert.Equal(src["one"], "1");
-            Assert.Equal(src["two"], "2");
+            Assert.Equal(2, src.Count);
+            Assert.Equal("1", src["one"]);
+            Assert.Equal("2", src["two"]);
         }
 
         [Fact]
@@ -46,9 +46,9 @@ namespace UnitTests
             var src = new Dictionary<string, object> { { "one", "1" }, { "two", 2 }, { "four", new double[] { 4.1, 4.2, 4.3 } } };
 
             //then
-            Assert.Equal(Dictionaries.Get<string>(src, "one"), "1");
-            Assert.Equal(Dictionaries.Get<int>(src, "two"), 2);
-            Assert.Equal(Dictionaries.Get<double[]>(src, "four"), new double[] { 4.1, 4.2, 4.3 });
+            Assert.Equal("1", Dictionaries.Get<string>(src, "one"));
+            Assert.Equal(2, Dictionaries.Get<int>(src, "two"));
+            Assert.Equal(new double[] { 4.1, 4.2, 4.3 }, Dictionaries.Get<double[]>(src, "four"));
             Assert.Null(Dictionaries.Get<string>(src, "three"));
             Assert.Null(Dictionaries.Get<string>(null, "one"));
         }
@@ -57,10 +57,10 @@ namespace UnitTests
         public void GetList()
         {
             //given
-            var src = new Dictionary<string, object> 
+            var src = new Dictionary<string, object>
             {
                 { "list", new List<object>{ "1", 2 }  },
-                { "array", new object[] { "2", 1 } } 
+                { "array", new object[] { "2", 1 } }
             };
 
             //when
@@ -69,11 +69,11 @@ namespace UnitTests
             var listOfInts = Dictionaries.GetList<int>(src, "list");
             var arrOfInts = Dictionaries.GetList<int>(src, "array");
             var unknown = Dictionaries.GetList<int>(src, "not me");
-            
-            Assert.Equal(listOfStrings, new[] { "1", "2" });
-            Assert.Equal(arrOfStrings, new[] { "2", "1" });
-            Assert.Equal(listOfInts, new[] { 1, 2 });
-            Assert.Equal(arrOfInts, new[] { 2, 1 });
+
+            Assert.Equal(new[] { "1", "2" }, listOfStrings);
+            Assert.Equal(new[] { "2", "1" }, arrOfStrings);
+            Assert.Equal(new[] { 1, 2 }, listOfInts);
+            Assert.Equal(new[] { 2, 1 }, arrOfInts);
             Assert.Null(unknown);
         }
 
@@ -88,7 +88,7 @@ namespace UnitTests
             var empty = Dictionaries.Except(src, new HashSet<string> { "two", "four", "one" });
 
             //then
-            Assert.NotSame(test, src);
+            Assert.NotSame(src, test);
             Assert.Equal(1, test.Count);
             Assert.Equal("1", test["one"]);
 
@@ -99,7 +99,6 @@ namespace UnitTests
         public void MergeHeaders_CalledWithOnlyNulls_ReturnsEmptyDictionary()
         {
             //given
-
 
             //when
             var ret = Dictionaries.MergeHeaders(null, null);
@@ -119,7 +118,7 @@ namespace UnitTests
             var ret = Dictionaries.MergeHeaders(src, null);
 
             //then
-            Assert.NotSame(ret, src);
+            Assert.NotSame(src, ret);
             Assert.Equal(2, ret.Count);
             Assert.Equal("1", ret["one"]);
             Assert.Equal("2", ret["two"]);
@@ -137,7 +136,7 @@ namespace UnitTests
             var ret = Dictionaries.MergeHeaders(dict1, dict2, dict3);
 
             //then
-            Assert.Equal(ret.Count, 6);
+            Assert.Equal(6, ret.Count);
             Assert.Equal("1", ret["one"]);
             Assert.Equal("2", ret["two"]);
             Assert.Equal("3", ret["three"]);
@@ -145,7 +144,6 @@ namespace UnitTests
             Assert.Equal(5, ret["five"]);
             Assert.Equal(6, ret["six"]);
         }
-
 
         [Fact]
         public void MergeHeaders_MergeNonUniqueKeys_ThrowsArgumentException()
@@ -162,6 +160,6 @@ namespace UnitTests
             Assert.NotNull(exception);
             Assert.IsType<System.ArgumentException>(exception);
             Assert.StartsWith("An item with the same key has already been added.", exception.Message);
-        }       
+        }
     }
 }
