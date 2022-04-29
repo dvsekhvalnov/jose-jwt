@@ -32,7 +32,7 @@ namespace UnitTests
             string test = Base64Url.Encode(key);
 
             //then
-            Assert.Equal(test, "VqqN6vgjbSBcIijNcacQGg");
+            Assert.Equal("VqqN6vgjbSBcIijNcacQGg", test);
         }
     }
 }

@@ -8,7 +8,7 @@ namespace UnitTests
 {
     public class JwkSetTest
     {
-        private TestConsole Console;
+        private readonly TestConsole Console;
 
         public JwkSetTest(ITestOutputHelper output)
         {
@@ -94,12 +94,12 @@ namespace UnitTests
             {
                 { "keys", new List<object>
                     {
-                        new Dictionary<string, object> 
+                        new Dictionary<string, object>
                         {
                             { "kty", "oct" },
                             { "k", "GawgguFyGrWKav7AX4VKUg" }
                         },
-                        new Dictionary<string, object> 
+                        new Dictionary<string, object>
                         {
                             { "kty", "RSA" },
                             { "e", "AQAB" },
@@ -140,7 +140,7 @@ namespace UnitTests
 
             //then
             Console.Out.WriteLine(test);
-            Assert.Equal(test, @"{""keys"":[{""kty"":""oct"",""k"":""GawgguFyGrWKav7AX4VKUg""},{""kty"":""RSA"",""e"":""AQAB"",""n"":""qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q""}]}");
+            Assert.Equal(@"{""keys"":[{""kty"":""oct"",""k"":""GawgguFyGrWKav7AX4VKUg""},{""kty"":""RSA"",""e"":""AQAB"",""n"":""qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q""}]}", test);
         }
 
         [Fact]
@@ -148,17 +148,17 @@ namespace UnitTests
         {
             //given
             var json = @"{
-	            ""keys"": [
-		            {
-			            ""kty"": ""oct"",
-			            ""k"": ""GawgguFyGrWKav7AX4VKUg""
-		            },
-		            {
-			            ""kty"": ""RSA"",
-			            ""e"": ""AQAB"",
-			            ""n"": ""qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q""
-		            }
-	            ]
+                ""keys"": [
+                    {
+                        ""kty"": ""oct"",
+                        ""k"": ""GawgguFyGrWKav7AX4VKUg""
+                    },
+                    {
+                        ""kty"": ""RSA"",
+                        ""e"": ""AQAB"",
+                        ""n"": ""qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q""
+                    }
+                ]
             }";
 
             //when
@@ -194,7 +194,6 @@ namespace UnitTests
                               y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"
                            );
             key3.Alg = "enc";
-
 
             JwkSet keySet = new JwkSet(key1, key2, key3);
 
