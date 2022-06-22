@@ -535,7 +535,7 @@ namespace Jose
             switch (name)
             {
                 case "P-256": return ECCurve.NamedCurves.nistP256;
-                case "P-284": return ECCurve.NamedCurves.nistP384;
+                case "P-384": return ECCurve.NamedCurves.nistP384;
                 case "P-521": return ECCurve.NamedCurves.nistP521;
             }
 
