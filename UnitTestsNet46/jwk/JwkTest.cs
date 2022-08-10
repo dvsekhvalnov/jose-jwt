@@ -653,7 +653,7 @@ namespace UnitTests
 
 #if NETSTANDARD || NET472
         [Fact]
-        public void EccKey_ECDsa_Public()
+        public void EccKey_ECDsa_Public_P256()
         {
             //given
             var key = new Jwk(crv: "P-256", x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
@@ -671,7 +671,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void EccKey_ECDsa_Private()
+        public void EccKey_ECDsa_Private_P256()
         {
             //given
             var key = new Jwk(crv: "P-256",
@@ -687,6 +687,88 @@ namespace UnitTests
             Assert.NotNull(test);
             Assert.Equal("P-256", key.Crv);
             Assert.Equal(256, test.KeySize);
+
+            Assert.NotNull(test.ExportParameters(true).D);
+        }
+
+        [Fact]
+        public void EccKey_ECDsa_Public_P384()
+        {
+            //given
+            var key = new Jwk(crv: "P-384", 
+                x: "Rpfcsz4AT-hyQDpLW9HogAeJlyoNlA-FXdcHA4h8DmXyz8BF1JFYO94hfy4e2q9P", 
+                y: "vcrEHpk1FnqrBLwqRwIJwb8Rb7ROBm6Z8JPLLZjstZzo3-OURJTdsDmVLMtTVUs3");
+
+            //when
+            var test = key.ECDsaKey();
+
+            //then
+            Assert.NotNull(test);
+            Assert.Equal("P-384", key.Crv);
+            Assert.Equal(384, test.KeySize);
+
+            // Make sure no private key
+            Assert.Throws<CryptographicException>(() => test.ExportParameters(true));
+        }
+
+        [Fact]
+        public void EccKey_ECDsa_Private_P384()
+        {
+            //given
+            var key = new Jwk(crv: "P-384",
+                x: "Rpfcsz4AT-hyQDpLW9HogAeJlyoNlA-FXdcHA4h8DmXyz8BF1JFYO94hfy4e2q9P",
+                y: "vcrEHpk1FnqrBLwqRwIJwb8Rb7ROBm6Z8JPLLZjstZzo3-OURJTdsDmVLMtTVUs3",
+                d: "ice3abxagFJ0L6Fk3WHQQK33CSq6vbVuGOH-iEuc8tFe2joOIb4PUo3uz9afjPeL"
+            );
+
+            //when
+            var test = key.ECDsaKey();
+
+            //then
+            Assert.NotNull(test);
+            Assert.Equal("P-384", key.Crv);
+            Assert.Equal(384, test.KeySize);
+
+            Assert.NotNull(test.ExportParameters(true).D);
+        }
+
+        [Fact]
+        public void EccKey_ECDsa_Public_P521()
+        {
+            //given
+            var key = new Jwk(crv: "P-521",
+                x: "APhJyzW4IkVv2eb_bNTx5V_vXYNkJVaYV2KqKxkjUIk-cMVxinRyN6WACIuU7W15KM0DPX8cwzor5ODkUuDblMxg",
+                y: "ADxHYXBqI3lQthSnjwj2bOqgwQoDlC0LOrG-rBqyvPBbGUNPQPHLQd_aDONSskKgE8LZrD36F07agqBp2NDrfC4g");
+
+            //when
+            var test = key.ECDsaKey();
+
+            //then
+            Assert.NotNull(test);
+            Assert.Equal("P-521", key.Crv);
+            Assert.Equal(521, test.KeySize);
+
+            // Make sure no private key
+            Assert.Throws<CryptographicException>(() => test.ExportParameters(true));
+        }
+
+        [Fact]
+        public void EccKey_ECDsa_Private_P521()
+        {
+            //given
+            var key = new Jwk(crv: "P-521",
+                x: "APhJyzW4IkVv2eb_bNTx5V_vXYNkJVaYV2KqKxkjUIk-cMVxinRyN6WACIuU7W15KM0DPX8cwzor5ODkUuDblMxg",
+                y: "ADxHYXBqI3lQthSnjwj2bOqgwQoDlC0LOrG-rBqyvPBbGUNPQPHLQd_aDONSskKgE8LZrD36F07agqBp2NDrfC4g",
+                d: "AN6BCYXPe3SwU1-pHXmgiRYVsDvLgT5vE04OrhTTOKBTKkrb0CfnIVRyR2ptoXTzppL854nkY5WYe8mdm4O1arNw"
+            );
+
+            //when
+            var test = key.ECDsaKey();
+
+            //then
+            Assert.NotNull(test);
+            Assert.Equal("P-521", key.Crv);
+            Assert.Equal(521, test.KeySize);
 
             Assert.NotNull(test.ExportParameters(true).D);
         }
