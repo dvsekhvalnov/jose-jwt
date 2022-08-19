@@ -75,13 +75,13 @@ JSON Web Key (RFC 7517):
     <Copyright>Copyright dvsekhvalnov 2014-2022</Copyright>
     <AssemblyTitle>Jose JWT</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <VersionPrefix>4.0.0</VersionPrefix>
+    <VersionPrefix>4.0.1</VersionPrefix>
     <Authors>Dmitry Vsekhvalnov</Authors>
     <TargetFrameworks>net40;net461;net472;netstandard1.4;netstandard2.1</TargetFrameworks>
     <AssemblyName>jose-jwt</AssemblyName>
     <PackageId>jose-jwt</PackageId>
     <PackageTags>jose;jwt;json;jwa;jwe;jws;jwk;aes;cbc;gcm;rsa;hmac;sha;rsassa;pss;rsaes;oaep;pkcs1-v1_5;es;elliptic;curve;diffe;hellman;agreement;ecdsa;key wrap;kw;ecdh;pbes;pbes2;pbkdf;pbkdf2;password based encryption;javascript object signing;two phase validation;netcore;clr;coreclr;portable;fips;compliant;open;banking;detached content;unencoded payload;json web key;</PackageTags>
-    <PackageReleaseNotes>Json Web Keys (JWK) RFC 7517 support.</PackageReleaseNotes>
+    <PackageReleaseNotes>Bug fix release.</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/dvsekhvalnov/jose-jwt</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.github.com/dvsekhvalnov/jose-jwt/master/LICENSE</PackageLicenseUrl>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
