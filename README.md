@@ -1414,7 +1414,7 @@ Usually people have success with https://github.com/brutaldev/StrongNameSigner
 
 ASP.NET Team provides [Microsoft.AspNetCore.Authentication.JwtBearer](https://www.nuget.org/packages/Microsoft.AspNetCore.Authentication.JwtBearer/) that can be used to authorize web service routes using JWT Tokens created using JOSE-JWT that are passed via `Authorize: Bearer` HTTP header.
 
-In `startup.cs`, you can add JWT Authorization middleware by using `UseJwtBearerAuthentication` extension method against the `IApplicationBuilder app` parameter in `void Configure` method.
+In `startup.cs`, you can add JWT Authorization middleware by passing options to the `services.AddAuthentication` extension method in `void Configure` method.
 
 Below is the example for setting up the middleware using HS-\* signed token:
 
@@ -1450,11 +1450,11 @@ var tokenValidationParameters = new TokenValidationParameters
     ValidateActor = false,
 };
 
-app.UseJwtBearerAuthentication(new JwtBearerOptions
-{
-    AutomaticAuthenticate = true,
-    TokenValidationParameters = tokenValidationParameters,
-});
+services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        }).AddJwtBearer(options => { options.TokenValidationParameters = tokenValidationParameters; });
 ```
 
 After that, your Controllers or Actions can be secured by using `[Authorize]` attribute.
