@@ -10,8 +10,8 @@ namespace UnitTests
 {
     public class SettingsTest
     {
-        private static readonly byte[] aes128Key = { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
-
+        private static readonly byte[] aes128Key = { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };        
+       
         [Fact]
         public void Encode_IJsonMapper_Override()
         {
@@ -94,16 +94,18 @@ namespace UnitTests
             //given
             MockJweAlgorithm encAlg = new MockJweAlgorithm(128);
 
+            JwtSettings settings = new JwtSettings().RegisterJwe(JweEncryption.A128GCM, encAlg);
+
             string json =
                 @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
 
             //when
-            string token = Jose.JWT.Encode(json, aes128Key, JweAlgorithm.DIR, JweEncryption.A128GCM, settings: new JwtSettings().RegisterJwe(JweEncryption.A128GCM, encAlg));
+            string token = Jose.JWT.Encode(json, aes128Key, JweAlgorithm.DIR, JweEncryption.A128GCM, settings: settings);
 
             //then
             Console.Out.WriteLine("DIR_A128GCM = {0}", token);
 
-            Assert.Equal(json, Jose.JWT.Decode(token, aes128Key));
+            Assert.Equal(json, Jose.JWT.Decode(token, aes128Key, settings));
             Assert.True(encAlg.EncryptCalled);
         }
 
@@ -133,15 +135,17 @@ namespace UnitTests
             string json =
                 @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
 
+            JwtSettings settings = new JwtSettings().RegisterJwa(JweAlgorithm.DIR, keyMgmt);
+
             //when
-            string token = Jose.JWT.Encode(json, aes128Key, JweAlgorithm.DIR, JweEncryption.A128GCM, settings: new JwtSettings().RegisterJwa(JweAlgorithm.DIR, keyMgmt));
+            string token = Jose.JWT.Encode(json, aes128Key, JweAlgorithm.DIR, JweEncryption.A128GCM, settings: settings);
 
             //then
             Console.Out.WriteLine("DIR_A128GCM = {0}", token);
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(json, Jose.JWT.Decode(token, aes128Key));
+            Assert.Equal(json, Jose.JWT.Decode(token, aes128Key, settings));
 
             Assert.True(keyMgmt.WrapCalled);
         }
@@ -181,7 +185,7 @@ namespace UnitTests
 
             string[] parts = token.Split('.');
 
-            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey()));
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey(), settings));
 
             Assert.True(compress.CompressCalled);
         }
@@ -252,6 +256,70 @@ namespace UnitTests
             var test = Jose.JWT.Decode<IDictionary<string, object>>(token, PrivKey(), settings: new JwtSettings().RegisterCompressionAlias("zip", JweCompression.DEF));
 
             Assert.Equal(new Dictionary<string, object> { { "hello", "world" } }, test);
+        }
+
+        [Fact]
+        public void DeregisterJwe()
+        {
+            try
+            {
+                JwtSettings settings = new JwtSettings();
+                settings.DeregisterJwe(JweEncryption.A128GCM);
+                Jose.JWT.Encode("should fail, no A128GCM", PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM, settings: settings);
+                Assert.True(false, string.Format("JoseException was expected"));
+            }
+            catch(JoseException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+        }
+
+        [Fact]
+        public void DeregisterJws()
+        {
+            try
+            {
+                JwtSettings settings = new JwtSettings();
+                settings.DeregisterJws(JwsAlgorithm.RS256);
+                Jose.JWT.Encode("should fail, no RS-256", PrivKey(), JwsAlgorithm.RS256, settings: settings);
+                Assert.True(false, string.Format("JoseException was expected"));
+            }
+            catch (JoseException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+        }
+
+        [Fact]
+        public void DeregisterJwa()
+        {
+            try
+            {
+                JwtSettings settings = new JwtSettings();
+                settings.DeregisterJwa(JweAlgorithm.RSA_OAEP_256);
+                Jose.JWT.Encode("should fail, no RSA-OAEP-256", PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM, settings: settings);
+                Assert.True(false, string.Format("JoseException was expected"));
+            }
+            catch (JoseException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+        }
+
+        [Fact]
+        public void DeregisterCompression()
+        {
+            try               
+            {
+                JwtSettings settings = new JwtSettings();
+                settings.DeregisterCompression(JweCompression.DEF);
+                Jose.JWT.Encode("should fail, no RSA-OAEP-256", PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM, JweCompression.DEF, settings: settings);
+                Assert.True(false, string.Format("JoseException was expected"));
+            }
+            catch (JoseException e)
+            {
+                Console.Out.WriteLine(e.ToString());                
+            }
         }
 
         #region test utils
