@@ -189,6 +189,12 @@ namespace Jose
             return this;
         }
 
+        /// <summary>
+        /// Register Jws implementation, will override existing one if any
+        /// </summary>
+        /// <param name="alg"></param>
+        /// <param name="impl"></param>
+        /// <returns></returns>
         public JwtSettings RegisterJws(JwsAlgorithm alg, IJwsAlgorithm impl)
         {
             jwsAlgorithms[alg] = impl;
@@ -202,6 +208,50 @@ namespace Jose
         public JwtSettings RegisterJwsAlias(string alias, JwsAlgorithm alg)
         {
             jwsAlgorithmsAliases[alias] = alg;
+            return this;
+        }
+
+        /// <summary>
+        /// Deregister Jws implementation. Subsequent calls to Decode/Encode for given alg will throw 'InvalidAlgorithmException'.
+        /// Note: this method is not updating alg aliases. One should take care of it manually.
+        /// </summary>
+        public JwtSettings DeregisterJws(JwsAlgorithm alg)
+        {
+            jwsAlgorithms.Remove(alg);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Deregister Jwa implementation. Subsequent calls to Decode/Encode for given alg will throw 'InvalidAlgorithmException'.
+        /// Note: this method is not updating alg aliases. One should take care of it manually.
+        /// </summary>
+        public JwtSettings DeregisterJwa(JweAlgorithm alg)
+        {
+            keyAlgorithms.Remove(alg);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Deregister Jwe implementation. Subsequent calls to Decode/Encode for given alg will throw 'InvalidAlgorithmException'.
+        /// Note: this method is not updating alg aliases. One should take care of it manually.
+        /// </summary>
+        public JwtSettings DeregisterJwe(JweEncryption alg)
+        {
+            encAlgorithms.Remove(alg);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Deregister compression implementation. Subsequent calls to Decode/Encode for given alg will throw 'InvalidAlgorithmException'.
+        /// Note: this method is not updating alg aliases. One should take care of it manually.
+        /// </summary>
+        public JwtSettings DeregisterCompression(JweCompression alg)
+        {
+            compressionAlgorithms.Remove(alg);
+
             return this;
         }
 

@@ -115,8 +115,16 @@ namespace Jose
 
             if (compression.HasValue)
             {
+                var compressionAlg = settings.Compression(compression.Value);
+
+                if (compressionAlg == null)
+                {
+                    throw new JoseException(string.Format("Unsupported compression alg requested: {0}", compression.Value));
+                }
+
                 joseProtectedHeader["zip"] = settings.CompressionHeader(compression.Value);
-                plaintext = settings.Compression(compression.Value).Compress(plaintext);
+                                
+                plaintext = compressionAlg.Compress(plaintext);
             }
 
             switch (mode)

@@ -260,6 +260,70 @@ namespace UnitTests
             Assert.Equal(new Dictionary<string, object> { { "hello", "world" } }, test);
         }
 
+        [Fact]
+        public void DeregisterJwe()
+        {
+            try
+            {
+                JwtSettings settings = new JwtSettings();
+                settings.DeregisterJwe(JweEncryption.A128GCM);
+                Jose.JWT.Encode("should fail, no A128GCM", PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM, settings: settings);
+                Assert.True(false, string.Format("JoseException was expected"));
+            }
+            catch (JoseException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+        }
+
+        [Fact]
+        public void DeregisterJws()
+        {
+            try
+            {
+                JwtSettings settings = new JwtSettings();
+                settings.DeregisterJws(JwsAlgorithm.RS256);
+                Jose.JWT.Encode("should fail, no RS-256", PrivKey(), JwsAlgorithm.RS256, settings: settings);
+                Assert.True(false, string.Format("JoseException was expected"));
+            }
+            catch (JoseException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+        }
+
+        [Fact]
+        public void DeregisterJwa()
+        {
+            try
+            {
+                JwtSettings settings = new JwtSettings();
+                settings.DeregisterJwa(JweAlgorithm.RSA_OAEP_256);
+                Jose.JWT.Encode("should fail, no RSA-OAEP-256", PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM, settings: settings);
+                Assert.True(false, string.Format("JoseException was expected"));
+            }
+            catch (JoseException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+        }
+
+        [Fact]
+        public void DeregisterCompression()
+        {
+            try
+            {
+                JwtSettings settings = new JwtSettings();
+                settings.DeregisterCompression(JweCompression.DEF);
+                Jose.JWT.Encode("should fail, no RSA-OAEP-256", PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM, JweCompression.DEF, settings: settings);
+                Assert.True(false, string.Format("JoseException was expected"));
+            }
+            catch (JoseException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+        }
+
         #region test utils
 
         private RSACryptoServiceProvider PrivKey()
