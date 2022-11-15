@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Security.Cryptography;
+using System.Text;
 using Jose;
 using Jose.keys;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace UnitTests
 {
@@ -18,6 +21,49 @@ namespace UnitTests
     /// </summary>
     public class SecurityVulnerabilitiesTest
     {
+        private static readonly byte[] aes128Key = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
+
+        private readonly TestConsole Console;
+
+        public SecurityVulnerabilitiesTest(ITestOutputHelper output)
+        {
+            this.Console = new TestConsole(output);
+        }
+
+        [Fact]
+        public void UnboundedPBKDF2Attack()
+        {
+            try
+            {
+                //forged token with 10mlns hash iterations
+                string token = "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJpdiI6Inh1MWlHLXpMVERWaWU3b3YiLCJ0YWciOiJacExHZWVtaElFeUZDdS1iUk9jZlhnIiwiZW5jIjoiQTEyOEdDTSIsInAyYyI6MTAwMDAwMDAsInAycyI6Ik5rWGppMTk0N2ZSc0tUbEIifQ.-E0s5d6yAV0jRoT21YKURA.NOzw8pTGuxfe8kvC.NZAFt1_Kv1hglGgbGg.ev7SjmNduQgEWvPGh9SUmg";
+                var payload = Jose.JWT.Decode(token, "whatever");
+
+
+                //var headers = new Dictionary<string, object>();
+                //headers["p2c"] = 10000000;
+                //headers["p2s"] = "NkXji1947fRsKTlB";
+                //string token = JWT.Encode("Gonna get you", aes128Key, JweAlgorithm.A128GCMKW, JweEncryption.A128GCM, extraHeaders: headers);
+                //Console.Out.WriteLine(token);
+
+                //var fakeHeader = JWT.Headers(token);
+                //fakeHeader["alg"] = "PBES2-HS256+A128KW";
+
+                //byte[] headerBytes = Encoding.UTF8.GetBytes(JWT.DefaultSettings.JsonMapper.Serialize(fakeHeader));
+
+                //byte[][] parts = Compact.Parse(token);
+                //parts[0] = headerBytes;
+
+                //Console.Out.WriteLine(Compact.Serialize(parts));
+
+            }
+            catch (ArgumentException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+        }
+
+
         [Fact]
         public void InvalidCurveAttack()
         {
@@ -46,7 +92,7 @@ namespace UnitTests
             }
             catch (CryptographicException e)
             {
-                Console.WriteLine(e);
+                Console.Out.WriteLine(e.ToString());
             }
 
             try
@@ -56,7 +102,7 @@ namespace UnitTests
             }
             catch (CryptographicException e)
             {
-                Console.WriteLine(e);
+                Console.Out.WriteLine(e.ToString());
             }
         }
 
@@ -117,7 +163,7 @@ namespace UnitTests
             }
             catch (Jose.IntegrityException e)
             {
-                Console.WriteLine(e);
+                Console.Out.WriteLine(e.ToString());
             }
         }
     }
