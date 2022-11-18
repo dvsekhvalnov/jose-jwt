@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using Jose;
 using Jose.keys;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace UnitTests
 {
@@ -19,6 +20,28 @@ namespace UnitTests
     /// </summary>
     public class SecurityVulnerabilitiesTest
     {
+        private readonly TestConsole Console;
+
+        public SecurityVulnerabilitiesTest(ITestOutputHelper output)
+        {
+            this.Console = new TestConsole(output);
+        }
+
+        [Fact]
+        public void UnboundedPBKDF2Attack()
+        {
+            try
+            {
+                //forged token with 10mlns hash iterations
+                string token = "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJpdiI6Inh1MWlHLXpMVERWaWU3b3YiLCJ0YWciOiJacExHZWVtaElFeUZDdS1iUk9jZlhnIiwiZW5jIjoiQTEyOEdDTSIsInAyYyI6MTAwMDAwMDAsInAycyI6Ik5rWGppMTk0N2ZSc0tUbEIifQ.-E0s5d6yAV0jRoT21YKURA.NOzw8pTGuxfe8kvC.NZAFt1_Kv1hglGgbGg.ev7SjmNduQgEWvPGh9SUmg";
+                var payload = Jose.JWT.Decode(token, "whatever");
+            }
+            catch (ArgumentException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+        }
+
         [SkippableFact]
         public void InvalidCurveAttack()
         {
@@ -49,7 +72,7 @@ namespace UnitTests
             }
             catch (CryptographicException e)
             {
-                Console.WriteLine(e);
+                Console.Out.WriteLine(e.ToString());
             }
 
             try
@@ -59,7 +82,7 @@ namespace UnitTests
             }
             catch (CryptographicException e)
             {
-                Console.WriteLine(e);
+                Console.Out.WriteLine(e.ToString());
             }
         }
 
@@ -120,7 +143,7 @@ namespace UnitTests
             }
             catch (Jose.IntegrityException e)
             {
-                Console.WriteLine(e);
+                Console.Out.WriteLine(e.ToString());
             }
         }
     }
