@@ -12,7 +12,7 @@ namespace Jose
         private readonly long maxIterations;
         private readonly long minIterations;
 
-        public Pbse2HmacShaKeyManagementWithAesKeyWrap(int keyLengthBits, AesKeyWrapManagement aesKw, long maxIterations = long.MaxValue, int minIterations = -1)
+        public Pbse2HmacShaKeyManagementWithAesKeyWrap(int keyLengthBits, AesKeyWrapManagement aesKw, long maxIterations = long.MaxValue, int minIterations = 0)
         {
             aesKW = aesKw;
             this.keyLengthBits = keyLengthBits;
