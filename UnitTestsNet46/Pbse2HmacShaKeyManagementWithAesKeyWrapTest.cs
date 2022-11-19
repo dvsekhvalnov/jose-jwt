@@ -12,7 +12,6 @@ namespace UnitTests
     public class Pbse2HmacShaKeyManagementWithAesKeyWrapTest
     {
         private readonly TestConsole Console;
-        //private static readonly byte[] aes128Key = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
         private static readonly byte[] aes256Key  = new byte[] { 164, 60, 194, 0, 161, 189, 41, 38, 130, 89, 141, 164, 45, 170, 159, 209, 69, 137, 243, 216, 191, 131, 47, 250, 32, 107, 231, 117, 37, 158, 225, 234 };
 
         public Pbse2HmacShaKeyManagementWithAesKeyWrapTest(ITestOutputHelper output)

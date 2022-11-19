@@ -1,25 +1,16 @@
 ﻿using Jose;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
-using Xunit.Abstractions;
+using NUnit.Framework;
+
 
 namespace UnitTests
 {
     public class Pbse2HmacShaKeyManagementWithAesKeyWrapTest
-    {
-        private readonly TestConsole Console;
+    {               
         private static readonly byte[] aes256Key  = new byte[] { 164, 60, 194, 0, 161, 189, 41, 38, 130, 89, 141, 164, 45, 170, 159, 209, 69, 137, 243, 216, 191, 131, 47, 250, 32, 107, 231, 117, 37, 158, 225, 234 };
-
-        public Pbse2HmacShaKeyManagementWithAesKeyWrapTest(ITestOutputHelper output)
-        {
-            Console = new TestConsole(output);
-        }
-
-        [Fact]
+        
+        [Test]
         public void WrapKeyMinIterations()
         {
             // given
@@ -40,7 +31,7 @@ namespace UnitTests
             }            
         }
 
-        [Fact]
+        [Test]
         public void WrapKeyMinIterationsDefaults()
         {
             // given
@@ -61,7 +52,7 @@ namespace UnitTests
             }            
         }
 
-        [Fact]
+        [Test]
         public void WrapKeyMaxIterations()
         {
             // given
@@ -83,7 +74,7 @@ namespace UnitTests
             }
         }
 
-        [Fact]
+        [Test]
         public void UnwrapKeyMinIterations()
         {
             // given            
@@ -105,7 +96,7 @@ namespace UnitTests
             }
         }
 
-        [Fact]
+        [Test]
         public void UnwrapKeyMaxIterations()
         {
             // given            
