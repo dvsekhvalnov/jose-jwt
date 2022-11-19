@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Security.Cryptography;
-using System.Text;
 using Jose;
 using Jose.keys;
 using Xunit;
@@ -38,6 +36,7 @@ namespace UnitTests
                 //forged token with 10mlns hash iterations
                 string token = "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJpdiI6Inh1MWlHLXpMVERWaWU3b3YiLCJ0YWciOiJacExHZWVtaElFeUZDdS1iUk9jZlhnIiwiZW5jIjoiQTEyOEdDTSIsInAyYyI6MTAwMDAwMDAsInAycyI6Ik5rWGppMTk0N2ZSc0tUbEIifQ.-E0s5d6yAV0jRoT21YKURA.NOzw8pTGuxfe8kvC.NZAFt1_Kv1hglGgbGg.ev7SjmNduQgEWvPGh9SUmg";
                 var payload = Jose.JWT.Decode(token, "whatever");
+                Assert.True(false, "Should fail with ArgumentException");
             }
             catch (ArgumentException e)
             {

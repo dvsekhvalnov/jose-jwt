@@ -36,13 +36,14 @@ namespace Jose
             byte[] algId = Encoding.UTF8.GetBytes((string)header["alg"]);
 
             int iterationCount = 8192;
+
             if (header.TryGetValue("p2c", out var iterationCountObj))
             {
                 iterationCount = Ensure.Type<int>(iterationCountObj, "Pbse2HmacShaKeyManagementWithAesKeyWrap management algorithm expects p2c to be int.");
-
-                Ensure.MinValue(iterationCount, minIterations, "Pbse2HmacShaKeyManagementWithAesKeyWrap expected 'p2c' to be higher than {0} but got {1}", minIterations, iterationCount);
-                Ensure.MaxValue(iterationCount, maxIterations, "Pbse2HmacShaKeyManagementWithAesKeyWrap expected 'p2c' to be less than {0} but got {1}", maxIterations, iterationCount);
             }
+
+            Ensure.MinValue(iterationCount, minIterations, "Pbse2HmacShaKeyManagementWithAesKeyWrap expected 'p2c' to be higher than {0} but got {1}", minIterations, iterationCount);
+            Ensure.MaxValue(iterationCount, maxIterations, "Pbse2HmacShaKeyManagementWithAesKeyWrap expected 'p2c' to be less than {0} but got {1}", maxIterations, iterationCount);
 
             byte[] saltInput = Arrays.Random(96); //12 bytes
 
