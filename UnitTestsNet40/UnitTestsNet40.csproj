@@ -66,6 +66,7 @@
     <Compile Include="jwe\JweTest.cs" />
     <Compile Include="jwe\JweTokenTest.cs" />
     <Compile Include="PBKDF2Test.cs" />
+    <Compile Include="Pbse2HmacShaKeyManagementWithAesKeyWrapTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SecurityVulnerabilitiesTest.cs" />
     <Compile Include="SettingsTest.cs" />

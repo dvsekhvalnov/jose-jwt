@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -10,11 +9,16 @@ namespace Jose
     {
         private readonly AesKeyWrapManagement aesKW;
         private readonly int keyLengthBits;
+        private readonly long maxIterations;
+        private readonly long minIterations;
 
-        public Pbse2HmacShaKeyManagementWithAesKeyWrap(int keyLengthBits, AesKeyWrapManagement aesKw)
+        public Pbse2HmacShaKeyManagementWithAesKeyWrap(int keyLengthBits, AesKeyWrapManagement aesKw, long maxIterations = long.MaxValue, int minIterations = 0)
         {
             aesKW = aesKw;
             this.keyLengthBits = keyLengthBits;
+            this.maxIterations = maxIterations;
+            this.minIterations = minIterations;
+
         }
 
         public byte[][] WrapNewKey(int cekSizeBits, object key, IDictionary<string, object> header)
@@ -32,10 +36,14 @@ namespace Jose
             byte[] algId = Encoding.UTF8.GetBytes((string)header["alg"]);
 
             int iterationCount = 8192;
+
             if (header.TryGetValue("p2c", out var iterationCountObj))
             {
                 iterationCount = Ensure.Type<int>(iterationCountObj, "Pbse2HmacShaKeyManagementWithAesKeyWrap management algorithm expects p2c to be int.");
             }
+
+            Ensure.MinValue(iterationCount, minIterations, "Pbse2HmacShaKeyManagementWithAesKeyWrap expected 'p2c' to be higher than {0} but got {1}", minIterations, iterationCount);
+            Ensure.MaxValue(iterationCount, maxIterations, "Pbse2HmacShaKeyManagementWithAesKeyWrap expected 'p2c' to be less than {0} but got {1}", maxIterations, iterationCount);
 
             byte[] saltInput = Arrays.Random(96); //12 bytes
 
@@ -66,6 +74,9 @@ namespace Jose
             byte[] algId = Encoding.UTF8.GetBytes((string)header["alg"]);
             int iterationCount = Convert.ToInt32(header["p2c"]);
             byte[] saltInput = Base64Url.Decode((string)header["p2s"]);
+
+            Ensure.MinValue(iterationCount, minIterations, "Pbse2HmacShaKeyManagementWithAesKeyWrap expected 'p2c' to be higher than {0} but got {1}", minIterations, iterationCount);
+            Ensure.MaxValue(iterationCount, maxIterations, "Pbse2HmacShaKeyManagementWithAesKeyWrap expected 'p2c' to be less than {0} but got {1}", maxIterations, iterationCount);
 
             byte[] salt = Arrays.Concat(algId, Arrays.Zero, saltInput);
 
