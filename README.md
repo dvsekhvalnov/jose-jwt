@@ -1356,6 +1356,11 @@ Jose.JWT.Decode(token, secretKey, settings: new JwtSettings()
 );
 ```
 
+## Customizing library for security
+In response to ever increasing attacks on various JWT implementations, `jose-jwt` as of version v4.1 introduced number of additional security controls to limit potential attack surface on services and projects using the library.
+
+### Deregister algorithm implementations
+### Customizing PBKDF2
 
 ## More examples
 Checkout UnitTests\TestSuite.cs for more examples.
