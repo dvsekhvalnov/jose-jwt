@@ -9,6 +9,12 @@ JWE JSON Serialization cross-tested with [JWCrypto](https://github.com/latchset/
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
+- v4.1 added additional capabilities to manage runtime avaliable alg suite, see [Customizing library for security](#customizing-library-for-security). And also introduced default max limits for `PBKDF2` (`PBES2-*`) max iterations according to [OWASP PBKDF2 Recomendations](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2).
+
+        PBES2-HS256+A128KW: 310000
+        PBES2-HS384+A192KW: 250000
+        PBES2-HS512+A256KW: 120000
+
 - v4.0 introduced Json Web Key (JWK), [RFC 7517](https://datatracker.ietf.org/doc/html/rfc7517) support. Latest stable. All new features will most likely appear based on given version.
 
 - v3.2 dropped `Newtonsoft.Json` support in favor of `System.Text.Json` on `netstandard2.1`
