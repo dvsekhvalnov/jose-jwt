@@ -1360,6 +1360,18 @@ Jose.JWT.Decode(token, secretKey, settings: new JwtSettings()
 In response to ever increasing attacks on various JWT implementations, `jose-jwt` as of version v4.1 introduced number of additional security controls to limit potential attack surface on services and projects using the library.
 
 ### Deregister algorithm implementations
+One can use following methods to deregister any signing, encryption, key management or compression algorithms from runtime suite, that is considered unsafe or simply not expected by service.
+
+ - `JwtSettings.DeregisterJws(JwsAlgorithm alg)` - to remove signing algorithm
+ - `JwtSettings.DeregisterJwa(JweAlgorithm alg))` - to remove key management algorithm
+ - `JwtSettings.DeregisterJwe(JweEncryption alg)` - to remove signing algorithm
+ - `JwtSettings.DeregisterCompression(JweCompression alg)` - to remove signing algorithm
+
+ ```c#
+    JWT.DefaultSettings.DeregisterJws(JwsAlgorithm.none)
+                       .DeregisterJwe(JweAlgorithm.RSA1_5)
+                       .DeregisterJwe(JweAlgorithm.DIR);
+ ```
 ### Customizing PBKDF2
 
 ## More examples
