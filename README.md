@@ -11,10 +11,6 @@ Library is fully FIPS compliant since v2.1
 ## Which version?
 - v4.1 added additional capabilities to manage runtime avaliable alg suite, see [Customizing library for security](#customizing-library-for-security). And also introduced default max limits for `PBKDF2` (`PBES2-*`) max iterations according to [OWASP PBKDF2 Recomendations](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2).
 
-        PBES2-HS256+A128KW: 310000
-        PBES2-HS384+A192KW: 250000
-        PBES2-HS512+A256KW: 120000
-
 - v4.0 introduced Json Web Key (JWK), [RFC 7517](https://datatracker.ietf.org/doc/html/rfc7517) support. Latest stable. All new features will most likely appear based on given version.
 
 - v3.2 dropped `Newtonsoft.Json` support in favor of `System.Text.Json` on `netstandard2.1`
@@ -1373,6 +1369,24 @@ One can use following methods to deregister any signing, encryption, key managem
                        .DeregisterJwe(JweAlgorithm.DIR);
  ```
 ### Customizing PBKDF2
+As it quite easy to abuse `PBES2` family of algorithms via forging header with extra large `p2c` values, `jose-jwt` library introduced iteration count limits in v4.1 to reduce runtime exposure.
+By default, `maxIterations` is set according to [OWASP PBKDF2 Recomendations](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2)
+
+        PBES2-HS256+A128KW: 310000
+        PBES2-HS384+A192KW: 250000
+        PBES2-HS512+A256KW: 120000
+
+, while `minIterations` kept at `0` for backward compatibility.
+
+If it is desired to implement different limits, it can be achieved via registering `Pbse2HmacShaKeyManagementWithAesKeyWrap` implementation with different parameters:
+
+```c#
+    Jost.JWT.DefaultSettings
+        // Pick your own min/max limits
+        .RegisterJwe(JweAlgorithm.PBES2_HS256_A128KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128), 310000, 310000));
+        .RegisterJwe(JweAlgorithm.PBES2_HS384_A192KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192), 250000, 250000));
+        .RegisterJwe(JweAlgorithm.PBES2_HS512_A256KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256), 120000, 120000));
+```
 
 ## More examples
 Checkout UnitTests\TestSuite.cs for more examples.
