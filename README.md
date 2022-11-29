@@ -1390,7 +1390,7 @@ If it is desired to implement different limits, it can be achieved via registeri
 ```
 
 ## More examples
-Checkout [UnitTests\TestSuite.cs](UnitTests\TestSuite.cs) for more examples.
+Checkout [UnitTests\TestSuite.cs](UnitTests\\TestSuite.cs) for more examples.
 
 ## Dealing with keys
 Below is collection of links and approaches to nail down some common questions around key management:
