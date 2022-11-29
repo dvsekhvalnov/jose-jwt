@@ -1370,6 +1370,7 @@ One can use following methods to deregister any signing, encryption, key managem
  ```
 ### Customizing PBKDF2
 As it quite easy to abuse `PBES2` family of algorithms via forging header with extra large `p2c` values, `jose-jwt` library introduced iteration count limits in v4.1 to reduce runtime exposure.
+
 By default, `maxIterations` is set according to [OWASP PBKDF2 Recomendations](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2)
 
         PBES2-HS256+A128KW: 310000
@@ -1389,7 +1390,7 @@ If it is desired to implement different limits, it can be achieved via registeri
 ```
 
 ## More examples
-Checkout UnitTests\TestSuite.cs for more examples.
+Checkout [UnitTests\TestSuite.cs](UnitTests\TestSuite.cs) for more examples.
 
 ## Dealing with keys
 Below is collection of links and approaches to nail down some common questions around key management:
