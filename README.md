@@ -1389,6 +1389,25 @@ If it is desired to implement different limits, it can be achieved via registeri
         .RegisterJwe(JweAlgorithm.PBES2_HS512_A256KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256), 120000, 120000));
 ```
 
+In case you can't upgrade to latest version, but would like to have protections against `PBES2` abuse, it is recommended to stick with [Two-phase validation](#two-phase-validation) precheck before decoding:
+
+```c#
+    IDictionary<string, object> headers = Jose.JWT.Headers(token);
+
+    string alg = (string)headers["alg"];
+    long p2c = Convert.ToInt32(headers["p2c"]);
+
+    if(alg.StartsWith("PBES2-") && p2c > 310000)
+    {
+        // potentially can be forged/abused token
+    }
+    else
+    {
+        // continue with decoding routine
+        Jose.JWT.Decode(token, key);
+    }
+```
+
 ## More examples
 Checkout [UnitTests/TestSuite.cs](UnitTests/TestSuite.cs) for more examples.
 
