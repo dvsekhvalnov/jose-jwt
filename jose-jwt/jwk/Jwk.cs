@@ -36,6 +36,7 @@ namespace Jose
         private byte[] octKey;
         private RSA rsaKey;
         private CngKey eccCngKey;
+        private ECDiffieHellman ecdhKey;
         private List<X509Certificate2> x509Chain;
 
     #if NETSTANDARD || NET472
@@ -206,6 +207,33 @@ namespace Jose
             }
 
             return eccCngKey;
+        }
+
+        public ECDiffieHellman EcDiffieHellmanKey()
+        {
+            if (ecdhKey == null && X != null && Y != null)
+            {
+                byte[] d = (D != null) ? Base64Url.Decode(D) : null;
+                
+                var privateParameters = new ECParameters
+                {
+                    Curve = NameToCurve(Crv),
+                    Q = new ECPoint
+                    {
+                        X = Base64Url.Decode(X),
+                        Y = Base64Url.Decode(Y)
+                    }
+                };
+
+                if (d != null)
+                {
+                    privateParameters.D = d;
+                }
+
+                ecdhKey = ECDiffieHellman.Create(privateParameters);
+            }
+
+            return ecdhKey;
         }
 
         public Jwk()
@@ -508,7 +536,7 @@ namespace Jose
         }
 
 #if NETSTANDARD2_1 || NET472
-        private static string CurveToName(ECCurve curve)
+        public static string CurveToName(ECCurve curve)
         {
             curve.Oid.FriendlyName = curve.Oid.FriendlyName;
 
@@ -530,7 +558,7 @@ namespace Jose
             return null;
         }
 
-        private static ECCurve NameToCurve(string name)
+        public static ECCurve NameToCurve(string name)
         {
             switch (name)
             {

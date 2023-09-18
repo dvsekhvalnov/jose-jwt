@@ -30,29 +30,30 @@ namespace Jose
 
         private byte[] NewKey(int keyLength, object key, IDictionary<string, object> header)
         {
-            CngKey recieverPubKey = null;
+            ECDiffieHellman receiverPubKey = null;
 
             if (key is Jwk jwk)
             {
                 if (jwk.Kty == Jwk.KeyTypes.EC)
                 {
-                    recieverPubKey = jwk.CngKey(CngKeyUsages.KeyAgreement);
+                    receiverPubKey = jwk.EcDiffieHellmanKey();
                 }
             }
 
-            recieverPubKey = recieverPubKey ?? Ensure.Type<CngKey>(key, "EcdhKeyManagement alg expects key to be of CngKey or Jwk types with kty='EC'.");
-            
-            EccKey ephemeral = EccKey.Generate(recieverPubKey);
+            receiverPubKey ??= Ensure.Type<ECDiffieHellman>(key, "EcdhKeyManagement alg expects key to be of ECDiffieHellman or Jwk types with kty='EC'.");
+
+            ECDiffieHellman ephemeral = ECDiffieHellman.Create(receiverPubKey.KeyExchangeAlgorithm);
+            var ephemeralParameters = ephemeral.ExportParameters(false);
 
             IDictionary<string, object> epk = new Dictionary<string, object>();
             epk["kty"] = "EC";
-            epk["x"] = Base64Url.Encode(ephemeral.X);
-            epk["y"] = Base64Url.Encode(ephemeral.Y);
-            epk["crv"] = ephemeral.Curve();
+            epk["x"] = Base64Url.Encode(ephemeralParameters.Q.X);
+            epk["y"] = Base64Url.Encode(ephemeralParameters.Q.Y);
+            epk["crv"] = Jwk.CurveToName(ephemeralParameters.Curve);
 
             header["epk"] = epk;
 
-            return DeriveKey(header, keyLength, recieverPubKey, ephemeral.Key);
+            return DeriveKey(header, keyLength, receiverPubKey, ephemeral);
         }
 
         public virtual byte[] Wrap(byte[] cek, object key)
@@ -62,17 +63,17 @@ namespace Jose
 
         public virtual byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
         {
-            CngKey privateKey = null;
+            ECDiffieHellman privateKey = null;
 
             if (key is Jwk jwk)
             {
                 if (jwk.Kty == Jwk.KeyTypes.EC)
                 {
-                    privateKey = jwk.CngKey(CngKeyUsages.KeyAgreement);
+                    privateKey = jwk.EcDiffieHellmanKey();
                 }
             }
 
-            privateKey = privateKey ?? Ensure.Type<CngKey>(key, "EcdhKeyManagement alg expects key to be of CngKey or Jwk types with kty='EC'.");            
+            privateKey = privateKey ?? Ensure.Type<ECDiffieHellman>(key, "EcdhKeyManagement alg expects key to be of ECDiffieHellman or Jwk types with kty='EC'.");            
 
             Ensure.Contains(header, new[] { "epk" }, "EcdhKeyManagement algorithm expects 'epk' key param in JWT header, but was not found");
             Ensure.Contains(header, new[] { algIdHeader }, "EcdhKeyManagement algorithm expects 'enc' header to be present in JWT header, but was not found");
@@ -84,12 +85,32 @@ namespace Jose
             var x = Base64Url.Decode((string)epk["x"]);
             var y = Base64Url.Decode((string)epk["y"]);
 
-            var externalPublicKey = EccKey.New(x, y, usage: CngKeyUsages.KeyAgreement);
+            var externalPublicKey = CreateEcDiffieHellman(Jwk.NameToCurve((string)epk["crv"]), x, y, null);
 
             return DeriveKey(header, cekSizeBits, externalPublicKey, privateKey);
         }
+        
+        public static ECDiffieHellman CreateEcDiffieHellman(ECCurve curve, byte[] x, byte[] y, byte[] d)
+        {
+            var privateParameters = new ECParameters
+            {
+                Curve = curve,
+                Q = new ECPoint
+                {
+                    X = x,
+                    Y = y
+                }
+            };
 
-        private byte[] DeriveKey(IDictionary<string, object> header, int cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
+            if (d != null)
+            {
+                privateParameters.D = d;
+            }
+
+            return ECDiffieHellman.Create(privateParameters);
+        }
+
+        private byte[] DeriveKey(IDictionary<string, object> header, int cekSizeBits, ECDiffieHellman externalPublicKey, ECDiffieHellman privateKey)
         {
             byte[] enc = Encoding.UTF8.GetBytes((string)header[algIdHeader]);
             byte[] apv = header.ContainsKey("apv") ? Base64Url.Decode((string)header["apv"]) : Arrays.Empty;
@@ -100,7 +121,7 @@ namespace Jose
             byte[] partyVInfo = Arrays.Concat(Arrays.IntToBytes(apv.Length), apv);
             byte[] suppPubInfo = Arrays.IntToBytes(cekSizeBits);
 
-            return ConcatKDF.DeriveKey(externalPublicKey, privateKey, cekSizeBits, algorithmId, partyVInfo, partyUInfo, suppPubInfo);
+            return ConcatKDF.DeriveKeyNonCng(externalPublicKey, privateKey, cekSizeBits, algorithmId, partyVInfo, partyUInfo, suppPubInfo);
         }       
     }
 }

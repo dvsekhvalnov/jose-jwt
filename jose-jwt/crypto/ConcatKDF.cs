@@ -43,5 +43,32 @@ namespace Jose
             throw new NotImplementedException("not yet");
 #endif
         }
+        
+        public static byte[] DeriveKeyNonCng(ECDiffieHellman externalPubKey, ECDiffieHellman privateKey, int keyBitLength, byte[] algorithmId, byte[] partyVInfo, byte[] partyUInfo, byte[] suppPubInfo)
+        {
+            // Concat KDF, as defined in Section 5.8.1 of [NIST.800-56A]
+            // reps = ceil( keydatalen / hashlen )
+            // K(i) = H(counter || Z || OtherInfo)
+            // DerivedKeyingMaterial = K(1) || K(2) || … || K(reps-1) || K_Last
+            // So knowing that:
+            // - jose-jwt supports a maximum keydatalen of 256
+            // - and hashlen=256
+            // then reps will always be 1
+            const int reps = 1;
+
+            var secretPrepend = Arrays.IntToBytes(reps);
+            var secretAppend = Arrays.Concat(
+                algorithmId,
+                partyUInfo,
+                partyVInfo,
+                suppPubInfo
+            );
+            
+            return Arrays.LeftmostBits(privateKey.DeriveKeyFromHash(
+                externalPubKey.PublicKey,
+                HashAlgorithmName.SHA256,
+                secretPrepend,
+                secretAppend), keyBitLength);
+        }
     }
 }
