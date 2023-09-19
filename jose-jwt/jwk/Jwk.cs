@@ -35,7 +35,7 @@ namespace Jose
 
         private byte[] octKey;
         private RSA rsaKey;
-        private CngKey eccCngKey;
+        private ECDiffieHellman eccCngKey;
         private ECDiffieHellman ecdhKey;
         private List<X509Certificate2> x509Chain;
 
@@ -197,7 +197,7 @@ namespace Jose
 #endif
         }
 
-        public CngKey CngKey(CngKeyUsages usage = CngKeyUsages.Signing)
+        public ECDiffieHellman CngKey(CngKeyUsages usage = CngKeyUsages.Signing)
         {
             if (eccCngKey == null && X != null && Y != null)
             {
@@ -334,7 +334,7 @@ namespace Jose
             }
         }
 
-        public Jwk(CngKey key, bool isPrivate = true)
+        public Jwk(ECDiffieHellman key, bool isPrivate = true)
         {
             eccCngKey = key;
 

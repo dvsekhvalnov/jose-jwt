@@ -22,6 +22,10 @@ namespace Jose.netstandard1_4
                 {
                     return Sign(cngKey, securedInput);
                 }
+                else if (key is ECDiffieHellman ecdhKey)
+                {
+                    return Sign(ecdhKey, securedInput);
+                }
                 else if (key is ECDsa ecDsa)
                 {
                     return Sign(ecDsa, securedInput);
@@ -54,6 +58,10 @@ namespace Jose.netstandard1_4
                 if (key is CngKey cngKey)
                 {
                     return Verify(cngKey, signature, securedInput);
+                }
+                if (key is ECDiffieHellman ecdhKey)
+                {
+                    return Verify(ecdhKey, signature, securedInput);
                 }
                 else if (key is ECDsa ecDsa)
                 {
@@ -106,6 +114,21 @@ namespace Jose.netstandard1_4
                 return signer.SignData(securedInput, Hash);
             }
         }
+        
+        private byte[] Sign(ECDiffieHellman privateKey, byte[] securedInput)
+        {
+            var ecdhParams = privateKey.ExportParameters(true);
+
+            using (ECDsa ecdsa = ECDsa.Create(new ECParameters
+                   {
+                       Curve = ecdhParams.Curve,
+                       Q = ecdhParams.Q,
+                       D = ecdhParams.D
+                   }))
+            {
+                return Sign(ecdsa, securedInput);
+            }
+        }
 
         private byte[] Sign(ECDsa privateKey, byte[] securedInput)
         {
@@ -121,6 +144,20 @@ namespace Jose.netstandard1_4
             using (var signer = new ECDsaCng(publicKey))
             {
                 return signer.VerifyData(securedInput, signature, Hash);
+            }
+        }
+
+        private bool Verify(ECDiffieHellman ecdhPublicKey, byte[] signature, byte[] securedInput)
+        {
+            var ecdhParams = ecdhPublicKey.ExportParameters(false);
+
+            using (ECDsa ecdsa = ECDsa.Create(new ECParameters
+                   {
+                       Curve = ecdhParams.Curve,
+                       Q = ecdhParams.Q
+                   }))
+            {
+                return Verify(ecdsa, signature, securedInput);
             }
         }
 

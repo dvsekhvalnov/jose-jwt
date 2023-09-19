@@ -42,7 +42,10 @@ namespace Jose
 
             receiverPubKey ??= Ensure.Type<ECDiffieHellman>(key, "EcdhKeyManagement alg expects key to be of ECDiffieHellman or Jwk types with kty='EC'.");
 
-            ECDiffieHellman ephemeral = ECDiffieHellman.Create(receiverPubKey.KeyExchangeAlgorithm);
+            // Cryptographic factory methods accepting an algorithm name are obsolete. Use the parameterless Create factory method on the algorithm type instead.
+            // https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.ecdiffiehellman.create
+            var pubKeyParams = receiverPubKey.ExportParameters(false);
+            ECDiffieHellman ephemeral = ECDiffieHellman.Create(pubKeyParams.Curve);
             var ephemeralParameters = ephemeral.ExportParameters(false);
 
             IDictionary<string, object> epk = new Dictionary<string, object>();
@@ -54,7 +57,7 @@ namespace Jose
             header["epk"] = epk;
 
             return DeriveKey(header, keyLength, receiverPubKey, ephemeral);
-        }
+        }   
 
         public virtual byte[] Wrap(byte[] cek, object key)
         {

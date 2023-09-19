@@ -32,7 +32,7 @@ namespace UnitTests
             byte[] suppPubInfo = new byte[] { 0, 0, 0, 128 };
 
             //when
-            byte[] key = ConcatKDF.DeriveKey(EccKey.New(ephemeral_x, ephemeral_y, usage: CngKeyUsages.KeyAgreement),
+            byte[] key = ConcatKDF.DeriveKeyNonCng(EccKey.New(ephemeral_x, ephemeral_y, usage: CngKeyUsages.KeyAgreement),
                 EccKey.New(bob_x, bob_y, bob_d, usage: CngKeyUsages.KeyAgreement), 128, algorithmId, partyVInfo,
                 partyUInfo, suppPubInfo);
 

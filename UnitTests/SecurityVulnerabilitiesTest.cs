@@ -71,6 +71,10 @@ namespace UnitTests
                 JWT.Decode(attackMod113, privateKey);
                 Assert.True(false, "Should fail with CrytographicException");
             }
+            catch (PlatformNotSupportedException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
             catch (CryptographicException e)
             {
                 Console.Out.WriteLine(e.ToString());
@@ -80,6 +84,10 @@ namespace UnitTests
             {
                 JWT.Decode(attackMod2447, privateKey);
                 Assert.True(false, "Should fail with CrytographicException");
+            }
+            catch (PlatformNotSupportedException e)
+            {
+                Console.Out.WriteLine(e.ToString());
             }
             catch (CryptographicException e)
             {
