@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Security.Cryptography;
 using Jose;
 
@@ -62,15 +63,20 @@ namespace Jose.keys
             get { return key; }
         }
 
+        public static ECDiffieHellman New(byte[] x, byte[] y, byte[] d = null, CngKeyUsages usage = CngKeyUsages.Signing)
+        {
+            return New<ECDiffieHellman>(x, y, d);
+        }
+
         /// <summary>
-        /// Creates CngKey Elliptic Curve Key from given (x,y) curve point - public part
+        /// Creates an AsymmetricAlgorithm Elliptic Curve Key (ECDiffieHellman or ECDsa) from given (x,y) curve point - public part
         /// and optional d - private part
         /// </summary>
         /// <param name="x">x coordinate of curve point</param>
         /// <param name="y">y coordinate of curve point</param>
         /// <param name="d">optional private part</param>
         /// <returns>CngKey for given (x,y) and d</returns>
-        public static ECDiffieHellman New(byte[] x, byte[] y, byte[] d = null, CngKeyUsages usage = CngKeyUsages.Signing)
+        public static T New<T>(byte[] x, byte[] y, byte[] d = null) where T : AsymmetricAlgorithm
         {
             if (x.Length != y.Length)
                 throw new ArgumentException("X and Y must be the same size");
@@ -112,19 +118,17 @@ namespace Jose.keys
             {
                 parameters.D = d;
             }
-
-            ECDiffieHellman ecdh = ECDiffieHellman.Create();
-            ecdh.ImportParameters(parameters);
-
-            return ecdh;
-        }
-
-        public static EccKey Generate(ECDiffieHellman receiverPubKey)
-        {
-            ECCurve curve = receiverPubKey.ExportParameters(false).Curve;
-            ECDiffieHellman ecdh = ECDiffieHellman.Create(curve);
-    
-            return new EccKey { key = ecdh };
+            
+            // If T is a ECDiffieHellman, we create an ECDiffieHellman object, otherwise we create a ECDsa object
+            // If T is not a ECDiffieHellman or ECDsa, we throw an exception
+            if (typeof(T) != typeof(ECDiffieHellman) && typeof(T) != typeof(ECDsa))
+            {
+                throw new ArgumentException("T must be ECDiffieHellman or ECDsa");
+            }
+            
+            return typeof(T) == typeof(ECDiffieHellman) ? 
+                ECDiffieHellman.Create(parameters) as T : 
+                ECDsa.Create(parameters) as T;
         }
 
         public static EccKey Export(ECDiffieHellman _key, bool isPrivate = true)
