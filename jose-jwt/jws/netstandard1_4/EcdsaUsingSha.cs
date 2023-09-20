@@ -22,10 +22,6 @@ namespace Jose.netstandard1_4
                 {
                     return Sign(cngKey, securedInput);
                 }
-                else if (key is ECDiffieHellman ecdhKey)
-                {
-                    return Sign(ecdhKey, securedInput);
-                }
                 else if (key is ECDsa ecDsa)
                 {
                     return Sign(ecDsa, securedInput);

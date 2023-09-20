@@ -39,6 +39,17 @@ namespace Jose
                     receiverPubKey = jwk.EcDiffieHellmanKey();
                 }
             }
+            else if (key is ECDsa ecdsa)
+            {
+                // Convert ECDsa to ECDiffieHellman
+                var ecdsaParams = ecdsa.ExportParameters(false);
+                receiverPubKey = ECDiffieHellman.Create();
+                receiverPubKey.ImportParameters(new ECParameters
+                {
+                    Curve = ecdsaParams.Curve,
+                    Q = ecdsaParams.Q
+                });
+            }
 
             receiverPubKey ??= Ensure.Type<ECDiffieHellman>(key, "EcdhKeyManagement alg expects key to be of ECDiffieHellman or Jwk types with kty='EC'.");
 
