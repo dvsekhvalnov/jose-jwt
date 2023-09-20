@@ -55,10 +55,6 @@ namespace Jose.netstandard1_4
                 {
                     return Verify(cngKey, signature, securedInput);
                 }
-                if (key is ECDiffieHellman ecdhKey)
-                {
-                    return Verify(ecdhKey, signature, securedInput);
-                }
                 else if (key is ECDsa ecDsa)
                 {
                     return Verify(ecDsa, signature, securedInput);
@@ -110,21 +106,6 @@ namespace Jose.netstandard1_4
                 return signer.SignData(securedInput, Hash);
             }
         }
-        
-        private byte[] Sign(ECDiffieHellman privateKey, byte[] securedInput)
-        {
-            var ecdhParams = privateKey.ExportParameters(true);
-
-            using (ECDsa ecdsa = ECDsa.Create(new ECParameters
-                   {
-                       Curve = ecdhParams.Curve,
-                       Q = ecdhParams.Q,
-                       D = ecdhParams.D
-                   }))
-            {
-                return Sign(ecdsa, securedInput);
-            }
-        }
 
         private byte[] Sign(ECDsa privateKey, byte[] securedInput)
         {
@@ -142,21 +123,7 @@ namespace Jose.netstandard1_4
                 return signer.VerifyData(securedInput, signature, Hash);
             }
         }
-
-        private bool Verify(ECDiffieHellman ecdhPublicKey, byte[] signature, byte[] securedInput)
-        {
-            var ecdhParams = ecdhPublicKey.ExportParameters(false);
-
-            using (ECDsa ecdsa = ECDsa.Create(new ECParameters
-                   {
-                       Curve = ecdhParams.Curve,
-                       Q = ecdhParams.Q
-                   }))
-            {
-                return Verify(ecdsa, signature, securedInput);
-            }
-        }
-
+        
         private bool Verify(ECDsa publicKey, byte[] signature, byte[] securedInput)
         {
             Ensure.BitSize(publicKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, publicKey.KeySize));

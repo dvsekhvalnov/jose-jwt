@@ -245,7 +245,7 @@ namespace UnitTests
             string token = "eyJhbGciOiJFUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.EVnmDMlz-oi05AQzts-R3aqWvaBlwVZddWkmaaHyMx5Phb2NSLgyI0kccpgjjAyo1S5KCB3LIMPfmxCX_obMKA";
 
             //when
-            string json = Jose.JWT.Decode(token, Ecc256Public());
+            string json = Jose.JWT.Decode(token, Ecc256PublicSigning());
 
             Console.Out.WriteLine("json = {0}", json);
 
@@ -293,7 +293,7 @@ namespace UnitTests
             string token = "eyJhbGciOiJFUzM4NCIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.jVTHd9T0fIQDJLNvAq3LPpgj_npXtWb64FfEK8Sm65Nr9q2goUWASrM9jv3h-71UrP4cBpM3on3yN--o6B-Tl6bscVUfpm1swPp94f7XD9VYLEjGMjQOaozr13iBZJCY";
 
             //when
-            string json = Jose.JWT.Decode(token, Ecc384Public());
+            string json = Jose.JWT.Decode(token, Ecc384PublicSigning());
 
             Console.Out.WriteLine("json = {0}", json);
 
@@ -310,7 +310,7 @@ namespace UnitTests
             string token = "eyJhbGciOiJFUzUxMiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.AHxJYFeTVpZmrfZsltpQKkkplmbkycQKFOFucD7hE4Sm3rCswUDi8hlSCfeYByugySYLFzogTQGk79PHP6vdl39sAUc9k2bhnv-NxRmJsN8ZxEx09qYKbc14qiNWZztLweQg0U-pU0DQ66rwJ0HikzSqgmyD1bJ6RxitJwceYLAovv0v";
 
             //when
-            string json = Jose.JWT.Decode(token, Ecc512Public());
+            string json = Jose.JWT.Decode(token, Ecc512PublicSigning());
 
             Console.Out.WriteLine("json = {0}", json);
 
@@ -669,7 +669,7 @@ namespace UnitTests
             Assert.Equal("eyJoZWxsbyI6ICJ3b3JsZCJ9", parts[1]); //Pyaload is non encrypted and static text
             Assert.Equal(86, parts[2].Length); //signature size
 
-            Assert.Equal(json, Jose.JWT.Decode(token, Ecc256Public()));
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecc256PublicSigning()));
         }
 
         [Fact]
@@ -720,7 +720,7 @@ namespace UnitTests
             Assert.Equal("eyJoZWxsbyI6ICJ3b3JsZCJ9", parts[1]); //Pyaload is non encrypted and static text
             Assert.Equal(86, parts[2].Length); //signature size
 
-            Assert.Equal(json, Jose.JWT.Decode(token, Ecc256Public()));
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecc256PublicSigning()));
         }
 
         [SkippableFact]
@@ -744,7 +744,7 @@ namespace UnitTests
             Assert.Equal("eyJoZWxsbyI6ICJ3b3JsZCJ9", parts[1]); //Pyaload is non encrypted and static text
             Assert.Equal(128, parts[2].Length); //signature size
 
-            Assert.Equal(json, Jose.JWT.Decode(token, Ecc384Public()));
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecc384PublicSigning()));
         }
 
         [SkippableFact]
@@ -768,7 +768,7 @@ namespace UnitTests
             Assert.Equal("eyJoZWxsbyI6ICJ3b3JsZCJ9", parts[1]); //Pyaload is non encrypted and static text
             Assert.Equal(176, parts[2].Length); //signature size
 
-            Assert.Equal(json, Jose.JWT.Decode(token, Ecc512Public()));
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecc512PublicSigning()));
         }
 
         [Fact]
@@ -3324,6 +3324,15 @@ namespace UnitTests
 
             return EccKey.New(x, y, usage: usage);
         }
+        
+        private ECDsa Ecc256PublicSigning()
+        {
+            byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+            byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+            byte[] d = { 42, 148, 231, 48, 225, 196, 166, 201, 23, 190, 229, 199, 20, 39, 226, 70, 209, 148, 29, 70, 125, 14, 174, 66, 9, 198, 80, 251, 95, 107, 98, 206 };
+
+            return EccKey.New<ECDsa>(x, y);
+        }
 
         private ECDiffieHellman Ecc384Public()
         {
@@ -3331,6 +3340,14 @@ namespace UnitTests
             byte[] y = { 189, 202, 196, 30, 153, 53, 22, 122, 171, 4, 188, 42, 71, 2, 9, 193, 191, 17, 111, 180, 78, 6, 110, 153, 240, 147, 203, 45, 152, 236, 181, 156, 232, 223, 227, 148, 68, 148, 221, 176, 57, 149, 44, 203, 83, 85, 75, 55 };
 
             return EccKey.New(x, y);
+        }
+        
+        private ECDsa Ecc384PublicSigning()
+        {
+            byte[] x = { 70, 151, 220, 179, 62, 0, 79, 232, 114, 64, 58, 75, 91, 209, 232, 128, 7, 137, 151, 42, 13, 148, 15, 133, 93, 215, 7, 3, 136, 124, 14, 101, 242, 207, 192, 69, 212, 145, 88, 59, 222, 33, 127, 46, 30, 218, 175, 79 };
+            byte[] y = { 189, 202, 196, 30, 153, 53, 22, 122, 171, 4, 188, 42, 71, 2, 9, 193, 191, 17, 111, 180, 78, 6, 110, 153, 240, 147, 203, 45, 152, 236, 181, 156, 232, 223, 227, 148, 68, 148, 221, 176, 57, 149, 44, 203, 83, 85, 75, 55 };
+
+            return EccKey.New<ECDsa>(x, y);
         }
 
         private ECDsa Ecc384Private()
@@ -3366,6 +3383,14 @@ namespace UnitTests
             byte[] y = { 0, 60, 71, 97, 112, 106, 35, 121, 80, 182, 20, 167, 143, 8, 246, 108, 234, 160, 193, 10, 3, 148, 45, 11, 58, 177, 190, 172, 26, 178, 188, 240, 91, 25, 67, 79, 64, 241, 203, 65, 223, 218, 12, 227, 82, 178, 66, 160, 19, 194, 217, 172, 61, 250, 23, 78, 218, 130, 160, 105, 216, 208, 235, 124, 46, 32 };
 
             return EccKey.New(x, y);
+        }
+        
+        private ECDsa Ecc512PublicSigning()
+        {
+            byte[] x = { 0, 248, 73, 203, 53, 184, 34, 69, 111, 217, 230, 255, 108, 212, 241, 229, 95, 239, 93, 131, 100, 37, 86, 152, 87, 98, 170, 43, 25, 35, 80, 137, 62, 112, 197, 113, 138, 116, 114, 55, 165, 128, 8, 139, 148, 237, 109, 121, 40, 205, 3, 61, 127, 28, 195, 58, 43, 228, 224, 228, 82, 224, 219, 148, 204, 96 };
+            byte[] y = { 0, 60, 71, 97, 112, 106, 35, 121, 80, 182, 20, 167, 143, 8, 246, 108, 234, 160, 193, 10, 3, 148, 45, 11, 58, 177, 190, 172, 26, 178, 188, 240, 91, 25, 67, 79, 64, 241, 203, 65, 223, 218, 12, 227, 82, 178, 66, 160, 19, 194, 217, 172, 61, 250, 23, 78, 218, 130, 160, 105, 216, 208, 235, 124, 46, 32 };
+
+            return EccKey.New<ECDsa>(x, y);
         }
 
         private ECDsa Ecc512Private()

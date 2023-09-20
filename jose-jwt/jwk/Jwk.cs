@@ -197,7 +197,7 @@ namespace Jose
 #endif
         }
 
-        public ECDiffieHellman CngKey(CngKeyUsages usage = CngKeyUsages.Signing)
+        public ECDiffieHellman ECDiffieHellman(CngKeyUsages usage = CngKeyUsages.Signing)
         {
             if (eccCngKey == null && X != null && Y != null)
             {
@@ -230,7 +230,7 @@ namespace Jose
                     privateParameters.D = d;
                 }
 
-                ecdhKey = ECDiffieHellman.Create(privateParameters);
+                ecdhKey = System.Security.Cryptography.ECDiffieHellman.Create(privateParameters);
             }
 
             return ecdhKey;

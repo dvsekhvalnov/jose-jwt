@@ -605,7 +605,7 @@ namespace UnitTests
             var key = new Jwk(crv: "P-256", x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
 
             //when
-            var test = key.CngKey();
+            var test = key.ECDiffieHellman();
 
             //then
             Assert.NotNull(test);
@@ -627,7 +627,7 @@ namespace UnitTests
                            );
 
             //when
-            var test = key.CngKey();
+            var test = key.ECDiffieHellman();
 
             //then
             Assert.NotNull(test);
@@ -649,7 +649,7 @@ namespace UnitTests
                            );
 
             //when
-            var test = key.CngKey(CngKeyUsages.KeyAgreement);
+            var test = key.ECDiffieHellman(CngKeyUsages.KeyAgreement);
 
             //then
             Assert.NotNull(test);
@@ -1028,7 +1028,7 @@ namespace UnitTests
             Assert.Equal("g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU", test.Y);
             Assert.Equal("KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4", test.D);
 
-            var key = test.CngKey();
+            var key = test.ECDiffieHellman();
 
             Assert.NotNull(key);
             var curveName = key.ExportParameters(false).Curve.Oid.FriendlyName;
@@ -1098,7 +1098,7 @@ namespace UnitTests
             Assert.Equal("g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU", test.Y);
             Assert.Equal("KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4", test.D);
 
-            var key = test.CngKey();
+            var key = test.ECDiffieHellman();
 
             Assert.NotNull(key);
 
