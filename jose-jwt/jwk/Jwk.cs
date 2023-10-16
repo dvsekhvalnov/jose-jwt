@@ -35,7 +35,7 @@ namespace Jose
 
         private byte[] octKey;
         private RSA rsaKey;
-        private ECDiffieHellman eccCngKey;
+        private CngKey eccCngKey;
         private ECDiffieHellman ecdhKey;
         private List<X509Certificate2> x509Chain;
 
@@ -197,7 +197,7 @@ namespace Jose
 #endif
         }
 
-        public ECDiffieHellman ECDiffieHellman(CngKeyUsages usage = CngKeyUsages.Signing)
+        public CngKey CngKey(CngKeyUsages usage = CngKeyUsages.Signing)
         {
             if (eccCngKey == null && X != null && Y != null)
             {
@@ -333,8 +333,27 @@ namespace Jose
                 QI = Base64Url.Encode(param.InverseQ);
             }
         }
-
+        
         public Jwk(ECDiffieHellman key, bool isPrivate = true)
+        {
+            ecdhKey = key;
+
+            Kty = Jwk.KeyTypes.EC;
+
+            var eccKey = EccKeyUnix.Export(key, isPrivate);
+
+            Crv = eccKey.Curve();
+
+            X = Base64Url.Encode(eccKey.X);
+            Y = Base64Url.Encode(eccKey.Y);
+
+            if (eccKey.D != null)
+            { 
+                D = Base64Url.Encode(eccKey.D);
+            }            
+        }
+
+        public Jwk(CngKey key, bool isPrivate = true)
         {
             eccCngKey = key;
 

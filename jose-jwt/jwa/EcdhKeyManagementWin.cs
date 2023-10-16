@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Text;
@@ -6,11 +5,11 @@ using Jose.keys;
 
 namespace Jose
 {
-    public class EcdhKeyManagement : IKeyManagement
+    public class EcdhKeyManagementWin : IKeyManagement
     {
         private readonly string algIdHeader;
 
-        public EcdhKeyManagement(bool isDirectAgreement)
+        public EcdhKeyManagementWin(bool isDirectAgreement)
         {
             algIdHeader = isDirectAgreement ? "enc" : "alg";
         }
@@ -30,45 +29,30 @@ namespace Jose
 
         private byte[] NewKey(int keyLength, object key, IDictionary<string, object> header)
         {
-            ECDiffieHellman receiverPubKey = null;
+            CngKey recieverPubKey = null;
 
             if (key is Jwk jwk)
             {
                 if (jwk.Kty == Jwk.KeyTypes.EC)
                 {
-                    receiverPubKey = jwk.EcDiffieHellmanKey();
+                    recieverPubKey = jwk.CngKey(CngKeyUsages.KeyAgreement);
                 }
             }
-            else if (key is ECDsa ecdsa)
-            {
-                // Convert ECDsa to ECDiffieHellman
-                var ecdsaParams = ecdsa.ExportParameters(false);
-                receiverPubKey = ECDiffieHellman.Create();
-                receiverPubKey.ImportParameters(new ECParameters
-                {
-                    Curve = ecdsaParams.Curve,
-                    Q = ecdsaParams.Q
-                });
-            }
 
-            receiverPubKey ??= Ensure.Type<ECDiffieHellman>(key, "EcdhKeyManagement alg expects key to be of ECDiffieHellman or Jwk types with kty='EC'.");
-
-            // Cryptographic factory methods accepting an algorithm name are obsolete. Use the parameterless Create factory method on the algorithm type instead.
-            // https://learn.microsoft.com/en-us/dotnet/api/system.security.cryptography.ecdiffiehellman.create
-            var pubKeyParams = receiverPubKey.ExportParameters(false);
-            ECDiffieHellman ephemeral = ECDiffieHellman.Create(pubKeyParams.Curve);
-            var ephemeralParameters = ephemeral.ExportParameters(false);
+            recieverPubKey = recieverPubKey ?? Ensure.Type<CngKey>(key, "EcdhKeyManagement alg expects key to be of CngKey or Jwk types with kty='EC'.");
+            
+            EccKey ephemeral = EccKey.Generate(recieverPubKey);
 
             IDictionary<string, object> epk = new Dictionary<string, object>();
             epk["kty"] = "EC";
-            epk["x"] = Base64Url.Encode(ephemeralParameters.Q.X);
-            epk["y"] = Base64Url.Encode(ephemeralParameters.Q.Y);
-            epk["crv"] = Jwk.CurveToName(ephemeralParameters.Curve);
+            epk["x"] = Base64Url.Encode(ephemeral.X);
+            epk["y"] = Base64Url.Encode(ephemeral.Y);
+            epk["crv"] = ephemeral.Curve();
 
             header["epk"] = epk;
 
-            return DeriveKey(header, keyLength, receiverPubKey, ephemeral);
-        }   
+            return DeriveKey(header, keyLength, recieverPubKey, ephemeral.Key);
+        }
 
         public virtual byte[] Wrap(byte[] cek, object key)
         {
@@ -77,17 +61,17 @@ namespace Jose
 
         public virtual byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
         {
-            ECDiffieHellman privateKey = null;
+            CngKey privateKey = null;
 
             if (key is Jwk jwk)
             {
                 if (jwk.Kty == Jwk.KeyTypes.EC)
                 {
-                    privateKey = jwk.EcDiffieHellmanKey();
+                    privateKey = jwk.CngKey(CngKeyUsages.KeyAgreement);
                 }
             }
 
-            privateKey = privateKey ?? Ensure.Type<ECDiffieHellman>(key, "EcdhKeyManagement alg expects key to be of ECDiffieHellman or Jwk types with kty='EC'.");            
+            privateKey = privateKey ?? Ensure.Type<CngKey>(key, "EcdhKeyManagement alg expects key to be of CngKey or Jwk types with kty='EC'.");            
 
             Ensure.Contains(header, new[] { "epk" }, "EcdhKeyManagement algorithm expects 'epk' key param in JWT header, but was not found");
             Ensure.Contains(header, new[] { algIdHeader }, "EcdhKeyManagement algorithm expects 'enc' header to be present in JWT header, but was not found");
@@ -99,32 +83,12 @@ namespace Jose
             var x = Base64Url.Decode((string)epk["x"]);
             var y = Base64Url.Decode((string)epk["y"]);
 
-            var externalPublicKey = CreateEcDiffieHellman(Jwk.NameToCurve((string)epk["crv"]), x, y, null);
+            var externalPublicKey = EccKey.New(x, y, usage: CngKeyUsages.KeyAgreement);
 
             return DeriveKey(header, cekSizeBits, externalPublicKey, privateKey);
         }
-        
-        public static ECDiffieHellman CreateEcDiffieHellman(ECCurve curve, byte[] x, byte[] y, byte[] d)
-        {
-            var privateParameters = new ECParameters
-            {
-                Curve = curve,
-                Q = new ECPoint
-                {
-                    X = x,
-                    Y = y
-                }
-            };
 
-            if (d != null)
-            {
-                privateParameters.D = d;
-            }
-
-            return ECDiffieHellman.Create(privateParameters);
-        }
-
-        private byte[] DeriveKey(IDictionary<string, object> header, int cekSizeBits, ECDiffieHellman externalPublicKey, ECDiffieHellman privateKey)
+        private byte[] DeriveKey(IDictionary<string, object> header, int cekSizeBits, CngKey externalPublicKey, CngKey privateKey)
         {
             byte[] enc = Encoding.UTF8.GetBytes((string)header[algIdHeader]);
             byte[] apv = header.ContainsKey("apv") ? Base64Url.Decode((string)header["apv"]) : Arrays.Empty;
@@ -135,7 +99,7 @@ namespace Jose
             byte[] partyVInfo = Arrays.Concat(Arrays.IntToBytes(apv.Length), apv);
             byte[] suppPubInfo = Arrays.IntToBytes(cekSizeBits);
 
-            return ConcatKDF.DeriveKeyNonCng(externalPublicKey, privateKey, cekSizeBits, algorithmId, partyVInfo, partyUInfo, suppPubInfo);
-        }       
+            return ConcatKDF.DeriveKey(externalPublicKey, privateKey, cekSizeBits, algorithmId, partyVInfo, partyUInfo, suppPubInfo);
+        }      
     }
 }

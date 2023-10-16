@@ -1,5 +1,6 @@
 ﻿using Jose;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace Jose
 {
@@ -9,6 +10,24 @@ namespace Jose
     /// </summary>
     public class JwtSettings
     {
+        public JwtSettings()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                keyAlgorithms.Add(JweAlgorithm.ECDH_ES, new EcdhKeyManagementWin(true));
+                keyAlgorithms.Add(JweAlgorithm.ECDH_ES_A128KW, new EcdhKeyManagementWinWithAesKeyWrap(128, new AesKeyWrapManagement(128)));
+                keyAlgorithms.Add(JweAlgorithm.ECDH_ES_A192KW, new EcdhKeyManagementWinWithAesKeyWrap(192, new AesKeyWrapManagement(192)));
+                keyAlgorithms.Add(JweAlgorithm.ECDH_ES_A256KW, new EcdhKeyManagementWinWithAesKeyWrap(256, new AesKeyWrapManagement(256)));
+            }
+            else
+            {
+                keyAlgorithms.Add(JweAlgorithm.ECDH_ES, new EcdhKeyManagementUnix(true));
+                keyAlgorithms.Add(JweAlgorithm.ECDH_ES_A128KW, new EcdhKeyManagementUnixWithAesKeyWrap(128, new AesKeyWrapManagement(128)));
+                keyAlgorithms.Add(JweAlgorithm.ECDH_ES_A192KW, new EcdhKeyManagementUnixWithAesKeyWrap(192, new AesKeyWrapManagement(192)));
+                keyAlgorithms.Add(JweAlgorithm.ECDH_ES_A256KW, new EcdhKeyManagementUnixWithAesKeyWrap(256, new AesKeyWrapManagement(256)));
+            }
+        }
+        
         private readonly Dictionary<JwsAlgorithm, IJwsAlgorithm> jwsAlgorithms = new Dictionary<JwsAlgorithm, IJwsAlgorithm>
         {
             { JwsAlgorithm.none, new Plaintext()},
@@ -85,11 +104,7 @@ namespace Jose
             { JweAlgorithm.A128KW, new AesKeyWrapManagement(128) },
             { JweAlgorithm.A192KW, new AesKeyWrapManagement(192) },
             { JweAlgorithm.A256KW, new AesKeyWrapManagement(256) },
-            { JweAlgorithm.ECDH_ES, new EcdhKeyManagement(true) },
-            { JweAlgorithm.ECDH_ES_A128KW, new EcdhKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128)) },
-            { JweAlgorithm.ECDH_ES_A192KW, new EcdhKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192)) },
-            { JweAlgorithm.ECDH_ES_A256KW, new EcdhKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256)) },
-
+            
             // PBKDF2 iterations limited per OWASP reccomendation: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2
             { JweAlgorithm.PBES2_HS256_A128KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128), 310000) },
             { JweAlgorithm.PBES2_HS384_A192KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192), 250000) },
