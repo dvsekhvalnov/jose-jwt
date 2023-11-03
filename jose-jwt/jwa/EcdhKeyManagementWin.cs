@@ -7,15 +7,22 @@ namespace Jose
 {
     public class EcdhKeyManagementWin : IKeyManagement
     {
+        private readonly EcdhKeyManagementUnix ecdhKeyManagementUnix;
         private readonly string algIdHeader;
 
-        public EcdhKeyManagementWin(bool isDirectAgreement)
+        public EcdhKeyManagementWin(bool isDirectAgreement, EcdhKeyManagementUnix ecdhKeyManagementUnix)
         {
+            this.ecdhKeyManagementUnix = ecdhKeyManagementUnix;
             algIdHeader = isDirectAgreement ? "enc" : "alg";
         }
 
         public virtual byte[][] WrapNewKey(int cekSizeBits, object key, IDictionary<string, object> header)
         {
+            if (key is ECDiffieHellman)
+            {
+                return ecdhKeyManagementUnix.WrapNewKey(cekSizeBits, key, header);
+            }
+            
             var cek = NewKey(cekSizeBits, key, header);
             var encryptedCek = Wrap(cek, key);
 
@@ -61,6 +68,11 @@ namespace Jose
 
         public virtual byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
         {
+            if (key is ECDiffieHellman)
+            {
+                return ecdhKeyManagementUnix.Unwrap(encryptedCek, key, cekSizeBits, header);
+            }
+            
             CngKey privateKey = null;
 
             if (key is Jwk jwk)

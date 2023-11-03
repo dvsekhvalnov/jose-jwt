@@ -12,12 +12,16 @@ namespace Jose
     {
         public JwtSettings()
         {
+            // By giving the Unix ECDHKeyManagement implementation to windows, we enable windows version of it to work with not only CngKey but also ECDiffieHellman.
+            // Initially this was implemented separately, but unit tests were failing on windows due to the lack of ECDiffieHellman support. 
+            // Since we don't know what the keys will be provided until runtime, and the registration happens before runtime, we need to make sure 
+            // on windows it will also supports ECDiffieHellman. 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                keyAlgorithms.Add(JweAlgorithm.ECDH_ES, new EcdhKeyManagementWin(true));
-                keyAlgorithms.Add(JweAlgorithm.ECDH_ES_A128KW, new EcdhKeyManagementWinWithAesKeyWrap(128, new AesKeyWrapManagement(128)));
-                keyAlgorithms.Add(JweAlgorithm.ECDH_ES_A192KW, new EcdhKeyManagementWinWithAesKeyWrap(192, new AesKeyWrapManagement(192)));
-                keyAlgorithms.Add(JweAlgorithm.ECDH_ES_A256KW, new EcdhKeyManagementWinWithAesKeyWrap(256, new AesKeyWrapManagement(256)));
+                keyAlgorithms.Add(JweAlgorithm.ECDH_ES, new EcdhKeyManagementWin(true, new EcdhKeyManagementUnix(true)));
+                keyAlgorithms.Add(JweAlgorithm.ECDH_ES_A128KW, new EcdhKeyManagementWinWithAesKeyWrap(128, new AesKeyWrapManagement(128), new EcdhKeyManagementUnixWithAesKeyWrap(128, new AesKeyWrapManagement(128))));
+                keyAlgorithms.Add(JweAlgorithm.ECDH_ES_A192KW, new EcdhKeyManagementWinWithAesKeyWrap(192, new AesKeyWrapManagement(192), new EcdhKeyManagementUnixWithAesKeyWrap(192, new AesKeyWrapManagement(192))));
+                keyAlgorithms.Add(JweAlgorithm.ECDH_ES_A256KW, new EcdhKeyManagementWinWithAesKeyWrap(256, new AesKeyWrapManagement(256), new EcdhKeyManagementUnixWithAesKeyWrap(256, new AesKeyWrapManagement(256))));
             }
             else
             {
