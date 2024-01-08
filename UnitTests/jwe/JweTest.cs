@@ -709,10 +709,15 @@ namespace UnitTests
             Assert.Equal("Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc", secondRecipient.Recipient.JoseHeader["kid"]);
         }
 
-        [SkippableFact]
-        public void DecodeMultipleRecipientsWithUnprotectedHeader()
+        [SkippableTheory]
+        [InlineData("CNG")]
+        [InlineData("ECDH")]
+        public void DecodeMultipleRecipientsWithUnprotectedHeader(string keyImplementation)
         {
-            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+            if (keyImplementation == "CNG")
+            {
+                Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+            }
 
             var token = @"{
                 ""ciphertext"": ""wnecd9ceRDb0PqFdvNkjUw"",
@@ -757,7 +762,7 @@ namespace UnitTests
             Assert.Equal(8192L, firstRecipient.Recipient.JoseHeader["p2c"]);
             Assert.Equal("kpL8s71MjhPnBExCF-cIMA", firstRecipient.Recipient.JoseHeader["p2s"]);
 
-            var secondRecipient = Jose.JWE.Decrypt(token, Ecc256Private());
+            var secondRecipient = keyImplementation == "CNG" ? Jose.JWE.Decrypt(token, Ecc256Private()) : Jose.JWE.Decrypt(token, Ecc256PrivateEcdh());
 
             Assert.Equal("Hello World", secondRecipient.Plaintext);
 
@@ -845,10 +850,15 @@ namespace UnitTests
             Assert.Throws<JoseException>(() => Jose.JWE.Decrypt(token, sharedKey));
         }
 
-        [SkippableFact]
-        public void DecodeDuplicateKeys_UnprotectedHeader_RecipientHeader()
+        [SkippableTheory]
+        [InlineData("CNG")]
+        [InlineData("ECDH")]
+        public void DecodeDuplicateKeys_UnprotectedHeader_RecipientHeader(string keyImplementation)
         {
-            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+            if (keyImplementation == "CNG")
+            {
+                Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+            }
 
             var token = @"{
                 ""ciphertext"": ""z95vPJ_gXxejpFsno9EBCQ"",
@@ -884,7 +894,7 @@ namespace UnitTests
                 }
             }";
             //then
-            Assert.Throws<JoseException>(() => Jose.JWE.Decrypt(token, Ecc256Private()));
+            Assert.Throws<JoseException>(() => keyImplementation == "CNG" ? Jose.JWE.Decrypt(token, Ecc256Private()) : Jose.JWE.Decrypt(token, Ecc256PrivateEcdh()));
         }
 
         [Fact]
@@ -943,14 +953,21 @@ namespace UnitTests
             Assert.Equal(payload, decoded.Plaintext);
         }
 
-        [SkippableFact]
-        public void EncodeMultipleRecipients()
+        [SkippableTheory]
+        [InlineData("CNG")]
+        [InlineData("ECDH")]
+        public void EncodeMultipleRecipients(string keyImplementation)
         {
-            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+            if (keyImplementation == "CNG")
+            {
+                Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+            }
 
             var payload = "Hello World !";
             JweRecipient r1 = new JweRecipient(JweAlgorithm.PBES2_HS256_A128KW, "secret");
-            JweRecipient r2 = new JweRecipient(JweAlgorithm.ECDH_ES_A128KW, Ecc256Public());
+            JweRecipient r2 = keyImplementation == "CNG"
+                ? new JweRecipient(JweAlgorithm.ECDH_ES_A128KW, Ecc256Public())
+                : new JweRecipient(JweAlgorithm.ECDH_ES_A128KW, Ecc256PublicEcdh());
             JweRecipient r3 = new JweRecipient(JweAlgorithm.RSA_OAEP_256, PubKey());
 
             string token = JWE.Encrypt(payload, new[] { r1, r2, r3 }, JweEncryption.A256GCM);
@@ -960,7 +977,7 @@ namespace UnitTests
             JObject deserialized = JObject.Parse(token);
 
             Assert.Equal("{\"enc\":\"A256GCM\"}",
-                             UTF8Encoding.UTF8.GetString(Base64Url.Decode((string)deserialized["protected"])));
+                UTF8Encoding.UTF8.GetString(Base64Url.Decode((string)deserialized["protected"])));
 
             Assert.Equal(16, ((string)deserialized["iv"]).Length); //IV size
             Assert.Equal(18, ((string)deserialized["ciphertext"]).Length); //cipher text size
@@ -993,7 +1010,15 @@ namespace UnitTests
 
             Assert.Equal(payload, JWE.Decrypt(token, "secret").Plaintext);
             Assert.Equal(payload, JWE.Decrypt(token, PrivKey()).Plaintext);
-            Assert.Equal(payload, JWE.Decrypt(token, Ecc256Private()).Plaintext);
+
+            if (keyImplementation == "CNG")
+            {
+                Assert.Equal(payload, JWE.Decrypt(token, Ecc256Private()).Plaintext);
+            }
+            else
+            {
+                Assert.Equal(payload, JWE.Decrypt(token, Ecc256PrivateEcdh()).Plaintext);
+            }
         }
 
         [Fact]
@@ -1186,7 +1211,6 @@ namespace UnitTests
         {
             byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
             byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
-            byte[] d = { 42, 148, 231, 48, 225, 196, 166, 201, 23, 190, 229, 199, 20, 39, 226, 70, 209, 148, 29, 70, 125, 14, 174, 66, 9, 198, 80, 251, 95, 107, 98, 206 };
 
             return EccKey.New(x, y, usage: CngKeyUsages.KeyAgreement);
         }
@@ -1199,6 +1223,23 @@ namespace UnitTests
 
             return EccKey.New(x, y, d, CngKeyUsages.KeyAgreement);
         }
+        
+        private static ECDiffieHellman Ecc256PublicEcdh()
+        {
+            byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+            byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+
+            return EccKeyUnix.New(x, y, usage: CngKeyUsages.KeyAgreement);
+        }
+
+        private static ECDiffieHellman Ecc256PrivateEcdh()
+        {
+            byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+            byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+            byte[] d = { 42, 148, 231, 48, 225, 196, 166, 201, 23, 190, 229, 199, 20, 39, 226, 70, 209, 148, 29, 70, 125, 14, 174, 66, 9, 198, 80, 251, 95, 107, 98, 206 };
+
+            return EccKeyUnix.New(x, y, d, CngKeyUsages.KeyAgreement);
+        }
 
         private static readonly byte[] sharedKey = new byte[] { 21, 26, 196, 88, 134, 11, 137, 127, 215, 118, 142, 180, 138, 115, 246, 247, 179, 182, 140, 136, 76, 33, 206, 189, 255, 22, 243, 100, 251, 74, 254, 161 };
 
@@ -1209,8 +1250,6 @@ namespace UnitTests
         private static readonly byte[] aes256KWKey3 = new byte[] { 4, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133, 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133, };
 
         private static readonly byte[] aes128KWKey = new byte[] { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
-
-        private static JweRecipient recipientEcdhEs1 => new JweRecipient(JweAlgorithm.ECDH_ES, Ecc256Public());
 
         private static JweRecipient recipientAes256KW1 => new JweRecipient(JweAlgorithm.A256KW, aes256KWKey1);
 
