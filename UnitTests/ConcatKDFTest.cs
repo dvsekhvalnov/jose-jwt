@@ -63,7 +63,7 @@ namespace UnitTests
             using var publicKey = CreateEcDiffieHellman(ECCurve.NamedCurves.nistP256, ephemeral_x, ephemeral_y, null);
             using var privateKey = CreateEcDiffieHellman(ECCurve.NamedCurves.nistP256, bob_x, bob_y, bob_d);
             
-            var derivedKey = ConcatKDF.DeriveKeyNonCng(publicKey, privateKey, 128, algorithmId, partyVInfo, partyUInfo, suppPubInfo);
+            var derivedKey = ConcatKDF.DeriveEcdhKey(publicKey, privateKey, 128, algorithmId, partyVInfo, partyUInfo, suppPubInfo);
 
             string test = Base64Url.Encode(derivedKey);
 
@@ -89,7 +89,7 @@ namespace UnitTests
             using var privateKey = CreateEcDiffieHellman(ECCurve.NamedCurves.nistP256, "3BDv2y0CqT9A28qOhJoSp9K6qNSEaGagF6TLuVtCR5g=", "AkR4kvGNucKbDyHW7d5iD/C37aJML+4V+rxcyeXN0ts=", "Zw1DgcQ2LAex8SBaceej1yCB6IaSPFfBz05JccmImCo=");
             using var publicKey = CreateEcDiffieHellman(ECCurve.NamedCurves.nistP256, "YZAG4YKtXl/sQW+kTERkV3CTjU4CqUeVAFcROMivNYQ=", "u2iWhH749lKT6YMjkGC5eU26/wfM5PsZNSojgnQOD30=", null);
 
-            var derivedKey = ConcatKDF.DeriveKeyNonCng(publicKey, privateKey, cekSizeBits, algorithmId, partyVInfo, partyUInfo, suppPubInfo);
+            var derivedKey = ConcatKDF.DeriveEcdhKey(publicKey, privateKey, cekSizeBits, algorithmId, partyVInfo, partyUInfo, suppPubInfo);
             
             var result = Convert.ToBase64String(derivedKey);
             

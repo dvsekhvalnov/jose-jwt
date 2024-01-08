@@ -135,7 +135,7 @@ namespace Jose
             byte[] partyVInfo = Arrays.Concat(Arrays.IntToBytes(apv.Length), apv);
             byte[] suppPubInfo = Arrays.IntToBytes(cekSizeBits);
 
-            return ConcatKDF.DeriveKeyNonCng(externalPublicKey, privateKey, cekSizeBits, algorithmId, partyVInfo, partyUInfo, suppPubInfo);
+            return ConcatKDF.DeriveEcdhKey(externalPublicKey, privateKey, cekSizeBits, algorithmId, partyVInfo, partyUInfo, suppPubInfo);
         }       
     }
 }

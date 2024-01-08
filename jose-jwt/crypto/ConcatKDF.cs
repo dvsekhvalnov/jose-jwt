@@ -44,7 +44,7 @@ namespace Jose
 #endif
         }
         
-        public static byte[] DeriveKeyNonCng(ECDiffieHellman externalPubKey, ECDiffieHellman privateKey, int keyBitLength, byte[] algorithmId, byte[] partyVInfo, byte[] partyUInfo, byte[] suppPubInfo)
+        public static byte[] DeriveEcdhKey(ECDiffieHellman externalPubKey, ECDiffieHellman privateKey, int keyBitLength, byte[] algorithmId, byte[] partyVInfo, byte[] partyUInfo, byte[] suppPubInfo)
         {
             // Concat KDF, as defined in Section 5.8.1 of [NIST.800-56A]
             // reps = ceil( keydatalen / hashlen )

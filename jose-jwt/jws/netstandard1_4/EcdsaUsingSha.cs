@@ -123,7 +123,7 @@ namespace Jose.netstandard1_4
                 return signer.VerifyData(securedInput, signature, Hash);
             }
         }
-        
+
         private bool Verify(ECDsa publicKey, byte[] signature, byte[] securedInput)
         {
             Ensure.BitSize(publicKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, publicKey.KeySize));
