@@ -43,10 +43,15 @@ namespace UnitTests
             }
         }
 
-        [SkippableFact]
-        public void InvalidCurveAttack()
+        [SkippableTheory]
+        [InlineData("CNG")]
+        [InlineData("ECDH")]
+        public void InvalidCurveAttack(string keyImplementation)
         {
-            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+            if (keyImplementation == "CNG")
+            {
+                Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "CNG is Windows only");
+            }
 
             // https://www.cs.bris.ac.uk/Research/CryptographySecurity/RWC/2017/nguyen.quan.pdf
             // Attack exploits some ECDH implementations which do not check
@@ -56,7 +61,7 @@ namespace UnitTests
             byte[] y = Base64Url.Decode("e8lnCO-AlStT-NJVX-crhB7QRYhiix03illJOVAOyck");
             byte[] d = Base64Url.Decode("VEmDZpDXXK8p8N0Cndsxs924q6nS1RXFASRl6BfUqdw");
 
-            var privateKey = EccKey.New(x, y, d, usage: CngKeyUsages.KeyAgreement);
+            var privateKey = keyImplementation == "CNG" ? (object) EccKey.New(x, y, d, usage: CngKeyUsages.KeyAgreement) : EccKeyUnix.New(x, y, d) ;
 
             //JWT encrypted with attacker private key, which is equals to (reciever_pk mod 113)
             var attackMod113 =
