@@ -6,6 +6,7 @@ using Jose.keys;
 
 namespace Jose
 {
+#if NET472 || NETSTANDARD2_1
     public class EcdhKeyManagementUnix : IKeyManagement
     {
         private readonly string algIdHeader;
@@ -138,4 +139,33 @@ namespace Jose
             return ConcatKDF.DeriveEcdhKey(externalPublicKey, privateKey, cekSizeBits, algorithmId, partyVInfo, partyUInfo, suppPubInfo);
         }       
     }
+
+#else
+    // Stub implentations for older targets that throws
+    public class EcdhKeyManagementUnix : IKeyManagement
+    {
+        public EcdhKeyManagementUnix(bool isDirectAgreement) {}
+
+        public virtual byte[][] WrapNewKey(int cekSizeBits, object key, IDictionary<string, object> header)
+        {
+            throw new NotImplementedException("Not supported, requires .NET 4.7.2+ or NETSTANDARD 2.1+");
+        }
+
+        public virtual byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header)
+        {
+            throw new NotImplementedException("Not supported, requires .NET 4.7.2+ or NETSTANDARD 2.1+");
+        }
+
+	public virtual byte[] Wrap(byte[] cek, object key) 
+	{
+            throw new NotImplementedException("Not supported, requires .NET 4.7.2+ or NETSTANDARD 2.1+");
+	}
+
+        public virtual byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
+	{
+            throw new NotImplementedException("Not supported, requires .NET 4.7.2+ or NETSTANDARD 2.1+");
+	}
+	
+    }
+#endif
 }

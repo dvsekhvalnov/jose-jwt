@@ -43,7 +43,7 @@ namespace Jose
             throw new NotImplementedException("not yet");
 #endif
         }
-        
+#if NET472 || NETSTANDARD2_1        
         public static byte[] DeriveEcdhKey(ECDiffieHellman externalPubKey, ECDiffieHellman privateKey, int keyBitLength, byte[] algorithmId, byte[] partyVInfo, byte[] partyUInfo, byte[] suppPubInfo)
         {
             // Concat KDF, as defined in Section 5.8.1 of [NIST.800-56A]
@@ -70,5 +70,6 @@ namespace Jose
                 secretPrepend,
                 secretAppend), keyBitLength);
         }
+#endif
     }
 }

@@ -36,7 +36,11 @@ namespace Jose
         private byte[] octKey;
         private RSA rsaKey;
         private CngKey eccCngKey;
+
+    #if NET472 || NETSTANDARD2_1
         private ECDiffieHellman ecdhKey;
+    #endif
+
         private List<X509Certificate2> x509Chain;
 
     #if NETSTANDARD || NET472
@@ -209,6 +213,7 @@ namespace Jose
             return eccCngKey;
         }
 
+    #if NET472 || NETSTANDARD2_1
         public ECDiffieHellman EcDiffieHellmanKey()
         {
             if (ecdhKey == null && X != null && Y != null)
@@ -235,6 +240,7 @@ namespace Jose
 
             return ecdhKey;
         }
+    #endif	
 
         public Jwk()
         {
@@ -333,7 +339,8 @@ namespace Jose
                 QI = Base64Url.Encode(param.InverseQ);
             }
         }
-        
+
+    #if NET472 || NETSTANDARD2_1        
         public Jwk(ECDiffieHellman key, bool isPrivate = true)
         {
             ecdhKey = key;
@@ -352,6 +359,7 @@ namespace Jose
                 D = Base64Url.Encode(eccKey.D);
             }            
         }
+    #endif
 
         public Jwk(CngKey key, bool isPrivate = true)
         {

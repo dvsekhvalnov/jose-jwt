@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 
 namespace Jose.keys
 {
+#if NET472 || NETSTANDARD2_1  
     public class EccKeyUnix
     {
         private ECDiffieHellman key;
@@ -166,4 +167,5 @@ namespace Jose.keys
             }
         }
     }
+#endif
 }

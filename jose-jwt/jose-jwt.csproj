@@ -78,6 +78,7 @@ JSON Web Key (RFC 7517):
     <VersionPrefix>4.1.0</VersionPrefix>
     <Authors>Dmitry Vsekhvalnov</Authors>
     <TargetFrameworks>net40;net461;net472;netstandard1.4;netstandard2.1</TargetFrameworks>
+    <LangVersion>latest</LangVersion>
     <AssemblyName>jose-jwt</AssemblyName>
     <PackageId>jose-jwt</PackageId>
     <PackageTags>jose;jwt;json;jwa;jwe;jws;jwk;aes;cbc;gcm;rsa;hmac;sha;rsassa;pss;rsaes;oaep;pkcs1-v1_5;es;elliptic;curve;diffe;hellman;agreement;ecdsa;key wrap;kw;ecdh;pbes;pbes2;pbkdf;pbkdf2;password based encryption;javascript object signing;two phase validation;netcore;clr;coreclr;portable;fips;compliant;open;banking;detached content;unencoded payload;json web key;</PackageTags>
