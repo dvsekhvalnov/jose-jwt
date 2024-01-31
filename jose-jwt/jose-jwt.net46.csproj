@@ -55,8 +55,10 @@
     <Compile Include="jwa\AesGcmKeyWrapManagement.cs" />
     <Compile Include="jwa\AesKeyWrapManagement.cs" />
     <Compile Include="jwa\DirectKeyManagement.cs" />
-    <Compile Include="jwa\EcdhKeyManagement.cs" />
-    <Compile Include="jwa\EcdhKeyManagementWithAesKeyWrap.cs" />
+    <Compile Include="jwa\EcdhKeyManagementUnix.cs" />
+    <Compile Include="jwa\EcdhKeyManagementUnixWithAesKeyWrap.cs" />
+    <Compile Include="jwa\EcdhKeyManagementWin.cs" />
+    <Compile Include="jwa\EcdhKeyManagementWinWithAesKeyWrap.cs" />
     <Compile Include="jwa\IKeyManagement.cs" />
     <Compile Include="jwa\Pbse2HmacShaKeyManagementWithAesKeyWrap.cs" />
     <Compile Include="jwa\RsaKeyManagement.cs" />
@@ -79,6 +81,7 @@
     <Compile Include="JWT.cs" />
     <Compile Include="JwtOptions.cs" />
     <Compile Include="JwtSettings.cs" />
+    <Compile Include="keys\EccKeyUnix.cs" />
     <Compile Include="native\BCrypt.cs" />
     <Compile Include="native\NCrypt.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
