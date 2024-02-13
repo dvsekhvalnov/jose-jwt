@@ -614,7 +614,7 @@ namespace UnitTests
             Assert.True(test.IsEphemeral);
         }
 		
-		[Fact]
+	[Fact]
         public void EccKey_Ecdh_Public()
         {
             //given
@@ -627,7 +627,7 @@ namespace UnitTests
             Assert.NotNull(test);
             Assert.Equal("P-256", key.Crv);
             var curveName = test.ExportParameters(false).Curve.Oid.FriendlyName;
-            Assert.Equal("nistP256", curveName);
+            Assert.Contains(curveName, new []{ "nistP256", "ECDSA_P256" });
         }
 
         [SkippableFact]
@@ -669,7 +669,7 @@ namespace UnitTests
             Assert.NotNull(test);
             Assert.Equal("P-256", key.Crv);
             var curveName = test.ExportParameters(false).Curve.Oid.FriendlyName;
-            Assert.Equal("nistP256", curveName);
+            Assert.Contains(curveName, new []{ "nistP256", "ECDSA_P256" });
         }
 
         [SkippableFact]
@@ -711,7 +711,7 @@ namespace UnitTests
             Assert.NotNull(test);
             Assert.Equal("P-256", key.Crv);
             var curveName = test.ExportParameters(false).Curve.Oid.FriendlyName;
-            Assert.Equal("nistP256", curveName);
+            Assert.Contains(curveName, new []{ "nistP256", "ECDSA_P256" });
         }
 
         [Fact]
@@ -1145,7 +1145,7 @@ namespace UnitTests
 
             Assert.NotNull(key);
             var curveName = key.ExportParameters(false).Curve.Oid.FriendlyName;
-            Assert.Equal("nistP256", curveName);
+            Assert.Contains(curveName, new []{ "nistP256", "ECDSA_P256" });
         }
 
         [Fact]
@@ -1249,10 +1249,9 @@ namespace UnitTests
             var key = test.EcDiffieHellmanKey();
 
             Assert.NotNull(key);
-
-            Assert.NotNull(key);
             var curveName = key.ExportParameters(false).Curve.Oid.FriendlyName;
-            Assert.Equal("nistP256", curveName);
+
+	    Assert.Contains(curveName, new []{ "nistP256", "ECDSA_P256" });
         }
 
         [Fact]
