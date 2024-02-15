@@ -136,17 +136,17 @@ namespace Jose.keys
             ECCurve curve = parameters.Curve;
 
             // Check OID values to determine curve
-            if (curve.Oid.FriendlyName == "nistP256")
+            if (curve.Oid.FriendlyName == "nistP256" || ECCurve.NamedCurves.nistP256.Oid.Value == curve.Oid.Value)
             {
                 return "P-256";
             }
 
-            if (curve.Oid.FriendlyName == "nistP384")
+            if (curve.Oid.FriendlyName == "nistP384" || ECCurve.NamedCurves.nistP384.Oid.Value == curve.Oid.Value)
             {
                 return "P-384";
             }
 
-            if (curve.Oid.FriendlyName == "nistP521")
+            if (curve.Oid.FriendlyName == "nistP521" || ECCurve.NamedCurves.nistP521.Oid.Value == curve.Oid.Value)
             {
                 return "P-521";
             }
