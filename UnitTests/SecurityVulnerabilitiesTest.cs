@@ -84,6 +84,10 @@ namespace UnitTests
             {
                 Console.Out.WriteLine(e.ToString());
             }
+            catch (IntegrityException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
 
             try
             {
@@ -95,6 +99,10 @@ namespace UnitTests
                 Console.Out.WriteLine(e.ToString());
             }
             catch (CryptographicException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+            catch (IntegrityException e)
             {
                 Console.Out.WriteLine(e.ToString());
             }

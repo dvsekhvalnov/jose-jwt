@@ -307,7 +307,7 @@ namespace UnitTests
             //when
             var test = key.ToJson(JWT.DefaultSettings.JsonMapper);
 
-            //then 
+            //then
             Console.Out.WriteLine(test);
 
             Assert.Equal(@"{""kty"":""oct"",""k"":""GawgguFyGrWKav7AX4VKUg""}", test);
@@ -338,7 +338,7 @@ namespace UnitTests
             //given
             var key = new Jwk(new byte[] { 25, 172, 32, 130, 225, 114, 26, 181, 138, 106, 254, 192, 95, 133, 74, 82 });
 
-            //then            
+            //then
             Assert.Equal(new byte[] { 25, 172, 32, 130, 225, 114, 26, 181, 138, 106, 254, 192, 95, 133, 74, 82 }, key.OctKey());
             Assert.Equal("GawgguFyGrWKav7AX4VKUg", key.K);
         }
@@ -613,7 +613,7 @@ namespace UnitTests
             Assert.Equal(CngAlgorithm.ECDsaP256, test.Algorithm);
             Assert.True(test.IsEphemeral);
         }
-		
+
 	[Fact]
         public void EccKey_Ecdh_Public()
         {
@@ -651,7 +651,7 @@ namespace UnitTests
             Assert.Equal(CngAlgorithm.ECDsaP256, test.Algorithm);
             Assert.True(test.IsEphemeral);
         }
-		
+
         [Fact]
         public void EccKey_Ecdh_Private()
         {
@@ -693,7 +693,7 @@ namespace UnitTests
             Assert.Equal(CngAlgorithm.ECDiffieHellmanP256, test.Algorithm);
             Assert.True(test.IsEphemeral);
         }
-		
+
         [Fact]
         public void EccKey_Ecdh_Private_KeyAgreement()
         {
@@ -757,8 +757,8 @@ namespace UnitTests
         public void EccKey_ECDsa_Public_P384()
         {
             //given
-            var key = new Jwk(crv: "P-384", 
-                x: "Rpfcsz4AT-hyQDpLW9HogAeJlyoNlA-FXdcHA4h8DmXyz8BF1JFYO94hfy4e2q9P", 
+            var key = new Jwk(crv: "P-384",
+                x: "Rpfcsz4AT-hyQDpLW9HogAeJlyoNlA-FXdcHA4h8DmXyz8BF1JFYO94hfy4e2q9P",
                 y: "vcrEHpk1FnqrBLwqRwIJwb8Rb7ROBm6Z8JPLLZjstZzo3-OURJTdsDmVLMtTVUs3");
 
             //when
@@ -1115,7 +1115,7 @@ namespace UnitTests
             Assert.Equal(CngAlgorithm.ECDsaP256, key.Algorithm);
             Assert.True(key.IsEphemeral);
         }
-		
+
         [Fact]
         public void FromDictionary_EccKey_Ecdh()
         {
@@ -1219,7 +1219,7 @@ namespace UnitTests
             Assert.Equal(CngAlgorithm.ECDsaP256, key.Algorithm);
             Assert.True(key.IsEphemeral);
         }
-		
+
         [Fact]
         public void FromJson_EccKey_Ecdh()
         {
@@ -1272,7 +1272,7 @@ namespace UnitTests
                 "MIIEoDCCAogCCQDU5pKjdLHJvzANBgkqhkiG9w0BAQsFADASMRAwDgYDVQQDDAdyb290LWNhMB4XDTIxMTIxOTE3MDU0OVoXDTMxMTIxNzE3MDU0OVowEjEQMA4GA1UEAwwHcm9vdC1jYTCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBANBiqzJ6O7wLuFE42569qU3pR5CklXWE2XuNnt3LNglYOAOTy8j5xiImiIj+xN4K9qvPu30xbDL1EV83fom5zY2145RFvDc/FKKjmp1RrmL6rErRW2VbppuxSLXgNYUu6cffLbANCJdOmTPkAEwB+8GqnsEou00NFSM6LTJIihfpVln3mOr+wn9bQr7LQ62zdkj0i+rgxojyNhNNWVuGuRNV4kQRPhXMedUbKz73XoGOt3EXsyed81oMfkLZ0mh3Z3hAq0upUaCD6NeydVOTY62RgnUop7EdN+wruW3GRLReRq0ZtRFWNiaNfQA5ffSggzdtk7DDc6IU5vZDc/GZZP2VEZRzQ9HHw6Z6UfeRlL2H1YctGEEDIWX1sUYpHK1zzZtcOjbGsKpJtMuPFkVwJs9QOFEHtncxJaNN73e70/yv65PvuPhuFmKExVqEfu37IxM2Qoilii8/WBK9RonLe0qTLqNH2suXFkBDp9vhhUHGeho+m9ExhDQHpbRiXMw3EZDMICkvujhAqlK8wqcOfN0+urf8tzO9LtwX8czKbUq0R4HuGGdexd06/rK8GuUAr6aDSNdGkREeGl8EceYmBuGTmYRs/SqRRpW+k5O05gK7Nbvo2rU3BKL8y13AF95a5yXIZ3mJarXciv/WCv5sITcUtDIwZa/AkpaIGROQF2ejAgMBAAEwDQYJKoZIhvcNAQELBQADggIBACwqqfzL/irX7xpepIg7sydaC1CpYp86bC+UiG4C7QdKuuDrguY37n38kg5D5x6nOBIAjqgW45hUUcSJBVItS8nLtGrtopnyWJfr/bbfVT7MXMpJKEaDzPYgkAx12ObDMav6O9m+aj9n3zzGyNKDzmwkEk4IVHR1La0FfleTQ57d/gCjxDjgHLa7ayaXUYIyloPg+OdkMTkOTzMiFfVP3dCuXY7YHmNz2WuL8lPAhvVaEAYW4IPN0BZkseHjfxDKxPaAQrOMPSSYn826Y3XTyUGkBqFYu60VvwVawVhN4bn5oCkbfLHg8+wCCzbCrcrTwAC/cZubwO3/Ko3lzO+hxJDkbcHUgm8xYZziztIAxNGHORHF/6zgi6yvwOQfPNSWs4qWOFSBV3+JNRn+lvRRknRdGs0WPGZN9zIV4rRAuz1H+oh1WSfPdfDwf+qPeHME3sN0uUvNysdQPSnhi8crVv1hT1F+fv420olGKy0pnobvOCmw6uaBNInOm+xDHIsDt36t1P9OC3V9QPd4gs8BHRfssHOcTnptY/3cEwhTzW83QsbFgb9aQn/wDve6kKE9+i9Nd3XUeEIQ9E0MM2oI7vLyLDVg/YqBmxwEpfe6k8l4UI1UZlfn9TSBXhcaQ7VPNNeYS0j5lCEBP06LSV0Lx9YF4ad+sXdI0jAflBQodo6r"
             }, jwk.X5C);
 
-            //when 
+            //when
             //add two more
 
             jwk.Add(chain[1]);
@@ -1374,13 +1374,13 @@ namespace UnitTests
 
         private X509Certificate2 X509()
         {
-            return new X509Certificate2("jwt-2048.p12", "1", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
+            return new X509Certificate2("jwt-2048.p12", "1", StorageFlags());
         }
 
         private List<X509Certificate2> X509Chain()
         {
             X509Certificate2Collection collection = new X509Certificate2Collection();
-            collection.Import("chain.p12", "1", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
+            collection.Import("chain.p12", "1", StorageFlags());
 
             List<X509Certificate2> result = new List<X509Certificate2>();
 
@@ -1401,7 +1401,7 @@ namespace UnitTests
 
             return EccKey.New(x, y, d, usage);
         }
-        
+
         private ECDiffieHellman Ecc256PrivateEcdh()
         {
             byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
@@ -1418,7 +1418,7 @@ namespace UnitTests
 
             return EccKey.New(x, y, usage: usage);
         }
-        
+
         private ECDiffieHellman Ecc256PublicEcdh()
         {
             byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
@@ -1434,7 +1434,7 @@ namespace UnitTests
 
             return EccKey.New(x, y);
         }
-        
+
         private ECDiffieHellman Ecc384PublicEcdh()
         {
             byte[] x = { 70, 151, 220, 179, 62, 0, 79, 232, 114, 64, 58, 75, 91, 209, 232, 128, 7, 137, 151, 42, 13, 148, 15, 133, 93, 215, 7, 3, 136, 124, 14, 101, 242, 207, 192, 69, 212, 145, 88, 59, 222, 33, 127, 46, 30, 218, 175, 79 };
@@ -1451,7 +1451,7 @@ namespace UnitTests
 
             return EccKey.New(x, y, d);
         }
-        
+
         private ECDiffieHellman Ecc384PrivateEcdh()
         {
             byte[] x = { 70, 151, 220, 179, 62, 0, 79, 232, 114, 64, 58, 75, 91, 209, 232, 128, 7, 137, 151, 42, 13, 148, 15, 133, 93, 215, 7, 3, 136, 124, 14, 101, 242, 207, 192, 69, 212, 145, 88, 59, 222, 33, 127, 46, 30, 218, 175, 79 };
@@ -1468,7 +1468,7 @@ namespace UnitTests
 
             return EccKey.New(x, y);
         }
-        
+
         private ECDiffieHellman Ecc512PublicEcdh()
         {
             byte[] x = { 0, 248, 73, 203, 53, 184, 34, 69, 111, 217, 230, 255, 108, 212, 241, 229, 95, 239, 93, 131, 100, 37, 86, 152, 87, 98, 170, 43, 25, 35, 80, 137, 62, 112, 197, 113, 138, 116, 114, 55, 165, 128, 8, 139, 148, 237, 109, 121, 40, 205, 3, 61, 127, 28, 195, 58, 43, 228, 224, 228, 82, 224, 219, 148, 204, 96 };
@@ -1485,7 +1485,7 @@ namespace UnitTests
 
             return EccKey.New(x, y, d);
         }
-        
+
         private ECDiffieHellman Ecc512PrivateEcdh()
         {
             byte[] x = { 0, 248, 73, 203, 53, 184, 34, 69, 111, 217, 230, 255, 108, 212, 241, 229, 95, 239, 93, 131, 100, 37, 86, 152, 87, 98, 170, 43, 25, 35, 80, 137, 62, 112, 197, 113, 138, 116, 114, 55, 165, 128, 8, 139, 148, 237, 109, 121, 40, 205, 3, 61, 127, 28, 195, 58, 43, 228, 224, 228, 82, 224, 219, 148, 204, 96 };
@@ -1493,6 +1493,14 @@ namespace UnitTests
             byte[] d = { 0, 222, 129, 9, 133, 207, 123, 116, 176, 83, 95, 169, 29, 121, 160, 137, 22, 21, 176, 59, 203, 129, 62, 111, 19, 78, 14, 174, 20, 211, 56, 160, 83, 42, 74, 219, 208, 39, 231, 33, 84, 114, 71, 106, 109, 161, 116, 243, 166, 146, 252, 231, 137, 228, 99, 149, 152, 123, 201, 157, 155, 131, 181, 106, 179, 112 };
 
             return EccKeyUnix.New(x, y, d);
+        }
+
+        private X509KeyStorageFlags StorageFlags() {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+                return X509KeyStorageFlags.Exportable;
+            }
+
+            return X509KeyStorageFlags.EphemeralKeySet | X509KeyStorageFlags.Exportable;
         }
 
         private ECDsa ECDSa256Public()
@@ -1504,7 +1512,7 @@ namespace UnitTests
 
         private ECDsa ECDSa256Private()
         {
-            var x095 = new X509Certificate2("ecc256.p12", "12345", X509KeyStorageFlags.EphemeralKeySet | X509KeyStorageFlags.Exportable);
+            var x095 = new X509Certificate2("ecc256.p12", "12345", StorageFlags());
 
             return Exportable(x095.GetECDsaPrivateKey());
         }
@@ -1518,21 +1526,29 @@ namespace UnitTests
 
         private ECDsa ECDSa384Private()
         {
-            var x095 = new X509Certificate2("ecc384.p12", "12345", X509KeyStorageFlags.EphemeralKeySet | X509KeyStorageFlags.Exportable);
+            var x095 = new X509Certificate2("ecc384.p12", "12345", StorageFlags());
 
             return Exportable(x095.GetECDsaPrivateKey());
         }
 
         private ECDsa ECDSa521Public()
         {
-            var x095 = new X509Certificate2("ecc521.p12", "12345");
+            #if NET5_0_OR_GREATER
+                var x095 = new X509Certificate2("ecc521n.p12", "12345");
+            #else
+                var x095 = new X509Certificate2("ecc521.p12", "12345");
+            #endif
 
             return x095.GetECDsaPublicKey();
         }
 
         private ECDsa ECDSa521Private()
         {
-            var x095 = new X509Certificate2("ecc521.p12", "12345", X509KeyStorageFlags.EphemeralKeySet | X509KeyStorageFlags.Exportable);
+            #if NET5_0_OR_GREATER
+                var x095 = new X509Certificate2("ecc521n.p12", "12345", StorageFlags());
+            #else
+                var x095 = new X509Certificate2("ecc521.p12", "12345", StorageFlags());
+            #endif
 
             return Exportable(x095.GetECDsaPrivateKey());
         }

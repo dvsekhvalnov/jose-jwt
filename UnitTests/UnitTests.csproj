@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>UnitTests Class Library</Description>
     <Authors>Administrator</Authors>
-    <TargetFrameworks>netcoreapp3.1;net50</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;net50;net80</TargetFrameworks>
     <AssemblyName>UnitTests</AssemblyName>
     <PackageId>UnitTests</PackageId>
   </PropertyGroup>
@@ -32,6 +32,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="ecc521.p12">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="ecc521n.p12">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="chain.p12">
