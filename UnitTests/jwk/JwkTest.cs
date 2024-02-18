@@ -1380,7 +1380,7 @@ namespace UnitTests
         private List<X509Certificate2> X509Chain()
         {
             X509Certificate2Collection collection = new X509Certificate2Collection();
-            collection.Import("chain.p12", "1", StorageFlags());
+            collection.Import("chain.p12", "1", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
 
             List<X509Certificate2> result = new List<X509Certificate2>();
 
