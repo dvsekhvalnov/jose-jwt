@@ -9,7 +9,7 @@ on:
 jobs:
 
   build-test-nix:
-    name: Build and test
+    name: Build and test .NET Core
 
     runs-on: ${{ matrix.os }}
     strategy:
@@ -17,7 +17,17 @@ jobs:
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
         framework: ['netcoreapp3.1', 'netcoreapp2.1', 'net50', 'net80']
-    steps:
+        exclude:
+        - os: macos-latest
+        framework: 'netcoreapp2.1'
+
+        - os: macos-latest
+        framework: 'netcoreapp3.1'
+
+        - os: macos-latest
+        framework: 'net50'
+
+	steps:
 
     - name: Check out code onto host
       uses: actions/checkout@v1
