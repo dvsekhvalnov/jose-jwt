@@ -1374,7 +1374,7 @@ namespace UnitTests
 
         private X509Certificate2 X509()
         {
-            return new X509Certificate2("jwt-2048.p12", "1", StorageFlags());
+            return new X509Certificate2("jwt-2048.p12", "1", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
         }
 
         private List<X509Certificate2> X509Chain()
