@@ -27,7 +27,7 @@ jobs:
         - os: macos-latest
         framework: 'net50'
 
-	steps:
+    steps:
 
     - name: Check out code onto host
       uses: actions/checkout@v1
