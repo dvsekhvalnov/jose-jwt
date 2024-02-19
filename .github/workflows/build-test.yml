@@ -19,13 +19,13 @@ jobs:
         framework: ['netcoreapp3.1', 'netcoreapp2.1', 'net50', 'net80']
         exclude:
           - os: macos-latest
-          framework: 'netcoreapp2.1'
+            framework: 'netcoreapp2.1'
 
           - os: macos-latest
-          framework: 'netcoreapp3.1'
+            framework: 'netcoreapp3.1'
 
           - os: macos-latest
-          framework: 'net50'
+            framework: 'net50'
 
     steps:
 
