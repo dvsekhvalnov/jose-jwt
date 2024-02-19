@@ -70,7 +70,7 @@ jobs:
   build-test-netfx:
     name: Build and test .NET Framework
 
-    runs-on: [windows-2019, windows-latest]
+    runs-on: [windows-2019]
     strategy:
       fail-fast: false # we want to see list of failing tests for each combination
       matrix:
