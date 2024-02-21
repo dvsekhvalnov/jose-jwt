@@ -919,13 +919,18 @@ namespace UnitTests
             Assert.Equal("AN6BCYXPe3SwU1-pHXmgiRYVsDvLgT5vE04OrhTTOKBTKkrb0CfnIVRyR2ptoXTzppL854nkY5WYe8mdm4O1arNw", test.D);
         }
 
-        [SkippableFact]
-        public void NewEccCng_Public_P256()
+        [SkippableTheory]
+        [InlineData("CNG")]
+        [InlineData("ECDH")]
+        public void NewEcc_Public_P256(string keyImplementation)
         {
-            Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+            if (keyImplementation == "CNG")
+            {
+                Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+            }
 
             //given
-            var test = new Jwk(Ecc256Public(), false);
+            var test = keyImplementation == "CNG" ? new Jwk(Ecc256Public(), false) :  new Jwk(Ecc256PublicEcdh(), false);
 
             //then
             Assert.Equal(Jwk.KeyTypes.EC, test.Kty);
