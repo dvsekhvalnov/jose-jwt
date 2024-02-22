@@ -11,7 +11,7 @@ namespace UnitTests
     public class ConcatKDFTest
     {
         [SkippableFact]
-        public void Derive128BitKey()
+        public void Derive128BitCngKey()
         {
             Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows),
                 "This requires CNG, which is Windows Only.");
@@ -43,7 +43,7 @@ namespace UnitTests
         }
         
         [Fact]
-        public void Derive128BitKeyNonCng()
+        public void Derive128BitEcdhKey()
         {
             // https://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-23#appendix-C
 
@@ -72,7 +72,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void Derive256BitKeyNonCng()
+        public void Derive256BitEcdhKey()
         {
             const int cekSizeBits = 256;
             const string algorithmType = "ECDH-ES";
