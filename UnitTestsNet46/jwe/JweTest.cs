@@ -690,7 +690,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void DecodeMultipleRecipientsWithUnprotectedHeader()
+        public void DecodeMultipleRecipientsWithUnprotectedHeaderCngKey()
         {
             var token = @"{
                 ""ciphertext"": ""wnecd9ceRDb0PqFdvNkjUw"",
@@ -752,6 +752,72 @@ namespace UnitTests
             Assert.Equal("WOqJxZwzivLSO-r3qRkBVDd9uA_de_AIu3G3hkIQg1M", epk["x"]);
             Assert.Equal("aFbCEl231v5IeA_Zjg8kMVJXxZWhpEHibtvHnq7Kk9k", epk["y"]);
         }
+
+#if NETSTANDARD || NET472
+        [Fact]
+        public void DecodeMultipleRecipientsWithUnprotectedHeaderEcdhKey()
+        {
+            var token = @"{
+                ""ciphertext"": ""wnecd9ceRDb0PqFdvNkjUw"",
+                ""iv"": ""d-F9AVZ7W6M5bWp45G_okw"",
+                ""protected"": ""eyJ0eXAiOiJKV0UifQ"",
+                ""recipients"": [
+                    {
+                        ""encrypted_key"": ""gk0a-lu_f588KjKomSl8v4ULeNEXktECpLWkTyxpmtFXMDyO-BtARt1fuBkFJsYqAwUNxz4uh1u4i3QCpKxdl01tZRW1yyxR"",
+                        ""header"": {
+                            ""alg"": ""PBES2-HS256+A128KW"",
+                            ""p2c"": 8192,
+                            ""p2s"": ""kpL8s71MjhPnBExCF-cIMA""
+                        }
+                    },
+                    {
+                        ""encrypted_key"": ""WDt1HtoyK0lazAF84EBoL7OWtkCyKBEj2hG_QEgX0hx2QDAgFh7HGiR5NnnChFTwdpXIA-8tBDzhWFLd6aEU8w8sqjC4txoc"",
+                        ""header"": {
+                            ""alg"": ""ECDH-ES+A128KW"",
+                            ""epk"": {
+                                ""crv"": ""P-256"",
+                                ""kty"": ""EC"",
+                                ""x"": ""WOqJxZwzivLSO-r3qRkBVDd9uA_de_AIu3G3hkIQg1M"",
+                                ""y"": ""aFbCEl231v5IeA_Zjg8kMVJXxZWhpEHibtvHnq7Kk9k""
+                            }
+                        }
+                    }
+                ],
+                ""tag"": ""zJxGA445Q4LBp4WAXo0vdCfD8ZdrWVLGRPkUH8Sv_6I"",
+                ""unprotected"": {
+                    ""enc"": ""A256CBC-HS512""
+                }
+            }";
+
+            var firstRecipient = Jose.JWE.Decrypt(token, "secret");
+
+            Assert.Equal("Hello World", firstRecipient.Plaintext);
+
+            Assert.Equal(5, firstRecipient.Recipient.JoseHeader.Count);
+            Assert.Equal("A256CBC-HS512", firstRecipient.Recipient.JoseHeader["enc"]);
+            Assert.Equal("JWE", firstRecipient.Recipient.JoseHeader["typ"]);
+            Assert.Equal("PBES2-HS256+A128KW", firstRecipient.Recipient.JoseHeader["alg"]);
+            Assert.Equal(8192, firstRecipient.Recipient.JoseHeader["p2c"]);
+            Assert.Equal("kpL8s71MjhPnBExCF-cIMA", firstRecipient.Recipient.JoseHeader["p2s"]);
+
+            var secondRecipient = Jose.JWE.Decrypt(token, Ecc256PrivateEcdh());
+
+            Assert.Equal("Hello World", secondRecipient.Plaintext);
+
+            Assert.Equal(4, secondRecipient.Recipient.JoseHeader.Count);
+            Assert.Equal("A256CBC-HS512", secondRecipient.Recipient.JoseHeader["enc"]);
+            Assert.Equal("JWE", secondRecipient.Recipient.JoseHeader["typ"]);
+            Assert.Equal("ECDH-ES+A128KW", secondRecipient.Recipient.JoseHeader["alg"]);
+            Assert.True(secondRecipient.Recipient.JoseHeader.ContainsKey("epk"));
+
+            var epk = (IDictionary<string, object>)secondRecipient.Recipient.JoseHeader["epk"];
+            Assert.Equal(4, epk.Count);
+            Assert.Equal("P-256", epk["crv"]);
+            Assert.Equal("EC", epk["kty"]);
+            Assert.Equal("WOqJxZwzivLSO-r3qRkBVDd9uA_de_AIu3G3hkIQg1M", epk["x"]);
+            Assert.Equal("aFbCEl231v5IeA_Zjg8kMVJXxZWhpEHibtvHnq7Kk9k", epk["y"]);
+        }
+#endif
 
         [Fact]
         public void DecodeDuplicateKeys_ProtectedHeader_ReceipientHeader()
@@ -825,7 +891,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void DecodeDuplicateKeys_UnprotectedHeader_RecipientHeader()
+        public void DecodeDuplicateKeys_UnprotectedHeader_RecipientHeader_CngKey()
         {
             var token = @"{
                 ""ciphertext"": ""z95vPJ_gXxejpFsno9EBCQ"",
@@ -865,6 +931,48 @@ namespace UnitTests
             Assert.Throws<JoseException>(() => Jose.JWE.Decrypt(token, Ecc256Private()));
         }
 
+#if NETSTANDARD || NET472
+        [Fact]
+        public void DecodeDuplicateKeys_UnprotectedHeader_RecipientHeader_EcdhKey()
+        {
+            var token = @"{
+                ""ciphertext"": ""z95vPJ_gXxejpFsno9EBCQ"",
+                ""iv"": ""jGdsbNjl-_uHT4V86MdFBA"",
+                ""protected"": ""eyJ0eXAiOiJKV0UifQ"",
+                ""recipients"": [
+                    {
+                        ""encrypted_key"": ""Kpr6FHWViJNnGCuDEEl27dsCiyWHRjiYuB2dOque06oqJZGVYgu9yif0L6OKd9gWvltrGJdo_byafGF5lwIvcl6ZGCNfRF3s"",
+                        ""header"": {
+                            ""alg"": ""PBES2-HS256+A128KW"",
+                            ""p2c"": 8192,
+                            ""p2s"": ""C5Hn0y-ho1mwygXPVfDynQ""
+                        }
+                    },
+                    {
+                        ""encrypted_key"": ""VuzPor1OEenPP-w0qg__uGS0w4h6Yt7K2ZHtzjqj0mnAzhNzTHumYFjaivk0dUwk1H2jxieEO9FYdC48BOMMjMcylnVGTgAV"",
+                        ""header"": {
+                            ""alg"": ""ECDH-ES+A128KW"",
+                            ""epk"": {
+                                ""crv"": ""P-256"",
+                                ""kty"": ""EC"",
+                                ""x"": ""LqM-HYhs3GcIPKRdiR2R7CuPx-aPVwBohgzP9l2WdfA"",
+                                ""y"": ""0hP45SduS8HPQaZ8RAyikZTuvYCjKaknhcCSVK_tIIY""
+                            }
+                        }
+                    }
+                ],
+                ""tag"": ""cbKJYp4ZRWWPWVHDyL2vuUjAZ3oAHXT1I75t1j9rCKI"",
+                ""unprotected"": {
+                    ""enc"": ""A256CBC-HS512"",
+                    ""alg"": ""ECDH-ES+A128KW""
+
+                }
+            }";
+
+            //then
+            Assert.Throws<JoseException>(() => Jose.JWE.Decrypt(token, Ecc256PrivateEcdh()));
+        }
+#endif
         [Fact]
         public void EncodeSingleRecipient()
         {
@@ -922,7 +1030,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void EncodeMultipleRecipients()
+        public void EncodeMultipleRecipientsCngKey()
         {
             var payload = "Hello World !";
             JweRecipient r1 = new JweRecipient(JweAlgorithm.PBES2_HS256_A128KW, "secret");
@@ -971,6 +1079,59 @@ namespace UnitTests
             Assert.Equal(payload, JWE.Decrypt(token, PrivKey()).Plaintext);
             Assert.Equal(payload, JWE.Decrypt(token, Ecc256Private()).Plaintext);
         }
+
+#if NETSTANDARD || NET472
+        [Fact]
+        public void EncodeMultipleRecipientsEcdhKey()
+        {
+            var payload = "Hello World !";
+            JweRecipient r1 = new JweRecipient(JweAlgorithm.PBES2_HS256_A128KW, "secret");
+            JweRecipient r2 = new JweRecipient(JweAlgorithm.ECDH_ES_A128KW, Ecc256PublicEcdh());
+            JweRecipient r3 = new JweRecipient(JweAlgorithm.RSA_OAEP_256, PubKey());
+
+            string token = JWE.Encrypt(payload, new[] { r1, r2, r3 }, JweEncryption.A256GCM, mode: SerializationMode.Json);
+
+            Console.Out.WriteLine("[JSON][PBES2_HS256_A128KW, ECDH-ES+A128KW, RSA_OAEP_256][A256GCM]: {0}", token);
+
+            JObject deserialized = JObject.Parse(token);
+
+            Assert.Equal("{\"enc\":\"A256GCM\"}",
+                             UTF8Encoding.UTF8.GetString(Base64Url.Decode((string)deserialized["protected"])));
+
+            Assert.Equal(16, ((string)deserialized["iv"]).Length); //IV size
+            Assert.Equal(18, ((string)deserialized["ciphertext"]).Length); //cipher text size
+            Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
+
+            Assert.True(deserialized["recipients"] is JArray);
+            Assert.Equal(3, ((JArray)deserialized["recipients"]).Count);
+            var rec0 = ((JArray)deserialized["recipients"])[0];
+            var rec1 = ((JArray)deserialized["recipients"])[1];
+            var rec2 = ((JArray)deserialized["recipients"])[2];
+
+            Assert.True(rec0["header"] is JObject);
+            Assert.Equal("PBES2-HS256+A128KW", rec0["header"]["alg"]);
+            Assert.Equal(8192, rec0["header"]["p2c"]);
+            Assert.Equal(16, ((string)rec0["header"]["p2s"]).Length);
+            Assert.Equal(54, ((string)rec0["encrypted_key"]).Length);
+
+            Assert.True(rec1["header"] is JObject);
+            Assert.True(rec1["header"]["epk"] is JObject);
+            Assert.Equal("ECDH-ES+A128KW", rec1["header"]["alg"]);
+            Assert.Equal("EC", rec1["header"]["epk"]["kty"]);
+            Assert.Equal("P-256", rec1["header"]["epk"]["crv"]);
+            Assert.Equal(43, ((string)rec1["header"]["epk"]["x"]).Length);
+            Assert.Equal(43, ((string)rec1["header"]["epk"]["y"]).Length);
+            Assert.Equal(54, ((string)rec1["encrypted_key"]).Length);
+
+            Assert.True(rec2["header"] is JObject);
+            Assert.Equal("RSA-OAEP-256", rec2["header"]["alg"]);
+            Assert.Equal(342, ((string)rec2["encrypted_key"]).Length);
+
+            Assert.Equal(payload, JWE.Decrypt(token, "secret").Plaintext);
+            Assert.Equal(payload, JWE.Decrypt(token, PrivKey()).Plaintext);
+            Assert.Equal(payload, JWE.Decrypt(token, Ecc256PrivateEcdh()).Plaintext);
+        }
+#endif
 
         [Fact]
         public void EncodeUnprotectedHeader()
@@ -1175,6 +1336,25 @@ namespace UnitTests
 
             return EccKey.New(x, y, d, CngKeyUsages.KeyAgreement);
         }
+
+#if NETSTANDARD || NET472
+        private static ECDiffieHellman Ecc256PublicEcdh()
+        {
+            byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+            byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+
+            return EccKeyUnix.New(x, y, usage: CngKeyUsages.KeyAgreement);
+        }
+
+        private static ECDiffieHellman Ecc256PrivateEcdh()
+        {
+            byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+            byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+            byte[] d = { 42, 148, 231, 48, 225, 196, 166, 201, 23, 190, 229, 199, 20, 39, 226, 70, 209, 148, 29, 70, 125, 14, 174, 66, 9, 198, 80, 251, 95, 107, 98, 206 };
+
+            return EccKeyUnix.New(x, y, d, CngKeyUsages.KeyAgreement);
+        }
+#endif
 
         private static readonly byte[] sharedKey = new byte[] { 21, 26, 196, 88, 134, 11, 137, 127, 215, 118, 142, 180, 138, 115, 246, 247, 179, 182, 140, 136, 76, 33, 206, 189, 255, 22, 243, 100, 251, 74, 254, 161 };
 
