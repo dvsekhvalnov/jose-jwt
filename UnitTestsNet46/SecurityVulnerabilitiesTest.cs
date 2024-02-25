@@ -87,6 +87,7 @@ namespace UnitTests
             }
         }
 
+#if NETSTANDARD || NET472
         [Fact]
         public void InvalidCurveAttackEcdhKey()
         {
@@ -139,7 +140,7 @@ namespace UnitTests
 
         }
 
-
+#endif
         [Fact]
         public void BitLengthIntegerOverflow()
         {
