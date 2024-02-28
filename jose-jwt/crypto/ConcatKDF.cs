@@ -7,6 +7,8 @@ namespace Jose
 {
     public static class ConcatKDF
     {
+        // Microsoft CNG implementation is unusable on NIST-384 and NISP-521 curves due to broken key derivation
+        // https://stackoverflow.com/questions/10879658/existing-implementations-for-nist-sp-800-56a-concatenation-single-step-key-deriv
         public static byte[] DeriveKey(CngKey externalPubKey, CngKey privateKey, int keyBitLength, byte[] algorithmId, byte[] partyVInfo, byte[] partyUInfo, byte[] suppPubInfo)
         {
 #if NET40 || NET461 || NET472 || NETSTANDARD2_1
@@ -19,7 +21,7 @@ namespace Jose
                     using (var pvuBuffer = new NCrypt.NCryptBuffer(NCrypt.KDF_PARTYUINFO, partyUInfo))
                     using (var spiBuffer = new NCrypt.NCryptBuffer(NCrypt.KDF_SUPPPUBINFO, suppPubInfo))
                     {
-                        using (var parameters = new NCrypt.NCryptBufferDesc(algIdBuffer, pviBuffer, pvuBuffer, spiBuffer))
+                        using (var parameters = new NCrypt.NCryptBufferDesc(algIdBuffer, pvuBuffer, pviBuffer, spiBuffer))
                         {
                             uint derivedSecretByteSize;
                             uint status = NCrypt.NCryptDeriveKey(hSecretAgreement, "SP800_56A_CONCAT", parameters, null, 0, out derivedSecretByteSize, 0);
@@ -50,25 +52,30 @@ namespace Jose
             // reps = ceil( keydatalen / hashlen )
             // K(i) = H(counter || Z || OtherInfo)
             // DerivedKeyingMaterial = K(1) || K(2) || … || K(reps-1) || K_Last
-            // So knowing that:
-            // - jose-jwt supports a maximum keydatalen of 256
-            // - and hashlen=256
-            // then reps will always be 1
-            const int reps = 1;
+            int reps = (int)Math.Ceiling(keyBitLength / (double)256);
 
-            var secretPrepend = Arrays.IntToBytes(reps);
-            var secretAppend = Arrays.Concat(
-                algorithmId,
-                partyUInfo,
-                partyVInfo,
-                suppPubInfo
-            );
-            
-            return Arrays.LeftmostBits(privateKey.DeriveKeyFromHash(
-                externalPubKey.PublicKey,
-                HashAlgorithmName.SHA256,
-                secretPrepend,
-                secretAppend), keyBitLength);
+            byte[][] K = new byte[reps][];
+
+            var otherInfo = Arrays.Concat(
+                    algorithmId,
+                    partyUInfo,
+                    partyVInfo,
+                    suppPubInfo
+                );
+
+            for (int c = 1; c <= reps; c++)
+            {
+                byte[] keyMaterial = privateKey.DeriveKeyFromHash(
+                    externalPubKey.PublicKey,
+                    HashAlgorithmName.SHA256,
+                    Arrays.IntToBytes(c),
+                    otherInfo);
+
+                K[c - 1] = keyMaterial;
+
+            }
+
+            return Arrays.LeftmostBits(Arrays.Concat(K), keyBitLength);
         }
 #endif
     }

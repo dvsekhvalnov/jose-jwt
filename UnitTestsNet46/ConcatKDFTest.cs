@@ -1,6 +1,5 @@
 using System;
 using System.Security.Cryptography;
-using System.Text;
 using Jose;
 using Jose.keys;
 
@@ -67,29 +66,41 @@ namespace UnitTests
             //then
             Assert.Equal("VqqN6vgjbSBcIijNcacQGg", test);
         }
+
         [Fact]
-        public void Derive256BitEcdhKey()
+        public void Derive192BitEcdhKey()
         {
-            const int cekSizeBits = 256;
-            const string algorithmType = "ECDH-ES";
+            var algorithmId = new byte[] { 0, 0, 0, 7, 65, 49, 50, 56, 71, 67, 77 };
+            var partyUInfo = new byte[] { 0, 0, 0, 5, 65, 108, 105, 99, 101 };
+            var partyVInfo = new byte[] { 0, 0, 0, 3, 66, 111, 98 };
+            var suppPubInfo = Arrays.IntToBytes(192);
 
-            var enc = Encoding.UTF8.GetBytes(algorithmType);
-            var apu = Array.Empty<byte>();
-            var apv = Array.Empty<byte>();
+            using var privateKey = CreateEcDiffieHellman(ECCurve.NamedCurves.nistP384, "Rpfcsz4AT-hyQDpLW9HogAeJlyoNlA-FXdcHA4h8DmXyz8BF1JFYO94hfy4e2q9P", "vcrEHpk1FnqrBLwqRwIJwb8Rb7ROBm6Z8JPLLZjstZzo3-OURJTdsDmVLMtTVUs3", "ice3abxagFJ0L6Fk3WHQQK33CSq6vbVuGOH-iEuc8tFe2joOIb4PUo3uz9afjPeL");
+            using var publicKey = CreateEcDiffieHellman(ECCurve.NamedCurves.nistP384, "YaSJKhKhyN22PlHkZ-6EGItMZy4wbJ3SOtXec0U5BVoBsM1p3lCkKrIRX_Xh7kW9", "lsHvjg_WJPHjZaNi-Mh2TaJ2_ULKTQpodmLVXLJegoEhxaxePoWxFEznj2iDATpa", null);
 
-            var algorithmId = Arrays.Concat(Arrays.IntToBytes(enc.Length), enc);
-            var partyUInfo = Arrays.Concat(Arrays.IntToBytes(apu.Length), apu);
-            var partyVInfo = Arrays.Concat(Arrays.IntToBytes(apv.Length), apv);
-            var suppPubInfo = Arrays.IntToBytes(cekSizeBits);
-
-            using var privateKey = CreateEcDiffieHellman(ECCurve.NamedCurves.nistP256, "3BDv2y0CqT9A28qOhJoSp9K6qNSEaGagF6TLuVtCR5g=", "AkR4kvGNucKbDyHW7d5iD/C37aJML+4V+rxcyeXN0ts=", "Zw1DgcQ2LAex8SBaceej1yCB6IaSPFfBz05JccmImCo=");
-            using var publicKey = CreateEcDiffieHellman(ECCurve.NamedCurves.nistP256, "YZAG4YKtXl/sQW+kTERkV3CTjU4CqUeVAFcROMivNYQ=", "u2iWhH749lKT6YMjkGC5eU26/wfM5PsZNSojgnQOD30=", null);
-
-            var derivedKey = ConcatKDF.DeriveEcdhKey(publicKey, privateKey, cekSizeBits, algorithmId, partyVInfo, partyUInfo, suppPubInfo);
+            var derivedKey = ConcatKDF.DeriveEcdhKey(publicKey, privateKey, 192, algorithmId, partyVInfo, partyUInfo, suppPubInfo);
 
             var result = Convert.ToBase64String(derivedKey);
 
-            Assert.Equal("d33muATOW7cEBggxhYr+8ZeKtNgFNh8inXomWnkQDFo=", result);
+            Assert.Equal("NMMLkEa2KgEQ6hsTdDnSj/09lup5Yzox", result);
+        }
+
+        [Fact]
+        public void Derive256BitEcdhKey()
+        {
+            var algorithmId = new byte[] { 0, 0, 0, 7, 65, 49, 50, 56, 71, 67, 77 };
+            var partyUInfo = new byte[] { 0, 0, 0, 5, 65, 108, 105, 99, 101 };
+            var partyVInfo = new byte[] { 0, 0, 0, 3, 66, 111, 98 };
+            var suppPubInfo = Arrays.IntToBytes(256);
+
+            using var privateKey = CreateEcDiffieHellman(ECCurve.NamedCurves.nistP521, "APhJyzW4IkVv2eb_bNTx5V_vXYNkJVaYV2KqKxkjUIk-cMVxinRyN6WACIuU7W15KM0DPX8cwzor5ODkUuDblMxg", "ADxHYXBqI3lQthSnjwj2bOqgwQoDlC0LOrG-rBqyvPBbGUNPQPHLQd_aDONSskKgE8LZrD36F07agqBp2NDrfC4g", "AN6BCYXPe3SwU1-pHXmgiRYVsDvLgT5vE04OrhTTOKBTKkrb0CfnIVRyR2ptoXTzppL854nkY5WYe8mdm4O1arNw");
+            using var publicKey = CreateEcDiffieHellman(ECCurve.NamedCurves.nistP521, "AdAzI7PoZxswcUGbbZ0GcqfK5RB7DGxHn9lgCAjIk7sw94tLRCO8dZAf51SEaOLjvuzmpL4rmH0HDxmjO6yiNE-P", "AXYEHTg6IFSR2Y6WYESdV8-WCLgyqsFAZ7sHqY4u79OqB-LeUS7azzoEZ1g8VXwn39B3P2ziEnqhxif4UUgwMCr9", null);
+
+            var derivedKey = ConcatKDF.DeriveEcdhKey(publicKey, privateKey, 256, algorithmId, partyVInfo, partyUInfo, suppPubInfo);
+
+            var result = Convert.ToBase64String(derivedKey);           
+
+            Assert.Equal("WAnUexiVf70F1vj1smMO9v5j339zpla9HEbKt/AVWgw=", result);
         }
 
         private static ECDiffieHellman CreateEcDiffieHellman(ECCurve curve, string x, string y, string d)
@@ -99,14 +110,14 @@ namespace UnitTests
                 Curve = curve,
                 Q = new ECPoint
                 {
-                    X = Convert.FromBase64String(x),
-                    Y = Convert.FromBase64String(y)
+                    X = Base64Url.Decode(x),
+                    Y = Base64Url.Decode(y)
                 }
             };
 
             if (!String.IsNullOrWhiteSpace(d))
             {
-                privateParameters.D = Convert.FromBase64String(d);
+                privateParameters.D = Base64Url.Decode(d);
             }
 
             return ECDiffieHellman.Create(privateParameters);
