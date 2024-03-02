@@ -2831,7 +2831,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void Encrypt_ECDH_ES_A128GCM()
+        public void Encrypt_ECDH_ES_A128GCM_CngKey()
         {
             //given
             const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
@@ -2840,7 +2840,7 @@ namespace UnitTests
             string token = Jose.JWT.Encode(json, Ecc256Public(CngKeyUsages.KeyAgreement), JweAlgorithm.ECDH_ES, JweEncryption.A128GCM);
 
             //then
-            Console.Out.WriteLine("ECDH-ES A128GCM = {0}", token);
+            Console.Out.WriteLine("ECDH-ES A128GCM CngKey = {0}", token);
 
             string[] parts = token.Split('.');
 
@@ -2853,6 +2853,32 @@ namespace UnitTests
 
             Assert.Equal(json, Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)));
         }
+
+#if NETSTANDARD || NET472
+        [Fact]
+        public void Encrypt_ECDH_ES_A128GCM_EcdhKey()
+        {
+            //given
+            const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, Ecdh256Public(CngKeyUsages.KeyAgreement), JweAlgorithm.ECDH_ES, JweEncryption.A128GCM);
+
+            //then
+            Console.Out.WriteLine("ECDH-ES A128GCM EcdhKey = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(222, parts[0].Length); //Header size
+            Assert.Equal(0, parts[1].Length); //no CEK
+            Assert.Equal(16, parts[2].Length); //IV size
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
+
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)));
+        }
+#endif
 
         [Fact]
         public void Encrypt_ECDH_ES_A128GCM_JsonWebKey()
@@ -2869,7 +2895,7 @@ namespace UnitTests
             string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.ECDH_ES, JweEncryption.A128GCM);
 
             //then
-            Console.Out.WriteLine("ECDH-ES A128GCM = {0}", token);
+            Console.Out.WriteLine("ECDH-ES A128GCM JWK = {0}", token);
 
             string[] parts = token.Split('.');
 
@@ -2884,7 +2910,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void Encrypt_ECDH_ES_A192GCM()
+        public void Encrypt_ECDH_ES_A192GCM_P256_CngKey()
         {
             //given
             const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
@@ -2893,7 +2919,7 @@ namespace UnitTests
             string token = Jose.JWT.Encode(json, Ecc256Public(CngKeyUsages.KeyAgreement), JweAlgorithm.ECDH_ES, JweEncryption.A192GCM);
 
             //then
-            Console.Out.WriteLine("ECDH-ES A192GCM = {0}", token);
+            Console.Out.WriteLine("ECDH-ES A192GCM P256 CngKey = {0}", token);
 
             string[] parts = token.Split('.');
 
@@ -2907,8 +2933,34 @@ namespace UnitTests
             Assert.Equal(json, Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)));
         }
 
+#if NETSTANDARD || NET472
         [Fact]
-        public void Encrypt_ECDH_ES_A256GCM()
+        public void Encrypt_ECDH_ES_A192GCM_P384_EcdhKey()
+        {
+            //given
+            const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, Ecdh384Public(CngKeyUsages.KeyAgreement), JweAlgorithm.ECDH_ES, JweEncryption.A192GCM);
+
+            //then
+            Console.Out.WriteLine("ECDH-ES A192GCM P384 EcdhKey = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(278, parts[0].Length); //Header size
+            Assert.Equal(0, parts[1].Length); //no CEK
+            Assert.Equal(16, parts[2].Length); //IV size
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
+
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecdh384Private(CngKeyUsages.KeyAgreement)));
+        }
+#endif
+
+        [Fact]
+        public void Encrypt_ECDH_ES_A256GCM_P256_CngKey()
         {
             //given
             const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
@@ -2917,7 +2969,7 @@ namespace UnitTests
             string token = Jose.JWT.Encode(json, Ecc256Public(CngKeyUsages.KeyAgreement), JweAlgorithm.ECDH_ES, JweEncryption.A256GCM);
 
             //then
-            Console.Out.WriteLine("ECDH-ES A256GCM = {0}", token);
+            Console.Out.WriteLine("ECDH-ES A256GCM P256 CngKey= {0}", token);
 
             string[] parts = token.Split('.');
 
@@ -2930,6 +2982,32 @@ namespace UnitTests
 
             Assert.Equal(json, Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)));
         }
+
+#if NETSTANDARD || NET472
+        [Fact]
+        public void Encrypt_ECDH_ES_A256GCM_P521_EcdhKey()
+        {
+            //given
+            const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, Ecdh512Public(CngKeyUsages.KeyAgreement), JweAlgorithm.ECDH_ES, JweEncryption.A256GCM);
+
+            //then
+            Console.Out.WriteLine("ECDH-ES A256GCM P521 EcdhKey= {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(342, parts[0].Length); //Header size
+            Assert.Equal(0, parts[1].Length); //no CEK
+            Assert.Equal(16, parts[2].Length); //IV size
+            Assert.Equal(262, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
+
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecdh512Private(CngKeyUsages.KeyAgreement)));
+        }
+#endif
 
         [Fact]
         public void Encrypt_A192KW_A192CBC_HS384()
@@ -3723,12 +3801,12 @@ namespace UnitTests
             return EccKey.New(x, y, usage: usage);
         }
 
-        private static CngKey Ecc384Public()
+        private static CngKey Ecc384Public(CngKeyUsages usage = CngKeyUsages.Signing)
         {
             byte[] x = { 70, 151, 220, 179, 62, 0, 79, 232, 114, 64, 58, 75, 91, 209, 232, 128, 7, 137, 151, 42, 13, 148, 15, 133, 93, 215, 7, 3, 136, 124, 14, 101, 242, 207, 192, 69, 212, 145, 88, 59, 222, 33, 127, 46, 30, 218, 175, 79 };
             byte[] y = { 189, 202, 196, 30, 153, 53, 22, 122, 171, 4, 188, 42, 71, 2, 9, 193, 191, 17, 111, 180, 78, 6, 110, 153, 240, 147, 203, 45, 152, 236, 181, 156, 232, 223, 227, 148, 68, 148, 221, 176, 57, 149, 44, 203, 83, 85, 75, 55 };
 
-            return EccKey.New(x, y);
+            return EccKey.New(x, y, usage: usage);
         }
 
         private static CngKey Ecc384Private(CngKeyUsages usage = CngKeyUsages.Signing)
@@ -3749,12 +3827,12 @@ namespace UnitTests
             return EccKey.New(x, y, d, usage);
         }
 
-        private static CngKey Ecc512Public()
+        private static CngKey Ecc512Public(CngKeyUsages usage = CngKeyUsages.Signing)
         {
             byte[] x = { 0, 248, 73, 203, 53, 184, 34, 69, 111, 217, 230, 255, 108, 212, 241, 229, 95, 239, 93, 131, 100, 37, 86, 152, 87, 98, 170, 43, 25, 35, 80, 137, 62, 112, 197, 113, 138, 116, 114, 55, 165, 128, 8, 139, 148, 237, 109, 121, 40, 205, 3, 61, 127, 28, 195, 58, 43, 228, 224, 228, 82, 224, 219, 148, 204, 96 };
             byte[] y = { 0, 60, 71, 97, 112, 106, 35, 121, 80, 182, 20, 167, 143, 8, 246, 108, 234, 160, 193, 10, 3, 148, 45, 11, 58, 177, 190, 172, 26, 178, 188, 240, 91, 25, 67, 79, 64, 241, 203, 65, 223, 218, 12, 227, 82, 178, 66, 160, 19, 194, 217, 172, 61, 250, 23, 78, 218, 130, 160, 105, 216, 208, 235, 124, 46, 32 };
 
-            return EccKey.New(x, y);
+            return EccKey.New(x, y, usage: usage);
         }
 
         private static CngKey Ecc512Private(CngKeyUsages usage = CngKeyUsages.Signing)
@@ -3784,6 +3862,14 @@ namespace UnitTests
             return EccKeyUnix.New(x, y, d, usage);
         }
 
+        private static ECDiffieHellman Ecdh384Public(CngKeyUsages usage = CngKeyUsages.Signing)
+        {
+            byte[] x = { 70, 151, 220, 179, 62, 0, 79, 232, 114, 64, 58, 75, 91, 209, 232, 128, 7, 137, 151, 42, 13, 148, 15, 133, 93, 215, 7, 3, 136, 124, 14, 101, 242, 207, 192, 69, 212, 145, 88, 59, 222, 33, 127, 46, 30, 218, 175, 79 };
+            byte[] y = { 189, 202, 196, 30, 153, 53, 22, 122, 171, 4, 188, 42, 71, 2, 9, 193, 191, 17, 111, 180, 78, 6, 110, 153, 240, 147, 203, 45, 152, 236, 181, 156, 232, 223, 227, 148, 68, 148, 221, 176, 57, 149, 44, 203, 83, 85, 75, 55 };            
+
+            return EccKeyUnix.New(x, y, usage: usage);
+        }
+
         private static ECDiffieHellman Ecdh384Private(CngKeyUsages usage = CngKeyUsages.Signing)
         {
             byte[] x = { 70, 151, 220, 179, 62, 0, 79, 232, 114, 64, 58, 75, 91, 209, 232, 128, 7, 137, 151, 42, 13, 148, 15, 133, 93, 215, 7, 3, 136, 124, 14, 101, 242, 207, 192, 69, 212, 145, 88, 59, 222, 33, 127, 46, 30, 218, 175, 79 };
@@ -3791,6 +3877,14 @@ namespace UnitTests
             byte[] d = { 137, 199, 183, 105, 188, 90, 128, 82, 116, 47, 161, 100, 221, 97, 208, 64, 173, 247, 9, 42, 186, 189, 181, 110, 24, 225, 254, 136, 75, 156, 242, 209, 94, 218, 58, 14, 33, 190, 15, 82, 141, 238, 207, 214, 159, 140, 247, 139 };
 
             return EccKeyUnix.New(x, y, d, usage);
+        }
+
+        private static ECDiffieHellman Ecdh512Public(CngKeyUsages usage = CngKeyUsages.Signing)
+        {
+            byte[] x = { 0, 248, 73, 203, 53, 184, 34, 69, 111, 217, 230, 255, 108, 212, 241, 229, 95, 239, 93, 131, 100, 37, 86, 152, 87, 98, 170, 43, 25, 35, 80, 137, 62, 112, 197, 113, 138, 116, 114, 55, 165, 128, 8, 139, 148, 237, 109, 121, 40, 205, 3, 61, 127, 28, 195, 58, 43, 228, 224, 228, 82, 224, 219, 148, 204, 96 };
+            byte[] y = { 0, 60, 71, 97, 112, 106, 35, 121, 80, 182, 20, 167, 143, 8, 246, 108, 234, 160, 193, 10, 3, 148, 45, 11, 58, 177, 190, 172, 26, 178, 188, 240, 91, 25, 67, 79, 64, 241, 203, 65, 223, 218, 12, 227, 82, 178, 66, 160, 19, 194, 217, 172, 61, 250, 23, 78, 218, 130, 160, 105, 216, 208, 235, 124, 46, 32 };            
+
+            return EccKeyUnix.New(x, y, usage:usage);
         }
 
         private static ECDiffieHellman Ecdh512Private(CngKeyUsages usage = CngKeyUsages.Signing)
