@@ -2489,12 +2489,13 @@ namespace UnitTests
         [SkippableTheory]
         [InlineData("CNG")]
         [InlineData("ECDH")]
-        public void Encrypt_ECDH_ES_A192KW_A192GCM(string keyImplementation)
+        public void Encrypt_ECDH_ES_A128KW_A128GCM(string keyImplementation)
         {
             if (keyImplementation == "CNG")
             {
                 Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
             }
+
             InitializeUtils(keyImplementation);
 
             //given
@@ -2502,16 +2503,16 @@ namespace UnitTests
                 @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
 
             //when
-            string token = Jose.JWT.Encode(json, testSuiteUtils.Ecc256Public(CngKeyUsages.KeyAgreement), JweAlgorithm.ECDH_ES_A192KW, JweEncryption.A192GCM);
+            string token = Jose.JWT.Encode(json, testSuiteUtils.Ecc256Public(CngKeyUsages.KeyAgreement), JweAlgorithm.ECDH_ES_A128KW, JweEncryption.A128GCM);
 
             //then
-            Console.Out.WriteLine("ECDH-ES+A192KW A192GCM = {0}", token);
+            Console.Out.WriteLine("ECDH-ES+A128KW A128GCM = {0}", token);
 
             string[] parts = token.Split('.');
 
             Assert.Equal(5, parts.Length); //Make sure 5 parts
             Assert.Equal(231, parts[0].Length); //Header size
-            Assert.Equal(43, parts[1].Length); //CEK size
+            Assert.Equal(32, parts[1].Length); //CEK size
             Assert.Equal(16, parts[2].Length); //IV size
             Assert.Equal(262, parts[3].Length); //cipher text size
             Assert.Equal(22, parts[4].Length); //auth tag size
@@ -2519,75 +2520,52 @@ namespace UnitTests
             Assert.Equal(json, Jose.JWT.Decode(token, testSuiteUtils.Ecc256Private(CngKeyUsages.KeyAgreement)));
         }
 
-        [SkippableTheory]
-        [InlineData("CNG")]
-        [InlineData("ECDH")]
-        public void Encrypt_ECDH_ES_A192KW_A192GCM_JsonWebKey(string keyImplementation)
+        [Fact]
+        public void Encrypt_ECDH_ES_A192KW_A192GCM_EcdhKey()
         {
-            if (keyImplementation == "CNG")
-            {
-                Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
-            }
-            InitializeUtils(keyImplementation);
-
             //given
-            string json =
-                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
-
-            var publicKey = new Jwk(crv: "P-256",
-                  x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
-                  y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"
-            );
+            const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
 
             //when
-            string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.ECDH_ES_A192KW, JweEncryption.A192GCM);
+            string token = Jose.JWT.Encode(json, Ecdh384Public(CngKeyUsages.KeyAgreement), JweAlgorithm.ECDH_ES_A192KW, JweEncryption.A192GCM);
 
             //then
-            Console.Out.WriteLine("ECDH-ES+A192KW A192GCM = {0}", token);
+            Console.Out.WriteLine("ECDH-ES+A192KW A192GCM EcdhKey = {0}", token);
 
             string[] parts = token.Split('.');
 
             Assert.Equal(5, parts.Length); //Make sure 5 parts
-            Assert.Equal(231, parts[0].Length); //Header size
+            Assert.Equal(287, parts[0].Length); //Header size
             Assert.Equal(43, parts[1].Length); //CEK size
             Assert.Equal(16, parts[2].Length); //IV size
             Assert.Equal(262, parts[3].Length); //cipher text size
             Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(json, Jose.JWT.Decode(token, testSuiteUtils.Ecc256Private(CngKeyUsages.KeyAgreement)));
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecdh384Private(CngKeyUsages.KeyAgreement)));
         }
 
-        [SkippableTheory]
-        [InlineData("CNG")]
-        [InlineData("ECDH")]
-        public void Encrypt_ECDH_ES_A256KW_A256GCM(string keyImplementation)
+        [Fact]
+        public void Encrypt_ECDH_ES_A256KW_A256GCM_EcdhKey()
         {
-            if (keyImplementation == "CNG")
-            {
-                Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
-            }
-            InitializeUtils(keyImplementation);
-
             //given
-            string json =
-                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+            const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
 
             //when
-            string token = Jose.JWT.Encode(json, testSuiteUtils.Ecc256Public(CngKeyUsages.KeyAgreement), JweAlgorithm.ECDH_ES_A256KW, JweEncryption.A256GCM);
+            string token = Jose.JWT.Encode(json, Ecdh512Public(CngKeyUsages.KeyAgreement), JweAlgorithm.ECDH_ES_A256KW, JweEncryption.A256GCM);
 
             //then
-            Console.Out.WriteLine("ECDH-ES+A256KW A256GCM = {0}", token);
+            Console.Out.WriteLine("ECDH-ES+A256KW A256GCM EcdhKey = {0}", token);
 
             string[] parts = token.Split('.');
 
             Assert.Equal(5, parts.Length); //Make sure 5 parts
-            Assert.Equal(231, parts[0].Length); //Header size
+            Assert.Equal(351, parts[0].Length); //Header size
             Assert.Equal(54, parts[1].Length); //CEK size
             Assert.Equal(16, parts[2].Length); //IV size
             Assert.Equal(262, parts[3].Length); //cipher text size
             Assert.Equal(22, parts[4].Length); //auth tag size
 
-            Assert.Equal(json, Jose.JWT.Decode(token, testSuiteUtils.Ecc256Private(CngKeyUsages.KeyAgreement)));
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecdh512Private(CngKeyUsages.KeyAgreement)));
         }
 
         [SkippableTheory]
