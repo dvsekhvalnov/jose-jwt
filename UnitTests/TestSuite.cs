@@ -2438,6 +2438,54 @@ namespace UnitTests
             Assert.Equal(json, Jose.JWT.Decode(token, testSuiteUtils.Ecc256Private(CngKeyUsages.KeyAgreement)));
         }
 
+        [Fact]
+        public void Encrypt_ECDH_ES_A192KW_A192CBC_HS384_EcdhKey()
+        {
+            //given
+            const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, Ecdh384Public(CngKeyUsages.KeyAgreement), JweAlgorithm.ECDH_ES_A192KW, JweEncryption.A192CBC_HS384);
+
+            //then
+            Console.Out.WriteLine("ECDH-ES+A192KW A192CBC_HS384 EcdhKey = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(295, parts[0].Length); //Header size
+            Assert.Equal(75, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(32, parts[4].Length); //auth tag size
+
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecdh384Private(CngKeyUsages.KeyAgreement)));
+        }
+
+        [Fact]
+        public void Encrypt_ECDH_ES_A256KW_A256CBC_HS512_EcdhKey()
+        {
+            //given
+            const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, Ecdh512Public(CngKeyUsages.KeyAgreement), JweAlgorithm.ECDH_ES_A256KW, JweEncryption.A256CBC_HS512);
+
+            //then
+            Console.Out.WriteLine("ECDH-ES+A256KW A256CBC_HS512 EcdhKey = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(359, parts[0].Length); //Header size
+            Assert.Equal(96, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(43, parts[4].Length); //auth tag size
+
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecdh512Private(CngKeyUsages.KeyAgreement)));
+        }
+
         [SkippableTheory]
         [InlineData("CNG")]
         [InlineData("ECDH")]
