@@ -70,7 +70,7 @@ namespace Jose
         public virtual byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
         {
 #if NET472 || NETSTANDARD2_1
-            if (key is ECDiffieHellman)
+            if (key is ECDiffieHellman || key is Jwk)
             {
                 return ecdhKeyManagementUnix.Unwrap(encryptedCek, key, cekSizeBits, header);
             }
