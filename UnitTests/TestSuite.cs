@@ -1940,6 +1940,123 @@ namespace UnitTests
         [SkippableTheory]
         [InlineData("CNG")]
         [InlineData("ECDH")]
+        public void Decrypt_ECDH_ES_A128KW_A128CBC_HS256(string keyImplementation)
+        {
+            if (keyImplementation == "CNG")
+            {
+                Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows), "This requires CNG, which is Windows Only.");
+            }
+            InitializeUtils(keyImplementation);
+
+            //given
+            string token = "eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImVuYyI6IkExMjhDQkMtSFMyNTYiLCJlcGsiOnsia3R5IjoiRUMiLCJ4IjoiQV9ZQTN2RmkwX1hLZDdjV1lieWtYM01jd3lJME1XNXdCTGJzVFhPSHBodyIsInkiOiJOVkRfLVlvWXdpek9NWExXb0RWZjFEWnhicWRua1pwc0lGek9MdUEyMWJrIiwiY3J2IjoiUC0yNTYifX0.w-xmfoNtoDJclw3oyQAGRFl7YncQmBuS2elOfOVwCxowy020eLgdDA.whppnZj93jGWs0my1yy9wA.hymV6EH4IBwb7ziemqFPuXKi4oebp1uJX9wlK_FBNMezZjiLjgV9ayhe-UVcPa79C1T1pTp1YVC7y1g6L5gvmyKJXGO8eHTeJUjJaXjBI-ayFWn3OjrOH6DaO70npNMncqsN3f0cgvHJvEYuUq5-NxgHtnSxH3OUAVzgdCneoMgL8XqKF4LtvdIn6TXZGyRWvMzcDKYaKLu9q1zAGmxXpGjMz2MQlLAgiqPOpG-Gn3giBOv4x0THgkuXCfwu29BpM92snOTFA__jIPPm7jH2eQ.XE2Kt5ndMpI4eLoxWkkEaw";
+
+            //when
+            string json = Jose.JWT.Decode(token, testSuiteUtils.Ecc256Private(CngKeyUsages.KeyAgreement));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
+        }
+
+        [Fact]
+        public void Decrypt_ECDH_ES_A128KW_A128CBC_HS256_JsonWebKey()
+        {
+            //given
+            const string token = "eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImVuYyI6IkExMjhDQkMtSFMyNTYiLCJlcGsiOnsia3R5IjoiRUMiLCJ4IjoiQV9ZQTN2RmkwX1hLZDdjV1lieWtYM01jd3lJME1XNXdCTGJzVFhPSHBodyIsInkiOiJOVkRfLVlvWXdpek9NWExXb0RWZjFEWnhicWRua1pwc0lGek9MdUEyMWJrIiwiY3J2IjoiUC0yNTYifX0.w-xmfoNtoDJclw3oyQAGRFl7YncQmBuS2elOfOVwCxowy020eLgdDA.whppnZj93jGWs0my1yy9wA.hymV6EH4IBwb7ziemqFPuXKi4oebp1uJX9wlK_FBNMezZjiLjgV9ayhe-UVcPa79C1T1pTp1YVC7y1g6L5gvmyKJXGO8eHTeJUjJaXjBI-ayFWn3OjrOH6DaO70npNMncqsN3f0cgvHJvEYuUq5-NxgHtnSxH3OUAVzgdCneoMgL8XqKF4LtvdIn6TXZGyRWvMzcDKYaKLu9q1zAGmxXpGjMz2MQlLAgiqPOpG-Gn3giBOv4x0THgkuXCfwu29BpM92snOTFA__jIPPm7jH2eQ.XE2Kt5ndMpI4eLoxWkkEaw";
+    
+            var privateKey = new Jwk(
+              crv: "P-256",
+              x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
+              y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
+              d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
+            );
+
+            //when
+            string json = Jose.JWT.Decode(token, privateKey);
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
+        }
+
+        [Fact]
+        public void Decrypt_ECDH_ES_A192KW_A192CBC_HS384_EcdhKey()
+        {
+            //given
+            const string token = "eyJhbGciOiJFQ0RILUVTK0ExOTJLVyIsImVuYyI6IkExOTJDQkMtSFMzODQiLCJlcGsiOnsia3R5IjoiRUMiLCJ4IjoiVklaTV8zWG9tNDBrRDE5b1cxNC1uSjlZOFg5TTdzOVJsTGtSeEpmS3J4VHBYUVhJems5TVRoaW5tUFlFc3FnYiIsInkiOiI5VVJrSXlneHd1ZzhIeVhhd3VRcUhKbzFyaHA1YzJ4eENCNDRLWDd6UWV4QUlPbGdrdS1vRVItYTZCZlNILTJoIiwiY3J2IjoiUC0zODQifX0.X-gzXQdqUADC89frMcbNWUaGtCH9loLzqaqQRXt59_N-fj5TP0h1nu9xdTHDOFyPQNOVIf4f4qs.R-sq1X7kgnTMQOt_PYXjeQ.THTrNE1NbBOQu-jf3QnttV8Uy63jBHR3WKMqkyO0hiLgNPNGCG5OP3gJJc4SAMrxiXC9dQ3rqEseFLIK2swD1IhseDUzom1d8xXeKbGus_l6tq7N29EOk7Oxy4X9gev8Z_wTMjbSOhVfGIWL8OenAWfudKV2gRsOAeh5AlfVvYIhCpbRRYXom8AK9ih-p_bl_0-8tNEduT9ilZFzFplRhpUqxs7lslS0-TkcvdZd6BM8CIGUNL-ACOtzAa00ioYC6D0aUPqdN_TrjpyAkn85OA.lqIWpxFi8zs-h2Ttj_gQp8rU8-1VZNid";
+
+            //when
+            string json = Jose.JWT.Decode(token, Ecdh384Private(CngKeyUsages.KeyAgreement));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
+        }
+
+        [Fact]
+        public void Decrypt_ECDH_ES_A192KW_A192CBC_HS384_JsonWebKey()
+        {
+            //given
+            const string token = "eyJhbGciOiJFQ0RILUVTK0ExOTJLVyIsImVuYyI6IkExOTJDQkMtSFMzODQiLCJlcGsiOnsia3R5IjoiRUMiLCJ4IjoiVklaTV8zWG9tNDBrRDE5b1cxNC1uSjlZOFg5TTdzOVJsTGtSeEpmS3J4VHBYUVhJems5TVRoaW5tUFlFc3FnYiIsInkiOiI5VVJrSXlneHd1ZzhIeVhhd3VRcUhKbzFyaHA1YzJ4eENCNDRLWDd6UWV4QUlPbGdrdS1vRVItYTZCZlNILTJoIiwiY3J2IjoiUC0zODQifX0.X-gzXQdqUADC89frMcbNWUaGtCH9loLzqaqQRXt59_N-fj5TP0h1nu9xdTHDOFyPQNOVIf4f4qs.R-sq1X7kgnTMQOt_PYXjeQ.THTrNE1NbBOQu-jf3QnttV8Uy63jBHR3WKMqkyO0hiLgNPNGCG5OP3gJJc4SAMrxiXC9dQ3rqEseFLIK2swD1IhseDUzom1d8xXeKbGus_l6tq7N29EOk7Oxy4X9gev8Z_wTMjbSOhVfGIWL8OenAWfudKV2gRsOAeh5AlfVvYIhCpbRRYXom8AK9ih-p_bl_0-8tNEduT9ilZFzFplRhpUqxs7lslS0-TkcvdZd6BM8CIGUNL-ACOtzAa00ioYC6D0aUPqdN_TrjpyAkn85OA.lqIWpxFi8zs-h2Ttj_gQp8rU8-1VZNid";
+
+            var privateKey = new Jwk(crv: "P-384",
+                x: "Rpfcsz4AT-hyQDpLW9HogAeJlyoNlA-FXdcHA4h8DmXyz8BF1JFYO94hfy4e2q9P",
+                y: "vcrEHpk1FnqrBLwqRwIJwb8Rb7ROBm6Z8JPLLZjstZzo3-OURJTdsDmVLMtTVUs3",
+                d: "ice3abxagFJ0L6Fk3WHQQK33CSq6vbVuGOH-iEuc8tFe2joOIb4PUo3uz9afjPeL"
+            );
+
+            //when
+            string json = Jose.JWT.Decode(token, privateKey);
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
+        }
+
+        [Fact]
+        public void Decrypt_ECDH_ES_A256KW_A256CBC_HS512_EcdhKey()
+        {
+            //given
+            const string token = "eyJhbGciOiJFQ0RILUVTK0EyNTZLVyIsImVuYyI6IkEyNTZDQkMtSFM1MTIiLCJlcGsiOnsia3R5IjoiRUMiLCJ4IjoiQUU3a3RFTDVUdkhFU0pYN2dKWWpBSUNRRGh5R3lZTk5LYlE1NFpCaEg2Y29ZZ084SXJZUVFGLUk4dWxNS3IzNVU1TXYwbEpkYzRjSzNtYjk4V1l5SGJWVSIsInkiOiJBZU13dmc5cS1qWnU5RmN6SE9lUUhBWmdCb0RLM29CQnlENWdHRFVUdk1uemo4WDIzZlJkZmxiLWgxbGFKUC0zSkNWSXlyTDVOS0Vsczg0T29Zck1Mb0xDIiwiY3J2IjoiUC01MjEifX0.AzuUhgcmii1fw3VSg_skn1aHRfxFxvlfy7c8vh9D_61CJtBHdbGj-Pa3qMKGZ-oyGwaY2fb6Uv1xzlJFqyuba8bPPLekjU7G.CzbtSbqdAcPOOqDEqZobAA.ckwnaXLae92xRPJRcC7rlAB4hQteHaxhDJjAUxqUSMQYoKAuyqAnTxJK5SmW-sicfmrzlicdhH51TFBHgzNvbz3xyvowfXG9B5e2o4ZtVlOkHNdB8Ef7QY99v-nPx0lXObyzOSqr6E0l2JDoWvFPYaV6cd0v9x7LJSWplth9p-H4fR2xq2WsMSoZi7BnJvcxZpXuiTpvkhixRN8ciO42f7Q2FCzbWbc4cdgmlcEWy3VQ6VBMLlDi4j-qnxfr8_CqQOTm7H_gC-drjbNskgRQhQ.shctWpOJ-54dDtD6dozCMyMqM-FoTAKJTh6vXTS6fXM";
+
+            //when
+            string json = Jose.JWT.Decode(token, Ecdh384Private(CngKeyUsages.KeyAgreement));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
+        }
+
+        [Fact]
+        public void Decrypt_ECDH_ES_A256KW_A256CBC_HS512_JsonWebKey()
+        {
+            //given
+            const string token = "eyJhbGciOiJFQ0RILUVTK0EyNTZLVyIsImVuYyI6IkEyNTZDQkMtSFM1MTIiLCJlcGsiOnsia3R5IjoiRUMiLCJ4IjoiQUU3a3RFTDVUdkhFU0pYN2dKWWpBSUNRRGh5R3lZTk5LYlE1NFpCaEg2Y29ZZ084SXJZUVFGLUk4dWxNS3IzNVU1TXYwbEpkYzRjSzNtYjk4V1l5SGJWVSIsInkiOiJBZU13dmc5cS1qWnU5RmN6SE9lUUhBWmdCb0RLM29CQnlENWdHRFVUdk1uemo4WDIzZlJkZmxiLWgxbGFKUC0zSkNWSXlyTDVOS0Vsczg0T29Zck1Mb0xDIiwiY3J2IjoiUC01MjEifX0.AzuUhgcmii1fw3VSg_skn1aHRfxFxvlfy7c8vh9D_61CJtBHdbGj-Pa3qMKGZ-oyGwaY2fb6Uv1xzlJFqyuba8bPPLekjU7G.CzbtSbqdAcPOOqDEqZobAA.ckwnaXLae92xRPJRcC7rlAB4hQteHaxhDJjAUxqUSMQYoKAuyqAnTxJK5SmW-sicfmrzlicdhH51TFBHgzNvbz3xyvowfXG9B5e2o4ZtVlOkHNdB8Ef7QY99v-nPx0lXObyzOSqr6E0l2JDoWvFPYaV6cd0v9x7LJSWplth9p-H4fR2xq2WsMSoZi7BnJvcxZpXuiTpvkhixRN8ciO42f7Q2FCzbWbc4cdgmlcEWy3VQ6VBMLlDi4j-qnxfr8_CqQOTm7H_gC-drjbNskgRQhQ.shctWpOJ-54dDtD6dozCMyMqM-FoTAKJTh6vXTS6fXM";
+
+            var privateKey = new Jwk(crv: "P-521",
+                x: "APhJyzW4IkVv2eb_bNTx5V_vXYNkJVaYV2KqKxkjUIk-cMVxinRyN6WACIuU7W15KM0DPX8cwzor5ODkUuDblMxg",
+                y: "ADxHYXBqI3lQthSnjwj2bOqgwQoDlC0LOrG-rBqyvPBbGUNPQPHLQd_aDONSskKgE8LZrD36F07agqBp2NDrfC4g",
+                d: "AN6BCYXPe3SwU1-pHXmgiRYVsDvLgT5vE04OrhTTOKBTKkrb0CfnIVRyR2ptoXTzppL854nkY5WYe8mdm4O1arNw"
+            );
+
+            //when
+            string json = Jose.JWT.Decode(token, privateKey);
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
+        }
+
+        [SkippableTheory]
+        [InlineData("CNG")]
+        [InlineData("ECDH")]
         public void Decrypt_ECDH_ES_A128KW_A128GCM(string keyImplementation)
         {
             if (keyImplementation == "CNG")
