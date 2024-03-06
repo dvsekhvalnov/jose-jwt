@@ -2025,7 +2025,7 @@ namespace UnitTests
             const string token = "eyJhbGciOiJFQ0RILUVTK0EyNTZLVyIsImVuYyI6IkEyNTZDQkMtSFM1MTIiLCJlcGsiOnsia3R5IjoiRUMiLCJ4IjoiQUU3a3RFTDVUdkhFU0pYN2dKWWpBSUNRRGh5R3lZTk5LYlE1NFpCaEg2Y29ZZ084SXJZUVFGLUk4dWxNS3IzNVU1TXYwbEpkYzRjSzNtYjk4V1l5SGJWVSIsInkiOiJBZU13dmc5cS1qWnU5RmN6SE9lUUhBWmdCb0RLM29CQnlENWdHRFVUdk1uemo4WDIzZlJkZmxiLWgxbGFKUC0zSkNWSXlyTDVOS0Vsczg0T29Zck1Mb0xDIiwiY3J2IjoiUC01MjEifX0.AzuUhgcmii1fw3VSg_skn1aHRfxFxvlfy7c8vh9D_61CJtBHdbGj-Pa3qMKGZ-oyGwaY2fb6Uv1xzlJFqyuba8bPPLekjU7G.CzbtSbqdAcPOOqDEqZobAA.ckwnaXLae92xRPJRcC7rlAB4hQteHaxhDJjAUxqUSMQYoKAuyqAnTxJK5SmW-sicfmrzlicdhH51TFBHgzNvbz3xyvowfXG9B5e2o4ZtVlOkHNdB8Ef7QY99v-nPx0lXObyzOSqr6E0l2JDoWvFPYaV6cd0v9x7LJSWplth9p-H4fR2xq2WsMSoZi7BnJvcxZpXuiTpvkhixRN8ciO42f7Q2FCzbWbc4cdgmlcEWy3VQ6VBMLlDi4j-qnxfr8_CqQOTm7H_gC-drjbNskgRQhQ.shctWpOJ-54dDtD6dozCMyMqM-FoTAKJTh6vXTS6fXM";
 
             //when
-            string json = Jose.JWT.Decode(token, Ecdh384Private(CngKeyUsages.KeyAgreement));
+            string json = Jose.JWT.Decode(token, Ecdh512Private(CngKeyUsages.KeyAgreement));
 
             //then
             Console.Out.WriteLine("json = {0}", json);

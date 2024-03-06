@@ -2245,12 +2245,13 @@ namespace UnitTests
         {
             //given
             const string token = "eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImVuYyI6IkExMjhDQkMtSFMyNTYiLCJlcGsiOnsia3R5IjoiRUMiLCJ4IjoiQV9ZQTN2RmkwX1hLZDdjV1lieWtYM01jd3lJME1XNXdCTGJzVFhPSHBodyIsInkiOiJOVkRfLVlvWXdpek9NWExXb0RWZjFEWnhicWRua1pwc0lGek9MdUEyMWJrIiwiY3J2IjoiUC0yNTYifX0.w-xmfoNtoDJclw3oyQAGRFl7YncQmBuS2elOfOVwCxowy020eLgdDA.whppnZj93jGWs0my1yy9wA.hymV6EH4IBwb7ziemqFPuXKi4oebp1uJX9wlK_FBNMezZjiLjgV9ayhe-UVcPa79C1T1pTp1YVC7y1g6L5gvmyKJXGO8eHTeJUjJaXjBI-ayFWn3OjrOH6DaO70npNMncqsN3f0cgvHJvEYuUq5-NxgHtnSxH3OUAVzgdCneoMgL8XqKF4LtvdIn6TXZGyRWvMzcDKYaKLu9q1zAGmxXpGjMz2MQlLAgiqPOpG-Gn3giBOv4x0THgkuXCfwu29BpM92snOTFA__jIPPm7jH2eQ.XE2Kt5ndMpI4eLoxWkkEaw";
+    
             var privateKey = new Jwk(
               crv: "P-256",
               x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
               y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
               d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
-        );
+            );
 
             //when
             string json = Jose.JWT.Decode(token, privateKey);
@@ -2305,7 +2306,7 @@ namespace UnitTests
             const string token = "eyJhbGciOiJFQ0RILUVTK0EyNTZLVyIsImVuYyI6IkEyNTZDQkMtSFM1MTIiLCJlcGsiOnsia3R5IjoiRUMiLCJ4IjoiQUU3a3RFTDVUdkhFU0pYN2dKWWpBSUNRRGh5R3lZTk5LYlE1NFpCaEg2Y29ZZ084SXJZUVFGLUk4dWxNS3IzNVU1TXYwbEpkYzRjSzNtYjk4V1l5SGJWVSIsInkiOiJBZU13dmc5cS1qWnU5RmN6SE9lUUhBWmdCb0RLM29CQnlENWdHRFVUdk1uemo4WDIzZlJkZmxiLWgxbGFKUC0zSkNWSXlyTDVOS0Vsczg0T29Zck1Mb0xDIiwiY3J2IjoiUC01MjEifX0.AzuUhgcmii1fw3VSg_skn1aHRfxFxvlfy7c8vh9D_61CJtBHdbGj-Pa3qMKGZ-oyGwaY2fb6Uv1xzlJFqyuba8bPPLekjU7G.CzbtSbqdAcPOOqDEqZobAA.ckwnaXLae92xRPJRcC7rlAB4hQteHaxhDJjAUxqUSMQYoKAuyqAnTxJK5SmW-sicfmrzlicdhH51TFBHgzNvbz3xyvowfXG9B5e2o4ZtVlOkHNdB8Ef7QY99v-nPx0lXObyzOSqr6E0l2JDoWvFPYaV6cd0v9x7LJSWplth9p-H4fR2xq2WsMSoZi7BnJvcxZpXuiTpvkhixRN8ciO42f7Q2FCzbWbc4cdgmlcEWy3VQ6VBMLlDi4j-qnxfr8_CqQOTm7H_gC-drjbNskgRQhQ.shctWpOJ-54dDtD6dozCMyMqM-FoTAKJTh6vXTS6fXM";
 
             //when
-            string json = Jose.JWT.Decode(token, Ecdh384Private(CngKeyUsages.KeyAgreement));
+            string json = Jose.JWT.Decode(token, Ecdh512Private(CngKeyUsages.KeyAgreement));
 
             //then
             Console.Out.WriteLine("json = {0}", json);
