@@ -3178,35 +3178,6 @@ namespace UnitTests
         }
 
         [Fact]
-        public void Encrypt_ECDH_ES_A192KW_A192GCM_P256_JsonWebKey()
-        {
-            //given
-            const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
-
-            var publicKey = new Jwk(crv: "P-256",
-                  x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
-                  y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"
-            );
-
-            //when
-            string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.ECDH_ES_A192KW, JweEncryption.A192GCM);
-
-            //then
-            Console.Out.WriteLine("ECDH-ES+A192KW A192GCM P256 JWK = {0}", token);
-
-            string[] parts = token.Split('.');
-
-            Assert.Equal(5, parts.Length); //Make sure 5 parts
-            Assert.Equal(231, parts[0].Length); //Header size
-            Assert.Equal(43, parts[1].Length); //CEK size
-            Assert.Equal(16, parts[2].Length); //IV size
-            Assert.Equal(262, parts[3].Length); //cipher text size
-            Assert.Equal(22, parts[4].Length); //auth tag size
-
-            Assert.Equal(json, Jose.JWT.Decode(token, Ecc256Private(CngKeyUsages.KeyAgreement)));
-        }
-
-        [Fact]
         public void Encrypt_ECDH_ES_A256KW_A256GCM_P256_CngKey()
         {
             //given
@@ -3278,6 +3249,36 @@ namespace UnitTests
 
             Assert.Equal(json, Jose.JWT.Decode(token, Ecdh256Private(CngKeyUsages.KeyAgreement)));
         }
+        
+        [Fact]
+        public void Encrypt_ECDH_ES_A128CBC_HS256_JsonWebKey()
+        {
+            //given
+            const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            var publicKey = new Jwk(
+                  crv: "P-256",
+                  x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
+                  y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"
+            );
+
+            //when
+            string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.ECDH_ES, JweEncryption.A128CBC_HS256);
+
+            //then
+            Console.Out.WriteLine("ECDH-ES A128CBC_HS256 JWK = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(230, parts[0].Length); //Header size
+            Assert.Equal(0, parts[1].Length); //no CEK
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
+
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecdh256Private(CngKeyUsages.KeyAgreement)));
+        }
 
         [Fact]
         public void Encrypt_ECDH_ES_A192CBC_HS384_EcdhKey()
@@ -3290,6 +3291,35 @@ namespace UnitTests
 
             //then
             Console.Out.WriteLine("ECDH-ES A192CBC_HS384 EcdhKey = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(286, parts[0].Length); //Header size
+            Assert.Equal(0, parts[1].Length); //no CEK
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(32, parts[4].Length); //auth tag size
+
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecdh384Private(CngKeyUsages.KeyAgreement)));
+        }
+
+        [Fact]
+        public void Encrypt_ECDH_ES_A192CBC_HS384_JsonWebKey()
+        {
+            //given
+            const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            var publicKey = new Jwk(crv: "P-384",
+                x: "Rpfcsz4AT-hyQDpLW9HogAeJlyoNlA-FXdcHA4h8DmXyz8BF1JFYO94hfy4e2q9P",
+                y: "vcrEHpk1FnqrBLwqRwIJwb8Rb7ROBm6Z8JPLLZjstZzo3-OURJTdsDmVLMtTVUs3"
+            );
+
+            //when
+            string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.ECDH_ES, JweEncryption.A192CBC_HS384);
+
+            //then
+            Console.Out.WriteLine("ECDH-ES A192CBC_HS384 JWK = {0}", token);
 
             string[] parts = token.Split('.');
 
@@ -3326,6 +3356,36 @@ namespace UnitTests
 
             Assert.Equal(json, Jose.JWT.Decode(token, Ecdh512Private(CngKeyUsages.KeyAgreement)));
         }
+
+        [Fact]
+        public void Encrypt_ECDH_ES_A256CBC_HS512_JsonWebKey()
+        {
+            //given
+            const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            var publicKey = new Jwk(crv: "P-521",
+                x: "APhJyzW4IkVv2eb_bNTx5V_vXYNkJVaYV2KqKxkjUIk-cMVxinRyN6WACIuU7W15KM0DPX8cwzor5ODkUuDblMxg",
+                y: "ADxHYXBqI3lQthSnjwj2bOqgwQoDlC0LOrG-rBqyvPBbGUNPQPHLQd_aDONSskKgE8LZrD36F07agqBp2NDrfC4g"
+            );
+
+            //when
+            string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.ECDH_ES, JweEncryption.A256CBC_HS512);
+
+            //then
+            Console.Out.WriteLine("ECDH-ES A256CBC_HS512 EcdhKey = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(350, parts[0].Length); //Header size
+            Assert.Equal(0, parts[1].Length); //no CEK
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(43, parts[4].Length); //auth tag size
+
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecdh512Private(CngKeyUsages.KeyAgreement)));
+        }
+
 #endif
 
         [Fact]
