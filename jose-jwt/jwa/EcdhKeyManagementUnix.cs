@@ -87,6 +87,12 @@ namespace Jose
                     privateKey = jwk.EcDiffieHellmanKey();
                 }
             }
+            else if (key is ECDsa ecdsa)
+            {
+                // Convert ECDsa to ECDiffieHellman                
+                privateKey = ECDiffieHellman.Create();
+                privateKey.ImportParameters(ecdsa.ExportParameters(true));
+            }
 
             privateKey = privateKey ?? Ensure.Type<ECDiffieHellman>(key, "EcdhKeyManagement alg expects key to be of ECDiffieHellman or Jwk types with kty='EC'.");            
 

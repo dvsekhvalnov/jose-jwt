@@ -1917,6 +1917,21 @@ namespace UnitTests
             Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
+        [Fact]
+        public void Decrypt_ECDH_ES_A128CBC_HS256_ECDsaKey()
+        {
+            //given
+            const string token = "eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOENCQy1IUzI1NiIsImVwayI6eyJrdHkiOiJFQyIsIngiOiItVk1LTG5NeW9IVHRGUlpGNnFXNndkRm5BN21KQkdiNzk4V3FVMFV3QVhZIiwieSI6ImhQQWNReTgzVS01Qjl1U21xbnNXcFZzbHVoZGJSZE1nbnZ0cGdmNVhXTjgiLCJjcnYiOiJQLTI1NiJ9fQ..UA3N2j-TbYKKD361AxlXUA.XxFur_nY1GauVp5W_KO2DEHfof5s7kUwvOgghiNNNmnB4Vxj5j8VRS8vMOb51nYy2wqmBb2gBf1IHDcKZdACkCOMqMIcpBvhyqbuKiZPLHiilwSgVV6ubIV88X0vK0C8ZPe5lEyRudbgFjdlTnf8TmsvuAsdtPn9dXwDjUR23bD2ocp8UGAV0lKqKzpAw528vTfD0gwMG8gt_op8yZAxqqLLljMuZdTnjofAfsW2Rq3Z6GyLUlxR51DAUlQKi6UpsKMJoXTrm1Jw8sXBHpsRqA.UHCYOtnqk4SfhAknCnymaQ";
+
+            //when
+            string json = Jose.JWT.Decode(token, ECDSa256Private());
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
+        }
+
 #endif
 
         [Fact]
@@ -1964,6 +1979,21 @@ namespace UnitTests
 
             //when
             string json = Jose.JWT.Decode(token, Ecdh384Private(CngKeyUsages.KeyAgreement));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
+        }
+
+        [Fact]
+        public void Decrypt_ECDH_ES_A192CBC_HS384_ECDsaKey()
+        {
+            //given
+            const string token = "eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTE5MkNCQy1IUzM4NCIsImVwayI6eyJrdHkiOiJFQyIsIngiOiJOdTBhLTFGTHFKb21aT25NbFYxWTZGYndEeEdfemlOcUZnc3psUzJZMUNpZmJrel9taHAxUHhjMXdnQXJJOVoxIiwieSI6IktVd0FTaUlGN2lsQVJocmEtTzNvUzhSM2FESWwwUWxiUzVCcy15R2g4TXBGby1jTks0NjJKVF9WWG1BTFlXSkkiLCJjcnYiOiJQLTM4NCJ9fQ..U100azY800gxj2SvIqFHeQ.rzImL0um7bIcHjzcXlbuurZjjSnYU54pkLPs02va3NfSD87hOtmyMTxVjYFfhWUKQFoL5ECqFN49lz6aZKr47qvtDDk-XamUi5_fGGDhXbIY1bCMghqVijBT7FsFaZu2KlzH31qZY-Hum5j3S7j6uX27NZIbysCfq-ei1rDc_pk75eKFaONxmdfk-HSXJyxEG883-QD2HQK2V0unzYaSf3244pZvwQNwInpmzjBA2rgbWA8LWxntkq31mvbi2cuY5wOM6MP5Liqv8P8ZXfCuPQ.bk9_z8hs8b3siIGPaNOXm0YLcKi96SU_";
+
+            //when
+            string json = Jose.JWT.Decode(token, ECDSa384Private());
 
             //then
             Console.Out.WriteLine("json = {0}", json);
@@ -2027,6 +2057,21 @@ namespace UnitTests
         }
 
         [Fact]
+        public void Decrypt_ECDH_ES_A256CBC_HS512_ECDsaKey()
+        {
+            //given
+            const string token = "eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTI1NkNCQy1IUzUxMiIsImVwayI6eyJrdHkiOiJFQyIsIngiOiJBWENDVDNvcm1CdW9YaDlFVm5PRFJSQkZIZUZ1VmlkRjVKV0xHSWtEQURfMEVvMDY4OGlZa0ZZUTMwcGJtU0o3V3N2em5UMzZfeG9idDFjQnRBZnctSnhsIiwieSI6IkFGV2lKSW9uU0JJNWJpRm1hQ09TcnJsaFhBU19KdW1QRkN0Rmd3TTBpMWZLMkgzWG14TDdpU1BtRU90RDlhYmtEVTR1bm1GeUE2S3JsV0t1dklsNEZaam4iLCJjcnYiOiJQLTUyMSJ9fQ..o1PEdCQsPCuBLXrQQCWfAg.NCDiMxlpk3PiCumJ0AJXheDmjHK1VILKx1vYnbltNutKHNaVOv4VYo2o4WL2KVAvwN15D7saN5qh5UbI75qO-pduryKZsxkJw_flW51fRDqqZbxmQ2LrXx4F_1cEhSzINCdI3bfF0W8OrCUbAvCmiye3ZsaWqNDASmW1N_bCuT-siJtyaZ9nuieaV1l4tlYcEDuoLa2dXqNX3QrcPT1FTXkV70_QRNp3Ld3O-YzkbKFA3HQ2EVzyKnXu--GM5jFDOBUvxCQ3zYcyVsELpiJ6aw.Q9GGWHO92UOFtVju9rI6K6eFz-vG-bPwMlMPyhIM0KU";
+
+            //when
+            string json = Jose.JWT.Decode(token, ECDSa521Private());
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
+        }
+
+        [Fact]
         public void Decrypt_ECDH_ES_A256CBC_HS512_JsonWebKey()
         {
             //given
@@ -2072,6 +2117,21 @@ namespace UnitTests
 
             //when
             string json = Jose.JWT.Decode(token, Ecdh256Private(CngKeyUsages.KeyAgreement));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
+        }
+
+        [Fact]
+        public void Decrypt_ECDH_ES_A128GCM_ECDsaKey()
+        {
+            //given
+            const string token = "eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOEdDTSIsImVwayI6eyJrdHkiOiJFQyIsIngiOiJPbDdqSWk4SDFpRTFrcnZRTmFQeGp5LXEtY3pQME40RVdPM1I3NTg0aEdVIiwieSI6Ik1kU2V1OVNudWtwOWxLZGU5clVuYmp4a3ozbV9kTWpqQXc5NFd3Q0xaa3MiLCJjcnYiOiJQLTI1NiJ9fQ..E4XwpWZ2kO-Vg0xb.lP5LWPlabtmzS-m2EPGhlPGgllLNhI5OF2nAbbV9tVvtCckKpt358IQNRk-W8-JNL9SsLdWmVUMplrw-GO-KA2qwxEeh_8-muYCw3qfdhVVhLnOF-kL4mW9a00Xls_6nIZponGrqpHCwRQM5aSr365kqTNpfOnXgJTKG2459nqv8n4oSfmwV2iRUBlXEgTO-1Tvrq9doDwZCCHj__JKvbuPfyRBp5T7d-QJio0XRF1TO4QY36GtKMXWR264lS7g-T1xxtA.vFevA9zsyOnNA5RZanKqHA";
+
+            //when
+            string json = Jose.JWT.Decode(token, ECDSa256Private());
 
             //then
             Console.Out.WriteLine("json = {0}", json);
@@ -2134,6 +2194,21 @@ namespace UnitTests
         }
 
         [Fact]
+        public void Decrypt_ECDH_ES_A192GCM_ECDsaKey()
+        {
+            //given
+            const string token = "eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTE5MkdDTSIsImVwayI6eyJrdHkiOiJFQyIsIngiOiJlV094QXI0MDJ0SWlmYTRKZDMzbWhZSkptV0ZjTVJDcE10T0IzT1ZsRUdrc21kSmtjN3ZMYmFNZGpreWZCRUI5IiwieSI6IkNaa2RMdHJzd3BodGF0TTE2M2xRSzFVQ3VrSUhycjFBQkthdUtqWV9QVXZUa2JKcm51Qk8yMV8yMFJIY1dEbVciLCJjcnYiOiJQLTM4NCJ9fQ..4ydoEeCXnFaoKh_L.z9aXHIcJvGAuax0YwqGy7anZLZTSW-zZhZo0FMQIqwKZNpoNyjNEzXEibYZhcmKzsvEBxKgHtxVgzmeR9Yuu7sMBQwYxIhcsZqJZU8HUX8UPV7XfOj95hpeU8jGqpvg92v-bGQriWAvCGv8WruyMkOHkvHG9rj_Ksbxpiu8CSn1MP2PHWTU5zMN7sl8LWKz2eYeArIXeRy5yXoplkRJVMOQvDjOI0fL73h_XnZ0XzQKr1HtoNebvcNT6HoNEbKc1sZKrjQ.ivfbbzJj05oia6G8IcJLJw";
+
+            //when
+            string json = Jose.JWT.Decode(token, ECDSa384Private());
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
+        }
+
+        [Fact]
         public void Decrypt_ECDH_ES_A192GCM_JsonWebKey()
         {
             //given
@@ -2180,6 +2255,21 @@ namespace UnitTests
 
             //when
             string json = Jose.JWT.Decode(token, Ecdh512Private(CngKeyUsages.KeyAgreement));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
+        }
+
+        [Fact]
+        public void Decrypt_ECDH_ES_A256GCM_ECDsaKey()
+        {
+            //given
+            const string token = "eyJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTI1NkdDTSIsImVwayI6eyJrdHkiOiJFQyIsIngiOiJBTmt5RjdwY1BYWHc5V0c5OVJRY0QwTzFvNUtXMk9xRkxjNXRHY29IUmV2OGVDZElkT3dldFdoTDhybFZwS3lRTVNET1ZZZzNRYnRfc0VFRzQ1aFhoUHVnIiwieSI6IkFDUV9jMDh4LTRwMjBxWm8yeVF4WDV2d3pKcEVoX0VtUU1JZzF0Q1I0NHhtdWVlcmJlbjJiSEpSUjVJemFpaWFabnRzQVhpS3VPVkNXalhDSlBjQnR5bWsiLCJjcnYiOiJQLTUyMSJ9fQ..r3GZ_w1zQtNg6J-C.b6sA8PHGxjAo_pLn3bdgRIPllN3oYiPYTBiU89z0BMfvnPrRVa2AwjeanWbyWoc2RFRNMUKI9WYtvZk8tN7UzLJqO9GrG2McxOIyGmg7OsZ06xR4saexoFNmc3LL78GYtL8VRvgswb1tojpmhbN_kOCkfJgwVqdnsKcyoWPQtSlRzQF9mmAZttc_Ag5zXZGygk2fQ-EFBuq88ThtjbIYSR3jPUrG1t7Wtm4kwa8BpKt5alNXKGCfhD-Rk6FTwB1RgF7hWQ.Z805Fbd1scJ_36t3P-gUZg";
+
+            //when
+            string json = Jose.JWT.Decode(token, ECDSa521Private());
 
             //then
             Console.Out.WriteLine("json = {0}", json);
@@ -4604,9 +4694,50 @@ namespace UnitTests
 
         private static ECDsa ECDSa256Private()
         {
-            var x095 = new X509Certificate2("ecc256.p12", "12345");
+            var x095 = new X509Certificate2("ecc256.p12", "12345", X509KeyStorageFlags.EphemeralKeySet | X509KeyStorageFlags.Exportable);
 
-            return x095.GetECDsaPrivateKey();
+            return Exportable(x095.GetECDsaPrivateKey());
+        }
+
+        private static ECDsa ECDSa384Public()
+        {
+            var x095 = new X509Certificate2("ecc384.p12", "12345");
+
+            return x095.GetECDsaPublicKey();
+        }
+
+        private static ECDsa ECDSa384Private()
+        {
+            var x095 = new X509Certificate2("ecc384.p12", "12345", X509KeyStorageFlags.EphemeralKeySet | X509KeyStorageFlags.Exportable);
+
+            return Exportable(x095.GetECDsaPrivateKey());
+        }
+
+        private static ECDsa ECDSa521Public()
+        {
+            var x095 = new X509Certificate2("ecc521.p12", "12345");
+
+            return x095.GetECDsaPublicKey();
+        }
+
+        private static ECDsa ECDSa521Private()
+        {
+            var x095 = new X509Certificate2("ecc521.p12", "12345", X509KeyStorageFlags.EphemeralKeySet | X509KeyStorageFlags.Exportable);
+
+            return Exportable(x095.GetECDsaPrivateKey());
+        }
+
+        // Make key exportable to avoid MS bugs with CNG interop
+        private static ECDsa Exportable(ECDsa key)
+        {
+            if (key is ECDsaCng)
+            {
+                ECDsaCng cng = key as ECDsaCng;
+                CngProperty pty = new CngProperty("Export Policy", BitConverter.GetBytes((int)(CngExportPolicies.AllowPlaintextExport)), CngPropertyOptions.Persist);
+                cng.Key.SetProperty(pty);
+            }
+
+            return key;
         }
 
         private static CngKey Ecc256Public(CngKeyUsages usage = CngKeyUsages.Signing)
