@@ -4685,6 +4685,7 @@ namespace UnitTests
             return new X509Certificate2("jwt-2048.p12", "1", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet);
         }
 
+#if NETSTANDARD || NET472
         private static ECDsa ECDSa256Public()
         {
             var x095 = new X509Certificate2("ecc256.p12", "12345");
@@ -4739,6 +4740,22 @@ namespace UnitTests
 
             return key;
         }
+#else
+        private static ECDsa ECDSa256Public()
+        {
+            var x095 = new X509Certificate2("ecc256.p12", "12345");
+
+            return x095.GetECDsaPublicKey();
+        }
+
+        private static ECDsa ECDSa256Private()
+        {
+            var x095 = new X509Certificate2("ecc256.p12", "12345");
+
+            return x095.GetECDsaPrivateKey();
+        }
+
+#endif
 
         private static CngKey Ecc256Public(CngKeyUsages usage = CngKeyUsages.Signing)
         {
@@ -4845,7 +4862,7 @@ namespace UnitTests
         }
 #endif
 
-        #endregion Test Utils
+#endregion Test Utils
     }
 
     public class TestPayloadModel
