@@ -3210,6 +3210,30 @@ namespace UnitTests
         }  
         
         [Fact]
+        public void Encrypt_ECDH_ES_A128KW_A128CBC_HS256_ECDSa()
+        {
+            //given
+            const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, ECDSa256Public(), JweAlgorithm.ECDH_ES_A128KW, JweEncryption.A128CBC_HS256);
+
+            //then
+            Console.Out.WriteLine("ECDH-ES+A128KW A128CBC_HS256 ECDSaKey = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(239, parts[0].Length); //Header size
+            Assert.Equal(54, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
+
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecdh256Private(CngKeyUsages.KeyAgreement)));
+        }  
+        
+        [Fact]
         public void Encrypt_ECDH_ES_A128KW_A128CBC_HS256_JsonWebKey()
         {
             //given
@@ -3264,6 +3288,30 @@ namespace UnitTests
         }
 
         [Fact]
+        public void Encrypt_ECDH_ES_A192KW_A192CBC_HS384_ECDSaKey()
+        {
+            //given
+            const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, ECDSa384Public(), JweAlgorithm.ECDH_ES_A192KW, JweEncryption.A192CBC_HS384);
+
+            //then
+            Console.Out.WriteLine("ECDH-ES+A192KW A192CBC_HS384 ECDSaKey = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(295, parts[0].Length); //Header size
+            Assert.Equal(75, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(32, parts[4].Length); //auth tag size
+
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecdh384Private(CngKeyUsages.KeyAgreement)));
+        }
+
+        [Fact]
         public void Encrypt_ECDH_ES_A192KW_A192CBC_HS384_JsonWebKey()
         {
             //given
@@ -3303,6 +3351,30 @@ namespace UnitTests
 
             //then
             Console.Out.WriteLine("ECDH-ES+A256KW A256CBC_HS512 EcdhKey = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(359, parts[0].Length); //Header size
+            Assert.Equal(96, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(43, parts[4].Length); //auth tag size
+
+            Assert.Equal(json, Jose.JWT.Decode(token, Ecdh512Private(CngKeyUsages.KeyAgreement)));
+        }
+
+        [Fact]
+        public void Encrypt_ECDH_ES_A256KW_A256CBC_HS512_ECDSaKey()
+        {
+            //given
+            const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, ECDSa521Public(), JweAlgorithm.ECDH_ES_A256KW, JweEncryption.A256CBC_HS512);
+
+            //then
+            Console.Out.WriteLine("ECDH-ES+A256KW A256CBC_HS512 ECDSaKey = {0}", token);
 
             string[] parts = token.Split('.');
 
