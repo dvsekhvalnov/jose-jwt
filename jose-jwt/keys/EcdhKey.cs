@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 namespace Jose.keys
 {
 #if NET472 || NETSTANDARD2_1  
-    public class EccKeyUnix
+    public class EcdhKey
     {
         private ECDiffieHellman key;
         private bool isPrivate = true;
@@ -48,26 +48,25 @@ namespace Jose.keys
             get { return key; }
         }
 
-        public static ECDiffieHellman New(byte[] x, byte[] y, byte[] d = null, CngKeyUsages usage = CngKeyUsages.Signing)
-        {
-            return New<ECDiffieHellman>(x, y, d);
-        }
-
         /// <summary>
-        /// Creates an AsymmetricAlgorithm Elliptic Curve Key (ECDiffieHellman or ECDsa) from given (x,y) curve point - public part
+        /// Creates an AsymmetricAlgorithm Elliptic Curve Key ECDiffieHellman agreement from given (x,y) curve point - public part
         /// and optional d - private part
         /// </summary>
         /// <param name="x">x coordinate of curve point</param>
         /// <param name="y">y coordinate of curve point</param>
         /// <param name="d">optional private part</param>
-        /// <returns>CngKey for given (x,y) and d</returns>
-        public static T New<T>(byte[] x, byte[] y, byte[] d = null) where T : AsymmetricAlgorithm
+        /// <returns>ECDiffieHellman for given (x,y) and d</returns>
+        public static ECDiffieHellman New(byte[] x, byte[] y, byte[] d = null, CngKeyUsages usage = CngKeyUsages.Signing)
         {
             if (x.Length != y.Length)
+            {
                 throw new ArgumentException("X and Y must be the same size");
+            }
 
             if (d != null && x.Length != d.Length)
+            {
                 throw new ArgumentException("X, Y, and D must be the same size");
+            }
 
             ECCurve curve;
             int partSize = x.Length;
@@ -91,11 +90,7 @@ namespace Jose.keys
 
             ECParameters parameters = new ECParameters
             {
-                Q = new ECPoint
-                {
-                    X = x,
-                    Y = y
-                },
+                Q = new ECPoint { X = x, Y = y },
                 Curve = curve
             };
 
@@ -103,31 +98,38 @@ namespace Jose.keys
             {
                 parameters.D = d;
             }
-            
-            // If T is a ECDiffieHellman, we create an ECDiffieHellman object, otherwise we create a ECDsa object
-            // If T is not a ECDiffieHellman or ECDsa, we throw an exception
-            if (typeof(T) != typeof(ECDiffieHellman) && typeof(T) != typeof(ECDsa))
-            {
-                throw new ArgumentException("T must be ECDiffieHellman or ECDsa");
-            }
-            
-            return typeof(T) == typeof(ECDiffieHellman) ? 
-                ECDiffieHellman.Create(parameters) as T : 
-                ECDsa.Create(parameters) as T;
+
+            return ECDiffieHellman.Create(parameters);
         }
 
-        public static EccKeyUnix Generate(ECDiffieHellman receiverPubKey)
+        public static ECDiffieHellman FromPublic(ECDsa key)
+        {
+            var ecdh = ECDiffieHellman.Create();
+            ecdh.ImportParameters(key.ExportParameters(false));
+
+            return ecdh;
+        }
+
+        public static ECDiffieHellman FromPrivate(ECDsa key)
+        {
+            var ecdh = ECDiffieHellman.Create();
+            ecdh.ImportParameters(key.ExportParameters(true));
+
+            return ecdh;
+        }
+
+        public static EcdhKey Generate(ECDiffieHellman receiverPubKey)
         {
             ECCurve curve = receiverPubKey.ExportParameters(false).Curve;
             ECDiffieHellman ecdh = ECDiffieHellman.Create(curve);
     
-            return new EccKeyUnix { key = ecdh };
+            return new EcdhKey { key = ecdh };
         }
 
-        public static EccKeyUnix Export(ECDiffieHellman _key, bool isPrivate = true)
+        public static EcdhKey Export(ECDiffieHellman _key, bool isPrivate = true)
         {
             // Assuming you're just copying the key reference. If you need to actually "export" or clone the key, you'd do that here.
-            return new EccKeyUnix { key = _key, isPrivate = isPrivate };
+            return new EcdhKey { key = _key, isPrivate = isPrivate };
         }
 
         public string Curve()

@@ -347,7 +347,7 @@ namespace Jose
 
             Kty = Jwk.KeyTypes.EC;
 
-            var eccKey = EccKeyUnix.Export(key, isPrivate);
+            var eccKey = EcdhKey.Export(key, isPrivate);
 
             Crv = eccKey.Curve();
 

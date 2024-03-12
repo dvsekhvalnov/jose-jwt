@@ -61,7 +61,7 @@ namespace UnitTests
             byte[] y = Base64Url.Decode("e8lnCO-AlStT-NJVX-crhB7QRYhiix03illJOVAOyck");
             byte[] d = Base64Url.Decode("VEmDZpDXXK8p8N0Cndsxs924q6nS1RXFASRl6BfUqdw");
 
-            var privateKey = keyImplementation == "CNG" ? (object) EccKey.New(x, y, d, usage: CngKeyUsages.KeyAgreement) : EccKeyUnix.New(x, y, d) ;
+            var privateKey = keyImplementation == "CNG" ? (object) EccKey.New(x, y, d, usage: CngKeyUsages.KeyAgreement) : EcdhKey.New(x, y, d) ;
 
             //JWT encrypted with attacker private key, which is equals to (reciever_pk mod 113)
             var attackMod113 =
