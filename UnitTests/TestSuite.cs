@@ -3131,7 +3131,7 @@ namespace UnitTests
             const string json = @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
 
             //when
-            string token = Jose.JWT.Encode(json, Ecdh256Public(), JweAlgorithm.ECDH_ES_A128KW, JweEncryption.A128GCM);
+            string token = Jose.JWT.Encode(json, ECDSa256Public(), JweAlgorithm.ECDH_ES_A128KW, JweEncryption.A128GCM);
 
             //then
             Console.Out.WriteLine("ECDH-ES+A128KW A128GCM ECDSaKey = {0}", token);
