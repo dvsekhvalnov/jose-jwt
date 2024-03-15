@@ -44,6 +44,16 @@ Library is fully FIPS compliant since v2.1
 > - `Security.Cryptography.EccKey` to `Jose.keys.EccKey`
 > - `Security.Cryptography.RsaKey` to `Jose.keys.RsaKey`
 
+## OS cross compatibility
+| .Net version | Windows | Linux | Mac OS | FreeBSD v14 |
+| --- | :---: | :---: | :---: | :---: |
+| netcoreapp2.1 | ✅ | ✅ |    |   |
+| netcoreapp3.1 | ✅ | ✅ | ✅ |   |
+| net 8.0       | ✅ | ✅ | ✅ | ✅ |
+| net 5.0       | ✅ | ✅ | ✅ |    |
+| net 4.7       | ✅ |   |    |    |
+| net 4.6       | ✅ |   |    |    |
+| net 4.0       | ✅ |   |    |    |
 
 ## Foreword
 Originally forked from https://github.com/johnsheehan/jwt . Almost re-written from scratch to support JWT encryption capabilities and unified interface for encoding/decoding/encryption
