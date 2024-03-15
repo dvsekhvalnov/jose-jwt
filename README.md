@@ -480,6 +480,10 @@ Accepts either `CngKey`, `Jwk` of type EC (see above) or additionally `ECDsa` an
 
 `Jwk` keys will use transparent bridging to `ECDiffieHellman` under the hood.
 
+`jose-jwt` provides convenient helper `EcdhKey.New(x,y,usage:CngKeyUsages.KeyAgreement)` if one want to to constuct `ECDiffieHellman` using raw key material (x,y) and d.
+
+`ECDsa` keys usually loaded from files.
+
 ``` cs
 var payload = new Dictionary<string, object>()
 {
