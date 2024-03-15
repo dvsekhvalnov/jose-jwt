@@ -9,6 +9,8 @@ JWE JSON Serialization cross-tested with [JWCrypto](https://github.com/latchset/
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
+- v5.0 brings Linux, OSX and FreeBSD compatibility for ECDH encryption as long as managed `ECDsa` keys support. And fixes cross compatibility issues with encryption over NIST P-384, P-521 curves.
+
 - v4.1 added additional capabilities to manage runtime avaliable alg suite, see [Customizing library for security](#customizing-library-for-security). And also introduced default max limits for `PBKDF2` (`PBES2-*`) max iterations according to [OWASP PBKDF2 Recomendations](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2).
 
 - v4.0 introduced Json Web Key (JWK), [RFC 7517](https://datatracker.ietf.org/doc/html/rfc7517) support. Latest stable. All new features will most likely appear based on given version.
@@ -30,6 +32,8 @@ Library is fully FIPS compliant since v2.1
 - PCLCrypto based experimental project living up here: [jose-pcl](https://github.com/dvsekhvalnov/jose-pcl).
 
 ## Important upgrade notes
+> :warning: **v4 -> v5 JWK EC keys now bridges to `ECDsa` by default instead of `CngKey` on .net 4.7.2+ and netstandard2.1+**
+
 > :warning: **v3.0 -> v3.1 stricter argument validation extraHeaders argument**
 >
 > In 3.1 and above an attempt to override `enc` or `alg` header values in `extraHeaders` will throw `ArgumentException`.
@@ -107,8 +111,8 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 ##### Notes:
 * Types returned by crytographic methods MAY be different on Windows and Linux. e.g. GetRSAPrivateKey() on X509Certificate2 on Windows returns RsaCng and OpenSslRsa on *nix.
 * It appears that Microsoft CNG implementation of BCryptSecretAgreement/NCryptSecretAgreement contains a bug for calculating Elliptic Curve Diffie-Hellman secret agreement
-on keys higher than 256 bit (P-384 and P-521 NIST curves correspondingly). At least produced secret agreements do not match any other implementation in different languages.
-Technically it is possible to use ECDH-ES or ECDH-ES+AES Key Wrap family with A192CBC-HS384 and A256CBC-HS512 but most likely produced JWT tokens will not be compatible with other platforms and therefore can't be decoded correctly.
+on keys higher than 256 bit (P-384 and P-521 NIST curves correspondingly). At least produced secret agreements do not match any other implementation in different languages. Starting version 5 we **not recommending** usage of `CngKey` keys with ECDH-ES family due to cross compatibility with other libraries.
+Please switch to use `ECDsa`, `ECDiffieHellman` or `JWK` instead, which are **cross compatible** on all curves and operating systems.
 
 ## Installation
 ### NuGet
