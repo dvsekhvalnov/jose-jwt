@@ -436,10 +436,13 @@ string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.A256GCMKW, JweEn
 ```
 
 #### ECDH-ES and ECDH-ES with AES Key Wrap key management family of algorithms
+**NET40-NET46 (windows only)**:
 ECDH-ES and ECDH-ES+A128KW, ECDH-ES+A192KW, ECDH-ES+A256KW key management requires `CngKey` (usually public) or `Jwk` of type `EC` elliptic curve key of corresponding length.
 
 Normally existing `CngKey` can be loaded via `CngKey.Open(..)` method from Key Storage Provider.
 But if you want to use raw key material (x,y) and d, jose-jwt provides convenient helper `EccKey.New(x,y,usage:CngKeyUsages.KeyAgreement)` or use `Jwk` instead.
+
+`Jwk` keys will use transparent bridging to `CngKey` under the hood.
 
 ``` cs
 var payload = new Dictionary<string, object>()
@@ -471,6 +474,39 @@ var publicKey = new Jwk(
 
 string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.ECDH_ES, JweEncryption.A256GCM);
 ```
+
+**NET472 or NETCORE (all OS)**:
+Accepts either `CngKey`, `Jwk` of type EC (see above) or additionally `ECDsa` and `ECDiffieHellman` as a key.
+
+`Jwk` keys will use transparent bridging to `ECDiffieHellman` under the hood.
+
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
+
+ECDsa publicKey = new X509Certificate2("ecc384.p12", "<password>").GetECDsaPublicKey();
+
+string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.ECDH_ES_A192KW, JweEncryption.A192GCM);
+```
+
+``` cs
+var payload = new Dictionary<string, object>()
+{
+    { "sub", "mr.x@contoso.com" },
+    { "exp", 1300819380 }
+};
+
+byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+
+ECDiffieHellman publicKey=EcdhKey.New(x, y, usage:CngKeyUsages.KeyAgreement);
+
+string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.ECDH_ES_A128KW, JweEncryption.A128GCM);
+```
+
 
 #### PBES2 using HMAC SHA with AES Key Wrap key management family of algorithms
 PBES2-HS256+A128KW, PBES2-HS384+A192KW, PBES2-HS512+A256KW key management requires `string` passphrase to derive key from
