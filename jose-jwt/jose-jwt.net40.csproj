@@ -80,7 +80,6 @@
     <Compile Include="JwtOptions.cs" />
     <Compile Include="JwtSettings.cs" />
     <Compile Include="keys\EccKey.cs" />
-    <Compile Include="keys\EccKeyUnix.cs" />
     <Compile Include="keys\RsaKey.cs" />
     <Compile Include="native\BCrypt.cs" />
     <Compile Include="native\NCrypt.cs" />

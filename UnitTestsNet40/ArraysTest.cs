@@ -128,5 +128,18 @@ namespace UnitTests
             Assert.That(Arrays.RightmostBits(data,16), Is.EqualTo(new byte[] { 8, 9 }));
             Assert.That(Arrays.RightmostBits(data, 72), Is.EqualTo(new byte[] { 1, 2, 3, 4, 5, 6, 7, 8, 9 }));
         }
+
+        [Test]
+        public void Truncate()
+        {
+            // given
+            byte[] data = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+            // then
+            Assert.That(Arrays.Truncate(data, 0), Is.EqualTo(new byte[] {}));
+            Assert.That(Arrays.Truncate(data, 1), Is.EqualTo(new byte[] { 0 }));
+            Assert.That(Arrays.Truncate(data, 5), Is.EqualTo(new byte[] { 0, 1, 2, 3, 4 }));
+            Assert.That(Arrays.Truncate(data, 10), Is.EqualTo(new byte[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 }));
+        }
     }
 }

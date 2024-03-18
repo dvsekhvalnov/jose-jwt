@@ -230,7 +230,7 @@ namespace UnitTests
             // when
             try
             {
-                string decoded = Jose.JWT.Decode(bomb, privateKey, JwsAlgorithm.RS256);
+                string decoded = Jose.JWT.Decode(bomb, privateKey);
                 Assert.True(false, "Should fail with NotSupportedException");
             }
             catch (JoseException e)

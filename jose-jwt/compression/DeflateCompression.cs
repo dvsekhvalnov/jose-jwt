@@ -42,7 +42,7 @@ namespace Jose
                         }
                     }
 
-                    return ms.ToArray();
+                    return Arrays.Truncate(ms.ToArray(), ms.Position);
                 }
             }
             catch(NotSupportedException e)
