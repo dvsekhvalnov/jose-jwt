@@ -9,7 +9,7 @@ JWE JSON Serialization cross-tested with [JWCrypto](https://github.com/latchset/
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
-- v5.0 brings Linux, OSX and FreeBSD compatibility for ECDH encryption as long as managed `ECDsa` keys support. And fixes cross compatibility issues with encryption over NIST P-384, P-521 curves.
+- v5.0 brings Linux, OSX and FreeBSD compatibility for [ECDH encryption](#ecdh-es-and-ecdh-es-with-aes-key-wrap-key-management-family-of-algorithms) as long as managed `ECDsa` keys support. And fixes cross compatibility issues with encryption over NIST P-384, P-521 curves.
 
 - v4.1 added additional capabilities to manage runtime avaliable alg suite, see [Customizing library for security](#customizing-library-for-security). And also introduced default max limits for `PBKDF2` (`PBES2-*`) max iterations according to [OWASP PBKDF2 Recomendations](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2).
 
