@@ -8,15 +8,25 @@ on:
 
 jobs:
 
-  build-test-linux:
-    name: Build and test
+  build-test-nix:
+    name: Build and test .NET Core
 
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false # we want to see list of failing tests for each combination
       matrix:
-        os: [windows-2019, ubuntu-18.04]
-        framework: ['netcoreapp3.1', 'netcoreapp2.1', 'net50']
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        framework: ['netcoreapp3.1', 'netcoreapp2.1', 'net50', 'net80']
+        exclude:
+          - os: macos-latest
+            framework: 'netcoreapp2.1'
+
+          - os: macos-latest
+            framework: 'netcoreapp3.1'
+
+          - os: macos-latest
+            framework: 'net50'
+
     steps:
 
     - name: Check out code onto host
@@ -36,6 +46,11 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: '5.0.x' # SDK Version to use.
+
+    - name: Setup .Net 8.0
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x' # SDK Version to use.
 
     - name: Dotnet info
       run: |

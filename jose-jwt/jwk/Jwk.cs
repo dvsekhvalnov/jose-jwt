@@ -36,6 +36,11 @@ namespace Jose
         private byte[] octKey;
         private RSA rsaKey;
         private CngKey eccCngKey;
+
+    #if NET472 || NETSTANDARD2_1
+        private ECDiffieHellman ecdhKey;
+    #endif
+
         private List<X509Certificate2> x509Chain;
 
     #if NETSTANDARD || NET472
@@ -208,6 +213,35 @@ namespace Jose
             return eccCngKey;
         }
 
+    #if NET472 || NETSTANDARD2_1
+        public ECDiffieHellman EcDiffieHellmanKey()
+        {
+            if (ecdhKey == null && X != null && Y != null)
+            {
+                byte[] d = (D != null) ? Base64Url.Decode(D) : null;
+                
+                var privateParameters = new ECParameters
+                {
+                    Curve = NameToCurve(Crv),
+                    Q = new ECPoint
+                    {
+                        X = Base64Url.Decode(X),
+                        Y = Base64Url.Decode(Y)
+                    }
+                };
+
+                if (d != null)
+                {
+                    privateParameters.D = d;
+                }
+
+                ecdhKey = System.Security.Cryptography.ECDiffieHellman.Create(privateParameters);
+            }
+
+            return ecdhKey;
+        }
+    #endif	
+
         public Jwk()
         {
 
@@ -305,6 +339,27 @@ namespace Jose
                 QI = Base64Url.Encode(param.InverseQ);
             }
         }
+
+    #if NET472 || NETSTANDARD2_1        
+        public Jwk(ECDiffieHellman key, bool isPrivate = true)
+        {
+            ecdhKey = key;
+
+            Kty = Jwk.KeyTypes.EC;
+
+            var eccKey = EcdhKey.Export(key, isPrivate);
+
+            Crv = eccKey.Curve();
+
+            X = Base64Url.Encode(eccKey.X);
+            Y = Base64Url.Encode(eccKey.Y);
+
+            if (eccKey.D != null)
+            { 
+                D = Base64Url.Encode(eccKey.D);
+            }            
+        }
+    #endif
 
         public Jwk(CngKey key, bool isPrivate = true)
         {
@@ -508,7 +563,7 @@ namespace Jose
         }
 
 #if NETSTANDARD2_1 || NET472
-        private static string CurveToName(ECCurve curve)
+        public static string CurveToName(ECCurve curve)
         {
             curve.Oid.FriendlyName = curve.Oid.FriendlyName;
 
@@ -530,7 +585,7 @@ namespace Jose
             return null;
         }
 
-        private static ECCurve NameToCurve(string name)
+        public static ECCurve NameToCurve(string name)
         {
             switch (name)
             {

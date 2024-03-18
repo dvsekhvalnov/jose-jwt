@@ -857,6 +857,212 @@ namespace UnitTests
             Assert.Equal("AN6BCYXPe3SwU1-pHXmgiRYVsDvLgT5vE04OrhTTOKBTKkrb0CfnIVRyR2ptoXTzppL854nkY5WYe8mdm4O1arNw", test.D);
         }
 
+        [Fact]
+        public void EccKey_Ecdh_Public()
+        {
+            //given
+            var key = new Jwk(crv: "P-256", x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
+
+            //when
+            var test = key.EcDiffieHellmanKey();
+
+            //then
+            Assert.NotNull(test);
+            Assert.Equal("P-256", key.Crv);
+            var curveName = test.ExportParameters(false).Curve.Oid.FriendlyName;
+            Assert.Contains(curveName, new[] { "nistP256", "ECDSA_P256" });
+        }
+
+        [Fact]
+        public void EccKey_Ecdh_Private()
+        {
+            //given
+            var key = new Jwk(crv: "P-256",
+                              x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
+                              y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
+                              d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
+                           );
+
+            //when
+            var test = key.EcDiffieHellmanKey();
+
+            //then
+            Assert.NotNull(test);
+            Assert.Equal("P-256", key.Crv);
+            var curveName = test.ExportParameters(false).Curve.Oid.FriendlyName;
+            Assert.Contains(curveName, new[] { "nistP256", "ECDSA_P256" });
+        }
+
+        [Fact]
+        public void EccKey_Ecdh_Private_KeyAgreement()
+        {
+            //given
+            var key = new Jwk(crv: "P-256",
+                              x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
+                              y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU",
+                              d: "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4"
+                           );
+
+            //when
+            var test = key.EcDiffieHellmanKey();
+
+            //then
+            Assert.NotNull(test);
+            Assert.Equal("P-256", key.Crv);
+            var curveName = test.ExportParameters(false).Curve.Oid.FriendlyName;
+            Assert.Contains(curveName, new[] { "nistP256", "ECDSA_P256" });
+        }
+
+        [Fact]
+        public void FromDictionary_EccKey_Ecdh()
+        {
+            //given
+            var data = new Dictionary<string, object>
+            {
+                { "kty", "EC" },
+                { "use", "enc" },
+                { "crv", "P-256" },
+                { "x", "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk" },
+                { "y", "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU" },
+                { "d", "KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4" }
+            };
+
+            //when
+            var test = Jwk.FromDictionary(data);
+
+            //then
+            Assert.Equal(Jwk.KeyTypes.EC, test.Kty);
+            Assert.Equal(Jwk.KeyUsage.Encryption, test.Use);
+            Assert.Equal("P-256", test.Crv);
+            Assert.Equal("BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", test.X);
+            Assert.Equal("g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU", test.Y);
+            Assert.Equal("KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4", test.D);
+
+            var key = test.EcDiffieHellmanKey();
+
+            Assert.NotNull(key);
+            var curveName = key.ExportParameters(false).Curve.Oid.FriendlyName;
+            Assert.Contains(curveName, new[] { "nistP256", "ECDSA_P256" });
+        }
+
+        [Fact]
+        public void FromJson_EccKey_Ecdh()
+        {
+            //given
+            var json = @"{
+                ""kty"": ""EC"",
+                ""kid"": ""Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc"",
+                ""crv"": ""P-256"",
+                ""use"": ""enc"",
+                ""x"": ""BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk"",
+                ""y"": ""g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU"",
+                ""d"": ""KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4""
+            }";
+
+            //when
+            var test = Jwk.FromJson(json, JWT.DefaultSettings.JsonMapper);
+
+            //then
+            Assert.Equal("Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc", test.KeyId);
+            Assert.Equal(Jwk.KeyTypes.EC, test.Kty);
+            Assert.Equal(Jwk.KeyUsage.Encryption, test.Use);
+            Assert.Equal("P-256", test.Crv);
+            Assert.Equal("BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", test.X);
+            Assert.Equal("g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU", test.Y);
+            Assert.Equal("KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4", test.D);
+
+            var key = test.EcDiffieHellmanKey();
+
+            Assert.NotNull(key);
+            var curveName = key.ExportParameters(false).Curve.Oid.FriendlyName;
+
+            Assert.Contains(curveName, new[] { "nistP256", "ECDSA_P256" });
+        }
+
+        [Fact]
+        public void NewEccEcdh_Public_P256()
+        {
+            //given
+            var test = new Jwk(Ecc256PublicEcdh(), false);
+
+            //then
+            Assert.Equal(Jwk.KeyTypes.EC, test.Kty);
+            Assert.Equal("P-256", test.Crv);
+            Assert.Equal("BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", test.X);
+            Assert.Equal("g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU", test.Y);
+            Assert.Null(test.D);
+        }
+
+        [Fact]
+        public void NewEccEcdh_Private_P256()
+        {
+            //given
+            var test = new Jwk(Ecc256PrivateEcdh());
+
+            //then
+            Assert.Equal(Jwk.KeyTypes.EC, test.Kty);
+            Assert.Equal("P-256", test.Crv);
+            Assert.Equal("BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", test.X);
+            Assert.Equal("g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU", test.Y);
+            Assert.Equal("KpTnMOHEpskXvuXHFCfiRtGUHUZ9Dq5CCcZQ-19rYs4", test.D);
+        }
+
+        [Fact]
+        public void NewEccEcdh_Public_P384()
+        {
+            //given
+            var test = new Jwk(Ecc384PublicEcdh(), false);
+
+            //then
+            Assert.Equal(Jwk.KeyTypes.EC, test.Kty);
+            Assert.Equal("P-384", test.Crv);
+            Assert.Equal("Rpfcsz4AT-hyQDpLW9HogAeJlyoNlA-FXdcHA4h8DmXyz8BF1JFYO94hfy4e2q9P", test.X);
+            Assert.Equal("vcrEHpk1FnqrBLwqRwIJwb8Rb7ROBm6Z8JPLLZjstZzo3-OURJTdsDmVLMtTVUs3", test.Y);
+            Assert.Null(test.D);
+        }
+
+        [Fact]
+        public void NewEccEcdh_Private_P384()
+        {
+            //given
+            var test = new Jwk(Ecc384PrivateEcdh());
+
+            //then
+            Assert.Equal(Jwk.KeyTypes.EC, test.Kty);
+            Assert.Equal("P-384", test.Crv);
+            Assert.Equal("Rpfcsz4AT-hyQDpLW9HogAeJlyoNlA-FXdcHA4h8DmXyz8BF1JFYO94hfy4e2q9P", test.X);
+            Assert.Equal("vcrEHpk1FnqrBLwqRwIJwb8Rb7ROBm6Z8JPLLZjstZzo3-OURJTdsDmVLMtTVUs3", test.Y);
+            Assert.Equal("ice3abxagFJ0L6Fk3WHQQK33CSq6vbVuGOH-iEuc8tFe2joOIb4PUo3uz9afjPeL", test.D);
+        }
+        [Fact]
+
+        public void NewEccEcdh_Public_P521()
+        {
+            //given
+            var test = new Jwk(Ecc512PublicEcdh(), false);
+
+            //then
+            Assert.Equal(Jwk.KeyTypes.EC, test.Kty);
+            Assert.Equal("P-521", test.Crv);
+            Assert.Equal("APhJyzW4IkVv2eb_bNTx5V_vXYNkJVaYV2KqKxkjUIk-cMVxinRyN6WACIuU7W15KM0DPX8cwzor5ODkUuDblMxg", test.X);
+            Assert.Equal("ADxHYXBqI3lQthSnjwj2bOqgwQoDlC0LOrG-rBqyvPBbGUNPQPHLQd_aDONSskKgE8LZrD36F07agqBp2NDrfC4g", test.Y);
+            Assert.Null(test.D);
+        }
+
+        [Fact]
+        public void NewEccEcdh_Private_P521()
+        {
+            //given
+            var test = new Jwk(Ecc512PrivateEcdh());
+
+            //then
+            Assert.Equal(Jwk.KeyTypes.EC, test.Kty);
+            Assert.Equal("P-521", test.Crv);
+            Assert.Equal("APhJyzW4IkVv2eb_bNTx5V_vXYNkJVaYV2KqKxkjUIk-cMVxinRyN6WACIuU7W15KM0DPX8cwzor5ODkUuDblMxg", test.X);
+            Assert.Equal("ADxHYXBqI3lQthSnjwj2bOqgwQoDlC0LOrG-rBqyvPBbGUNPQPHLQd_aDONSskKgE8LZrD36F07agqBp2NDrfC4g", test.Y);
+            Assert.Equal("AN6BCYXPe3SwU1-pHXmgiRYVsDvLgT5vE04OrhTTOKBTKkrb0CfnIVRyR2ptoXTzppL854nkY5WYe8mdm4O1arNw", test.D);
+        }
+
 #endif
 
         [Fact]
@@ -986,7 +1192,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void FromDictionary_EccKey()
+        public void FromDictionary_EccKey_Cng()
         {
             //given
             var data = new Dictionary<string, object>
@@ -1053,7 +1259,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void FromJson_EccKey()
+        public void FromJson_EccKey_Cng()
         {
             //given
             var json = @"{
@@ -1333,6 +1539,57 @@ namespace UnitTests
             }
 
             return key;
+        }
+
+        private ECDiffieHellman Ecc256PrivateEcdh()
+        {
+            byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+            byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+            byte[] d = { 42, 148, 231, 48, 225, 196, 166, 201, 23, 190, 229, 199, 20, 39, 226, 70, 209, 148, 29, 70, 125, 14, 174, 66, 9, 198, 80, 251, 95, 107, 98, 206 };
+
+            return EcdhKey.New(x, y, d);
+        }
+
+        private ECDiffieHellman Ecc256PublicEcdh()
+        {
+            byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };
+            byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159, 214, 186, 250, 47, 207, 246, 142, 127, 54, 183, 72, 72, 253, 21, 88, 53 };
+
+            return EcdhKey.New(x, y);
+        }
+
+        private ECDiffieHellman Ecc384PublicEcdh()
+        {
+            byte[] x = { 70, 151, 220, 179, 62, 0, 79, 232, 114, 64, 58, 75, 91, 209, 232, 128, 7, 137, 151, 42, 13, 148, 15, 133, 93, 215, 7, 3, 136, 124, 14, 101, 242, 207, 192, 69, 212, 145, 88, 59, 222, 33, 127, 46, 30, 218, 175, 79 };
+            byte[] y = { 189, 202, 196, 30, 153, 53, 22, 122, 171, 4, 188, 42, 71, 2, 9, 193, 191, 17, 111, 180, 78, 6, 110, 153, 240, 147, 203, 45, 152, 236, 181, 156, 232, 223, 227, 148, 68, 148, 221, 176, 57, 149, 44, 203, 83, 85, 75, 55 };
+
+            return EcdhKey.New(x, y);
+        }
+
+        private ECDiffieHellman Ecc384PrivateEcdh()
+        {
+            byte[] x = { 70, 151, 220, 179, 62, 0, 79, 232, 114, 64, 58, 75, 91, 209, 232, 128, 7, 137, 151, 42, 13, 148, 15, 133, 93, 215, 7, 3, 136, 124, 14, 101, 242, 207, 192, 69, 212, 145, 88, 59, 222, 33, 127, 46, 30, 218, 175, 79 };
+            byte[] y = { 189, 202, 196, 30, 153, 53, 22, 122, 171, 4, 188, 42, 71, 2, 9, 193, 191, 17, 111, 180, 78, 6, 110, 153, 240, 147, 203, 45, 152, 236, 181, 156, 232, 223, 227, 148, 68, 148, 221, 176, 57, 149, 44, 203, 83, 85, 75, 55 };
+            byte[] d = { 137, 199, 183, 105, 188, 90, 128, 82, 116, 47, 161, 100, 221, 97, 208, 64, 173, 247, 9, 42, 186, 189, 181, 110, 24, 225, 254, 136, 75, 156, 242, 209, 94, 218, 58, 14, 33, 190, 15, 82, 141, 238, 207, 214, 159, 140, 247, 139 };
+
+            return EcdhKey.New(x, y, d);
+        }
+
+        private ECDiffieHellman Ecc512PublicEcdh()
+        {
+            byte[] x = { 0, 248, 73, 203, 53, 184, 34, 69, 111, 217, 230, 255, 108, 212, 241, 229, 95, 239, 93, 131, 100, 37, 86, 152, 87, 98, 170, 43, 25, 35, 80, 137, 62, 112, 197, 113, 138, 116, 114, 55, 165, 128, 8, 139, 148, 237, 109, 121, 40, 205, 3, 61, 127, 28, 195, 58, 43, 228, 224, 228, 82, 224, 219, 148, 204, 96 };
+            byte[] y = { 0, 60, 71, 97, 112, 106, 35, 121, 80, 182, 20, 167, 143, 8, 246, 108, 234, 160, 193, 10, 3, 148, 45, 11, 58, 177, 190, 172, 26, 178, 188, 240, 91, 25, 67, 79, 64, 241, 203, 65, 223, 218, 12, 227, 82, 178, 66, 160, 19, 194, 217, 172, 61, 250, 23, 78, 218, 130, 160, 105, 216, 208, 235, 124, 46, 32 };
+
+            return EcdhKey.New(x, y);
+        }
+
+        private ECDiffieHellman Ecc512PrivateEcdh()
+        {
+            byte[] x = { 0, 248, 73, 203, 53, 184, 34, 69, 111, 217, 230, 255, 108, 212, 241, 229, 95, 239, 93, 131, 100, 37, 86, 152, 87, 98, 170, 43, 25, 35, 80, 137, 62, 112, 197, 113, 138, 116, 114, 55, 165, 128, 8, 139, 148, 237, 109, 121, 40, 205, 3, 61, 127, 28, 195, 58, 43, 228, 224, 228, 82, 224, 219, 148, 204, 96 };
+            byte[] y = { 0, 60, 71, 97, 112, 106, 35, 121, 80, 182, 20, 167, 143, 8, 246, 108, 234, 160, 193, 10, 3, 148, 45, 11, 58, 177, 190, 172, 26, 178, 188, 240, 91, 25, 67, 79, 64, 241, 203, 65, 223, 218, 12, 227, 82, 178, 66, 160, 19, 194, 217, 172, 61, 250, 23, 78, 218, 130, 160, 105, 216, 208, 235, 124, 46, 32 };
+            byte[] d = { 0, 222, 129, 9, 133, 207, 123, 116, 176, 83, 95, 169, 29, 121, 160, 137, 22, 21, 176, 59, 203, 129, 62, 111, 19, 78, 14, 174, 20, 211, 56, 160, 83, 42, 74, 219, 208, 39, 231, 33, 84, 114, 71, 106, 109, 161, 116, 243, 166, 146, 252, 231, 137, 228, 99, 149, 152, 123, 201, 157, 155, 131, 181, 106, 179, 112 };
+
+            return EcdhKey.New(x, y, d);
         }
 #endif
         #endregion Test Utils
