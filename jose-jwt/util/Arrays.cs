@@ -199,5 +199,20 @@ namespace Jose
 
             return result;
         }
+
+        public static byte[] Truncate(byte[] data, long size)
+        {
+            Ensure.MinValue(size, 0, "Truncate() can't go negative size, but was given {0}", size);
+            Ensure.MaxValue(size, data.Length, "Truncate() can't go beyond array size {0}, but was given {1}", data.Length, size);
+            Ensure.MaxValue(size, Int32.MaxValue, "Truncate() can't go beyond int32, but was given {0}", size);
+
+            int byteCount = Convert.ToInt32(size);
+
+            var result = new byte[byteCount];
+
+            Buffer.BlockCopy(data, 0, result, 0, byteCount);
+
+            return result;
+        }
     }
 }

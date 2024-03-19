@@ -152,7 +152,10 @@ namespace Jose
 
         private readonly Dictionary<JweCompression, ICompression> compressionAlgorithms = new Dictionary<JweCompression, ICompression>
         {
-            { JweCompression.DEF, new DeflateCompression() }
+            { 
+                // 250Kb limited decompression buffer
+                JweCompression.DEF, new DeflateCompression(250 * 1024) 
+            }
         };
 
         private readonly Dictionary<JweCompression, string> jweCompressionHeaderValue = new Dictionary<JweCompression, string>

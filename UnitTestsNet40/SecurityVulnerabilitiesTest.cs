@@ -128,5 +128,33 @@ namespace UnitTests
             //if we reach that point HMAC check was bypassed although the decrypted data is different
             Assert.Fail("JoseException should be raised.");
         }
+
+        [Test]
+        public void DeflateBomb()
+        {
+            // given
+            byte[] x = Base64Url.Decode("weNJy2HscCSM6AEDTDg04biOvhFhyyWvOHQfeF_PxMQ");
+            byte[] y = Base64Url.Decode("e8lnCO-AlStT-NJVX-crhB7QRYhiix03illJOVAOyck");
+            byte[] d = Base64Url.Decode("VEmDZpDXXK8p8N0Cndsxs924q6nS1RXFASRl6BfUqdw");
+
+            var privateKey = EccKey.New(x, y, d, usage: CngKeyUsages.KeyAgreement);
+            var publicKey = EccKey.New(x, y, usage: CngKeyUsages.KeyAgreement);
+
+            string strU = new string('U', 400000000);
+            string strUU = new string('U', 100000000);
+            string payload = $@"{{""U"":""{strU}"", ""UU"":""{strUU}""}}";
+            string bomb = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.ECDH_ES, JweEncryption.A128GCM, JweCompression.DEF);
+
+            // when
+            try
+            {
+                string decoded = Jose.JWT.Decode(bomb, privateKey);
+                Assert.Fail("Should fail with NotSupportedException");
+            }
+            catch (JoseException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+        }
     }
 }

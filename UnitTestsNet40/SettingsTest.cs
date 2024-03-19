@@ -420,6 +420,8 @@ namespace UnitTests
 
         class MockCompression : DeflateCompression, ICompression
         {
+            public MockCompression(): base(250*1024) {}
+
             public bool CompressCalled { get; set; }
             public bool DecompressCalled { get; set; }
 

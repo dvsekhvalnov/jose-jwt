@@ -9,7 +9,7 @@ JWE JSON Serialization cross-tested with [JWCrypto](https://github.com/latchset/
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
-- v5.0 brings Linux, OSX and FreeBSD compatibility for [ECDH encryption](#ecdh-es-and-ecdh-es-with-aes-key-wrap-key-management-family-of-algorithms) as long as managed `ECDsa` keys support. And fixes cross compatibility issues with encryption over NIST P-384, P-521 curves.
+- v5.0 brings Linux, OSX and FreeBSD compatibility for [ECDH encryption](#ecdh-es-and-ecdh-es-with-aes-key-wrap-key-management-family-of-algorithms) as long as managed `ECDsa` keys support. Fixes cross compatibility issues with encryption over NIST P-384, P-521 curves. And introduces new [security fixes and controls](#customizing-compression).
 
 - v4.1 added additional capabilities to manage runtime avaliable alg suite, see [Customizing library for security](#customizing-library-for-security). And also introduced default max limits for `PBKDF2` (`PBES2-*`) max iterations according to [OWASP PBKDF2 Recomendations](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2).
 
@@ -32,7 +32,10 @@ Library is fully FIPS compliant since v2.1
 - PCLCrypto based experimental project living up here: [jose-pcl](https://github.com/dvsekhvalnov/jose-pcl).
 
 ## Important upgrade notes
-> :warning: **v4 -> v5 JWK EC keys now bridges to `ECDsa` by default instead of `CngKey` on .net 4.7.2+ and netstandard2.1+**
+> :warning: **v4 -> v5**:
+> - JWK EC keys now bridges to `ECDsa` by default instead of `CngKey` on .net 4.7.2+ and netstandard2.1+
+> - Deflate decompression is limited to 250Kb by default. Check out [customization section](#customizing-compression) if need more.
+
 
 > :warning: **v3.0 -> v3.1 stricter argument validation extraHeaders argument**
 >
@@ -1452,8 +1455,20 @@ One can use following methods to deregister any signing, encryption, key managem
  ```c#
     JWT.DefaultSettings.DeregisterJws(JwsAlgorithm.none)
                        .DeregisterJwe(JweAlgorithm.RSA1_5)
-                       .DeregisterJwe(JweAlgorithm.DIR);
+                       .DeregisterJwe(JweAlgorithm.DIR)
+                       .DeregisterCompression(JweCompression.DEF);
  ```
+
+### Customizing compression
+There were denial-of-service attacks reported on JWT libraries that supports deflate compression by constructing malicious payload that explodes in terms of RAM on decompression. See for details: https://github.com/dvsekhvalnov/jose-jwt/issues/237
+
+As of v5 `jose-jwt` limits decompression buffer to 250Kb to limit memory consumption and additionaly provides a way to adjust the limit according to specific scenarios:
+
+``` cs
+    // Override compression alg with new limits (10Kb example)
+    Jose.JWT.DefaultSettings.RegisterCompression(JweCompression.DEF, new DeflateCompression(10 * 1024));
+```
+
 ### Customizing PBKDF2
 As it quite easy to abuse `PBES2` family of algorithms via forging header with extra large `p2c` values, `jose-jwt` library introduced iteration count limits in v4.1 to reduce runtime exposure.
 
@@ -1468,7 +1483,7 @@ By default, `maxIterations` is set according to [OWASP PBKDF2 Recomendations](ht
 If it is desired to implement different limits, it can be achieved via registering `Pbse2HmacShaKeyManagementWithAesKeyWrap` implementation with different parameters:
 
 ```c#
-    Jost.JWT.DefaultSettings
+    Jose.JWT.DefaultSettings
         // Pick your own min/max limits
         .RegisterJwe(JweAlgorithm.PBES2_HS256_A128KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128), 310000, 310000));
         .RegisterJwe(JweAlgorithm.PBES2_HS384_A192KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192), 250000, 250000));

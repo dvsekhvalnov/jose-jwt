@@ -56,7 +56,7 @@ namespace Jose
                 throw new ArgumentException(string.Format(msg,args));
         }
 
-        public static void MaxValue(int arg, long max, string msg, params object[] args)
+        public static void MaxValue(long arg, long max, string msg, params object[] args)
         {
             if(arg > max)
                 throw new ArgumentException(string.Format(msg,args));
