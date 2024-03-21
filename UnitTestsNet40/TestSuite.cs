@@ -2572,7 +2572,7 @@ namespace UnitTests
         }
 
         [Test]
-        public void DecodeSignedTokenValidationFailure()
+        public void DecodeSignedTokenValidationWrongAlg()
         {
             // given
             string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
@@ -2583,6 +2583,28 @@ namespace UnitTests
             try
             {
                 Jose.JWT.Decode(token, PubKey(), JwsAlgorithm.RS512);
+            }
+            catch (InvalidAlgorithmException)
+            {
+                exceptionThrown = true;
+            }
+
+            // then
+            Assert.That(exceptionThrown, Is.EqualTo(true));
+        }
+
+        [Test]
+        public void DecodeSignedTokenValidationWrongEnc()
+        {
+            // given
+            string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
+
+            // when
+            bool exceptionThrown = false;
+
+            try
+            {
+                Jose.JWT.Decode(token, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
             }
             catch (InvalidAlgorithmException)
             {
@@ -2608,7 +2630,7 @@ namespace UnitTests
         }
 
         [Test]
-        public void DecodeEncryptedTokenValidationFailure()
+        public void DecodeEncryptedTokenValidationWrongEnc()
         {
             // given
             string json = @"{""hello"": ""world""}";
@@ -2639,6 +2661,30 @@ namespace UnitTests
             // then
             Assert.That(incorrectAlgorithm, Is.EqualTo(true));
             Assert.That(incorrectEncryption, Is.EqualTo(true));
+        }
+
+        [Test]
+        public void DecodeEncryptedTokenValidationWrongAlg()
+        {
+            // given
+            string json = @"{""hello"": ""world""}";
+            string token = Jose.JWT.Encode(json, RsaKey.New(PubKey().ExportParameters(false)), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+
+            // when
+            bool exceptionThrown = false;
+
+            try
+            {
+                Jose.JWT.Decode(token, PrivKey(), JwsAlgorithm.RS256);
+            }
+            catch (InvalidAlgorithmException)
+            {
+                exceptionThrown = true;
+
+            }
+
+            // then
+            Assert.That(exceptionThrown, Is.EqualTo(true));
         }
 
         [Test]

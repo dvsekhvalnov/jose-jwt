@@ -4367,6 +4367,7 @@ namespace UnitTests
 
             // then
             Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, testSuiteUtils.PubKey(), JwsAlgorithm.RS512));
+	    Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, testSuiteUtils.PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM));            
         }
 
         [Fact]
@@ -4393,6 +4394,7 @@ namespace UnitTests
             // then
             Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, testSuiteUtils.PrivKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A192GCM));
             Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, testSuiteUtils.PrivKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128CBC_HS256));
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, testSuiteUtils.PrivKey(), JwsAlgorithm.RS256));
         }
 
         [Fact]

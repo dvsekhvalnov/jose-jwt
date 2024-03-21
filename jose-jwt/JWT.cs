@@ -466,10 +466,21 @@ namespace Jose
 
             if (parts.Count == 5) //encrypted JWT
             {
+                if (expectedJwsAlg != null)
+                {
+                    throw new InvalidAlgorithmException("Encrypted tokens can't assert signing algorithm type.");
+                }
+
                 return JWE.Decrypt(token, key, expectedJweAlg, expectedJweEnc, settings).PlaintextBytes;
             }
             else
             {
+                if (expectedJweAlg != null || expectedJweEnc !=null)
+                {
+                    throw new InvalidAlgorithmException("Signed tokens can't assert encryption type.");
+                }
+
+
                 //signed or plain JWT
                 var jwtSettings = GetSettings(settings);
 
