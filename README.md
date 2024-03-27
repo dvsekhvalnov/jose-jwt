@@ -558,7 +558,7 @@ string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA1_5, JweEncry
 
 ### Verifying and Decoding Tokens
 #### What methods to use?
-Historically `jose-jwt` provided single family of `Decode()` methods that handles both signed and encrypted tokens with uniform interface, but as a number of confusion attacks on JWT libraries increased over last years, starting v5 library additionally provides dedicated methods `Verify()` and `Encrypt()` that are limited in scope to verifying signatures and decrypting tokens accordingly. See [Strict Validation](#strict-validation) for more information.
+Historically `jose-jwt` provided single family of `Decode()` methods that handles both signed and encrypted tokens with uniform interface, but as a number of confusion attacks on JWT libraries increased over last years, starting v5 library additionally provides dedicated methods `Verify()` and `Encrypt()` that are limited in scope to verifying signatures and decrypting tokens accordingly. See [Strict Validation](#strict-validation) and [Confusion Attacks](#confusion-attacks-and-how-to-nail-them) sections for more information.
 
 Decoding json web tokens is fully symmetric to creating signed or encrypted tokens:
 
@@ -1131,6 +1131,9 @@ string token = "eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJSUzI1NiJ9..iyormY
 
 // will echo provided payload back as return value, for consistency
 string json = Jose.JWT.Decode(token, PubKey(), payload: @"{""hello"": ""world""}");
+
+// as of v5 can also be used with Verify:
+string json = Jose.JWT.Verify(token, PubKey(), payload: @"{""hello"": ""world""}");
 ```
 
 also works with binary payloads:
@@ -1501,7 +1504,7 @@ Jose.JWT.Decode(token, secretKey, settings: new JwtSettings()
 ```
 
 ## Customizing library for security
-In response to ever increasing attacks on various JWT implementations, `jose-jwt` as of version v4.1 introduced number of additional security controls to limit potential attack surface on services and projects using the library.
+In response to ever increasing attacks on various JWT implementations, `jose-jwt` as of version v4.1 and beyond introduced number of additional security controls to limit potential attack surface on services and projects using the library.
 
 ### Deregister algorithm implementations
 One can use following methods to deregister any signing, encryption, key management or compression algorithms from runtime suite, that is considered unsafe or simply not expected by service.
@@ -1567,6 +1570,24 @@ In case you can't upgrade to latest version, but would like to have protections 
         Jose.JWT.Decode(token, key);
     }
 ```
+
+### Confusion attacks and how to nail them
+There are number of algorithm confusion attacks reported in general on different JWT libraries in recent years. Typically attacks exploits public keys published on server side (or obtained by other means) via forging bogus JWT tokens signed or encrypted with given public key but with tampered alg header to confuse server validation implementation (hence the attack name). For example take a look at https://github.com/dvsekhvalnov/jose-jwt/issues/236
+
+By nature most of confusion attacks targeting specific usage of libraries rather then libraries itself, as library can't predict in what type of applications and conditions it will be used.
+
+Here are some design practices to consider in your applications to avoid confusion attacks with `jose-jwt`:
+
+1. Clearly separate your signing and encryption keys. **Do not allow** to use signing keys to decrypt tokens and vice versa.
+
+2. When you can, **be explicit** whether you working with signed or encrypted tokens. As of v5 library provides dedicated verification methods: `Verify()` and `Decrypt()`
+
+3. Use [Strict Validation](#strict-validation) and **assert algorithms** explicitly if possible.
+
+4. Always good idea to [deregister](#deregister-algorithm-implementations) algorithms you are **not planning to use** to limit attack surface.
+
+5. For highly dynamic environments consider [two-phase validation](#two-phase-validation) practice to implement more flexible protection measures.
+
 
 ## More examples
 Checkout [UnitTests/TestSuite.cs](UnitTests/TestSuite.cs) for more examples.
