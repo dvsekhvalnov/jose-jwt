@@ -558,7 +558,7 @@ string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA1_5, JweEncry
 
 ### Verifying and Decoding Tokens
 #### What methods to use?
-Historically `jose-jwt` provided single family of `Decode()` methods that handles both signed and encrypted tokens with uniform interface, but as number of confusion attacks on JWT libraries increased over last years, as of v5 `jose-jwt` additionally provides dedicated methods `Verify()` and `Encrypt()` that are limited in scope to verifying signatures and decrypting tokens accordingly. See [TODO] for more information.
+Historically `jose-jwt` provided single family of `Decode()` methods that handles both signed and encrypted tokens with uniform interface, but as a number of confusion attacks on JWT libraries increased over last years, starting v5 library additionally provides dedicated methods `Verify()` and `Encrypt()` that are limited in scope to verifying signatures and decrypting tokens accordingly. See [TODO] for more information.
 
 Decoding json web tokens is fully symmetric to creating signed or encrypted tokens:
 
@@ -572,7 +572,7 @@ byte[] secretKey=new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159
 string json = Jose.JWT.Decode(token, secretKey);
 
 // starting v5 can also
-string json Jose.JWT.Decrypt(token, secretKey);
+string json=Jose.JWT.Decrypt(token, secretKey);
 ```
 
 ``` cs
@@ -583,7 +583,7 @@ byte[] secretKey=new Jwk(new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45
 string json = Jose.JWT.Decode(token, secretKey);
 
 // starting v5 can also
-string json Jose.JWT.Decrypt(token, secretKey);
+string json = Jose.JWT.Decrypt(token, secretKey);
 ```
 
 **RS256, RS384, RS512**, **PS256, PS384, PS512** signatures and **RSA-OAEP-256**, **RSA-OAEP, RSA1_5** key management algorithms expects
@@ -598,7 +598,7 @@ var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlag
 string json = Jose.JWT.Decode(token,privateKey);
 
 // starting v5 can also
-string json Jose.JWT.Decrypt(token, secretKey);
+string json = Jose.JWT.Decrypt(token, secretKey);
 ```
 
 **NETCORE**: `RSA` or `Jwk` of type `RSA` as a key, public/private is asymmetric to encoding:
@@ -610,7 +610,7 @@ var privateKey=new X509Certificate2("my-key.p12", "password").GetRSAPrivateKey()
 string json = Jose.JWT.Decode(token,privateKey);
 
 // starting v5 can also
-string json Jose.JWT.Decrypt(token, secretKey);
+string json = Jose.JWT.Decrypt(token, secretKey);
 ```
 
 ``` cs
@@ -630,7 +630,7 @@ Jwk privateKey = new Jwk(
 string json = Jose.JWT.Decode(token,privateKey);
 
 // starting v5 can also
-string json Jose.JWT.Decrypt(token, secretKey);
+string json = Jose.JWT.Decrypt(token, secretKey);
 ```
 
 **NET461**: `RSACryptoServiceProvider`, `RSA`, `Jwk` of type `RSA` (see above) or `CngKey` types of keys, public/private is asymmetric to encoding.
@@ -643,7 +643,7 @@ CngKey privateKey = CngKey.Open("decryptionKeyId", CngProvider.MicrosoftSoftware
 string json = Jose.JWT.Decode(token,privateKey);
 
 // starting v5 can also
-string json Jose.JWT.Decrypt(token, secretKey);
+string json = Jose.JWT.Decrypt(token, secretKey);
 ```
 
 **ES256, ES284, ES512** signatures expects
@@ -715,7 +715,7 @@ var privateKey=EccKey.New(x, y, d, CngKeyUsages.KeyAgreement);
 string json = Jose.JWT.Decode(token, privateKey);
 
 // starting v5 can also
-string json Jose.JWT.Decrypt(token, secretKey);
+string json = Jose.JWT.Decrypt(token, secretKey);
 ```
 
 ``` cs
@@ -731,7 +731,7 @@ var privateKey = new Jwk(
 string json = Jose.JWT.Decode(token, privateKey);
 
 // starting v5 can also
-string json Jose.JWT.Decrypt(token, secretKey);
+string json = Jose.JWT.Decrypt(token, secretKey);
 ```
 
 **NET472 or NETCORE (all OS)**:
@@ -747,7 +747,7 @@ ECDsa privateKey = new X509Certificate2("ecc256.p12", "<password>").GetECDsaPriv
 string token = Jose.JWT.Decode(token, privateKey);
 
 // starting v5 can also
-string json Jose.JWT.Decrypt(token, secretKey);
+string json = Jose.JWT.Decrypt(token, secretKey);
 ```
 
 ``` cs
@@ -762,7 +762,7 @@ var privateKey=EcdhKey.New(x, y, d, CngKeyUsages.KeyAgreement);
 string json = Jose.JWT.Decode(token, privateKey);
 
 // starting v5 can also
-string json Jose.JWT.Decrypt(token, secretKey);
+string json = Jose.JWT.Decrypt(token, secretKey);
 ```
 
 
@@ -774,7 +774,7 @@ string token = "eyJhbGciOiJQQkVTMi1IUzI1NitBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2
 string json = Jose.JWT.Decode(token, "top secret");
 
 // starting v5 can also
-string json Jose.JWT.Decrypt(token, secretKey);
+string json = Jose.JWT.Decrypt(token, secretKey);
 ```
 
 ### JWE JSON Serialization support (RFC 7516)
@@ -1267,6 +1267,13 @@ var payload = JWE.Decrypt(token, key).Plaintext;
 ### Strict validation
 It is possible to use strict validation before decoding a token. This means that you will specify which algorithm and possibly encryption type you are expecting to receive in the header. If the received header doesn't match with the types that you have specified an exception will be thrown and the parsing will be stopped.
 
+Additionally starting v5 `jose-jwt` offering dedicated methods:
+- `JWT.Verify()`, `JWT.VerifyBytes()` - same as `JWT.Decode()` but works only with signed tokens, use when you want to explicitly restrict only to signing algs.
+- `JWT.Decrypt()`, `JWT.DecryptBytes()` - same as `JWT.Decode()` but works only with encrypted tokens, use when you want to explicitly restrict only to encryption algs.
+
+Both can be additionally combined with strict validation.
+
+
 Example of how to strictly validate an encrypted token:
 ```C#
 string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..Fmz3PLVfv-ySl4IJ.LMZpXMDoBIll5yuEs81Bws2-iUUaBSpucJPL-GtDKXkPhFpJmES2T136Vd8xzvp-3JW-fvpRZtlhluqGHjywPctol71Zuz9uFQjuejIU4axA_XiAy-BadbRUm1-25FRT30WtrrxKltSkulmIS5N-Nsi_zmCz5xicB1ZnzneRXGaXY4B444_IHxGBIS_wdurPAN0OEGw4xIi2DAD1Ikc99a90L7rUZfbHNg_iTBr-OshZqDbR6C5KhmMgk5KqDJEN8Ik-Yw.Jbk8ZmO901fqECYVPKOAzg";
@@ -1291,7 +1298,7 @@ var publicKey = EccKey.New(x, y);
 string json = Jose.JWT.Decode(token, publicKey, JwsAlgorithm.ES256);
 
 // starting v5 also applies to dedicated methods
-string json = Jose.JWT.Verfiy(token, secretKey, JwsAlgorithm.ES256);
+string json = Jose.JWT.Verify(token, secretKey, JwsAlgorithm.ES256);
 ```
 
 ### Working with binary payload
