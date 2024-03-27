@@ -458,6 +458,43 @@ namespace Jose
             return GetSettings(settings).JsonMapper.Parse<T>(Decode(token, key, settings));
         }
 
+        public static string Verify(string token, object key, JwsAlgorithm? alg = null, JwtSettings settings = null, string payload = null)
+        {
+            var detached = payload != null ? Encoding.UTF8.GetBytes(payload) : null;
+
+            return Encoding.UTF8.GetString(VerifyBytes(token, key, alg, settings, detached));
+        }
+
+        public static byte[] VerifyBytes(string token, object key, JwsAlgorithm? alg = null, JwtSettings settings = null, byte[] payload = null)
+        {
+            var parts = Compact.Iterate(token);
+
+            if (parts.Count != 3)
+            {
+                throw new JoseException("Unexpected number of parts in signed token: " + parts.Count);
+            }
+
+            return DecodeBytes(token, key, alg, null, null, settings, payload);
+        }
+
+        public static string Decrypt(string token, object key, JweAlgorithm? alg = null, JweEncryption? enc = null, JwtSettings settings = null)
+        {
+            return Encoding.UTF8.GetString(DecryptBytes(token, key, alg, enc, settings));
+        }
+
+        public static byte[] DecryptBytes(string token, object key, JweAlgorithm? alg = null, JweEncryption? enc = null, JwtSettings settings = null)
+        {
+            var parts = Compact.Iterate(token);
+
+            if (parts.Count != 5)
+            {
+                throw new JoseException("Unexpected number of parts in encrypted token: " + parts.Count);
+            }
+
+            return DecodeBytes(token, key, null, alg, enc, settings);
+        }
+
+
         private static byte[] DecodeBytes(string token, object key = null, JwsAlgorithm? expectedJwsAlg = null, JweAlgorithm? expectedJweAlg = null, JweEncryption? expectedJweEnc = null, JwtSettings settings = null, byte[] payload = null)
         {
             Ensure.IsNotEmpty(token, "Incoming token expected to be in compact serialization form, not empty, whitespace or null.");
@@ -466,10 +503,20 @@ namespace Jose
 
             if (parts.Count == 5) //encrypted JWT
             {
+                if (expectedJwsAlg != null)
+                {
+                    throw new InvalidAlgorithmException("Encrypted tokens can't assert signing algorithm type.");
+                }
+
                 return JWE.Decrypt(token, key, expectedJweAlg, expectedJweEnc, settings).PlaintextBytes;
             }
             else
             {
+                if (expectedJweAlg != null || expectedJweEnc !=null)
+                {
+                    throw new InvalidAlgorithmException("Signed tokens can't assert encryption type.");
+                }
+
                 //signed or plain JWT
                 var jwtSettings = GetSettings(settings);
 
@@ -521,58 +568,6 @@ namespace Jose
             var payloadBytes = DecodeBytes(token, key, jwsAlg, jweAlg, jweEnc, settings, detached);
 
             return Encoding.UTF8.GetString(payloadBytes);
-        }
-
-        private static byte[] DecryptBytes(Compact.Iterator parts, object key, JweAlgorithm? jweAlg, JweEncryption? jweEnc, JwtSettings settings = null)
-        {
-            byte[] header = parts.Next();
-            byte[] encryptedCek = parts.Next();
-            byte[] iv = parts.Next();
-            byte[] cipherText = parts.Next();
-            byte[] authTag = parts.Next();
-
-            JwtSettings jwtSettings = GetSettings(settings);
-            IDictionary<string, object> jwtHeader = jwtSettings.JsonMapper.Parse<IDictionary<string, object>>(Encoding.UTF8.GetString(header));
-
-            JweAlgorithm headerAlg = jwtSettings.JwaAlgorithmFromHeader((string)jwtHeader["alg"]);
-            JweEncryption headerEnc = jwtSettings.JweAlgorithmFromHeader((string)jwtHeader["enc"]);
-
-            IKeyManagement keys = jwtSettings.Jwa(headerAlg);
-            IJweAlgorithm enc = jwtSettings.Jwe(headerEnc);
-
-            if (keys == null)
-            {
-                throw new JoseException(string.Format("Unsupported JWA algorithm requested: {0}", headerAlg));
-            }
-
-            if (enc == null)
-            {
-                throw new JoseException(string.Format("Unsupported JWE algorithm requested: {0}", headerEnc));
-            }
-
-            if (jweAlg != null && (JweAlgorithm)jweAlg != headerAlg)
-            {
-                throw new InvalidAlgorithmException("The algorithm type passed to the Decrypt method did not match the algorithm type in the header.");
-            }
-
-            if (jweEnc != null && (JweEncryption)jweEnc != headerEnc)
-            {
-                throw new InvalidAlgorithmException("The encryption type passed to the Decrypt method did not match the encryption type in the header.");
-            }
-
-            byte[] cek = keys.Unwrap(encryptedCek, key, enc.KeySize, jwtHeader);
-            byte[] aad = Encoding.UTF8.GetBytes(Compact.Serialize(header));
-
-            byte[] plainText = enc.Decrypt(aad, cek, iv, cipherText, authTag);
-
-            if (jwtHeader.ContainsKey("zip"))
-            {
-                var compression = jwtSettings.Compression((string)jwtHeader["zip"]);
-
-                plainText = compression.Decompress(plainText);
-            }
-
-            return plainText;
         }
 
         private static JwtSettings GetSettings(JwtSettings settings)

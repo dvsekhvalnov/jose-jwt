@@ -2528,7 +2528,6 @@ namespace UnitTests
             Assert.That(tokenHeaders["crit"], Is.EqualTo(new[] { "b64", "exp" }));
         }
 
-
         [Test]
         public void DecodeUnencodedDetached()
         {
@@ -2557,7 +2556,6 @@ namespace UnitTests
         }
 
 
-
         [Test]
         public void DecodeSignedTokenValidationSuccess()
         {
@@ -2572,7 +2570,7 @@ namespace UnitTests
         }
 
         [Test]
-        public void DecodeSignedTokenValidationFailure()
+        public void DecodeSignedTokenValidationWrongAlg()
         {
             // given
             string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
@@ -2583,6 +2581,28 @@ namespace UnitTests
             try
             {
                 Jose.JWT.Decode(token, PubKey(), JwsAlgorithm.RS512);
+            }
+            catch (InvalidAlgorithmException)
+            {
+                exceptionThrown = true;
+            }
+
+            // then
+            Assert.That(exceptionThrown, Is.EqualTo(true));
+        }
+
+        [Test]
+        public void DecodeSignedTokenValidationWrongEnc()
+        {
+            // given
+            string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
+
+            // when
+            bool exceptionThrown = false;
+
+            try
+            {
+                Jose.JWT.Decode(token, PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
             }
             catch (InvalidAlgorithmException)
             {
@@ -2608,7 +2628,7 @@ namespace UnitTests
         }
 
         [Test]
-        public void DecodeEncryptedTokenValidationFailure()
+        public void DecodeEncryptedTokenValidationWrongEnc()
         {
             // given
             string json = @"{""hello"": ""world""}";
@@ -2639,6 +2659,29 @@ namespace UnitTests
             // then
             Assert.That(incorrectAlgorithm, Is.EqualTo(true));
             Assert.That(incorrectEncryption, Is.EqualTo(true));
+        }
+
+        [Test]
+        public void DecodeEncryptedTokenValidationWrongAlg()
+        {
+            // given
+            string json = @"{""hello"": ""world""}";
+            string token = Jose.JWT.Encode(json, RsaKey.New(PubKey().ExportParameters(false)), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+
+            // when
+            bool exceptionThrown = false;
+
+            try
+            {
+                Jose.JWT.Decode(token, PrivKey(), JwsAlgorithm.RS256);
+            }
+            catch (InvalidAlgorithmException)
+            {
+                exceptionThrown = true;
+            }
+
+            // then
+            Assert.That(exceptionThrown, Is.EqualTo(true));
         }
 
         [Test]
@@ -2699,7 +2742,7 @@ namespace UnitTests
 
             //when
             Jose.JWT.Decode(token, PrivKey());
-        }             
+        }
 
         [Test]
         [ExpectedException(typeof(InvalidAlgorithmException))]
@@ -2710,6 +2753,170 @@ namespace UnitTests
 
             //when
             Jose.JWT.Decode(token, PrivKey());
+        }
+
+        [Test]
+        public void Verify()
+        {
+            //given
+            const string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
+
+            //then
+            string json = Jose.JWT.Verify(token, PubKey());
+
+            Assert.That(json, Is.EqualTo(@"{""hello"": ""world""}"));
+        }
+
+        [Test]
+        public void VerifyBytes()
+        {
+            //given
+            const string token = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w.3_-H4HJiNi8--Ss-VAMM1Dg0JtTGEXNvMo1LAHEnQ7bZpQiblqAu5tt-G9p8KFnSlSYOG6l64pIqmqu5p5RvuQ";
+
+            //when
+            var payload = Jose.JWT.DecodeBytes(token, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS512);
+
+            //then
+            Assert.That(payload, Is.EqualTo(BinaryPayload));
+        }
+
+        [Test]
+        [ExpectedException(typeof(InvalidAlgorithmException))]
+        public void VerifyUnknownAlg()
+        {
+            //given
+            const string token = "eyJhbGciOiJfUlMyNTYiLCJ0eXAiOiJKV1QifQ.eyJoZWxsbyI6ICJ3b3JsZCJ9.HhLwe11JpybXCXDqneSyG8V2pG38pZ2RzgPF3kT7CpHmYL-jmDfwn9ChNig7gmpWkhc4SZO7KNl2-dGOo8wfC7ITg9rZimjac6dMF5m7668Q8OyePiaICzGUCUPOVZ30ty6QSyH3aDVQgbh57jUTlbdXyE1-CmdhF2_b_2YA940Qm8YLeIXYP5pO-5OLKeWlzF2tXX9kEytWsa1WxrlUs4pHInMO1iA9GoE_NLa99p200L2kBwknsRlU3qzTzCs_ez_XvFhd0rq2AE9GhATNi4LZbNnkx0F3rD5ivskeFnO23AlTzjnV0wguRoNtweGyC-5tFHsVan3_1KFf7USZKg";
+
+            //then            
+            Jose.JWT.Verify(token, PubKey());
+        }
+
+        [Test]
+        [ExpectedException(typeof(JoseException))]
+        public void VerifyEncryptedToken()
+        {
+            //given
+            const string token = "eyJhbGciOiJSU0EtT0FFUC0yNTYiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0.bje66yTjMUpyGzbt3QvPNOmCmUPowgEmoBHXw-pByhST2VBSs0_67JKDymKW0VpmQC5Qb7ZLC6nNG8YW5pxTZDOeTQLodhAvzoNAsrx4M2R_N58ZVqBPLKTq7FKi1NNd8oJ80dwWbOJ13dkLH68SlhOK5bhqKFgtbzalnglL2kq8Fki1GkN4YyFnS8-chC-mlrS5bJrPSHUF7oAsG_flL_e9-KzYqYTQgGCB3GYSo_pgalsp2rUO3Oz2Pfe9IEJNlX7R9wOT1nTT0UUg-lSzQ2oOaXNvNyaPgEa76mJ1nk7ZQq7ZNix1m8snjk0Vizd8EOFCSRyOGcp4mHMn7-s00Q.tMFMCdFNQXbhEnwE6mP_XQ.E_O_ZBtJ8P0FvhKOV_W98oxIySDgdd0up0c8FAjo-3OVZ_6XMEQYFDKVG_Zc3zkbaz1Z2hmc7D7M28RbhRdya3yJN6Hcv1KuXeZ9ociI7o739Ni_bPvv8xCmGxlASS5AF7N4JR7XjrWL-SYKGNL1p0XNTlPo3B3qYqgAY6jFNvlcjWupim-pQbWKNqPbO2KmSCtUzyKE5oHjsomH0hnQs0_DXv3cgQ_ZFLFZBc1tC4AjQ8QZex5kWg5BmlJDM5F_jD7QRhb7B1u4Mi563-AKVA.0lraw3IXMM6wPqUZVYA8pg";
+
+            //then
+            Jose.JWT.Verify(token, PubKey());
+        }
+
+        [Test]
+        [ExpectedException(typeof(InvalidAlgorithmException))]
+        public void VerifyTokenWrongAlg()
+        {
+            //given
+            const string token = "eyJhbGciOiJSUzM4NCIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.cOPca7YEOxnXVdIi7cJqfgRMmDFPCrZG1M7WCJ23U57rAWvCTaQgEFdLjs7aeRAPY5Su_MVWV7YixcawKKYOGVG9eMmjdGiKHVoRcfjwVywGIb-nuD1IBzGesrQe7mFQrcWKtYD9FurjCY1WuI2FzGPp5YhW5Zf4TwmBvOKz6j2D1vOFfGsogzAyH4lqaMpkHpUAXddQxzu8rmFhZ54Rg4T-jMGVlsdrlAAlGA-fdRZ-V3F2PJjHQYUcyS6n1ULcy6ljEOgT5fY-_8DDLLpI8jAIdIhcHUAynuwvvnDr9bJ4xIy4olFRqcUQIHbcb5-WDeWul_cSGzTJdxDZsnDuvg";
+
+            //then
+            Jose.JWT.Decode(token, PubKey(), JwsAlgorithm.RS256);
+        }
+
+        [Test]
+        public void VerifyTokenCorrectAlg()
+        {
+            //give
+            const string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
+
+            //then
+            string json = Jose.JWT.Decode(token, PubKey(), JwsAlgorithm.RS256);
+
+            Assert.That(json, Is.EqualTo(@"{""hello"": ""world""}"));
+        }
+
+        [Test]
+        public void Decrypt()
+        {
+            //given
+            const string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..yVi-LdQQngN0C5WS.1McwSmhZzAtmmLp9y-OdnJwaJFo1nj_4ashmzl2LhubGf0Jl1OTEVJzsHZb7bkup7cGTkuxh6Vfv10ljHsjWf_URXoxP3stQqQeViVcuPV0y2Q_WHYzTNGZpmHGe-hM6gjDhyZyvu3yeXGFSvfPQmp9pWVOgDjI4RC0MQ83rzzn-rRdnZkznWjbmOPxwPrR72Qng0BISsEwbkPn4oO8-vlHkVmPpuDTaYzCT2ZR5K9JnIU8d8QdxEAGb7-s8GEJ1yqtd_w._umbK59DAKA3O89h15VoKQ";
+
+            //when
+            string json = Jose.JWT.Decode(token, aes128Key);
+
+            //then
+            Assert.That(@"{""exp"":1392548520,""sub"":""alice"",""nbf"":1392547920,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0e659a67-1cd3-438b-8888-217e72951ec9"",""iat"":1392547920}", Is.EqualTo(json));
+        }
+
+        [Test]
+        public void DecryptBytes()
+        {
+            //given
+            string token = Jose.JWT.EncodeBytes(BinaryPayload, PubKey(), JweAlgorithm.RSA1_5, JweEncryption.A256GCM);
+
+            //when
+            var payload = Jose.JWT.DecryptBytes(token, PrivKey());
+
+            //then
+            Assert.That(payload, Is.EqualTo(BinaryPayload));
+        }
+
+        [Test]
+        public void DecryptCorrectAlgEnc()
+        {
+            //given
+            const string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..yVi-LdQQngN0C5WS.1McwSmhZzAtmmLp9y-OdnJwaJFo1nj_4ashmzl2LhubGf0Jl1OTEVJzsHZb7bkup7cGTkuxh6Vfv10ljHsjWf_URXoxP3stQqQeViVcuPV0y2Q_WHYzTNGZpmHGe-hM6gjDhyZyvu3yeXGFSvfPQmp9pWVOgDjI4RC0MQ83rzzn-rRdnZkznWjbmOPxwPrR72Qng0BISsEwbkPn4oO8-vlHkVmPpuDTaYzCT2ZR5K9JnIU8d8QdxEAGb7-s8GEJ1yqtd_w._umbK59DAKA3O89h15VoKQ";
+
+            //when
+            string json = Jose.JWT.Decode(token, aes128Key, JweAlgorithm.DIR, JweEncryption.A128GCM);
+
+            //then
+            Assert.That(@"{""exp"":1392548520,""sub"":""alice"",""nbf"":1392547920,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0e659a67-1cd3-438b-8888-217e72951ec9"",""iat"":1392547920}", Is.EqualTo(json));
+        }
+
+        [Test]
+        [ExpectedException(typeof(InvalidAlgorithmException))]
+        public void DecryptUnknownAlg()
+        {
+            //given
+            const string token = "eyJhbGciOiJfZGlyIiwiZW5jIjoiQTE5MkdDTSJ9..iGv0rssUTgZiEi02.dcKA-zsKqqIUniF5n18B2XgKRKRs1u0_NX9jwSjO49d33Uma0Me0fOj1himzqFWszxABXbLUrpyhEI92oj8iUsf4E8L07cv5iq9L15rDE4qnTqnBUAFSfRt9Fb2HWAfh2yJeJVz5R3TCO0CiB7rLYR7Gm7bAGit-yjz4GpUbtOlYz6bQhgrhixJNkl_s_HVxV2YRFn5xkSaXADdLtpaWUFf2yffJEul9jS7GdNXYVSJigKgmVOtIMdwekXydEOm-TFxlIw.St4I5-yaHMBsKlcZxGEtPA";
+
+            //then            
+            Jose.JWT.Decrypt(token, aes192Key);
+        }
+
+        [Test]
+        [ExpectedException(typeof(InvalidAlgorithmException))]
+        public void DecryptUnknownEnc()
+        {
+            //given
+            const string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJfQTE5MkdDTSJ9..EvSrkEx-G18c6jVW.M7MmvjgGssYVn-14I34oMBEE1pmpjSsXKnS6wd7NgCbRkSA1GKmirgr37YGnnpzSuKo-EOSoeUXQ6OMTxtpl89SeMSWv3uub1ZRc85vnRdC2BUtCzAE31YDdLdkNn5bConApCLkNFU-HP6yOx0xeGDsz7NpN8jNgeXNPoD9S22m0MbPdYSLQUPtJ5uhEkwM1EjQFkjmaXeGxkQ62GPlJdfsF2JEWGZfQj6unyouU8nHXHXm6Dw3ElhUhqIsmODEfedJ9xA.1hcrtcagWx4VTIpDkbXKcA";
+
+            //then            
+            Jose.JWT.Decrypt(token, aes192Key);
+        }
+
+        [Test]
+        [ExpectedException(typeof(InvalidAlgorithmException))]
+        public void DecryptWrongAlg()
+        {
+            //given
+            const string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..yVi-LdQQngN0C5WS.1McwSmhZzAtmmLp9y-OdnJwaJFo1nj_4ashmzl2LhubGf0Jl1OTEVJzsHZb7bkup7cGTkuxh6Vfv10ljHsjWf_URXoxP3stQqQeViVcuPV0y2Q_WHYzTNGZpmHGe-hM6gjDhyZyvu3yeXGFSvfPQmp9pWVOgDjI4RC0MQ83rzzn-rRdnZkznWjbmOPxwPrR72Qng0BISsEwbkPn4oO8-vlHkVmPpuDTaYzCT2ZR5K9JnIU8d8QdxEAGb7-s8GEJ1yqtd_w._umbK59DAKA3O89h15VoKQ";
+
+            //then            
+            Jose.JWT.Decrypt(token, aes192Key, JweAlgorithm.RSA_OAEP);
+        }
+
+        [Test]
+        [ExpectedException(typeof(InvalidAlgorithmException))]
+        public void DecryptWrongEnc()
+        {
+            //given
+            const string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..yVi-LdQQngN0C5WS.1McwSmhZzAtmmLp9y-OdnJwaJFo1nj_4ashmzl2LhubGf0Jl1OTEVJzsHZb7bkup7cGTkuxh6Vfv10ljHsjWf_URXoxP3stQqQeViVcuPV0y2Q_WHYzTNGZpmHGe-hM6gjDhyZyvu3yeXGFSvfPQmp9pWVOgDjI4RC0MQ83rzzn-rRdnZkznWjbmOPxwPrR72Qng0BISsEwbkPn4oO8-vlHkVmPpuDTaYzCT2ZR5K9JnIU8d8QdxEAGb7-s8GEJ1yqtd_w._umbK59DAKA3O89h15VoKQ";
+
+            //then            
+            Jose.JWT.Decrypt(token, aes128Key, JweAlgorithm.DIR, JweEncryption.A192GCM);
+        }
+
+        [Test]
+        [ExpectedException(typeof(JoseException))]
+        public void DecryptSignedToken()
+        {
+            //given
+            const string token = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w.3_-H4HJiNi8--Ss-VAMM1Dg0JtTGEXNvMo1LAHEnQ7bZpQiblqAu5tt-G9p8KFnSlSYOG6l64pIqmqu5p5RvuQ";
+
+            //then
+            Jose.JWT.Decrypt(token, aes128Key);
         }
 
         [Test]
