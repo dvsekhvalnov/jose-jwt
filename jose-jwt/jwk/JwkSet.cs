@@ -58,7 +58,7 @@ namespace Jose
                 foreach (Jwk key in keys)
                 {
                     keyList.Add(key.ToDictionary());
-                }                
+                }
             }
 
             result["keys"] = keyList;
@@ -68,13 +68,13 @@ namespace Jose
 
         public string ToJson(IJsonMapper mapper = null)
         {
-            return mapper.Serialize(ToDictionary());
+            return (mapper ?? JWT.DefaultSettings.JsonMapper).Serialize(ToDictionary());
         }
 
         public static JwkSet FromJson(string json, IJsonMapper mapper = null)
         {
             return JwkSet.FromDictionary(
-                mapper.Parse<IDictionary<string, object>>(json)
+                (mapper ?? JWT.DefaultSettings.JsonMapper).Parse<IDictionary<string, object>>(json)
             );
         }
 
