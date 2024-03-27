@@ -558,7 +558,7 @@ string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA1_5, JweEncry
 
 ### Verifying and Decoding Tokens
 #### What methods to use?
-Historically `jose-jwt` provided single family of `Decode()` methods that handles both signed and encrypted tokens with uniform interface, but as a number of confusion attacks on JWT libraries increased over last years, starting v5 library additionally provides dedicated methods `Verify()` and `Encrypt()` that are limited in scope to verifying signatures and decrypting tokens accordingly. See [TODO] for more information.
+Historically `jose-jwt` provided single family of `Decode()` methods that handles both signed and encrypted tokens with uniform interface, but as a number of confusion attacks on JWT libraries increased over last years, starting v5 library additionally provides dedicated methods `Verify()` and `Encrypt()` that are limited in scope to verifying signatures and decrypting tokens accordingly. See [Strict Validation](#strict-validation) for more information.
 
 Decoding json web tokens is fully symmetric to creating signed or encrypted tokens:
 
