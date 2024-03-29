@@ -61,16 +61,18 @@ namespace Jose
             if (token == null)
                 throw new ArgumentNullException(nameof(token));
 
-            return new Iterator(token.Split('.'));
+            return new Iterator(token, token.Split('.'));
         }
 
         public class Iterator
         {
+            private string token;
             private string[] parts;
             private int current;
 
-            public Iterator(string[] parts)
+            public Iterator(string token, string[] parts)
             {
+                this.token = token;
                 this.parts = parts;
                 this.current = 0;
             }
@@ -90,6 +92,11 @@ namespace Jose
                 }
 
                 return null;
+            }
+
+            public string Token
+            {
+                get { return token; }
             }
         }
     }
