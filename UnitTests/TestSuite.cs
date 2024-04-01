@@ -4725,6 +4725,19 @@ namespace UnitTests
             Assert.Equal("testperson@example.com", test.sub);
         }
 
+        [Fact]
+        public void DecodeMalformedToken()
+        {
+            // 1 parts
+            Assert.Throws<JoseException>(() => Jose.JWT.Decode("eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0", testSuiteUtils.PubKey()));
+
+            // 2 parts
+            Assert.Throws<JoseException>(() => Jose.JWT.Decode("eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9", testSuiteUtils.PubKey()));
+
+            // 4 parts
+            Assert.Throws<JoseException>(() => Jose.JWT.Decode("eyJhbGciOiJBMTI4R0NNS1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiaXYiOiJ1SDVxVThlN2JVZXhGYWh3IiwidGFnIjoiamdxc2czdHoyUGo0QmhEWU1xTnBrdyJ9.peAzKiVO3_w2tAlSzRZdqqQpnUSpgPDHi_xgTd6VzP4.o8bhvYO_UTkrsxQmm__nIg.MSmgetpjXHWMs0TyuGgmWd-msfbQ7oVWC4WuCJcfAsbhLU9kLDLrd0naL5f_UkWBaM04bfcc31K4FRN20IiUxcHzLnMR-lY-HkvRFWYdur-kLWw1UXjIlPOb0nqCuyd2FRpxMdSfFnYr5Us9T45cF7DdK8p4iA7KqPToMHWBsvAcET_ycMIoERqJrBuiJzh-j7UtDzH6KtUfgD4tzZAm3iM6HWT2lq25Pqsu4qf19LYXxZaMIiFwFKboeexkJ5E0hc7P-wIeknzFJaZhkb5P4g", aes128Key));
+        }
+
         private static ECDiffieHellman Ecdh256Private(CngKeyUsages usage = CngKeyUsages.Signing)
         {
             byte[] x = { 4, 114, 29, 223, 58, 3, 191, 170, 67, 128, 229, 33, 242, 178, 157, 150, 133, 25, 209, 139, 166, 69, 55, 26, 84, 48, 169, 165, 67, 232, 98, 9 };

@@ -3031,6 +3031,30 @@ namespace UnitTests
             Assert.That(test.sub, Is.EqualTo("testperson@example.com"));
         }
 
+        [Test]
+        [ExpectedException(typeof(JoseException))]
+
+        public void DecodeMalformedTokenOnePart()
+        {            
+            Jose.JWT.Decode("eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0", PubKey());
+        }
+
+        [Test]
+        [ExpectedException(typeof(JoseException))]
+
+        public void DecodeMalformedTokenTwoPart()
+        {            
+            Jose.JWT.Decode("eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9", PubKey());
+        }
+
+        [Test]
+        [ExpectedException(typeof(JoseException))]
+
+        public void DecodeMalformedTokenFourPart()
+        {            
+            Jose.JWT.Decode("eyJhbGciOiJBMTI4R0NNS1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiaXYiOiJ1SDVxVThlN2JVZXhGYWh3IiwidGFnIjoiamdxc2czdHoyUGo0QmhEWU1xTnBrdyJ9.peAzKiVO3_w2tAlSzRZdqqQpnUSpgPDHi_xgTd6VzP4.o8bhvYO_UTkrsxQmm__nIg.MSmgetpjXHWMs0TyuGgmWd-msfbQ7oVWC4WuCJcfAsbhLU9kLDLrd0naL5f_UkWBaM04bfcc31K4FRN20IiUxcHzLnMR-lY-HkvRFWYdur-kLWw1UXjIlPOb0nqCuyd2FRpxMdSfFnYr5Us9T45cF7DdK8p4iA7KqPToMHWBsvAcET_ycMIoERqJrBuiJzh-j7UtDzH6KtUfgD4tzZAm3iM6HWT2lq25Pqsu4qf19LYXxZaMIiFwFKboeexkJ5E0hc7P-wIeknzFJaZhkb5P4g", PubKey());
+        }
+
         #region test utils
 
         private RSACryptoServiceProvider PrivKey()
