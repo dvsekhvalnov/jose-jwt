@@ -34,6 +34,7 @@ Library is fully FIPS compliant since v2.1
 ## Important upgrade notes
 > :warning: **v4 -> v5**:
 > - JWK EC keys now bridges to `ECDsa` by default instead of `CngKey` on .net 4.7.2+ and netstandard2.1+
+> - `Jwk.ToJson()` / `Jwk.FromJson()` now defaults to `JWT.DefaultSettings.JsonMapper` if not provided explicitly.
 > - Deflate decompression is limited to 250Kb by default. Check out [customization section](#customizing-compression) if need more.
 
 
