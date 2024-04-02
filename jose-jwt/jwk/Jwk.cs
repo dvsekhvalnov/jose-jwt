@@ -552,13 +552,13 @@ namespace Jose
 
         public string ToJson(IJsonMapper mapper = null)
         {
-            return mapper.Serialize(ToDictionary());
+            return (mapper ?? JWT.DefaultSettings.JsonMapper).Serialize(ToDictionary());
         }
 
         public static Jwk FromJson(string json, IJsonMapper mapper = null)
         {
             return Jwk.FromDictionary(
-                mapper.Parse<IDictionary<string, object>>(json)
+                (mapper ?? JWT.DefaultSettings.JsonMapper).Parse<IDictionary<string, object>>(json)
             );
         }
 

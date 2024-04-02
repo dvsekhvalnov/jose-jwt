@@ -136,7 +136,7 @@ namespace UnitTests
             });
 
             //when
-            var test = keySet.ToJson(JWT.DefaultSettings.JsonMapper);
+            var test = keySet.ToJson();
 
             //then
             Console.Out.WriteLine(test);
@@ -162,7 +162,7 @@ namespace UnitTests
             }";
 
             //when
-            JwkSet test = JwkSet.FromJson(json, JWT.DefaultSettings.JsonMapper);
+            JwkSet test = JwkSet.FromJson(json);
 
             //then
             Assert.Equal(2, test.Keys.Count);
