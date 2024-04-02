@@ -5,7 +5,7 @@
 
 Ultimate Javascript Object Signing and Encryption (JOSE), JSON Web Token (JWT), JSON Web Encryption (JWE) and JSON Web Key (JWK) Implementation for .NET. Minimallistic. Zero-dependency. Full suite of signature and encryption algorithms. 
 Supports generating, decoding, encryption and compression of JSON Web Tokens. Full-blown support for JSON Web Keys (RFC 7517) and two way bridging with .NET core cryptography. JSON parsing agnostic. Supports two-phase validation. FIPS compliant. Unencoded payload and detached content support (RFC 7797). 
-JSON Web Encryption (JWE, RFC 7516) support.
+JSON Web Encryption (JWE, RFC 7516) support. Full alg suite support on Windows, Linux, MacOS and FreeBSD.
 
 CLR (.net framework 4.0+) supported algorithms 
 
@@ -72,17 +72,17 @@ JSON Web Key (RFC 7517):
   - RSA, EC, oct keys
   - X509 Chains, SHA1 &amp; SHA2 thumbprints
 </Description>
-    <Copyright>Copyright dvsekhvalnov 2014-2022</Copyright>
+    <Copyright>Copyright dvsekhvalnov 2014-2024</Copyright>
     <AssemblyTitle>Jose JWT</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <VersionPrefix>4.1.0</VersionPrefix>
+    <VersionPrefix>5.0.0</VersionPrefix>
     <Authors>Dmitry Vsekhvalnov</Authors>
     <TargetFrameworks>net40;net461;net472;netstandard1.4;netstandard2.1</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <AssemblyName>jose-jwt</AssemblyName>
     <PackageId>jose-jwt</PackageId>
     <PackageTags>jose;jwt;json;jwa;jwe;jws;jwk;aes;cbc;gcm;rsa;hmac;sha;rsassa;pss;rsaes;oaep;pkcs1-v1_5;es;elliptic;curve;diffe;hellman;agreement;ecdsa;key wrap;kw;ecdh;pbes;pbes2;pbkdf;pbkdf2;password based encryption;javascript object signing;two phase validation;netcore;clr;coreclr;portable;fips;compliant;open;banking;detached content;unencoded payload;json web key;</PackageTags>
-    <PackageReleaseNotes>Extra security controls</PackageReleaseNotes>
+    <PackageReleaseNotes>Major upgrade introducing cross platform ECDH compatibility for P-384 and P-521 NIST Curves on Windows, Linux, Mac OS and FreeBSD. Bugfixes and more security controls to address new threats.</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/dvsekhvalnov/jose-jwt</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.github.com/dvsekhvalnov/jose-jwt/master/LICENSE</PackageLicenseUrl>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
