@@ -1251,7 +1251,7 @@ namespace UnitTests
                            );
 
             //when
-            var test = key.ToJson(JWT.DefaultSettings.JsonMapper);
+            var test = key.ToJson();
 
             //then
             Console.Out.WriteLine(test);
@@ -1273,7 +1273,7 @@ namespace UnitTests
             }";
 
             //when
-            var test = Jwk.FromJson(json, JWT.DefaultSettings.JsonMapper);
+            var test = Jwk.FromJson(json);
 
             //then
             Assert.Equal("Ex-p1KJFz8hQE1S76SzkhHcaObCKoDPrtAPJdWuTcTc", test.KeyId);
