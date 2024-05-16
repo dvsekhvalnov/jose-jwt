@@ -16,26 +16,21 @@ jobs:
       fail-fast: false # we want to see list of failing tests for each combination
       matrix:
         os: [windows-latest, ubuntu-latest, macos-latest]
-        framework: ['netcoreapp3.1', 'netcoreapp2.1', 'net5.0', 'net8.0']
+        framework: ['netcoreapp3.1', 'net5.0', 'net8.0']
         exclude:
-          - os: macos-latest
-            framework: 'netcoreapp2.1'
-
           - os: macos-latest
             framework: 'netcoreapp3.1'
 
           - os: macos-latest
             framework: 'net5.0'
 
+          - os: macos-latest
+            framework: 'net8.0'
+
     steps:
 
     - name: Check out code onto host
       uses: actions/checkout@v1
-
-    - name: Setup .Net 2.1
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '2.1.x' # SDK Version to use.
 
     - name: Setup .Net 3.1
       uses: actions/setup-dotnet@v1
