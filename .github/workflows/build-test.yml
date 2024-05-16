@@ -32,20 +32,13 @@ jobs:
     - name: Check out code onto host
       uses: actions/checkout@v1
 
-    - name: Setup .Net 3.1
-      uses: actions/setup-dotnet@v1
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: '3.1.x' # SDK Version to use.
-
-    - name: Setup .Net 5.0
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '5.0.x' # SDK Version to use.
-
-    - name: Setup .Net 8.0
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: '8.0.x' # SDK Version to use.
+        dotnet-version: | 
+          3.1.x
+          5.0.x
+          8.0.x
 
     - name: Dotnet info
       run: |
