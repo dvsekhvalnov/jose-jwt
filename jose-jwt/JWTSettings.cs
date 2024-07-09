@@ -13,7 +13,7 @@ namespace Jose
     {
         public JwtSettings()
         {
-#if NET472 || NETSTANDARD2_1 
+#if NET472 || NETSTANDARD2_1 || NET
 	    // By giving the Unix ECDHKeyManagement implementation to windows, we enable windows version of it to work with not only CngKey but also ECDiffieHellman.
             // Initially this was implemented separately, but unit tests were failing on windows due to the lack of ECDiffieHellman support. 
             // Since we don't know what the keys will be provided until runtime, and the registration happens before runtime, we need to make sure 
@@ -58,7 +58,7 @@ namespace Jose
             { JwsAlgorithm.ES256, new EcdsaUsingSha(256) },
             { JwsAlgorithm.ES384, new EcdsaUsingSha(384) },
             { JwsAlgorithm.ES512, new EcdsaUsingSha(521) }
-#elif NETSTANDARD || NET461 || NET472
+#elif NETSTANDARD || NET461 || NET472 || NET
             { JwsAlgorithm.ES256, new Jose.netstandard1_4.EcdsaUsingSha(256) },
             { JwsAlgorithm.ES384, new Jose.netstandard1_4.EcdsaUsingSha(384) },
             { JwsAlgorithm.ES512, new Jose.netstandard1_4.EcdsaUsingSha(521) }
@@ -169,7 +169,7 @@ namespace Jose
         private IJsonMapper jsMapper = new JSSerializerMapper();
 #elif NETSTANDARD1_4
         private IJsonMapper jsMapper = new NewtonsoftMapper();
-#elif NETSTANDARD2_1
+#elif NETSTANDARD2_1 || NET
         private IJsonMapper jsMapper = new JsonMapper();
 #endif
 

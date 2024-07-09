@@ -19,7 +19,7 @@ namespace Jose
 
         public override byte[][] WrapNewKey(int cekSizeBits, object key, IDictionary<string, object> header)
         {
-    #if NET472 || NETSTANDARD2_1
+    #if NET472 || NETSTANDARD2_1 || NET
             if (key is ECDiffieHellman || key is ECDsa || key is Jwk)
             {
                 return ecdhKeyManagementUnixWithAesKeyWrap.WrapNewKey(cekSizeBits, key, header);
@@ -32,7 +32,7 @@ namespace Jose
 
         public override byte[] WrapKey(byte[] cek, object key, IDictionary<string, object> header)
         {
-    #if NET472 || NETSTANDARD2_1
+    #if NET472 || NETSTANDARD2_1 || NET
             if (key is ECDiffieHellman || key is ECDsa || key is Jwk)
             {
                 return ecdhKeyManagementUnixWithAesKeyWrap.WrapKey(cek, key, header);
@@ -47,7 +47,7 @@ namespace Jose
 
         public override byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
         {
-    #if NET472 || NETSTANDARD2_1
+    #if NET472 || NETSTANDARD2_1 || NET
             if (key is ECDiffieHellman || key is ECDsa || key is Jwk)
             {
                 return ecdhKeyManagementUnixWithAesKeyWrap.Unwrap(encryptedCek, key, cekSizeBits, header);

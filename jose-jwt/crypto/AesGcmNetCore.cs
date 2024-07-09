@@ -1,4 +1,4 @@
-#if NETSTANDARD2_1
+#if NETSTANDARD2_1 || NET
 using System.Security.Cryptography;
 
 namespace Jose
@@ -16,7 +16,12 @@ namespace Jose
         /// /// <exception cref="CryptographicException">if encryption failed by any reason</exception>
         public static byte[][] Encrypt(byte[] key, byte[] iv, byte[] aad, byte[] plainText)
         {
+#if NET
+            using var gcm =
+                new System.Security.Cryptography.AesGcm(key, System.Security.Cryptography.AesGcm.TagByteSizes.MaxSize);
+#elif NETSTANDARD2_1
             using var gcm = new System.Security.Cryptography.AesGcm(key);
+#endif
 
             var ciphertext = new byte[plainText.Length];
             var tag = new byte[System.Security.Cryptography.AesGcm.TagByteSizes.MaxSize];
@@ -37,7 +42,12 @@ namespace Jose
         /// <exception cref="CryptographicException">if decryption failed by any reason</exception>
         public static byte[] Decrypt(byte[] key, byte[] iv, byte[] aad, byte[] cipherText, byte[] authTag)
         {
+#if NET
+            using var gcm =
+                new System.Security.Cryptography.AesGcm(key, System.Security.Cryptography.AesGcm.TagByteSizes.MaxSize);
+#elif NETSTANDARD2_1
             using var gcm = new System.Security.Cryptography.AesGcm(key);
+#endif
 
             var plaintext = new byte[cipherText.Length];
 

@@ -61,7 +61,7 @@ namespace Jose
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey, RSACryptoServiceProvider, RSA types or Jwk type with kty='rsa'.");
 
 
-#elif NETSTANDARD
+#elif NETSTANDARD || NET
             if (key is RSA rsa)
             {
                 return rsa.Encrypt(cek, RSAEncryptionPadding.OaepSHA256);
@@ -124,7 +124,7 @@ namespace Jose
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey, RSACryptoServiceProvider, RSA types or Jwk type with kty='rsa'.");
 
-#elif NETSTANDARD
+#elif NETSTANDARD || NET
             if (key is RSA rsa)
             {
                 return rsa.Decrypt(encryptedCek, RSAEncryptionPadding.OaepSHA256);
