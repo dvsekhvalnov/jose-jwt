@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.Versioning;
 using System.Security.Cryptography;
 
 namespace Jose
 {
+    [SupportedOSPlatform("windows")]
     public class EcdhKeyManagementWinWithAesKeyWrap : EcdhKeyManagementWin
     {
         private readonly AesKeyWrapManagement aesKW;

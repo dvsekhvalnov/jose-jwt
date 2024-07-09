@@ -3,9 +3,9 @@
 namespace System.Runtime.Versioning;
 
 [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Class)]
-internal class SupportedOSPlatform : Attribute
+internal sealed class SupportedOSPlatformAttribute : Attribute
 {
-    internal SupportedOSPlatform(string platformName)
+    public SupportedOSPlatformAttribute(string platformName)
     {
     }
 }

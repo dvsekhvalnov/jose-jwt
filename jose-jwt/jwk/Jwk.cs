@@ -1,6 +1,7 @@
 ﻿using Jose.keys;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -201,6 +202,7 @@ namespace Jose
 #endif
         }
 
+        [SupportedOSPlatform("windows")]
         public CngKey CngKey(CngKeyUsages usage = CngKeyUsages.Signing)
         {
             if (eccCngKey == null && X != null && Y != null)

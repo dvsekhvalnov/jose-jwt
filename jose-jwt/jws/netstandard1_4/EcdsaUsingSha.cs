@@ -1,6 +1,7 @@
 ﻿#if NETSTANDARD || NET461 || NET472 || NET
 
 using System;
+using System.Runtime.Versioning;
 using System.Security.Cryptography;
 
 namespace Jose.netstandard1_4
@@ -18,7 +19,11 @@ namespace Jose.netstandard1_4
         {
             try
             {
+#if NET
+                if (OperatingSystem.IsWindows() && key is CngKey cngKey)
+#else
                 if (key is CngKey cngKey)
+#endif
                 {
                     return Sign(cngKey, securedInput);
                 }
@@ -51,7 +56,11 @@ namespace Jose.netstandard1_4
         {
             try
             {
+#if NET
+                if (OperatingSystem.IsWindows() && key is CngKey cngKey)
+#else
                 if (key is CngKey cngKey)
+#endif
                 {
                     return Verify(cngKey, signature, securedInput);
                 }
@@ -97,6 +106,7 @@ namespace Jose.netstandard1_4
             }
         }
 
+        [SupportedOSPlatform("windows")]
         private byte[] Sign(CngKey privateKey, byte[] securedInput)
         {
             Ensure.BitSize(privateKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, privateKey.KeySize));
@@ -114,6 +124,7 @@ namespace Jose.netstandard1_4
             return privateKey.SignData(securedInput, Hash);
         }
 
+        [SupportedOSPlatform("windows")]
         private bool Verify(CngKey publicKey, byte[] signature, byte[] securedInput)
         {
             Ensure.BitSize(publicKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, publicKey.KeySize));

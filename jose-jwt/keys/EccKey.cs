@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using Jose;
 
@@ -70,6 +71,7 @@ namespace Jose.keys
         /// <param name="y">y coordinate of curve point</param>
         /// <param name="d">optional private part</param>
         /// <returns>CngKey for given (x,y) and d</returns>
+        [SupportedOSPlatform("windows")]
         public static CngKey New(byte[] x, byte[] y, byte[] d = null, CngKeyUsages usage = CngKeyUsages.Signing)
         {
             if (x.Length != y.Length)
@@ -139,6 +141,7 @@ namespace Jose.keys
             return key;
         }
 
+        [SupportedOSPlatform("windows")]
         public static EccKey Generate(CngKey receiverPubKey)
         {
             CngKey cngKey = CngKey.Create(receiverPubKey.Algorithm, null, new CngKeyCreationParameters { ExportPolicy = CngExportPolicies.AllowPlaintextExport });

@@ -1,10 +1,12 @@
 using System.Collections.Generic;
+using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Text;
 using Jose.keys;
 
 namespace Jose
 {
+    [SupportedOSPlatform("windows")]
     public class EcdhKeyManagementWin : IKeyManagement
     {
         private readonly IKeyManagement ecdhKeyManagementUnix;
