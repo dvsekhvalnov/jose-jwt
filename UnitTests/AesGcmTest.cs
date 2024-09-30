@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Text;
 using Jose;
 using Xunit;
@@ -38,6 +40,24 @@ namespace UnitTests
 
             //then
             Assert.Equal(Encoding.UTF8.GetBytes("decrypt me"), test);
+        }
+
+        [Fact]
+        public void DecryptTruncatedTag()
+        {
+            //given
+            byte[] iv = { 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 };
+            byte[] tag = { 121, 235, 93, 169, 185, 192, 202, 230, 130, 37, 35, 135, 46, 129, 168, 104 };
+            byte[] cipher = { 33, 6, 206, 1, 182, 114, 131, 218, 124, 60 };
+            byte[] aad = Encoding.UTF8.GetBytes("top secret");
+
+            tag = tag.SkipLast(1).ToArray();
+
+            Assert.Throws<ArgumentException>(() =>
+            {
+                //when
+                byte[] test = AesGcm.Decrypt(aes128Key, iv, aad, cipher, tag);
+            });
         }
     }
 }

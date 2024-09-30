@@ -1,9 +1,11 @@
 using System;
+using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using Jose;
 
 namespace Jose.keys
 {
+    [SupportedOSPlatform("windows")]
     public static class RsaKey
     {
         public static readonly byte[] BCRYPT_RSAPUBLIC_MAGIC = BitConverter.GetBytes(0x31415352);

@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD2_1
+﻿#if NETSTANDARD2_1 || NET
 using System;
 using System.Collections.Generic;
 using System.Text.Encodings.Web;

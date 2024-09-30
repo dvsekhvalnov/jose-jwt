@@ -17,7 +17,7 @@ namespace Jose.native
 
 #if NET40 || NET461 || NET472
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-#elif NETSTANDARD
+#elif NETSTANDARD || NET
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
 #endif
         public class NCryptBufferDesc : IDisposable
@@ -50,7 +50,7 @@ namespace Jose.native
 
     #if NET40 || NET461 || NET472
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Auto)]
-#elif NETSTANDARD
+#elif NETSTANDARD || NET
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
 #endif
         public class NCryptBuffer : IDisposable
@@ -83,14 +83,14 @@ namespace Jose.native
 
     #if NET40 || NET461 || NET472
         [DllImport("ncrypt.dll", CharSet = CharSet.Auto, SetLastError = true)]
-#elif NETSTANDARD
+#elif NETSTANDARD || NET
         [DllImport("ncrypt.dll", CharSet = CharSet.Unicode, SetLastError = true)]
 #endif
         public static extern uint NCryptSecretAgreement(SafeNCryptKeyHandle hPrivKey, SafeNCryptKeyHandle hPublicKey, out SafeNCryptSecretHandle phSecret, uint flags);
 
     #if NET40 || NET461 || NET472
         [DllImport("ncrypt.dll", CharSet = CharSet.Auto, SetLastError = true)]
-#elif NETSTANDARD
+#elif NETSTANDARD || NET
         [DllImport("ncrypt.dll", CharSet = CharSet.Unicode, SetLastError = true)]
 #endif
         public static extern uint NCryptDeriveKey(SafeNCryptSecretHandle hSharedSecret,

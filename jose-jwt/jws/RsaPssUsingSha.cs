@@ -86,7 +86,7 @@ namespace Jose
 
             throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either CngKey or RSA types or Jwk type with kty='RSA'");
 
-#elif NETSTANDARD
+#elif NETSTANDARD || NET
             if (key is RSA rsa)
             {
                 return rsa.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pss);
@@ -176,7 +176,7 @@ namespace Jose
 
             throw new ArgumentException("RsaUsingSha with PSS padding alg expects key to be of either CngKey or RSA types or Jwk type with kty='RSA'");
 
-#elif NETSTANDARD
+#elif NETSTANDARD || NET
             if (key is RSA rsa)
             {
                 return rsa.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pss);
@@ -193,7 +193,7 @@ namespace Jose
 #endif
         }
 
-#if NETSTANDARD || NET461 || NET472
+#if NETSTANDARD || NET461 || NET472 || NET
         private HashAlgorithmName HashAlgorithm
         {
             get

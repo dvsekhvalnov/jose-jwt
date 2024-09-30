@@ -99,6 +99,7 @@
     <Compile Include="util\Compact.cs" />
     <Compile Include="util\Dictionaries.cs" />
     <Compile Include="util\Ensure.cs" />
+    <Compile Include="util\SupportedOSPlatform.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,6 +1,7 @@
 ﻿using Jose.keys;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 
@@ -37,13 +38,13 @@ namespace Jose
         private RSA rsaKey;
         private CngKey eccCngKey;
 
-    #if NET472 || NETSTANDARD2_1
+    #if NET472 || NETSTANDARD2_1 || NET
         private ECDiffieHellman ecdhKey;
     #endif
 
         private List<X509Certificate2> x509Chain;
 
-    #if NETSTANDARD || NET472
+    #if NETSTANDARD || NET472 || NET
         private ECDsa ecdsaKey;
     #endif
 
@@ -148,7 +149,7 @@ namespace Jose
                 }
 
 
-            #if NETSTANDARD
+            #if NETSTANDARD || NET
                 rsaKey = RSA.Create();
                 rsaKey.ImportParameters(param);
             # elif NET461 || NET472
@@ -174,7 +175,7 @@ namespace Jose
      
         public ECDsa ECDsaKey ()
         {
-#if NETSTANDARD2_1 || NET472
+#if NETSTANDARD2_1 || NET472 || NET
             if (ecdsaKey == null && X != null && Y != null && Crv !=null)
             {
                 ECParameters param = new ECParameters();
@@ -201,6 +202,7 @@ namespace Jose
 #endif
         }
 
+        [SupportedOSPlatform("windows")]
         public CngKey CngKey(CngKeyUsages usage = CngKeyUsages.Signing)
         {
             if (eccCngKey == null && X != null && Y != null)
@@ -213,7 +215,7 @@ namespace Jose
             return eccCngKey;
         }
 
-    #if NET472 || NETSTANDARD2_1
+    #if NET472 || NETSTANDARD2_1 || NET
         public ECDiffieHellman EcDiffieHellmanKey()
         {
             if (ecdhKey == null && X != null && Y != null)
@@ -278,7 +280,7 @@ namespace Jose
 
         public Jwk(ECDsa key, bool isPrivate = true)
         {
-#if NETSTANDARD2_1 || NET472
+#if NETSTANDARD2_1 || NET472 || NET
             ecdsaKey = key;
             Kty = KeyTypes.EC;           
 
@@ -340,7 +342,7 @@ namespace Jose
             }
         }
 
-    #if NET472 || NETSTANDARD2_1        
+    #if NET472 || NETSTANDARD2_1 || NET
         public Jwk(ECDiffieHellman key, bool isPrivate = true)
         {
             ecdhKey = key;
@@ -562,7 +564,7 @@ namespace Jose
             );
         }
 
-#if NETSTANDARD2_1 || NET472
+#if NETSTANDARD2_1 || NET472 || NET
         public static string CurveToName(ECCurve curve)
         {
             curve.Oid.FriendlyName = curve.Oid.FriendlyName;

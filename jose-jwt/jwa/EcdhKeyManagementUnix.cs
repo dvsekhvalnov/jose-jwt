@@ -6,7 +6,7 @@ using Jose.keys;
 
 namespace Jose
 {
-#if NET472 || NETSTANDARD2_1
+#if NET472 || NETSTANDARD2_1 || NET
     public class EcdhKeyManagementUnix : IKeyManagement
     {
         private readonly string algIdHeader;

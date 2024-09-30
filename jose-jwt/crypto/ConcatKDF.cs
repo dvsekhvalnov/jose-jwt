@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.Versioning;
 using System.Security.Cryptography;
 using Jose.native;
 using Microsoft.Win32.SafeHandles;
@@ -9,9 +10,10 @@ namespace Jose
     {
         // Microsoft CNG implementation is unusable on NIST-384 and NISP-521 curves due to broken key derivation
         // https://stackoverflow.com/questions/10879658/existing-implementations-for-nist-sp-800-56a-concatenation-single-step-key-deriv
+        [SupportedOSPlatform("windows")]
         public static byte[] DeriveKey(CngKey externalPubKey, CngKey privateKey, int keyBitLength, byte[] algorithmId, byte[] partyVInfo, byte[] partyUInfo, byte[] suppPubInfo)
         {
-#if NET40 || NET461 || NET472 || NETSTANDARD2_1
+#if NET40 || NET461 || NET472 || NETSTANDARD2_1 || NET
             using (var cng = new ECDiffieHellmanCng(privateKey))
             {
                 using (SafeNCryptSecretHandle hSecretAgreement = cng.DeriveSecretAgreementHandle(externalPubKey))
@@ -45,7 +47,7 @@ namespace Jose
             throw new NotImplementedException("not yet");
 #endif
         }
-#if NET472 || NETSTANDARD2_1        
+#if NET472 || NETSTANDARD2_1 || NET
         public static byte[] DeriveEcdhKey(ECDiffieHellman externalPubKey, ECDiffieHellman privateKey, int keyBitLength, byte[] algorithmId, byte[] partyVInfo, byte[] partyUInfo, byte[] suppPubInfo)
         {
             // Concat KDF, as defined in Section 5.8.1 of [NIST.800-56A]
