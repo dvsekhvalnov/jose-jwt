@@ -1,10 +1,13 @@
 #if NETSTANDARD2_1 || NET
+using System;
 using System.Security.Cryptography;
 
 namespace Jose
 {
     public static class AesGcm
     {
+        public static int FixedTagLength => System.Security.Cryptography.AesGcm.TagByteSizes.MaxSize; // 16 bytes
+        
         /// <summary>
         /// Performs AES encryption in GCM chaining mode over plain text
         /// </summary>
@@ -18,13 +21,13 @@ namespace Jose
         {
 #if NET
             using var gcm =
-                new System.Security.Cryptography.AesGcm(key, System.Security.Cryptography.AesGcm.TagByteSizes.MaxSize);
+                new System.Security.Cryptography.AesGcm(key, FixedTagLength);
 #elif NETSTANDARD2_1
             using var gcm = new System.Security.Cryptography.AesGcm(key);
 #endif
 
             var ciphertext = new byte[plainText.Length];
-            var tag = new byte[System.Security.Cryptography.AesGcm.TagByteSizes.MaxSize];
+            var tag = new byte[FixedTagLength];
 
             gcm.Encrypt(nonce: iv, plaintext: plainText, ciphertext: ciphertext, tag: tag, associatedData: aad);
 
@@ -44,8 +47,10 @@ namespace Jose
         {
 #if NET
             using var gcm =
-                new System.Security.Cryptography.AesGcm(key, System.Security.Cryptography.AesGcm.TagByteSizes.MaxSize);
+                new System.Security.Cryptography.AesGcm(key, FixedTagLength);
 #elif NETSTANDARD2_1
+            if (authTag.Length != FixedTagLength)
+                throw new ArgumentException("The specified tag is not a valid size for this algorithm (must be " + FixedTagLength + " bytes).", nameof(authTag));
             using var gcm = new System.Security.Cryptography.AesGcm(key);
 #endif
 
