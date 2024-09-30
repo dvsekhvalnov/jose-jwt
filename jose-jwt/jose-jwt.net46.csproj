@@ -92,6 +92,7 @@
     <Compile Include="util\Compact.cs" />
     <Compile Include="util\Dictionaries.cs" />
     <Compile Include="util\Ensure.cs" />
+    <Compile Include="util\SupportedOSPlatform.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

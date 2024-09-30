@@ -1,12 +1,13 @@
 #if !NET
 
-namespace System.Runtime.Versioning;
-
-[AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Class)]
-internal sealed class SupportedOSPlatformAttribute : Attribute
+namespace System.Runtime.Versioning
 {
-    public SupportedOSPlatformAttribute(string platformName)
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Class)]
+    internal sealed class SupportedOSPlatformAttribute : Attribute
     {
+        public SupportedOSPlatformAttribute(string platformName)
+        {
+        }
     }
 }
 
