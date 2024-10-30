@@ -5,11 +5,11 @@ using Jose.keys;
 
 namespace Jose
 {
-    public class RsaOaep256KeyManagement : IKeyManagement
+    public class RsaOaepKeyManagement : IKeyManagement
     {
         private readonly int hashSizeBits;
 
-        public RsaOaep256KeyManagement(int hashSizeBits)
+        public RsaOaepKeyManagement(int hashSizeBits)
         {
             this.hashSizeBits = hashSizeBits;
         }

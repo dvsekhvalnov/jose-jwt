@@ -1025,6 +1025,21 @@ namespace UnitTests
         }
 
         [Fact]
+        public void Decrypt_RSA_OAEP_256_A128GCM()
+        {
+            //given
+            const string token = "eyJlbmMiOiJBMTI4R0NNIiwiYWxnIjoiUlNBLU9BRVAtMjU2In0.Ki1uPWs34nXxE2nGmie94nGkcl1KbJcutGIRL2x7025JXITQ905nGlMqPf4YjgzvJxj51oc0EARPfC6IrFVlefuJzeKbJgZNj0IBkIKL1UbxkP0PrCovuXOnQhfYbcbppC0uNA6SDdGUiCJZH9DNnEBjQcbUWmDAdLSmI0ZkBhYK7fsla7dITP6rcAPM8wQcN6JqcVFZ-s_-uP8B6o2ywkawdtTacsQq9UxJvJ5bKfXJSNT-0xZY5kevgUo7rbJIpzv6BpFsA4EduOVMGu9Y7Xu_4seNIHZQA4NEqTxtbwjuq1lUdkm6Bnkr7GSXJ8tRjoFRf6OD2aX-snFx6Zg-MA.ez2XiQxsD1dvkehk._UCAGhvkeUWHKNa5lHQZvPpvWyH7j4E6wPJFLeNIFe53WCWVBVqFPoBRa5SANLak2COOgF__KBezLp935hROEvmtgFqJ5adl9uF501fCN0Cq-53bZP5MjKP237fOcZYQrGcei2GRRG-vOMt--owVX0Wjyy4Jy0oLqf9-hHoImtyLTpM89nN1s3jKcpsMntIfiqespShHLehZ0zW4v9pzT0ScHmSdjSqsisqcA0Za71GzPRoNIq5BzCvIf0TR6Q.hm0FdUsB0iHd1yrJW4Omzg";
+
+            //when
+            string json = Jose.JWT.Decode(token, RsaKey.New(PrivKey().ExportParameters(true)));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+            
+            Assert.Equal(@"{""sub"":""alice"",""aud"":[""https://app-one.com"",""https://app-two.com""],""nbf"":1730312729,""iss"":""https://openid.net"",""exp"":1730313329,""iat"":1730312729,""jti"":""d8915fdb-8985-4c86-ae8d-28567016f623""}", json);            
+        }
+
+        [Fact]
         public void Decrypt_RSA_OAEP_384_A192GCM()
         {
             //given
@@ -1182,7 +1197,8 @@ namespace UnitTests
             const string json = @"{""hello"": ""world""}";
 
             //when
-            string token = Jose.JWT.Encode(json, RsaKey.New(PubKey().ExportParameters(false)), JweAlgorithm.RSA_OAEP_512, JweEncryption.A256GCM);
+            Jwk publicKey = new Jwk("AQAB", "qFZv0pea_jn5Mo4qEUmStuhlulso8n1inXbEotd_zTrQp9K0RK0hf7t0K4BjKVhaiqIam4tVVQvkmYeBeYr1MmnO_0N97dMBz_7fmvyv0hgHaBdQ5mR5u3LTlHo8tjRE7-GzZmGs6jMcyj7HbXobDPQJZpqNy6JjliDVXxW8nWJDetxGBlqmTj1E1fr2RCsZLreDOPSDIedG1upz9RraShsIDzeefOcKibcAaKeeVI3rkAU8_mOauLSXv37hlk0h6sStJb3qZQXyOUkVkjXIkhvNu_ve0v7LiLT4G_OxYGzpOQcCnimKdojzNP6GtVDaMPh-QkSJE32UCos9R3wI2Q");
+            string token = Jose.JWT.Encode(json, publicKey, JweAlgorithm.RSA_OAEP_512, JweEncryption.A256GCM);
 
             //then
             Console.Out.WriteLine("RSA_OAEP_512_A256GCM={0}", token);
