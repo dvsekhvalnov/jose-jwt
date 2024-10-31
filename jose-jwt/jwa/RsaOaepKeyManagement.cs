@@ -165,7 +165,7 @@ namespace Jose
                     throw new ArgumentException(string.Format("Unsupported hash size: {0} bits.", hashSizeBits));
             }
         }
-
+#if NET461 || NET472 || NETSTANDARD
         private RSAEncryptionPadding OaepPadding()
         {
             switch (hashSizeBits)
@@ -182,6 +182,8 @@ namespace Jose
                 default:
                     throw new ArgumentException(string.Format("Unsupported hash size: {0} bits.", hashSizeBits));
             }
+     
         }
+#endif
     }
 }
