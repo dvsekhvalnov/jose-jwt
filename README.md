@@ -9,6 +9,8 @@ JWE JSON Serialization cross-tested with [JWCrypto](https://github.com/latchset/
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
+- v5.1 support for experimental algorithms RSA-OAEP-384, RSA-OAEP-512
+
 - v5.0 brings Linux, OSX and FreeBSD compatibility for [ECDH encryption](#ecdh-es-and-ecdh-es-with-aes-key-wrap-key-management-family-of-algorithms) as long as managed `ECDsa` keys support. Fixes cross compatibility issues with encryption over NIST P-384, P-521 curves. And introduces new [security fixes and controls](#customizing-compression).
 
 - v4.1 added additional capabilities to manage runtime avaliable alg suite, see [Customizing library for security](#customizing-library-for-security). And also introduced default max limits for `PBKDF2` (`PBES2-*`) max iterations according to [OWASP PBKDF2 Recomendations](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2).
@@ -78,7 +80,7 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 - NONE (unprotected) plain text algorithm without integrity protection
 
 **Encryption**
-- RSAES OAEP 256 (using SHA-256 and MGF1 with SHA-256) encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- RSAES OAEP 256, 384, 512 (using SHA-256, 384, 512 and MGF1 with SHA-256, 384, 512) encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 - RSAES OAEP (using SHA-1 and MGF1 with SHA-1) encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 - RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 - Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM
@@ -101,7 +103,7 @@ AES Key Wrap implementation ideas and test data from http://www.cryptofreak.org/
 - NONE (unprotected) plain text algorithm without integrity protection
 
 **Encryption**
-- RSAES OAEP 256 (using SHA-256 and MGF1 with SHA-256) encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
+- RSAES OAEP 256, 384, 512 (using SHA-256, 384, 512 and MGF1 with SHA-256, 384, 512) encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 - RSAES OAEP (using SHA-1 and MGF1 with SHA-1) encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 - RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM
 - Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM
@@ -302,7 +304,7 @@ Accepts `CngKey`, `ECDsa` and `Jwk` types of keys (see above).
 
 **NET40-NET45**:
 
-RSA-OAEP-256, RSA-OAEP and RSA1_5 key management requires `RSACryptoServiceProvider` (usually public) key of corresponding length.
+RSA-OAEP-256, RSA-OAEP-384, RSA-OAEP-512, RSA-OAEP and RSA1_5 key management requires `RSACryptoServiceProvider` (usually public) key of corresponding length.
 
 ```C#
 var payload = new Dictionary<string, object>()
@@ -317,7 +319,7 @@ string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEnc
 ```
 
 **NETCORE:**
-RSA-OAEP-256, RSA-OAEP and RSA1_5 key management requires `RSA` (usually public) or `Jwk` key of type `RSA` of corresponding length.
+RSA-OAEP-256, RSA-OAEP-384, RSA-OAEP-512, RSA-OAEP and RSA1_5 key management requires `RSA` (usually public) or `Jwk` key of type `RSA` of corresponding length.
 
 ``` cs
 var payload = new Dictionary<string, object>()
@@ -587,7 +589,7 @@ string json = Jose.JWT.Decode(token, secretKey);
 string json = Jose.JWT.Decrypt(token, secretKey);
 ```
 
-**RS256, RS384, RS512**, **PS256, PS384, PS512** signatures and **RSA-OAEP-256**, **RSA-OAEP, RSA1_5** key management algorithms expects
+**RS256, RS384, RS512**, **PS256, PS384, PS512** signatures and **RSA-OAEP-256**, **RSA-OAEP-384**, **RSA-OAEP-512**, **RSA-OAEP, RSA1_5** key management algorithms expects
 
 **NET40-NET45**: `RSACryptoServiceProvider` as a key, public/private is asymmetric to encoding:
 

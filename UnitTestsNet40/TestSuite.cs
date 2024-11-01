@@ -705,6 +705,51 @@ namespace UnitTests
         }
 
         [Test]
+        public void Decrypt_RSA_OAEP_256_A128GCM()
+        {
+            //given
+            const string token = "eyJlbmMiOiJBMTI4R0NNIiwiYWxnIjoiUlNBLU9BRVAtMjU2In0.Ki1uPWs34nXxE2nGmie94nGkcl1KbJcutGIRL2x7025JXITQ905nGlMqPf4YjgzvJxj51oc0EARPfC6IrFVlefuJzeKbJgZNj0IBkIKL1UbxkP0PrCovuXOnQhfYbcbppC0uNA6SDdGUiCJZH9DNnEBjQcbUWmDAdLSmI0ZkBhYK7fsla7dITP6rcAPM8wQcN6JqcVFZ-s_-uP8B6o2ywkawdtTacsQq9UxJvJ5bKfXJSNT-0xZY5kevgUo7rbJIpzv6BpFsA4EduOVMGu9Y7Xu_4seNIHZQA4NEqTxtbwjuq1lUdkm6Bnkr7GSXJ8tRjoFRf6OD2aX-snFx6Zg-MA.ez2XiQxsD1dvkehk._UCAGhvkeUWHKNa5lHQZvPpvWyH7j4E6wPJFLeNIFe53WCWVBVqFPoBRa5SANLak2COOgF__KBezLp935hROEvmtgFqJ5adl9uF501fCN0Cq-53bZP5MjKP237fOcZYQrGcei2GRRG-vOMt--owVX0Wjyy4Jy0oLqf9-hHoImtyLTpM89nN1s3jKcpsMntIfiqespShHLehZ0zW4v9pzT0ScHmSdjSqsisqcA0Za71GzPRoNIq5BzCvIf0TR6Q.hm0FdUsB0iHd1yrJW4Omzg";
+
+            //when
+            string json = Jose.JWT.Decode(token, RsaKey.New(PrivKey().ExportParameters(true)));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.That(json,  Is.EqualTo(@"{""sub"":""alice"",""aud"":[""https://app-one.com"",""https://app-two.com""],""nbf"":1730312729,""iss"":""https://openid.net"",""exp"":1730313329,""iat"":1730312729,""jti"":""d8915fdb-8985-4c86-ae8d-28567016f623""}"));
+        }
+
+        [Test]
+        public void Decrypt_RSA_OAEP_384_A192GCM()
+        {
+            //given
+            const string token = "eyJlbmMiOiJBMTkyR0NNIiwiYWxnIjoiUlNBLU9BRVAtMzg0In0.pHwaRvG-WVUQtofFUwjedVIY_MxZs8V3ulf-46pFSAKqyERjJF0Za-LoDqN_EvMMwJp4TJ2JgEFHk9vLoThh-7EtJ3noaLaDxTXbt38slZ6xw1J-dziSUKXaiJstUiGLuJAK5liKwFWdqNtolBG0plEc2vvuROu7xUNoFuwb286992sKOAQb_1CFomDk5QuaiTN8pDwtQDLt8UsU5Gurml1U9bdU08FnH0PYIZlyVxKDL7a_fAfG-4o9_S__p8xLpYfp0aKX4MMbHSZcnMgqiwbfx_PiWQLhTYWeqf8XNNEYnGdv_QHK11FAd2NnT_RS028WJkf9W8veJTc-UUujjg.yej5UbPyU3A9gQD2.euXP6xG2-cLGJ0rTTjhwbeUX-qUKgT0Rr5JmtwDtGpZG8LyUpTpYhhLLcDTMtiUd0l0GeJPRzeApt5XTy-2RgpS-vcTn0b4t2xH27GPtN5Jvvsc-0rJlSbmptIE3QImrbckEXnwNCbz0qt95wPFSde04UzRWsna-LaSQ6se_pXbfga2kn5TiZ6ZKWh6fcfV6WIY3DtcWY1GCwdX2VW1vrqp-EQbWrOKqZp8Zx6BLwo521SPFg36EnJZWopoQBA.ZAC9GsPtN4P_ZhEKU1Hnpg";
+
+            //when
+            string json = Jose.JWT.Decode(token, PrivKey());
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert. That(json, Is.EqualTo(@"{""sub"":""alice"",""aud"":[""https://app-one.com"",""https://app-two.com""],""nbf"":1729866729,""iss"":""https://openid.net"",""exp"":1729867329,""iat"":1729866729,""jti"":""da2aa440-2923-4501-b169-04fe0904da4d""}"));
+        }
+
+        [Test]
+        public void Decrypt_RSA_OAEP_512_A256GCM()
+        {
+            //given
+            const string token = "eyJlbmMiOiJBMjU2R0NNIiwiYWxnIjoiUlNBLU9BRVAtNTEyIn0.Xti41IW1gNT9RqV2Eah4v8ylTP_E1DOjniWw9EJbEHTWzAjXeQ7sWdHLgH_h7G6xNhppLziGbsSZeqBcB_r-jkRXkSpP-kUyKp8QddvXCgUHHgme39LnnNjZXQ6KHBFiM0F0zQp3DJhxBe0lFEezrW3oSjusX43ybsTx3OqKWpp1TwhLyiGtjrKP82b2KcPS8XHT5mOP-_-KFKqOtut3m4jpLO6xYTClP-HZFtTHTz-CrK1y5XisDez-hk9LwzwJu0G-MFL5mNtWL24yeskbD2JWXzOHpkywiZ-pUU_BkfGqCHJnNGlbbX19xEHpd4a4XkPI_IatFX7QNCZOfRoiSw.mftbPhWtNUuxaRO_.GQPlZZruXeXEWeYu6QtCbu0i2bXBWThic-5VjVlRa2hu_ZJm1X4yUmmLdIsc8AE0F28dxbgvAI6HxTwVJkihPT_n5EF8zMdUPsTOMmxQOqfyRWgNX1WOvFgtsf8D1AlQ0Ukf0Pyt57nb-0ha6x5Bj9jMUmGQNfL98bDzNYrR-Y-cHIRfXzbyXw3u5f4qdczmdsNgWJ7ZQSm-4Rc8QSCP70bnISRPehhIOGYrKJenL9GaIUZa0lRrNv6YS17mhQ.6R_c3mLxSQ524Uk8usfNPg";
+
+            //when
+            string json = Jose.JWT.Decode(token, PrivKey());
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.That(json, Is.EqualTo(@"{""sub"":""alice"",""aud"":[""https://app-one.com"",""https://app-two.com""],""nbf"":1729866729,""iss"":""https://openid.net"",""exp"":1729867329,""iat"":1729866729,""jti"":""b02ef943-92d6-4bf4-b7ac-18d2e122efa5""}"));
+        }
+
+        [Test]
         public void Encrypt_RSA_OAEP_256_A128GCM()
         {
             //given
@@ -801,6 +846,54 @@ namespace UnitTests
             Assert.That(parts[4].Length, Is.EqualTo(22), "auth tag size");
 
             Assert.That(Jose.JWT.Decode(token, RsaKey.New(PrivKey().ExportParameters(true))), Is.EqualTo(json), "Make sure we are consistent with ourselfs");
+        }
+
+        [Test]
+        public void Encrypt_RSA_OAEP_384_A192GCM()
+        {
+            //given
+            const string json = @"{""hello"": ""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, RsaKey.New(PubKey().ExportParameters(false)), JweAlgorithm.RSA_OAEP_384, JweEncryption.A192GCM);
+
+            //then
+            Console.Out.WriteLine("RSA_OAEP_384_A192GCM={0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5)); //Make sure 5 parts
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJSU0EtT0FFUC0zODQiLCJlbmMiOiJBMTkyR0NNIn0")); //Header is non-encrypted and static text
+            Assert.That(parts[1].Length, Is.EqualTo(342)); //CEK size
+            Assert.That(parts[2].Length, Is.EqualTo(16)); //IV size
+            Assert.That(parts[3].Length, Is.EqualTo(24)); //cipher text size
+            Assert.That(parts[4].Length, Is.EqualTo(22)); //auth tag size
+
+            Assert.That(Jose.JWT.Decode(token, RsaKey.New(PrivKey().ExportParameters(true))), Is.EqualTo(json));
+        }
+
+        [Test]
+        public void Encrypt_RSA_OAEP_512_A256GCM()
+        {
+            //given
+            const string json = @"{""hello"": ""world""}";
+
+            //when            
+            string token = Jose.JWT.Encode(json, RsaKey.New(PubKey().ExportParameters(false)), JweAlgorithm.RSA_OAEP_512, JweEncryption.A256GCM);
+
+            //then
+            Console.Out.WriteLine("RSA_OAEP_512_A256GCM={0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.That(parts.Length, Is.EqualTo(5)); //Make sure 5 parts
+            Assert.That(parts[0], Is.EqualTo("eyJhbGciOiJSU0EtT0FFUC01MTIiLCJlbmMiOiJBMjU2R0NNIn0")); //Header is non-encrypted and static text
+            Assert.That(parts[1].Length, Is.EqualTo(342)); //CEK size
+            Assert.That(parts[2].Length, Is.EqualTo(16)); //IV size
+            Assert.That(parts[3].Length, Is.EqualTo(24)); //cipher text size
+            Assert.That(parts[4].Length, Is.EqualTo(22)); //auth tag size
+
+            Assert.That(Jose.JWT.Decode(token, RsaKey.New(PrivKey().ExportParameters(true))), Is.EqualTo(json));
         }
 
         [Test]

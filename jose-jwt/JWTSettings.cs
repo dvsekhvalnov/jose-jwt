@@ -110,7 +110,9 @@ namespace Jose
         private readonly Dictionary<JweAlgorithm, IKeyManagement> keyAlgorithms = new Dictionary<JweAlgorithm, IKeyManagement>
         {
             { JweAlgorithm.RSA_OAEP, new RsaKeyManagement(true) },
-            { JweAlgorithm.RSA_OAEP_256, new RsaOaep256KeyManagement() },
+            { JweAlgorithm.RSA_OAEP_256, new RsaOaepKeyManagement(256) },
+            { JweAlgorithm.RSA_OAEP_384, new RsaOaepKeyManagement(384) },
+            { JweAlgorithm.RSA_OAEP_512, new RsaOaepKeyManagement(512) },
             { JweAlgorithm.RSA1_5, new RsaKeyManagement(false) },
             { JweAlgorithm.DIR, new DirectKeyManagement() },
             { JweAlgorithm.A128KW, new AesKeyWrapManagement(128) },
@@ -132,6 +134,8 @@ namespace Jose
             { JweAlgorithm.RSA1_5, "RSA1_5" },
             { JweAlgorithm.RSA_OAEP, "RSA-OAEP" },
             { JweAlgorithm.RSA_OAEP_256, "RSA-OAEP-256" },
+            { JweAlgorithm.RSA_OAEP_384, "RSA-OAEP-384" },
+            { JweAlgorithm.RSA_OAEP_512, "RSA-OAEP-512" },
             { JweAlgorithm.DIR, "dir" },
             { JweAlgorithm.A128KW, "A128KW" },
             { JweAlgorithm.A256KW, "A256KW" },
