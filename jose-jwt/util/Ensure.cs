@@ -31,6 +31,12 @@ namespace Jose
             if(expectedSize != array.Length * 8L)
                 throw new ArgumentException(string.Format(msg,args));
         }
+        
+        public static void ByteSize(byte[] array, long expectedSize, string msg, params object[] args)
+        {
+            if(expectedSize != array.Length)
+                throw new ArgumentException(string.Format(msg,args));
+        }
 
         public static void BitSize(int actualSize, int expectedSize, string msg)
         {

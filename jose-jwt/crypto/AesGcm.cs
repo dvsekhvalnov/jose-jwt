@@ -8,7 +8,7 @@ using Jose.native;
 namespace Jose
 {
     public static class AesGcm
-    {
+    {       
         /// <summary>
         /// Performs AES encryption in GCM chaining mode over plain text
         /// </summary>
@@ -71,11 +71,14 @@ namespace Jose
             IntPtr hKey, keyDataBuffer = ImportKey(hAlg, key, out hKey);
 
             byte[] plainText;
+            int expectedTagSize = MaxAuthTagSize(hAlg);
+
+            Ensure.ByteSize(authTag, expectedTagSize, "Expected auth tag of length: {0} bytes, but got: {1} bytes", expectedTagSize, authTag.Length);
 
             var authInfo = new BCrypt.BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO(iv, aad, authTag);
             using (authInfo)
             {
-                byte[] ivData = new byte[MaxAuthTagSize(hAlg)];
+                byte[] ivData = new byte[expectedTagSize];
 
                 int plainTextSize = 0;
 
