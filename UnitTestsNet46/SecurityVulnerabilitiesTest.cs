@@ -238,5 +238,24 @@ namespace UnitTests
                 Console.Out.WriteLine(e.ToString());
             }
         }
+
+        [Fact]
+        public void TruncatedGcmAuthTag()
+        {
+            // given 
+            string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..PEXf1goWOF0SZRe_.Zp3CHYq4ZqM3_opMIy25O50gmQzw_p-nCOiW2ROuQSv80-aD-78n8m103kgPRPCsOt7qrckDRGSDACOBZGr2WovzSC-dxIcW3EsPqtibueyh0p3FY43h-bcbhPzXBdjQPaNTCY0o26wcEV_4FzPYdE9_ngRFIUe_7Kby-E2CWYLFc5D9RO9TLGN5dpHL6l4SOGbNz8M0o4aQuyJv3BV1wj_KswqyVcKBHjm0eh6RmFhoERxWjvt5yeo83bzxTfReVWAxXw.AVLr7JE1r1uiUSLj";
+
+            try
+            {
+                // when decrypt token with trunated AES GCM tag, it should fail
+                Jose.JWT.Decode(token, aes128Key);  
+                Assert.True(false, "Should fail with IntegrityException");
+
+            }
+            catch (ArgumentException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+        }
     }
 }

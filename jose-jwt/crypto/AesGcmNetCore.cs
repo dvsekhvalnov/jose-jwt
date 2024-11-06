@@ -37,7 +37,9 @@ namespace Jose
         /// <exception cref="CryptographicException">if decryption failed by any reason</exception>
         public static byte[] Decrypt(byte[] key, byte[] iv, byte[] aad, byte[] cipherText, byte[] authTag)
         {
-            using var gcm = new System.Security.Cryptography.AesGcm(key);
+            Ensure.ByteSize(authTag, System.Security.Cryptography.AesGcm.TagByteSizes.MaxSize, "Expected auth tag of length: {0} bytes, but got: {1} bytes", System.Security.Cryptography.AesGcm.TagByteSizes.MaxSize, authTag.Length);
+
+	    using var gcm = new System.Security.Cryptography.AesGcm(key);
 
             var plaintext = new byte[cipherText.Length];
 
