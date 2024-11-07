@@ -17,7 +17,7 @@ Signing:
   - NONE (unprotected) plain text algorithm without integrity protection 
 
 Encryption: 
-  - RSAES OAEP 256 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
+  - RSAES OAEP 256 384 512 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
   - RSAES OAEP encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
   - RSAES-PKCS1-V1_5 encryption with A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM, A256GCM 
   - Direct symmetric key encryption with pre-shared key A128CBC-HS256, A192CBC-HS384, A256CBC-HS512, A128GCM, A192GCM and A256GCM 
@@ -51,7 +51,7 @@ JSON Web Key (RFC 7517):
     <AssemblyName>jose-jwt</AssemblyName>
     <PackageId>jose-jwt</PackageId>
     <PackageTags>jose;jwt;json;jwa;jwe;jws;jwk;aes;cbc;gcm;rsa;hmac;sha;rsassa;pss;rsaes;oaep;pkcs1-v1_5;es;elliptic;curve;diffe;hellman;agreement;ecdsa;key wrap;kw;ecdh;pbes;pbes2;pbkdf;pbkdf2;password based encryption;javascript object signing;two phase validation;netcore;clr;coreclr;portable;fips;compliant;open;banking;detached content;unencoded payload;json web key;</PackageTags>
-    <PackageReleaseNotes>Major upgrade introducing cross platform ECDH compatibility for P-384 and P-521 NIST Curves on Windows, Linux, Mac OS and FreeBSD. Bugfixes and more security controls to address new threats.</PackageReleaseNotes>
+    <PackageReleaseNotes>Added new key management algorithms RSA-OAEP-384 and RSA-OAEP-512. Security fixes to prevent truncated AES GCM tag attacks.</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/dvsekhvalnov/jose-jwt</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
