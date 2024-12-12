@@ -63,7 +63,7 @@ namespace UnitTests
             byte[] y = Base64Url.Decode("e8lnCO-AlStT-NJVX-crhB7QRYhiix03illJOVAOyck");
             byte[] d = Base64Url.Decode("VEmDZpDXXK8p8N0Cndsxs924q6nS1RXFASRl6BfUqdw");
 
-            var privateKey = keyImplementation == "CNG" ? (object) EccKey.New(x, y, d, usage: CngKeyUsages.KeyAgreement) : EcdhKey.New(x, y, d) ;
+            var privateKey = keyImplementation == "CNG" ? (object)EccKey.New(x, y, d, usage: CngKeyUsages.KeyAgreement) : EcdhKey.New(x, y, d);
 
             //JWT encrypted with attacker private key, which is equals to (reciever_pk mod 113)
             var attackMod113 =
@@ -171,7 +171,7 @@ namespace UnitTests
             }
         }
 
-	[Fact]
+        [Fact]
         public void DeflateBomb()
         {
             // given
@@ -197,15 +197,8 @@ namespace UnitTests
             string bomb = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM, JweCompression.DEF);
 
             // when
-            try
-            {
-                string decoded = Jose.JWT.Decode(bomb, privateKey, JwsAlgorithm.RS256);
-                Assert.True(false, "Should fail with NotSupportedException");
-            }
-            catch (JoseException e)
-            {
-                Console.Out.WriteLine(e.ToString());
-            }
+            Exception thrownException = Assert.Throws<JoseException>(() => Jose.JWT.Decode(bomb, privateKey));
+            Assert.IsAssignableFrom<NotSupportedException>(thrownException.InnerException);
         }
 
         [Fact]
@@ -217,7 +210,7 @@ namespace UnitTests
             try
             {
                 // when decrypt token with trunated AES GCM tag, it should fail
-                Jose.JWT.Decode(token, aes128Key);  
+                Jose.JWT.Decode(token, aes128Key);
                 Assert.True(false, "Should fail with IntegrityException");
 
             }
