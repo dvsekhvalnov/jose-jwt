@@ -28,11 +28,9 @@ namespace Jose
 
         public byte[] Decompress(byte[] compressedText)
         {
-            byte[] buffer = new byte[maxBufferSizeBytes];
-
             try
             {
-                using (MemoryStream ms = new MemoryStream(buffer))
+                using (MemoryStream ms = new CappedMemoryStream(maxBufferSizeBytes))
                 {
                     using (MemoryStream compressedStream = new MemoryStream(compressedText))
                     {
@@ -42,10 +40,10 @@ namespace Jose
                         }
                     }
 
-                    return Arrays.Truncate(ms.ToArray(), ms.Position);
+                    return ms.ToArray();
                 }
             }
-            catch(NotSupportedException e)
+            catch (NotSupportedException e)
             {
                 throw new JoseException("Unable to deflate compressed payload, most likely exceeded decompression buffer size.", e);
             }

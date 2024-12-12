@@ -198,7 +198,7 @@ namespace UnitTests
 
             // when
             Exception thrownException = Assert.Throws<JoseException>(() => Jose.JWT.Decode(bomb, privateKey));
-            Assert.IsAssignableFrom<NotSupportedException>(thrownException.InnerException);
+            Assert.IsType<NotSupportedException>(thrownException.InnerException);
         }
 
         [Fact]
