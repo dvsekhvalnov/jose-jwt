@@ -1,7 +1,5 @@
-using Jose;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 
 namespace Jose
@@ -499,7 +497,7 @@ namespace Jose
 
         private static byte[] DecodeBytes(Compact.Iterator parts, object key = null, JwsAlgorithm? expectedJwsAlg = null, JweAlgorithm? expectedJweAlg = null, JweEncryption? expectedJweEnc = null, JwtSettings settings = null, byte[] payload = null)
         {
-            Ensure.IsNotEmpty(parts.Token, "Incoming token expected to be in compact serialization form, not empty, whitespace or null.");            
+            Ensure.IsNotEmpty(parts.Token, "Incoming token expected to be in compact serialization form, not empty, whitespace or null.");
 
             if (parts.Count == 5) //encrypted JWT
             {
@@ -512,7 +510,7 @@ namespace Jose
             }
             else if (parts.Count == 3) // signed JWT
             {
-                if (expectedJweAlg != null || expectedJweEnc !=null)
+                if (expectedJweAlg != null || expectedJweEnc != null)
                 {
                     throw new InvalidAlgorithmException("Signed tokens can't assert encryption type.");
                 }
@@ -609,5 +607,11 @@ namespace Jose
     {
         public InvalidAlgorithmException(string message) : base(message) { }
         public InvalidAlgorithmException(string message, Exception innerException) : base(message, innerException) { }
+    }
+
+    public class CapacityExceededException : JoseException
+    {
+        public CapacityExceededException(string message) : base(message) { }
+        public CapacityExceededException(string message, Exception innerException) : base(message, innerException) { }
     }
 }
