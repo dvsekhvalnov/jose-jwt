@@ -197,8 +197,7 @@ namespace UnitTests
             string bomb = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM, JweCompression.DEF);
 
             // when
-            Exception thrownException = Assert.Throws<JoseException>(() => Jose.JWT.Decode(bomb, privateKey));
-            Assert.IsType<NotSupportedException>(thrownException.InnerException);
+            Exception thrownException = Assert.Throws<CapacityExceededException>(() => Jose.JWT.Decode(bomb, privateKey));
         }
 
         [Fact]
@@ -219,6 +218,5 @@ namespace UnitTests
                 Console.Out.WriteLine(e.ToString());
             }
         }
-
     }
 }

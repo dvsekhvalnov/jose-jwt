@@ -16,7 +16,7 @@ public class CappedMemoryStream : MemoryStream
     {
         if (Length + Math.Min(count, buffer.Length - offset) > maxCapacity)
         {
-            throw new NotSupportedException("Exceeding maximum memory stream size.");
+            throw new CapacityExceededException("Exceeding maximum memory stream size.");
         }
 
         base.Write(buffer, offset, count);
@@ -26,7 +26,7 @@ public class CappedMemoryStream : MemoryStream
     {
         if (Length + 1 > maxCapacity)
         {
-            throw new NotSupportedException("Exceeding maximum memory stream size.");
+            throw new CapacityExceededException("Exceeding maximum memory stream size.");
         }
 
         base.WriteByte(value);
