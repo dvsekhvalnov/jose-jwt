@@ -29,6 +29,10 @@ jobs:
 
     steps:
 
+    - name: Install ICU packages
+      if: ${{ matrix.os == 'ubuntu-latest'}}
+      run: sudo apt-get update && sudo apt-get install -y libicu-dev
+
     - name: Check out code onto host
       uses: actions/checkout@v1
 
