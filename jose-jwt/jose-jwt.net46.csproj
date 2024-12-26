@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="compression\CappedMemoryStream.cs" />
     <Compile Include="compression\DeflateCompression.cs" />
     <Compile Include="compression\ICompression.cs" />
     <Compile Include="crypto\AesGcm.cs" />
