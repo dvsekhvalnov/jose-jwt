@@ -1,34 +1,35 @@
 ﻿using System;
 using System.IO;
 
-namespace Jose;
-
-public class CappedMemoryStream : MemoryStream
+namespace Jose
 {
-    private readonly long maxCapacity;
-
-    public CappedMemoryStream(long maxCapacity)
+    public class CappedMemoryStream : MemoryStream
     {
-        this.maxCapacity = maxCapacity;
-    }
+        private readonly long maxCapacity;
 
-    public override void Write(byte[] buffer, int offset, int count)
-    {
-        if (Length + Math.Min(count, buffer.Length - offset) > maxCapacity)
+        public CappedMemoryStream(long maxCapacity)
         {
-            throw new CapacityExceededException("Exceeding maximum memory stream size.");
+            this.maxCapacity = maxCapacity;
         }
 
-        base.Write(buffer, offset, count);
-    }
-
-    public override void WriteByte(byte value)
-    {
-        if (Length + 1 > maxCapacity)
+        public override void Write(byte[] buffer, int offset, int count)
         {
-            throw new CapacityExceededException("Exceeding maximum memory stream size.");
+            if (Length + Math.Min(count, buffer.Length - offset) > maxCapacity)
+            {
+                throw new CapacityExceededException("Exceeding maximum memory stream size.");
+            }
+
+            base.Write(buffer, offset, count);
         }
 
-        base.WriteByte(value);
+        public override void WriteByte(byte value)
+        {
+            if (Length + 1 > maxCapacity)
+            {
+                throw new CapacityExceededException("Exceeding maximum memory stream size.");
+            }
+
+            base.WriteByte(value);
+        }
     }
 }
