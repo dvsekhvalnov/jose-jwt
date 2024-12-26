@@ -24,9 +24,6 @@ jobs:
           - os: macos-latest
             framework: 'net5.0'
 
-          - os: macos-latest
-            framework: 'net8.0'
-
           - os: ubuntu-latest
             framework: 'net5.0'
 
