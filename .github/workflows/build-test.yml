@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false # we want to see list of failing tests for each combination
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
+        os: [windows-latest, ubuntu-latest, ubuntu-22.04, macos-latest]
         framework: ['netcoreapp3.1', 'net5.0', 'net8.0']
         exclude:
           - os: macos-latest
@@ -27,10 +27,16 @@ jobs:
           - os: macos-latest
             framework: 'net8.0'
 
+          - os: ubuntu-latest
+            framework: 'net5.0
+'
+          - os: ubuntu-latest
+            framework: 'netcoreapp3.1'
+
     steps:
 
     - name: Install ICU packages
-      if: ${{ matrix.os == 'ubuntu-latest'}}
+      if: ${{ matrix.os == 'ubuntu-22.04'}}
       run: sudo apt-get update && sudo apt-get install -y libicu-dev
 
     - name: Check out code onto host
