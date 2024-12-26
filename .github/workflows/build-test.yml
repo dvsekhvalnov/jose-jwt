@@ -28,16 +28,12 @@ jobs:
             framework: 'net8.0'
 
           - os: ubuntu-latest
-            framework: 'net5.0
-'
+            framework: 'net5.0'
+
           - os: ubuntu-latest
             framework: 'netcoreapp3.1'
 
     steps:
-
-    - name: Install ICU packages
-      if: ${{ matrix.os == 'ubuntu-22.04'}}
-      run: sudo apt-get update && sudo apt-get install -y libicu-dev
 
     - name: Check out code onto host
       uses: actions/checkout@v1
