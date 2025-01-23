@@ -9,6 +9,8 @@ JWE JSON Serialization cross-tested with [JWCrypto](https://github.com/latchset/
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
+- v5.1.1 Maintenence release, improved memory allocation for deflated tokens (see https://github.com/dvsekhvalnov/jose-jwt/issues/258, https://github.com/dvsekhvalnov/jose-jwt/issues/257)
+
 - v5.1 support for experimental algorithms RSA-OAEP-384, RSA-OAEP-512 and forced strict AES-GCM to avoid trancated tags (see https://github.com/dotnet/runtime/issues/71366)
 
 - v5.0 brings Linux, OSX and FreeBSD compatibility for [ECDH encryption](#ecdh-es-and-ecdh-es-with-aes-key-wrap-key-management-family-of-algorithms) as long as managed `ECDsa` keys support. Fixes cross compatibility issues with encryption over NIST P-384, P-521 curves. And introduces new [security fixes and controls](#customizing-compression).
