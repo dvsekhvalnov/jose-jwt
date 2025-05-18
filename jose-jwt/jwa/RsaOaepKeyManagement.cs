@@ -39,7 +39,7 @@ namespace Jose
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey or RSACryptoServiceProvider types.");
 
-#elif NET461 || NET472
+#elif NET461_OR_GREATER
             if (key is CngKey cngKey)
             {
                 return RsaOaep.Encrypt(cek, cngKey, CngAlgorithmHash());
@@ -68,7 +68,7 @@ namespace Jose
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey, RSACryptoServiceProvider, RSA types or Jwk type with kty='rsa'.");
 
 
-#elif NETSTANDARD
+#elif NETSTANDARD || NET
             if (key is RSA rsa)
             {
                 return rsa.Encrypt(cek, OaepPadding());
@@ -104,7 +104,7 @@ namespace Jose
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey type.");
 
-#elif NET461 || NET472
+#elif NET461_OR_GREATER
             if (key is CngKey cngKey)
             {
                 return RsaOaep.Decrypt(encryptedCek, cngKey, CngAlgorithmHash());
@@ -131,7 +131,7 @@ namespace Jose
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey, RSACryptoServiceProvider, RSA types or Jwk type with kty='rsa'.");
 
-#elif NETSTANDARD
+#elif NETSTANDARD || NET
             if (key is RSA rsa)
             {
                 return rsa.Decrypt(encryptedCek, OaepPadding());
@@ -165,7 +165,7 @@ namespace Jose
                     throw new ArgumentException(string.Format("Unsupported hash size: {0} bits.", hashSizeBits));
             }
         }
-#if NET461 || NET472 || NETSTANDARD
+#if NET461_OR_GREATER || NETSTANDARD || NET
         private RSAEncryptionPadding OaepPadding()
         {
             switch (hashSizeBits)

@@ -1,4 +1,4 @@
-#if !NETSTANDARD2_1
+#if NETFRAMEWORK || NETSTANDARD1_4
 using System;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;

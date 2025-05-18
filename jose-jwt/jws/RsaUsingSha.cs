@@ -25,7 +25,7 @@ namespace Jose
                 return pkcs1.CreateSignature(sha.ComputeHash(securedInput));
             }
 
-#elif NETSTANDARD || NET461 || NET472
+#elif NET461_OR_GREATER || NETSTANDARD || NET
             if (key is RSA rsa)
             {
                 return rsa.SignData(securedInput, HashAlgorithm, RSASignaturePadding.Pkcs1);
@@ -55,7 +55,7 @@ namespace Jose
 
                 return pkcs1.VerifySignature(hash, signature);
             }
-#elif NETSTANDARD || NET461 || NET472
+#elif NET461_OR_GREATER || NETSTANDARD || NET
             if (key is RSA rsa)
             {
                 return rsa.VerifyData(securedInput, signature, HashAlgorithm, RSASignaturePadding.Pkcs1);
@@ -87,7 +87,7 @@ namespace Jose
                     throw new ArgumentException("Unsupported hashing algorithm: '{0}'", hashMethod);
             }
         }
-#elif NETSTANDARD || NET461 || NET472
+#elif NET461_OR_GREATER || NETSTANDARD || NET
         private HashAlgorithmName HashAlgorithm
         {
             get

@@ -27,7 +27,7 @@ namespace Jose
             var publicKey = Ensure.Type<RSACryptoServiceProvider>(key, "RsaKeyManagement alg expects key to be of RSACryptoServiceProvider type.");
 
             return publicKey.Encrypt(cek, useRsaOaepPadding);
-#elif NET461 || NET472
+#elif NET461_OR_GREATER
             if (key is CngKey cngKey)
             {
                 return encrypt(cek, new RSACng(cngKey));
@@ -53,7 +53,7 @@ namespace Jose
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey, RSACryptoServiceProvider, RSA types or Jwk type with kty='rsa'.");
 
-#elif NETSTANDARD
+#elif NETSTANDARD || NET
             if (key is RSA rsa)
             {
                 return encrypt(cek, rsa);
@@ -76,7 +76,7 @@ namespace Jose
             var privateKey = Ensure.Type<RSACryptoServiceProvider>(key, "RsaKeyManagement alg expects key to be of RSACryptoServiceProvider type.");
 
             return privateKey.Decrypt(encryptedCek, useRsaOaepPadding);
-#elif NET461 || NET472
+#elif NET461_OR_GREATER
             if (key is CngKey cngKey)
             {
                 return decrypt(encryptedCek, new RSACng(cngKey));
@@ -101,7 +101,7 @@ namespace Jose
 
             throw new ArgumentException("RsaKeyManagement algorithm expects key to be of CngKey, RSACryptoServiceProvider, RSA types or Jwk type with kty='rsa'.");
 
-#elif NETSTANDARD
+#elif NETSTANDARD || NET
             if (key is RSA rsa)
             {
                 return decrypt(encryptedCek, rsa); 
@@ -118,7 +118,7 @@ namespace Jose
 #endif        
         }
 
-#if NET461 || NET472 || NETSTANDARD
+#if NET461_OR_GREATER || NETSTANDARD || NET
         private byte[] decrypt(byte[] content, RSA privateKey)
         {
             RSAEncryptionPadding padding = useRsaOaepPadding ? RSAEncryptionPadding.OaepSHA1 :

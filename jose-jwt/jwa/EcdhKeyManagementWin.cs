@@ -18,7 +18,7 @@ namespace Jose
 
         public virtual byte[][] WrapNewKey(int cekSizeBits, object key, IDictionary<string, object> header)
         {
-#if NET472 || NETSTANDARD2_1
+#if NET472 || NETSTANDARD2_1 || NET
             if (key is ECDiffieHellman || key is ECDsa || key is Jwk)
             {
                 return ecdhKeyManagementUnix.WrapNewKey(cekSizeBits, key, header);
@@ -69,7 +69,7 @@ namespace Jose
 
         public virtual byte[] Unwrap(byte[] encryptedCek, object key, int cekSizeBits, IDictionary<string, object> header)
         {
-#if NET472 || NETSTANDARD2_1
+#if NET472 || NETSTANDARD2_1 || NET
             if (key is ECDiffieHellman || key is ECDsa  || key is Jwk)
             {
                 return ecdhKeyManagementUnix.Unwrap(encryptedCek, key, cekSizeBits, header);
