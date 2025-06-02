@@ -13,7 +13,7 @@ namespace Jose
     {
         public JwtSettings()
         {
-#if NET472 || NETSTANDARD2_1 
+#if NET472 || NETSTANDARD2_1 || NET
 	    // By giving the Unix ECDHKeyManagement implementation to windows, we enable windows version of it to work with not only CngKey but also ECDiffieHellman.
             // Initially this was implemented separately, but unit tests were failing on windows due to the lack of ECDiffieHellman support. 
             // Since we don't know what the keys will be provided until runtime, and the registration happens before runtime, we need to make sure 
@@ -37,7 +37,7 @@ namespace Jose
                 keyAlgorithms.Add(JweAlgorithm.ECDH_ES_A128KW, new EcdhKeyManagementWinWithAesKeyWrap(128, new AesKeyWrapManagement(128), new EcdhKeyManagementUnixWithAesKeyWrap(128, new AesKeyWrapManagement(128))));
                 keyAlgorithms.Add(JweAlgorithm.ECDH_ES_A192KW, new EcdhKeyManagementWinWithAesKeyWrap(192, new AesKeyWrapManagement(192), new EcdhKeyManagementUnixWithAesKeyWrap(192, new AesKeyWrapManagement(192))));
                 keyAlgorithms.Add(JweAlgorithm.ECDH_ES_A256KW, new EcdhKeyManagementWinWithAesKeyWrap(256, new AesKeyWrapManagement(256), new EcdhKeyManagementUnixWithAesKeyWrap(256, new AesKeyWrapManagement(256))));
-    #endif
+#endif
         }
         
         private readonly Dictionary<JwsAlgorithm, IJwsAlgorithm> jwsAlgorithms = new Dictionary<JwsAlgorithm, IJwsAlgorithm>
@@ -58,7 +58,7 @@ namespace Jose
             { JwsAlgorithm.ES256, new EcdsaUsingSha(256) },
             { JwsAlgorithm.ES384, new EcdsaUsingSha(384) },
             { JwsAlgorithm.ES512, new EcdsaUsingSha(521) }
-#elif NETSTANDARD || NET461 || NET472
+#elif NET461_OR_GREATER || NETSTANDARD || NET
             { JwsAlgorithm.ES256, new Jose.netstandard1_4.EcdsaUsingSha(256) },
             { JwsAlgorithm.ES384, new Jose.netstandard1_4.EcdsaUsingSha(384) },
             { JwsAlgorithm.ES512, new Jose.netstandard1_4.EcdsaUsingSha(521) }
@@ -169,11 +169,11 @@ namespace Jose
 
         private readonly Dictionary<string, JweCompression> compressionAlgorithmsAliases = new Dictionary<string, JweCompression>();
 
-#if NET40 || NET461  || NET472
+#if NETFRAMEWORK
         private IJsonMapper jsMapper = new JSSerializerMapper();
 #elif NETSTANDARD1_4
         private IJsonMapper jsMapper = new NewtonsoftMapper();
-#elif NETSTANDARD2_1
+#elif NETSTANDARD2_1 || NET
         private IJsonMapper jsMapper = new JsonMapper();
 #endif
 

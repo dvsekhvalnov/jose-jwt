@@ -1,4 +1,4 @@
-﻿#if NETSTANDARD || NET461 || NET472
+﻿#if NET461_OR_GREATER || NETSTANDARD || NET
 
 using System;
 using System.Security.Cryptography;
@@ -30,7 +30,7 @@ namespace Jose.netstandard1_4
                 {
                     if (jwk.Kty == Jwk.KeyTypes.EC)
                     {
-#if NETSTANDARD || NET472
+#if NETSTANDARD || NET472 || NET
                         return Sign(jwk.ECDsaKey(), securedInput);
 #else
                         return Sign(jwk.CngKey(), securedInput);
@@ -63,7 +63,7 @@ namespace Jose.netstandard1_4
                 {
                     if (jwk.Kty == Jwk.KeyTypes.EC)
                     {
-#if NETSTANDARD || NET472
+#if NETSTANDARD || NET472 || NET
                         return Verify(jwk.ECDsaKey(), signature, securedInput);
 #else
                         return Verify(jwk.CngKey(), signature, securedInput);

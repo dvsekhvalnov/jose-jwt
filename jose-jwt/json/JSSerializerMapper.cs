@@ -1,4 +1,4 @@
-#if NET40 || NET461 || NET472
+#if NETFRAMEWORK
 using System.Web.Script.Serialization;
 
 namespace Jose

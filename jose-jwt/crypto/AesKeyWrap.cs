@@ -79,7 +79,7 @@ namespace Jose
 
         private static byte[] AesDec(byte[] sharedKey, byte[] cipherText)
         {
-        #if NET40 || NET461 || NET472
+#if NETFRAMEWORK
             using (Aes aes = new AesCryptoServiceProvider())
             {
                 aes.Key = sharedKey;
@@ -100,7 +100,7 @@ namespace Jose
                     }
                 }
             }
-#elif NETSTANDARD
+#elif NETSTANDARD || NET
             using (Aes aes = System.Security.Cryptography.Aes.Create())
             {
                 aes.Key = sharedKey;
@@ -147,7 +147,7 @@ namespace Jose
                     }
                 }
             }
-        #elif NETSTANDARD || NET472
+#elif NET472 || NETSTANDARD || NET
             using (Aes aes = System.Security.Cryptography.Aes.Create())
             {
                 aes.Key = sharedKey;
