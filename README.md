@@ -9,6 +9,7 @@ JWE JSON Serialization cross-tested with [JWCrypto](https://github.com/latchset/
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
+- v5.2 Maintenece release, added .net6 target to remove dependencies on external outdated packages
 - v5.1.1 Maintenence release, improved memory allocation for deflated tokens (see https://github.com/dvsekhvalnov/jose-jwt/issues/258, https://github.com/dvsekhvalnov/jose-jwt/issues/257)
 
 - v5.1 support for experimental algorithms RSA-OAEP-384, RSA-OAEP-512 and forced strict AES-GCM to avoid trancated tags (see https://github.com/dotnet/runtime/issues/71366)
