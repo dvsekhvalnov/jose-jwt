@@ -1,2 +1,2 @@
 cd ..\jose-jwt\bin\Release
-..\..\..\tools\nuget.exe Push jose-jwt.5.1.1.nupkg -Source https://www.nuget.org
+..\..\..\tools\nuget.exe Push jose-jwt.5.2.0.nupkg -Source https://www.nuget.org
