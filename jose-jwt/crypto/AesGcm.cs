@@ -27,7 +27,7 @@ namespace Jose
             byte[] tag = new byte[MaxAuthTagSize(hAlg)];
 
             var authInfo = new BCrypt.BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO(iv, aad, tag);
-            using (authInfo)
+            try
             {
                 byte[] ivData = new byte[tag.Length];
 
@@ -47,6 +47,10 @@ namespace Jose
                     throw new CryptographicException(string.Format("BCrypt.BCryptEncrypt() failed with status code:{0}", status));
 
                 Marshal.Copy(authInfo.pbTag, tag, 0, authInfo.cbTag);
+            }
+            finally
+            {
+                authInfo.Dispose();
             }
 
             BCrypt.BCryptDestroyKey(hKey);
@@ -76,7 +80,7 @@ namespace Jose
             Ensure.ByteSize(authTag, expectedTagSize, "Expected auth tag of length: {0} bytes, but got: {1} bytes", expectedTagSize, authTag.Length);
 
             var authInfo = new BCrypt.BCRYPT_AUTHENTICATED_CIPHER_MODE_INFO(iv, aad, authTag);
-            using (authInfo)
+            try
             {
                 byte[] ivData = new byte[expectedTagSize];
 
@@ -96,6 +100,10 @@ namespace Jose
 
                 if (status != BCrypt.ERROR_SUCCESS)
                     throw new CryptographicException(string.Format("BCrypt.BCryptDecrypt() failed with status code:{0}", status));
+            }
+            finally
+            {
+                authInfo.Dispose();
             }
 
             BCrypt.BCryptDestroyKey(hKey);

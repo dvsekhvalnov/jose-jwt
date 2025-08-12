@@ -49,7 +49,7 @@ namespace Jose
                     return signer.VerifyData(securedInput, signature);
                 }
             }
-            catch (CryptographicException e)
+            catch (CryptographicException)
             {
                 return false;
             }

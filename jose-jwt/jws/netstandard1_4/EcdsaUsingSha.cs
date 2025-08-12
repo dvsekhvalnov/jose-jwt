@@ -73,7 +73,7 @@ namespace Jose.netstandard1_4
 
                 throw new ArgumentException("EcdsaUsingSha algorithm expects key to be of CngKey, ECDsa or Jwk types with kty='EC'.");
             }
-            catch (CryptographicException e)
+            catch (CryptographicException)
             {
                 return false;
             }
