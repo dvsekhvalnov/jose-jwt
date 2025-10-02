@@ -1553,9 +1553,9 @@ If it is desired to implement different limits, it can be achieved via registeri
 ```c#
     Jose.JWT.DefaultSettings
         // Pick your own min/max limits
-        .RegisterJwe(JweAlgorithm.PBES2_HS256_A128KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128), 310000, 310000));
-        .RegisterJwe(JweAlgorithm.PBES2_HS384_A192KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192), 250000, 250000));
-        .RegisterJwe(JweAlgorithm.PBES2_HS512_A256KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256), 120000, 120000));
+        .RegisterJwa(JweAlgorithm.PBES2_HS256_A128KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128), 310000, 310000));
+        .RegisterJwa(JweAlgorithm.PBES2_HS384_A192KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192), 250000, 250000));
+        .RegisterJwa(JweAlgorithm.PBES2_HS512_A256KW, new Pbse2HmacShaKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256), 120000, 120000));
 ```
 
 In case you can't upgrade to latest version, but would like to have protections against `PBES2` abuse, it is recommended to stick with [Two-phase validation](#two-phase-validation) precheck before decoding:
@@ -1843,3 +1843,4 @@ $http.post("/api/v1/function", {
     // Request failed! Do something with the response.
 });
 ```
+
