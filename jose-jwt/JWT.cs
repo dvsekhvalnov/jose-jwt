@@ -90,7 +90,12 @@ namespace Jose
         /// <returns>unmarshalled headers</returns>
         public static IDictionary<string, object> Headers(string token, JwtSettings settings = null)
         {
-            return Headers<IDictionary<string, object>>(token, settings);
+            var dict = Headers<IDictionary<string, object>>(token, settings);
+            if (dict != null && dict.TryGetValue("crit", out var critObj) && critObj is List<object> critList)
+            {
+                dict["crit"] = critList.ConvertAll(x => x.ToString()).ToArray();
+            }
+            return dict;
         }
 
         /// <summary>
@@ -281,22 +286,58 @@ namespace Jose
             var jwtOptions = options ?? JwtOptions.Default;
 
             Dictionary<string, object> jwtHeader;
-            if (extraHeaders == null)
-            {
-                // Build in correct order for test: alg, typ
-                jwtHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwsHeaderValue(algorithm) }, { "typ", "JWT" } };
-            }
-            else
-            {
-                jwtHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwsHeaderValue(algorithm) } };
-                Dictionaries.Append(jwtHeader, extraHeaders);
-            }
-
-            if (!jwtOptions.EncodePayload)
-            {
-                jwtHeader["b64"] = false;
-                jwtHeader["crit"] = Collections.Union(new[] { "b64" }, Dictionaries.Get<object>(extraHeaders, "crit"));
-            }
+                {
+                    if (!jwtOptions.EncodePayload)
+                    {
+                        // Build header: alg, b64, crit (b64 always first), all extra headers except crit/typ, then typ if not present
+                        var critList = new List<string> { "b64" };
+                        if (extraHeaders != null && extraHeaders.TryGetValue("crit", out var critVal))
+                        {
+                            IEnumerable<string> extras = null;
+                            if (critVal is string[] arr)
+                                extras = arr;
+                            else if (critVal is IEnumerable<object> objEnum)
+                                extras = System.Linq.Enumerable.Select(objEnum, o => o.ToString());
+                            else if (critVal is IEnumerable<string> strEnum)
+                                extras = strEnum;
+                            if (extras != null)
+                            {
+                                foreach (var c in extras)
+                                    if (c != "b64" && c != "crit" && !critList.Contains(c))
+                                        critList.Add(c);
+                            }
+                        }
+                        jwtHeader = new Dictionary<string, object>
+                        {
+                            { "alg", jwtSettings.JwsHeaderValue(algorithm) },
+                            { "b64", false },
+                            { "crit", critList.ToArray() }
+                        };
+                        if (extraHeaders != null)
+                        {
+                            foreach (var kv in extraHeaders)
+                            {
+                                if (kv.Key != "crit" && kv.Key != "typ")
+                                    jwtHeader[kv.Key] = kv.Value;
+                            }
+                        }
+                        if (extraHeaders == null)
+                            jwtHeader["typ"] = "JWT";
+                }
+                else
+                {
+                    // Encoded payload (default) header construction
+                    if (extraHeaders == null)
+                    {
+                        jwtHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwsHeaderValue(algorithm) }, { "typ", "JWT" } };
+                    }
+                    else
+                    {
+                        jwtHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwsHeaderValue(algorithm) } };
+                        Dictionaries.Append(jwtHeader, extraHeaders);
+                    }
+                }
+                    }
 
             byte[] headerBytes = Encoding.UTF8.GetBytes(jwtSettings.JsonMapper.Serialize(jwtHeader));
 
