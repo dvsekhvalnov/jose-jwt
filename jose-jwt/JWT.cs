@@ -282,7 +282,7 @@ namespace Jose
 
             var jwtHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwsHeaderValue(algorithm) } };
 
-            if (extraHeaders == null) //allow overload, but keep backward compatible defaults
+            if (extraHeaders == null) // allow overload, but keep backward compatible defaults
             {
                 extraHeaders = new Dictionary<string, object> { { "typ", "JWT" } };
             }
@@ -297,22 +297,53 @@ namespace Jose
             byte[] headerBytes = Encoding.UTF8.GetBytes(jwtSettings.JsonMapper.Serialize(jwtHeader));
 
             var jwsAlgorithm = jwtSettings.Jws(algorithm);
-
             if (jwsAlgorithm == null)
             {
                 throw new JoseException(string.Format("Unsupported JWS algorithm requested: {0}", algorithm));
             }
 
-            byte[] signature = jwsAlgorithm.Sign(securedInput(headerBytes, payload, jwtOptions.EncodePayload), key);
-
-            Stream payloadStream = jwtOptions.DetachPayload ? new MemoryStream() : payload;
-
-            var jwt = Compact.Serialize(headerBytes, payloadStream, jwtOptions.EncodePayload, signature);
-            
-            using (var reader = new StreamReader(jwt))
+            // Read payload into memory (needed for deterministic signature and to avoid disposal issues)
+            byte[] payloadBytes;
+            if (payload is MemoryStream ms && ms.TryGetBuffer(out ArraySegment<byte> segment))
             {
-                string text = reader.ReadToEnd();
-                return text;
+                if (segment.Array != null)
+                {
+                    payloadBytes = new byte[segment.Count];
+                    Buffer.BlockCopy(segment.Array, segment.Offset, payloadBytes, 0, segment.Count);
+                }
+                else
+                {
+                    payloadBytes = ms.ToArray();
+                }
+            }
+            else
+            {
+                using (var collector = new MemoryStream())
+                {
+                    if (payload.CanSeek) payload.Position = 0;
+                    payload.CopyTo(collector);
+                    payloadBytes = collector.ToArray();
+                }
+            }
+
+            bool b64 = jwtOptions.EncodePayload;
+
+            // Sign over the exact same secured input format used by verification path to avoid any divergence.
+            // We use a fresh MemoryStream instance so we don't consume the original payload stream twice.
+            using (var signingPayload = new MemoryStream(payloadBytes, false))
+            using (var signingInput = securedInput(headerBytes, signingPayload, b64))
+            {
+                // jwsAlgorithm.Sign will fully read signingInput; signingPayload is an in-memory copy.
+                // Do NOT reuse signingPayload for final token serialization (will be at end position).
+                byte[] signature = jwsAlgorithm.Sign(signingInput, key);
+
+                // Build final token parts
+                Stream payloadForToken = jwtOptions.DetachPayload ? new MemoryStream() : new MemoryStream(payloadBytes, false);
+                using (var tokenStream = Compact.Serialize(headerBytes, payloadForToken, b64, signature))
+                using (var reader = new StreamReader(tokenStream, Encoding.UTF8))
+                {
+                    return reader.ReadToEnd();
+                }
             }
         }
 

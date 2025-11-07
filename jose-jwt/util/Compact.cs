@@ -23,42 +23,36 @@ namespace Jose
 
         public static Stream Serialize(byte[] header, Stream payload, bool encodePayload, params byte[][] other)
         {
-            // Header part
-            var headerBytes = Encoding.UTF8.GetBytes(Base64Url.Encode(header));
+            // Header part (always base64url encoded)
+            var headerEncoded = Encoding.UTF8.GetBytes(Base64Url.Encode(header));
             var dot = Encoding.UTF8.GetBytes(".");
 
-            // Build a sequence of streams: header, ".", payload, ".", other parts joined by "."
             var streams = new List<Stream>
             {
-                new MemoryStream(headerBytes, writable: false),
-                new MemoryStream(dot, writable: false)
+                new MemoryStream(headerEncoded, false),
+                new MemoryStream(dot, false)
             };
 
-            // Payload part
-            Stream payloadStream = encodePayload
-                ? new Base64UrlEncodingStream(payload)
-                : payload;
-
-            if (payload.CanSeek)
-                payload.Position = 0;
-
+            // Payload part: optionally base64url encoded
+            if (payload.CanSeek) payload.Position = 0;
+            Stream payloadStream = encodePayload ? new Base64UrlEncodingStream(payload) : payload;
             streams.Add(payloadStream);
-            streams.Add(new MemoryStream(dot, writable: false));
 
-            // Other parts
-            for (int i = 0; i < other.Length; i++)
+            if (other.Length > 0)
             {
-                var test = Base64Url.Encode(other[i]);
-
-                if (encodePayload)
-                    streams.Add(new Base64UrlEncodingStream(new MemoryStream(other[i], writable: false)));
-                else
-                    streams.Add(new MemoryStream(other[i], writable: false));
-
-                if (i < other.Length - 1)
-                    streams.Add(new MemoryStream(dot, writable: false));
+                // Separator before signature / other parts
+                streams.Add(new MemoryStream(dot, false));
+                for (int i = 0; i < other.Length; i++)
+                {
+                    // Other parts (signature, encrypted components) are ALWAYS base64url encoded
+                    var partEncoded = Encoding.UTF8.GetBytes(Base64Url.Encode(other[i]));
+                    streams.Add(new MemoryStream(partEncoded, false));
+                    if (i < other.Length - 1)
+                        streams.Add(new MemoryStream(dot, false));
+                }
             }
 
+            // If there are no other parts we do NOT append a trailing dot (important for JWS signing input)
             return new ConcatenatedStream(streams);
         }
 
