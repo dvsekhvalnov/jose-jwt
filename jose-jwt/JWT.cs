@@ -302,47 +302,48 @@ namespace Jose
                 throw new JoseException(string.Format("Unsupported JWS algorithm requested: {0}", algorithm));
             }
 
-            // Read payload into memory (needed for deterministic signature and to avoid disposal issues)
-            byte[] payloadBytes;
-            if (payload is MemoryStream ms && ms.TryGetBuffer(out ArraySegment<byte> segment))
+            bool b64 = jwtOptions.EncodePayload;
+
+            // Memory-efficient path: if payload is seekable we can sign over it directly and then rewind.
+            if (payload.CanSeek)
             {
-                if (segment.Array != null)
+                long start = payload.Position;
+
+                // Wrap payload so ConcatenatedStream produced by securedInput won't dispose the original stream.
+                using (var signingInput = securedInput(headerBytes, new NonDisposingStream(payload), b64))
                 {
-                    payloadBytes = new byte[segment.Count];
-                    Buffer.BlockCopy(segment.Array, segment.Offset, payloadBytes, 0, segment.Count);
-                }
-                else
-                {
-                    payloadBytes = ms.ToArray();
+                    byte[] signature = jwsAlgorithm.Sign(signingInput, key);
+
+                    // Rewind for serialization
+                    payload.Position = start;
+                    Stream payloadForToken = jwtOptions.DetachPayload ? new MemoryStream() : payload; // reuse original
+                    using (var tokenStream = Compact.Serialize(headerBytes, payloadForToken, b64, signature))
+                    using (var reader = new StreamReader(tokenStream, Encoding.UTF8))
+                    {
+                        return reader.ReadToEnd();
+                    }
                 }
             }
             else
             {
+                // Fallback for non-seekable streams: buffer into memory (cannot rewind otherwise)
+                byte[] payloadBytes;
                 using (var collector = new MemoryStream())
                 {
-                    if (payload.CanSeek) payload.Position = 0;
                     payload.CopyTo(collector);
                     payloadBytes = collector.ToArray();
                 }
-            }
 
-            bool b64 = jwtOptions.EncodePayload;
-
-            // Sign over the exact same secured input format used by verification path to avoid any divergence.
-            // We use a fresh MemoryStream instance so we don't consume the original payload stream twice.
-            using (var signingPayload = new MemoryStream(payloadBytes, false))
-            using (var signingInput = securedInput(headerBytes, signingPayload, b64))
-            {
-                // jwsAlgorithm.Sign will fully read signingInput; signingPayload is an in-memory copy.
-                // Do NOT reuse signingPayload for final token serialization (will be at end position).
-                byte[] signature = jwsAlgorithm.Sign(signingInput, key);
-
-                // Build final token parts
-                Stream payloadForToken = jwtOptions.DetachPayload ? new MemoryStream() : new MemoryStream(payloadBytes, false);
-                using (var tokenStream = Compact.Serialize(headerBytes, payloadForToken, b64, signature))
-                using (var reader = new StreamReader(tokenStream, Encoding.UTF8))
+                using (var signingPayload = new MemoryStream(payloadBytes, false))
+                using (var signingInput = securedInput(headerBytes, signingPayload, b64))
                 {
-                    return reader.ReadToEnd();
+                    byte[] signature = jwsAlgorithm.Sign(signingInput, key);
+                    Stream payloadForToken = jwtOptions.DetachPayload ? new MemoryStream() : new MemoryStream(payloadBytes, false);
+                    using (var tokenStream = Compact.Serialize(headerBytes, payloadForToken, b64, signature))
+                    using (var reader = new StreamReader(tokenStream, Encoding.UTF8))
+                    {
+                        return reader.ReadToEnd();
+                    }
                 }
             }
         }
