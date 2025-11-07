@@ -303,8 +303,6 @@ namespace Jose
                 throw new JoseException(string.Format("Unsupported JWS algorithm requested: {0}", algorithm));
             }
 
-            bool b64 = jwtOptions.EncodePayload;
-
             // Ensure we have a seekable, rewindable payload stream for signing & serialization.
             if (!payload.CanSeek)
                 throw new NotImplementedException("Non-seekable streams are not supported for JWT signing.");
@@ -313,7 +311,7 @@ namespace Jose
             if (payload.Position != 0) payload.Position = 0; // sign from start for deterministic output
 
             // Sign over secured input without disposing caller's stream.
-            using (var signingInput = securedInput(headerBytes, payload, b64))
+            using (var signingInput = securedInput(headerBytes, payload, jwtOptions.EncodePayload))
             {
                 byte[] signature = jwsAlgorithm.Sign(signingInput, key);
 
@@ -325,7 +323,7 @@ namespace Jose
                     ? new MemoryStream()
                     : payload; // payload kept open via ConcatenatedStream keepOpen
 
-                using (var tokenStream = Compact.Serialize(headerBytes, payloadForToken, b64, signature))
+                using (var tokenStream = Compact.Serialize(headerBytes, payloadForToken, jwtOptions.EncodePayload, signature))
                 using (var reader = new StreamReader(tokenStream, Encoding.UTF8))
                 {
                     // Restore caller payload position if it was seekable and we changed it.
