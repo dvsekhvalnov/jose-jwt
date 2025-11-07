@@ -381,6 +381,12 @@ namespace UnitTests
                 return base.Sign(stream, key);
             }
 
+            public new byte[] Sign(Stream securedInput, object key)
+            {
+                SignCalled = true;
+                return base.Sign(securedInput, key);
+            }
+
             public new bool Verify(byte[] signature, Stream securedInput, object key)
             {
                 VerifyCalled = true;

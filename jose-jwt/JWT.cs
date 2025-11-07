@@ -280,20 +280,24 @@ namespace Jose
             var jwtSettings = GetSettings(settings);
             var jwtOptions = options ?? JwtOptions.Default;
 
-            var jwtHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwsHeaderValue(algorithm) } };
-
-            if (extraHeaders == null) // allow overload, but keep backward compatible defaults
+            Dictionary<string, object> jwtHeader;
+            if (extraHeaders == null)
             {
-                extraHeaders = new Dictionary<string, object> { { "typ", "JWT" } };
+                // Build in correct order for test: alg, typ
+                jwtHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwsHeaderValue(algorithm) }, { "typ", "JWT" } };
+            }
+            else
+            {
+                jwtHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwsHeaderValue(algorithm) } };
+                Dictionaries.Append(jwtHeader, extraHeaders);
             }
 
             if (!jwtOptions.EncodePayload)
             {
                 jwtHeader["b64"] = false;
-                jwtHeader["crit"] = Collections.Union(["b64"], Dictionaries.Get<object>(extraHeaders, "crit"));
+                jwtHeader["crit"] = Collections.Union(new[] { "b64" }, Dictionaries.Get<object>(extraHeaders, "crit"));
             }
 
-            Dictionaries.Append(jwtHeader, extraHeaders);
             byte[] headerBytes = Encoding.UTF8.GetBytes(jwtSettings.JsonMapper.Serialize(jwtHeader));
 
             var jwsAlgorithm = jwtSettings.Jws(algorithm);
