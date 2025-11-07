@@ -90,12 +90,7 @@ namespace Jose
         /// <returns>unmarshalled headers</returns>
         public static IDictionary<string, object> Headers(string token, JwtSettings settings = null)
         {
-            var dict = Headers<IDictionary<string, object>>(token, settings);
-            if (dict != null && dict.TryGetValue("crit", out var critObj) && critObj is List<object> critList)
-            {
-                dict["crit"] = critList.ConvertAll(x => x.ToString()).ToArray();
-            }
-            return dict;
+            return Headers<IDictionary<string, object>>(token, settings);
         }
 
         /// <summary>
