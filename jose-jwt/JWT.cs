@@ -305,7 +305,7 @@ namespace Jose
 
             // Ensure we have a seekable, rewindable payload stream for signing & serialization.
             if (!payload.CanSeek)
-                throw new NotImplementedException("Non-seekable streams are not supported for JWT signing.");
+                throw new NotImplementedException("Non-seekable streams are not supported.");
 
             long originalPosition = payload.Position;
             if (payload.Position != 0) payload.Position = 0; // sign from start for deterministic output
