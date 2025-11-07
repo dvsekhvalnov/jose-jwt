@@ -311,24 +311,23 @@ namespace Jose
             bool b64 = jwtOptions.EncodePayload;
 
             // Ensure we have a seekable, rewindable payload stream for signing & serialization.
-            Stream workingPayload = payload;
             if (!payload.CanSeek)
                 throw new NotImplementedException("Non-seekable streams are not supported for JWT signing.");
 
             if (payload.Position != 0) payload.Position = 0; // sign from start for deterministic output
 
             // Sign over secured input without disposing caller's stream.
-            using (var signingInput = securedInput(headerBytes, new NonDisposingStream(workingPayload), b64))
+            using (var signingInput = securedInput(headerBytes, new NonDisposingStream(payload), b64))
             {
                 byte[] signature = jwsAlgorithm.Sign(signingInput, key);
 
                 // Rewind for serialization (if seekable)
-                if (workingPayload.CanSeek) workingPayload.Position = 0;
+                if (payload.CanSeek) payload.Position = 0;
 
-                // Detached payload: empty stream placeholder; otherwise reuse workingPayload (wrapped to avoid disposal).
+                // Detached payload: empty stream placeholder; otherwise reuse payload (wrapped to avoid disposal).
                 Stream payloadForToken = jwtOptions.DetachPayload
                     ? new MemoryStream()
-                    : new NonDisposingStream(workingPayload);
+                    : new NonDisposingStream(payload);
 
                 using (var tokenStream = Compact.Serialize(headerBytes, payloadForToken, b64, signature))
                 using (var reader = new StreamReader(tokenStream, Encoding.UTF8))
