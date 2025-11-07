@@ -312,19 +312,10 @@ namespace Jose
 
             // Ensure we have a seekable, rewindable payload stream for signing & serialization.
             Stream workingPayload = payload;
-            long originalPosition = 0;
             if (!payload.CanSeek)
-            {
-                var buffer = new MemoryStream();
-                payload.CopyTo(buffer);
-                buffer.Position = 0;
-                workingPayload = buffer; // buffered copy
-            }
-            else
-            {
-                originalPosition = payload.Position;
-                if (payload.Position != 0) payload.Position = 0; // sign from start for deterministic output
-            }
+                throw new NotImplementedException("Non-seekable streams are not supported for JWT signing.");
+
+            if (payload.Position != 0) payload.Position = 0; // sign from start for deterministic output
 
             // Sign over secured input without disposing caller's stream.
             using (var signingInput = securedInput(headerBytes, new NonDisposingStream(workingPayload), b64))
@@ -344,7 +335,7 @@ namespace Jose
                 {
                     // Restore caller payload position if it was seekable and we changed it.
                     if (payload.CanSeek)
-                        payload.Position = originalPosition;
+                        payload.Position = payload.Position;
                     return reader.ReadToEnd();
                 }
             }
