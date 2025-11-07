@@ -304,46 +304,42 @@ namespace Jose
 
             bool b64 = jwtOptions.EncodePayload;
 
-            // Memory-efficient path: if payload is seekable we can sign over it directly and then rewind.
-            if (payload.CanSeek)
+            // Ensure we have a seekable, rewindable payload stream for signing & serialization.
+            Stream workingPayload = payload;
+            long originalPosition = 0;
+            if (!payload.CanSeek)
             {
-                long start = payload.Position;
-
-                // Wrap payload so ConcatenatedStream produced by securedInput won't dispose the original stream.
-                using (var signingInput = securedInput(headerBytes, new NonDisposingStream(payload), b64))
-                {
-                    byte[] signature = jwsAlgorithm.Sign(signingInput, key);
-
-                    // Rewind for serialization
-                    payload.Position = start;
-                    Stream payloadForToken = jwtOptions.DetachPayload ? new MemoryStream() : payload; // reuse original
-                    using (var tokenStream = Compact.Serialize(headerBytes, payloadForToken, b64, signature))
-                    using (var reader = new StreamReader(tokenStream, Encoding.UTF8))
-                    {
-                        return reader.ReadToEnd();
-                    }
-                }
+                var buffer = new MemoryStream();
+                payload.CopyTo(buffer);
+                buffer.Position = 0;
+                workingPayload = buffer; // buffered copy
             }
             else
             {
-                // Fallback for non-seekable streams: buffer into memory (cannot rewind otherwise)
-                byte[] payloadBytes;
-                using (var collector = new MemoryStream())
-                {
-                    payload.CopyTo(collector);
-                    payloadBytes = collector.ToArray();
-                }
+                originalPosition = payload.Position;
+                if (payload.Position != 0) payload.Position = 0; // sign from start for deterministic output
+            }
 
-                using (var signingPayload = new MemoryStream(payloadBytes, false))
-                using (var signingInput = securedInput(headerBytes, signingPayload, b64))
+            // Sign over secured input without disposing caller's stream.
+            using (var signingInput = securedInput(headerBytes, new NonDisposingStream(workingPayload), b64))
+            {
+                byte[] signature = jwsAlgorithm.Sign(signingInput, key);
+
+                // Rewind for serialization (if seekable)
+                if (workingPayload.CanSeek) workingPayload.Position = 0;
+
+                // Detached payload: empty stream placeholder; otherwise reuse workingPayload (wrapped to avoid disposal).
+                Stream payloadForToken = jwtOptions.DetachPayload
+                    ? new MemoryStream()
+                    : new NonDisposingStream(workingPayload);
+
+                using (var tokenStream = Compact.Serialize(headerBytes, payloadForToken, b64, signature))
+                using (var reader = new StreamReader(tokenStream, Encoding.UTF8))
                 {
-                    byte[] signature = jwsAlgorithm.Sign(signingInput, key);
-                    Stream payloadForToken = jwtOptions.DetachPayload ? new MemoryStream() : new MemoryStream(payloadBytes, false);
-                    using (var tokenStream = Compact.Serialize(headerBytes, payloadForToken, b64, signature))
-                    using (var reader = new StreamReader(tokenStream, Encoding.UTF8))
-                    {
-                        return reader.ReadToEnd();
-                    }
+                    // Restore caller payload position if it was seekable and we changed it.
+                    if (payload.CanSeek)
+                        payload.Position = originalPosition;
+                    return reader.ReadToEnd();
                 }
             }
         }

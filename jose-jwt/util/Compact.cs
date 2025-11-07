@@ -23,37 +23,29 @@ namespace Jose
 
         public static Stream Serialize(byte[] header, Stream payload, bool encodePayload, params byte[][] other)
         {
-            // Header part (always base64url encoded)
-            var headerEncoded = Encoding.UTF8.GetBytes(Base64Url.Encode(header));
-            var dot = Encoding.UTF8.GetBytes(".");
+            var dotBytes = Encoding.UTF8.GetBytes(".");
+            var list = new List<Stream>();
 
-            var streams = new List<Stream>
-            {
-                new MemoryStream(headerEncoded, false),
-                new MemoryStream(dot, false)
-            };
+            // header
+            list.Add(new MemoryStream(Encoding.UTF8.GetBytes(Base64Url.Encode(header)), false));
+            list.Add(new MemoryStream(dotBytes, false));
 
-            // Payload part: optionally base64url encoded
+            // payload (possibly streaming encoded)
             if (payload.CanSeek) payload.Position = 0;
-            Stream payloadStream = encodePayload ? new Base64UrlEncodingStream(payload) : payload;
-            streams.Add(payloadStream);
+            list.Add(encodePayload ? new Base64UrlEncodingStream(payload) : payload);
 
             if (other.Length > 0)
             {
-                // Separator before signature / other parts
-                streams.Add(new MemoryStream(dot, false));
+                list.Add(new MemoryStream(dotBytes, false));
                 for (int i = 0; i < other.Length; i++)
                 {
-                    // Other parts (signature, encrypted components) are ALWAYS base64url encoded
-                    var partEncoded = Encoding.UTF8.GetBytes(Base64Url.Encode(other[i]));
-                    streams.Add(new MemoryStream(partEncoded, false));
+                    list.Add(new MemoryStream(Encoding.UTF8.GetBytes(Base64Url.Encode(other[i])), false));
                     if (i < other.Length - 1)
-                        streams.Add(new MemoryStream(dot, false));
+                        list.Add(new MemoryStream(dotBytes, false));
                 }
             }
 
-            // If there are no other parts we do NOT append a trailing dot (important for JWS signing input)
-            return new ConcatenatedStream(streams);
+            return new ConcatenatedStream(list);
         }
 
         public static byte[][] Parse(string token)
