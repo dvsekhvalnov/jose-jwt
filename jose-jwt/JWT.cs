@@ -314,6 +314,7 @@ namespace Jose
             if (!payload.CanSeek)
                 throw new NotImplementedException("Non-seekable streams are not supported for JWT signing.");
 
+            long originalPosition = payload.Position;
             if (payload.Position != 0) payload.Position = 0; // sign from start for deterministic output
 
             // Sign over secured input without disposing caller's stream.
@@ -334,7 +335,7 @@ namespace Jose
                 {
                     // Restore caller payload position if it was seekable and we changed it.
                     if (payload.CanSeek)
-                        payload.Position = payload.Position;
+                        payload.Position = originalPosition;
                     return reader.ReadToEnd();
                 }
             }
