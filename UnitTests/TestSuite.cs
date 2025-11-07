@@ -9,6 +9,8 @@ using Jose;
 using Jose.keys;
 using Xunit;
 using Xunit.Abstractions;
+using System.IO;
+
 #if NETCOREAPP
 using Newtonsoft.Json.Linq;
 #endif //NETCOREAPP
@@ -81,6 +83,21 @@ namespace UnitTests
             string token = Jose.JWT.EncodeBytes(BinaryPayload, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS512);
 
             Console.Out.WriteLine("EncodeBytesHS512: " + token);
+
+            Assert.Equal("eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w.3_-H4HJiNi8--Ss-VAMM1Dg0JtTGEXNvMo1LAHEnQ7bZpQiblqAu5tt-G9p8KFnSlSYOG6l64pIqmqu5p5RvuQ", token);
+        }
+
+        [Fact]
+        public void EncodeStreamHS512()
+        {
+            // This test encodes a payload consisting of arbitrary binary data. Only a single signature algorithm is tested
+            // in the binary data scenario, as the internal flow is the same as for the non-Bytes methods and the
+            // other tests also cover the primary JOSE functionality, with only the binary-payload-specific part tested here.
+
+            using var stream = new MemoryStream(BinaryPayload);
+            string token = Jose.JWT.EncodeStream(stream, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS512);
+
+            Console.Out.WriteLine("EncodeStreamHS512: " + token);
 
             Assert.Equal("eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w.3_-H4HJiNi8--Ss-VAMM1Dg0JtTGEXNvMo1LAHEnQ7bZpQiblqAu5tt-G9p8KFnSlSYOG6l64pIqmqu5p5RvuQ", token);
         }
@@ -681,7 +698,7 @@ namespace UnitTests
         [InlineData("ECDH")]
         public void EncodeES256(string keyImplementation)
         {
-            if(keyImplementation == "CNG")
+            if (keyImplementation == "CNG")
             {
                 Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows),
                     "This requires CNG, which is Windows Only.");
@@ -734,7 +751,7 @@ namespace UnitTests
         [InlineData("ECDH")]
         public void EncodeES256_JsonWebKey(string keyImplementation)
         {
-            if(keyImplementation == "CNG")
+            if (keyImplementation == "CNG")
             {
                 Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows),
                     "This requires CNG, which is Windows Only.");
@@ -770,7 +787,7 @@ namespace UnitTests
         [InlineData("ECDH")]
         public void EncodeES384(string keyImplementation)
         {
-            if(keyImplementation == "CNG")
+            if (keyImplementation == "CNG")
             {
                 Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows),
                     "This requires CNG, which is Windows Only.");
@@ -801,7 +818,7 @@ namespace UnitTests
         [InlineData("ECDH")]
         public void EncodeES512(string keyImplementation)
         {
-            if(keyImplementation == "CNG")
+            if (keyImplementation == "CNG")
             {
                 Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows),
                     "This requires CNG, which is Windows Only.");
@@ -969,8 +986,8 @@ namespace UnitTests
 
             //then
             Console.Out.WriteLine("json = {0}", json);
-            
-            Assert.Equal(@"{""sub"":""alice"",""aud"":[""https://app-one.com"",""https://app-two.com""],""nbf"":1730312729,""iss"":""https://openid.net"",""exp"":1730313329,""iat"":1730312729,""jti"":""d8915fdb-8985-4c86-ae8d-28567016f623""}", json);            
+
+            Assert.Equal(@"{""sub"":""alice"",""aud"":[""https://app-one.com"",""https://app-two.com""],""nbf"":1730312729,""iss"":""https://openid.net"",""exp"":1730313329,""iat"":1730312729,""jti"":""d8915fdb-8985-4c86-ae8d-28567016f623""}", json);
         }
 
         [Fact]
@@ -984,8 +1001,8 @@ namespace UnitTests
 
             //then
             Console.Out.WriteLine("json = {0}", json);
-            
-            Assert.Equal(@"{""sub"":""alice"",""aud"":[""https://app-one.com"",""https://app-two.com""],""nbf"":1729866729,""iss"":""https://openid.net"",""exp"":1729867329,""iat"":1729866729,""jti"":""da2aa440-2923-4501-b169-04fe0904da4d""}", json);            
+
+            Assert.Equal(@"{""sub"":""alice"",""aud"":[""https://app-one.com"",""https://app-two.com""],""nbf"":1729866729,""iss"":""https://openid.net"",""exp"":1729867329,""iat"":1729866729,""jti"":""da2aa440-2923-4501-b169-04fe0904da4d""}", json);
         }
 
         [Fact]
@@ -2020,7 +2037,7 @@ namespace UnitTests
             Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
-	[Fact]
+        [Fact]
         public void Decrypt_ECDH_ES_A192GCM()
         {
             //given
@@ -2086,7 +2103,7 @@ namespace UnitTests
             Assert.Equal(@"{""exp"":1392553211,""sub"":""alice"",""nbf"":1392552611,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""586dd129-a29f-49c8-9de7-454af1155e27"",""iat"":1392552611}", json);
         }
 
-	[Fact]
+        [Fact]
         public void Decrypt_ECDH_ES_A256GCM()
         {
             //given
@@ -2165,7 +2182,7 @@ namespace UnitTests
         {
             //given
             const string token = "eyJhbGciOiJFQ0RILUVTK0ExMjhLVyIsImVuYyI6IkExMjhDQkMtSFMyNTYiLCJlcGsiOnsia3R5IjoiRUMiLCJ4IjoiQV9ZQTN2RmkwX1hLZDdjV1lieWtYM01jd3lJME1XNXdCTGJzVFhPSHBodyIsInkiOiJOVkRfLVlvWXdpek9NWExXb0RWZjFEWnhicWRua1pwc0lGek9MdUEyMWJrIiwiY3J2IjoiUC0yNTYifX0.w-xmfoNtoDJclw3oyQAGRFl7YncQmBuS2elOfOVwCxowy020eLgdDA.whppnZj93jGWs0my1yy9wA.hymV6EH4IBwb7ziemqFPuXKi4oebp1uJX9wlK_FBNMezZjiLjgV9ayhe-UVcPa79C1T1pTp1YVC7y1g6L5gvmyKJXGO8eHTeJUjJaXjBI-ayFWn3OjrOH6DaO70npNMncqsN3f0cgvHJvEYuUq5-NxgHtnSxH3OUAVzgdCneoMgL8XqKF4LtvdIn6TXZGyRWvMzcDKYaKLu9q1zAGmxXpGjMz2MQlLAgiqPOpG-Gn3giBOv4x0THgkuXCfwu29BpM92snOTFA__jIPPm7jH2eQ.XE2Kt5ndMpI4eLoxWkkEaw";
-    
+
             var privateKey = new Jwk(
               crv: "P-256",
               x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk",
@@ -2998,7 +3015,7 @@ namespace UnitTests
             Assert.Equal(22, parts[4].Length); //auth tag size
 
             Assert.Equal(json, Jose.JWT.Decode(token, Ecdh256Private(CngKeyUsages.KeyAgreement)));
-        }  
+        }
 
         [Fact]
         public void Encrypt_ECDH_ES_A128KW_A128CBC_HS256_JsonWebKey()
@@ -3808,7 +3825,7 @@ namespace UnitTests
             Assert.Equal(22, parts[4].Length); //auth tag size
 
             Assert.Equal(json, Jose.JWT.Decode(token, Ecdh384Private(CngKeyUsages.KeyAgreement)));
-        } 
+        }
 
         [Fact]
         public void Encrypt_ECDH_ES_A192GCM_JsonWebKey()
@@ -4461,7 +4478,7 @@ namespace UnitTests
 
             // then
             Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, testSuiteUtils.PubKey(), JwsAlgorithm.RS512));
-	    Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, testSuiteUtils.PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM));            
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, testSuiteUtils.PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM));
         }
 
         [Fact]
@@ -4566,7 +4583,7 @@ namespace UnitTests
 
             //then
             string json = Jose.JWT.Verify(token, testSuiteUtils.PubKey());
-            
+
             Assert.Equal(@"{""hello"": ""world""}", json);
         }
 
@@ -4846,7 +4863,7 @@ namespace UnitTests
             byte[] x = { 70, 151, 220, 179, 62, 0, 79, 232, 114, 64, 58, 75, 91, 209, 232, 128, 7, 137, 151, 42, 13, 148, 15, 133, 93, 215, 7, 3, 136, 124, 14, 101, 242, 207, 192, 69, 212, 145, 88, 59, 222, 33, 127, 46, 30, 218, 175, 79 };
             byte[] y = { 189, 202, 196, 30, 153, 53, 22, 122, 171, 4, 188, 42, 71, 2, 9, 193, 191, 17, 111, 180, 78, 6, 110, 153, 240, 147, 203, 45, 152, 236, 181, 156, 232, 223, 227, 148, 68, 148, 221, 176, 57, 149, 44, 203, 83, 85, 75, 55 };
 
-            return EcdhKey.New(x, y, usage:usage);
+            return EcdhKey.New(x, y, usage: usage);
         }
 
         private static ECDiffieHellman Ecdh384Private(CngKeyUsages usage = CngKeyUsages.Signing)
@@ -4863,7 +4880,7 @@ namespace UnitTests
             byte[] x = { 0, 248, 73, 203, 53, 184, 34, 69, 111, 217, 230, 255, 108, 212, 241, 229, 95, 239, 93, 131, 100, 37, 86, 152, 87, 98, 170, 43, 25, 35, 80, 137, 62, 112, 197, 113, 138, 116, 114, 55, 165, 128, 8, 139, 148, 237, 109, 121, 40, 205, 3, 61, 127, 28, 195, 58, 43, 228, 224, 228, 82, 224, 219, 148, 204, 96 };
             byte[] y = { 0, 60, 71, 97, 112, 106, 35, 121, 80, 182, 20, 167, 143, 8, 246, 108, 234, 160, 193, 10, 3, 148, 45, 11, 58, 177, 190, 172, 26, 178, 188, 240, 91, 25, 67, 79, 64, 241, 203, 65, 223, 218, 12, 227, 82, 178, 66, 160, 19, 194, 217, 172, 61, 250, 23, 78, 218, 130, 160, 105, 216, 208, 235, 124, 46, 32 };
 
-            return EcdhKey.New(x, y, usage:usage);
+            return EcdhKey.New(x, y, usage: usage);
         }
 
         private static ECDiffieHellman Ecdh512Private(CngKeyUsages usage = CngKeyUsages.Signing)
@@ -4875,8 +4892,10 @@ namespace UnitTests
             return EcdhKey.New(x, y, d, usage);
         }
 
-        private X509KeyStorageFlags StorageFlags() {
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) {
+        private X509KeyStorageFlags StorageFlags()
+        {
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+            {
                 return X509KeyStorageFlags.Exportable;
             }
 
@@ -4913,22 +4932,22 @@ namespace UnitTests
 
         private ECDsa ECDSa521Public()
         {
-            #if NET5_0_OR_GREATER
-                var x095 = new X509Certificate2("ecc521n.p12", "12345");
-            #else
+#if NET5_0_OR_GREATER
+            var x095 = new X509Certificate2("ecc521n.p12", "12345");
+#else
                 var x095 = new X509Certificate2("ecc521.p12", "12345");
-            #endif
+#endif
 
             return x095.GetECDsaPublicKey();
         }
 
         private ECDsa ECDSa521Private()
         {
-            #if NET5_0_OR_GREATER
-                var x095 = new X509Certificate2("ecc521n.p12", "12345", StorageFlags());
-            #else
+#if NET5_0_OR_GREATER
+            var x095 = new X509Certificate2("ecc521n.p12", "12345", StorageFlags());
+#else
                 var x095 = new X509Certificate2("ecc521.p12", "12345", StorageFlags());
-            #endif
+#endif
 
             return Exportable(x095.GetECDsaPrivateKey());
         }

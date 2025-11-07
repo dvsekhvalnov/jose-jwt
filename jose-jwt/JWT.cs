@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Jose
@@ -243,9 +244,7 @@ namespace Jose
         /// <returns>JWT in compact serialization form, digitally signed.</returns>
         public static string Encode(string payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null, JwtOptions options = null)
         {
-            byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);
-
-            return EncodeBytes(payloadBytes, key, algorithm, extraHeaders, settings, options);
+            return EncodeStream(new MemoryStream(Encoding.UTF8.GetBytes(payload)), key, algorithm, extraHeaders, settings, options);
         }
 
         /// <summary>
@@ -259,6 +258,21 @@ namespace Jose
         /// <param name="options">additional encoding options</param>
         /// <returns>JWT in compact serialization form, digitally signed.</returns>
         public static string EncodeBytes(byte[] payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null, JwtOptions options = null)
+        {
+            return EncodeStream(new MemoryStream(payload), key, algorithm, extraHeaders, settings, options);
+        }
+
+        /// <summary>
+        /// Encodes given stream to JWT token and sign it using given algorithm.
+        /// </summary>
+        /// <param name="payload">Stream to encode (not null)</param>
+        /// <param name="key">key for signing, suitable for provided JWS algorithm, can be null.</param>
+        /// <param name="algorithm">JWT algorithm to be used.</param>
+        /// <param name="extraHeaders">optional extra headers to pass along with the payload.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
+        /// <param name="options">additional encoding options</param>
+        /// <returns>JWT in compact serialization form, digitally signed.</returns>
+        public static string EncodeStream(Stream payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null, JwtOptions options = null)
         {
             if (payload == null)
                 throw new ArgumentNullException(nameof(payload));
@@ -276,7 +290,7 @@ namespace Jose
             if (!jwtOptions.EncodePayload)
             {
                 jwtHeader["b64"] = false;
-                jwtHeader["crit"] = Collections.Union(new[] { "b64" }, Dictionaries.Get<object>(extraHeaders, "crit"));
+                jwtHeader["crit"] = Collections.Union(["b64"], Dictionaries.Get<object>(extraHeaders, "crit"));
             }
 
             Dictionaries.Append(jwtHeader, extraHeaders);
@@ -291,11 +305,15 @@ namespace Jose
 
             byte[] signature = jwsAlgorithm.Sign(securedInput(headerBytes, payload, jwtOptions.EncodePayload), key);
 
-            byte[] payloadBytes = jwtOptions.DetachPayload ? new byte[0] : payload;
+            Stream payloadStream = jwtOptions.DetachPayload ? new MemoryStream() : payload;
 
-            return jwtOptions.EncodePayload
-                ? Compact.Serialize(headerBytes, payloadBytes, signature)
-                : Compact.Serialize(headerBytes, Encoding.UTF8.GetString(payloadBytes), signature);
+            var jwt = Compact.Serialize(headerBytes, payloadStream, jwtOptions.EncodePayload, signature);
+            
+            using (var reader = new StreamReader(jwt))
+            {
+                string text = reader.ReadToEnd();
+                return text;
+            }
         }
 
         /// <summary>
@@ -550,7 +568,7 @@ namespace Jose
                     throw new JoseException(string.Format("Unsupported JWS algorithm requested: {0}", algorithm));
                 }
 
-                if (!jwsAlgorithmImpl.Verify(signature, securedInput(header, effectivePayload, b64), key))
+                if (!jwsAlgorithmImpl.Verify(signature, securedInput(header, new MemoryStream(effectivePayload), b64), key))
                 {
                     throw new IntegrityException("Invalid signature.");
                 }
@@ -575,13 +593,9 @@ namespace Jose
             return settings ?? defaultSettings;
         }
 
-        private static byte[] securedInput(byte[] header, byte[] payload, bool b64)
+        private static Stream securedInput(byte[] header, Stream payload, bool b64)
         {
-            return b64
-                ? Encoding.UTF8.GetBytes(Compact.Serialize(header, payload))
-                : Arrays.Concat(Encoding.UTF8.GetBytes(Compact.Serialize(header)),
-                                Encoding.UTF8.GetBytes("."),
-                                payload);
+            return Compact.Serialize(header, payload, b64);
         }
     }
 

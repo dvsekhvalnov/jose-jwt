@@ -112,7 +112,8 @@ namespace Jose
             byte[] al = Arrays.LongToBytes(aad.Length * 8L);
             byte[] hmacInput = Arrays.Concat(aad, iv, cipherText, al);
 
-            byte[] hmac = hashAlgorithm.Sign(hmacInput, hmacKey);
+            using var stream = new MemoryStream(hmacInput);
+            byte[] hmac = hashAlgorithm.Sign(stream, hmacKey);
 
             return Arrays.FirstHalf(hmac);
         }

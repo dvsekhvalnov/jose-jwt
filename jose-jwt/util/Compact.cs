@@ -1,7 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using System.Threading;
 
 namespace Jose
 {
@@ -9,34 +9,57 @@ namespace Jose
     {
         public static string Serialize(params byte[][] parts)
         {
-            var builder=new StringBuilder();
+            var builder = new StringBuilder();
 
             foreach (var part in parts)
             {
                 builder.Append(Base64Url.Encode(part)).Append(".");
             }
 
-            builder.Remove(builder.Length - 1,1);
+            builder.Remove(builder.Length - 1, 1);
 
             return builder.ToString();
         }
 
-        public static string Serialize(byte[] header, string payload, params byte[][]other)
+        public static Stream Serialize(byte[] header, Stream payload, bool encodePayload, params byte[][] other)
         {
-            var builder=new StringBuilder()            
-                .Append(Base64Url.Encode(header))
-                .Append(".")
-                .Append(payload)
-                .Append(".");            
+            // Header part
+            var headerBytes = Encoding.UTF8.GetBytes(Base64Url.Encode(header));
+            var dot = Encoding.UTF8.GetBytes(".");
 
-            foreach (var part in other)
+            // Build a sequence of streams: header, ".", payload, ".", other parts joined by "."
+            var streams = new List<Stream>
             {
-                builder.Append(Base64Url.Encode(part)).Append(".");
+                new MemoryStream(headerBytes, writable: false),
+                new MemoryStream(dot, writable: false)
+            };
+
+            // Payload part
+            Stream payloadStream = encodePayload
+                ? new Base64UrlEncodingStream(payload)
+                : payload;
+
+            if (payload.CanSeek)
+                payload.Position = 0;
+
+            streams.Add(payloadStream);
+            streams.Add(new MemoryStream(dot, writable: false));
+
+            // Other parts
+            for (int i = 0; i < other.Length; i++)
+            {
+                var test = Base64Url.Encode(other[i]);
+
+                if (encodePayload)
+                    streams.Add(new Base64UrlEncodingStream(new MemoryStream(other[i], writable: false)));
+                else
+                    streams.Add(new MemoryStream(other[i], writable: false));
+
+                if (i < other.Length - 1)
+                    streams.Add(new MemoryStream(dot, writable: false));
             }
 
-            builder.Remove(builder.Length - 1,1);
-
-            return builder.ToString();
+            return new ConcatenatedStream(streams);
         }
 
         public static byte[][] Parse(string token)
@@ -86,7 +109,7 @@ namespace Jose
             {
                 if (current < parts.Length)
                 {
-                    string  part = parts[current++];
+                    string part = parts[current++];
 
                     return decode ? Base64Url.Decode(part) : Encoding.UTF8.GetBytes(part);
                 }

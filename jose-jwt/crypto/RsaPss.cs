@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Security.Cryptography;
 using Jose.native;
 
@@ -6,7 +7,7 @@ namespace Jose
 {
     public static class RsaPss
     {
-        public static byte[] Sign(byte[] input, CngKey key, CngAlgorithm hash, int saltSize)
+        public static byte[] Sign(Stream input, CngKey key, CngAlgorithm hash, int saltSize)
         {
             using (HashAlgorithm algo = HashAlgorithm(hash))
             {
@@ -14,7 +15,7 @@ namespace Jose
             }
         }
 
-        public static bool Verify(byte[] securedInput, byte[] signature, CngKey key, CngAlgorithm hash, int saltSize)
+        public static bool Verify(Stream securedInput, byte[] signature, CngKey key, CngAlgorithm hash, int saltSize)
         {
             using (HashAlgorithm algo = HashAlgorithm(hash))
             {
