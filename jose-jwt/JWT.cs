@@ -318,7 +318,7 @@ namespace Jose
             if (payload.Position != 0) payload.Position = 0; // sign from start for deterministic output
 
             // Sign over secured input without disposing caller's stream.
-            using (var signingInput = securedInput(headerBytes, new NonDisposingStream(payload), b64))
+            using (var signingInput = securedInput(headerBytes, payload, b64))
             {
                 byte[] signature = jwsAlgorithm.Sign(signingInput, key);
 
@@ -328,7 +328,7 @@ namespace Jose
                 // Detached payload: empty stream placeholder; otherwise reuse payload (wrapped to avoid disposal).
                 Stream payloadForToken = jwtOptions.DetachPayload
                     ? new MemoryStream()
-                    : new NonDisposingStream(payload);
+                    : payload; // payload kept open via ConcatenatedStream keepOpen
 
                 using (var tokenStream = Compact.Serialize(headerBytes, payloadForToken, b64, signature))
                 using (var reader = new StreamReader(tokenStream, Encoding.UTF8))
@@ -620,6 +620,7 @@ namespace Jose
 
         private static Stream securedInput(byte[] header, Stream payload, bool b64)
         {
+            // Keep payload stream open (caller owns it)
             return Compact.Serialize(header, payload, b64);
         }
     }

@@ -7,22 +7,23 @@ namespace Jose
     // Concatenates multiple streams into one logical stream
     public class ConcatenatedStream : Stream
     {
-        private readonly IEnumerator<Stream> streams;
+        private readonly List<Stream> streams;
+        private readonly Stream keepOpen; // stream we should NOT dispose
+        private int index;
         private Stream current;
 
-        public ConcatenatedStream(IEnumerable<Stream> streams)
+        public ConcatenatedStream(IEnumerable<Stream> streams, Stream keepOpen = null)
         {
-            this.streams = streams.GetEnumerator();
-            MoveNextStream();
+            this.streams = new List<Stream>(streams);
+            this.keepOpen = keepOpen;
+            index = 0;
+            current = this.streams.Count > 0 ? this.streams[0] : null;
         }
 
         private void MoveNextStream()
         {
-            current?.Dispose();
-            if (streams.MoveNext())
-                current = streams.Current;
-            else
-                current = null;
+            index++;
+            current = index < streams.Count ? streams[index] : null;
         }
 
         public override bool CanRead => true;
@@ -53,10 +54,11 @@ namespace Jose
         {
             if (disposing)
             {
-                current?.Dispose();
-                while (streams.MoveNext())
-                    streams.Current.Dispose();
-                streams.Dispose();
+                foreach (var s in streams)
+                {
+                    if (s != keepOpen)
+                        s.Dispose();
+                }
             }
             base.Dispose(disposing);
         }

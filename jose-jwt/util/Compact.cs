@@ -45,7 +45,8 @@ namespace Jose
                 }
             }
 
-            return new ConcatenatedStream(list);
+            // Keep original payload stream undisposed for caller reuse
+            return new ConcatenatedStream(list, payload);
         }
 
         public static byte[][] Parse(string token)
