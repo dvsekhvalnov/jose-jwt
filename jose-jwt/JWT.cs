@@ -311,7 +311,7 @@ namespace Jose
             if (payload.Position != 0) payload.Position = 0; // sign from start for deterministic output
 
             // Sign over secured input without disposing caller's stream.
-            using (var signingInput = securedInput(headerBytes, payload, jwtOptions.EncodePayload))
+            using (var signingInput = Compact.Serialize(headerBytes, payload, jwtOptions.EncodePayload))
             {
                 byte[] signature = jwsAlgorithm.Sign(signingInput, key);
 
@@ -586,7 +586,7 @@ namespace Jose
                     throw new JoseException(string.Format("Unsupported JWS algorithm requested: {0}", algorithm));
                 }
 
-                if (!jwsAlgorithmImpl.Verify(signature, securedInput(header, new MemoryStream(effectivePayload), b64), key))
+                if (!jwsAlgorithmImpl.Verify(signature, Compact.Serialize(header, new MemoryStream(effectivePayload), b64), key))
                 {
                     throw new IntegrityException("Invalid signature.");
                 }
@@ -609,12 +609,6 @@ namespace Jose
         private static JwtSettings GetSettings(JwtSettings settings)
         {
             return settings ?? defaultSettings;
-        }
-
-        private static Stream securedInput(byte[] header, Stream payload, bool b64)
-        {
-            // Keep payload stream open (caller owns it)
-            return Compact.Serialize(header, payload, b64);
         }
     }
 
