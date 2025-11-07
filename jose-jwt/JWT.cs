@@ -279,65 +279,26 @@ namespace Jose
         /// <returns>JWT in compact serialization form, digitally signed.</returns>
         public static string EncodeStream(Stream payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null, JwtOptions options = null)
         {
-            if (payload == null)
+             if (payload == null)
                 throw new ArgumentNullException(nameof(payload));
 
             var jwtSettings = GetSettings(settings);
             var jwtOptions = options ?? JwtOptions.Default;
 
-            Dictionary<string, object> jwtHeader;
-                {
-                    if (!jwtOptions.EncodePayload)
-                    {
-                        // Build header: alg, b64, crit (b64 always first), all extra headers except crit/typ, then typ if not present
-                        var critList = new List<string> { "b64" };
-                        if (extraHeaders != null && extraHeaders.TryGetValue("crit", out var critVal))
-                        {
-                            IEnumerable<string> extras = null;
-                            if (critVal is string[] arr)
-                                extras = arr;
-                            else if (critVal is IEnumerable<object> objEnum)
-                                extras = System.Linq.Enumerable.Select(objEnum, o => o.ToString());
-                            else if (critVal is IEnumerable<string> strEnum)
-                                extras = strEnum;
-                            if (extras != null)
-                            {
-                                foreach (var c in extras)
-                                    if (c != "b64" && c != "crit" && !critList.Contains(c))
-                                        critList.Add(c);
-                            }
-                        }
-                        jwtHeader = new Dictionary<string, object>
-                        {
-                            { "alg", jwtSettings.JwsHeaderValue(algorithm) },
-                            { "b64", false },
-                            { "crit", critList.ToArray() }
-                        };
-                        if (extraHeaders != null)
-                        {
-                            foreach (var kv in extraHeaders)
-                            {
-                                if (kv.Key != "crit" && kv.Key != "typ")
-                                    jwtHeader[kv.Key] = kv.Value;
-                            }
-                        }
-                        if (extraHeaders == null)
-                            jwtHeader["typ"] = "JWT";
-                }
-                else
-                {
-                    // Encoded payload (default) header construction
-                    if (extraHeaders == null)
-                    {
-                        jwtHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwsHeaderValue(algorithm) }, { "typ", "JWT" } };
-                    }
-                    else
-                    {
-                        jwtHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwsHeaderValue(algorithm) } };
-                        Dictionaries.Append(jwtHeader, extraHeaders);
-                    }
-                }
-                    }
+            var jwtHeader = new Dictionary<string, object> { { "alg", jwtSettings.JwsHeaderValue(algorithm) } };
+
+            if (extraHeaders == null) //allow overload, but keep backward compatible defaults
+            {
+                extraHeaders = new Dictionary<string, object> { { "typ", "JWT" } };
+            }
+
+            if (!jwtOptions.EncodePayload)
+            {
+                jwtHeader["b64"] = false;
+                jwtHeader["crit"] = Collections.Union(new[] { "b64" }, Dictionaries.Get<object>(extraHeaders, "crit"));
+            }
+
+            Dictionaries.Append(jwtHeader, extraHeaders);
 
             byte[] headerBytes = Encoding.UTF8.GetBytes(jwtSettings.JsonMapper.Serialize(jwtHeader));
 
