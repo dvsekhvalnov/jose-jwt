@@ -1,13 +1,12 @@
 name: BuildAndTestFunctions
 on:
+  workflow_dispatch:
   push:
-
   pull_request:
     branches:
-    - master
+      - master
 
 jobs:
-
   build-test-nix:
     name: Build and test .NET Core
 
@@ -16,47 +15,46 @@ jobs:
       fail-fast: false # we want to see list of failing tests for each combination
       matrix:
         os: [windows-latest, ubuntu-latest, ubuntu-22.04, macos-latest]
-        framework: ['netcoreapp3.1', 'net5.0', 'net8.0']
+        framework: ["netcoreapp3.1", "net5.0", "net8.0"]
         exclude:
           - os: macos-latest
-            framework: 'netcoreapp3.1'
+            framework: "netcoreapp3.1"
 
           - os: macos-latest
-            framework: 'net5.0'
+            framework: "net5.0"
 
           - os: ubuntu-latest
-            framework: 'net5.0'
+            framework: "net5.0"
 
           - os: ubuntu-latest
-            framework: 'netcoreapp3.1'
+            framework: "netcoreapp3.1"
 
     steps:
+      - name: Check out code onto host
+        uses: actions/checkout@v1
 
-    - name: Check out code onto host
-      uses: actions/checkout@v1
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            3.1.x
+            5.0.x
+            8.0.x
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: | 
-          3.1.x
-          5.0.x
-          8.0.x
+      - name: Dotnet info
+        run: |
+          dotnet --version
+          dotnet --info
 
-    - name: Dotnet info
-      run: |
-        dotnet --version
-        dotnet --info
+      - name: Clear nuget cache
+        # Workaround for https://github.com/actions/setup-dotnet/issues/155
+        run: |
+          dotnet clean jose-jwt.sln
+          dotnet nuget locals all --clear
 
-    - name: Clear nuget cache
-    # Workaround for https://github.com/actions/setup-dotnet/issues/155
-      run: |
-        dotnet clean jose-jwt.sln
-        dotnet nuget locals all --clear
-
-    - name: Run unit tests
-      run: |
-        dotnet test jose-jwt.sln --framework=${{ matrix.framework }}
+      - name: Run unit tests
+        run: |
+          dotnet test jose-jwt.sln --framework=${{ matrix.framework }}
 
   build-test-netfx:
     name: Build and test .NET Framework
@@ -65,39 +63,39 @@ jobs:
     strategy:
       fail-fast: false # we want to see list of failing tests for each combination
       matrix:
-        framework: ['net40', 'net46', 'net47']
+        framework: ["net40", "net46", "net47"]
     steps:
-    - name: Check out code onto host
-      uses: actions/checkout@v3
+      - name: Check out code onto host
+        uses: actions/checkout@v3
 
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v1.1
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v1.1
 
-    - name: Setup NuGet
-      uses: nuget/setup-nuget@v1
-      with:
-        nuget-version: '6.x'
+      - name: Setup NuGet
+        uses: nuget/setup-nuget@v1
+        with:
+          nuget-version: "6.x"
 
-    - name: Nuget Restore jose-jwt-${{ matrix.framework }}
-      continue-on-error: true
-      run: nuget restore jose-jwt-${{ matrix.framework }}.sln
+      - name: Nuget Restore jose-jwt-${{ matrix.framework }}
+        continue-on-error: true
+        run: nuget restore jose-jwt-${{ matrix.framework }}.sln
 
-    - name: MSBuild jose-jwt-${{ matrix.framework }}
-      continue-on-error: true
-      run: msbuild jose-jwt-${{ matrix.framework }}.sln /t:rebuild /v:detailed /p:Configuration=Release
+      - name: MSBuild jose-jwt-${{ matrix.framework }}
+        continue-on-error: true
+        run: msbuild jose-jwt-${{ matrix.framework }}.sln /t:rebuild /v:detailed /p:Configuration=Release
 
-    # - name: Install NUnit.ConsoleRunner
-    #   if: matrix.framework == 'net40'
-    #   run: nuget install NUnit.ConsoleRunner -Version 3.15.0 -DirectDownload -OutputDirectory .
+      # - name: Install NUnit.ConsoleRunner
+      #   if: matrix.framework == 'net40'
+      #   run: nuget install NUnit.ConsoleRunner -Version 3.15.0 -DirectDownload -OutputDirectory .
 
-    # - name: Run UnitTestsNet40
-    #   if: matrix.framework == 'net40'
-    #   run: .\NUnit.ConsoleRunner.3.15.0\tools\nunit3-console.exe UnitTestsNet40\bin\Release\UnitTestsNet40.dll
+      # - name: Run UnitTestsNet40
+      #   if: matrix.framework == 'net40'
+      #   run: .\NUnit.ConsoleRunner.3.15.0\tools\nunit3-console.exe UnitTestsNet40\bin\Release\UnitTestsNet40.dll
 
-    - name: Install xunit.runner.console
-      if: ${{ matrix.framework == 'net46' || matrix.framework == 'net47' }}
-      run: nuget install xunit.runner.console -Version 2.2.0-beta4-build3444 -DirectDownload -OutputDirectory .
+      - name: Install xunit.runner.console
+        if: ${{ matrix.framework == 'net46' || matrix.framework == 'net47' }}
+        run: nuget install xunit.runner.console -Version 2.4.2 -DirectDownload -OutputDirectory .
 
-    - name: Run UnitTestsNet46
-      if: ${{ matrix.framework == 'net46' || matrix.framework == 'net47' }}
-      run: .\xunit.runner.console.2.2.0-beta4-build3444\tools\xunit.console.exe UnitTestsNet46\bin\Release\UnitTestsNet46.dll
+      - name: Run UnitTestsNet46
+        if: ${{ matrix.framework == 'net46' || matrix.framework == 'net47' }}
+        run: .\xunit.runner.console.2.4.2\tools\xunit.console.exe UnitTestsNet46\bin\Release\UnitTestsNet46.dll
