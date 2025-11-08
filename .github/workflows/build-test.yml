@@ -98,4 +98,4 @@ jobs:
 
       - name: Run UnitTestsNet46
         if: ${{ matrix.framework == 'net46' || matrix.framework == 'net47' }}
-        run: .\xunit.runner.console.2.4.2\tools\xunit.console.exe UnitTestsNet46\bin\Release\UnitTestsNet46.dll
+        run: .\xunit.runner.console.2.4.2\tools\net46\xunit.console.exe UnitTestsNet46\bin\Release\UnitTestsNet46.dll
