@@ -90,16 +90,23 @@ namespace UnitTests
         [Fact]
         public void EncodeStreamHS512()
         {
-            // This test encodes a payload consisting of arbitrary binary data. Only a single signature algorithm is tested
-            // in the binary data scenario, as the internal flow is the same as for the non-Bytes methods and the
-            // other tests also cover the primary JOSE functionality, with only the binary-payload-specific part tested here.
+            // This test encodes a binary payload via stream using HS512 and verifies:
+            // 1) Token matches expected value
+            // 2) Stream remains usable (readable & seekable)
+            // 3) Stream position is restored to its original (0)
+            // 4) Payload data is intact
 
             using var stream = new MemoryStream(BinaryPayload);
+            const string expectedToken = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w.3_-H4HJiNi8--Ss-VAMM1Dg0JtTGEXNvMo1LAHEnQ7bZpQiblqAu5tt-G9p8KFnSlSYOG6l64pIqmqu5p5RvuQ";
+
+            Assert.Equal(0, stream.Position);                  // original position integrity
+
             string token = Jose.JWT.EncodeStream(stream, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS512);
 
-            Console.Out.WriteLine("EncodeStreamHS512: " + token);
-
-            Assert.Equal("eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w.3_-H4HJiNi8--Ss-VAMM1Dg0JtTGEXNvMo1LAHEnQ7bZpQiblqAu5tt-G9p8KFnSlSYOG6l64pIqmqu5p5RvuQ", token);
+            Assert.Equal(expectedToken, token);                // token integrity
+            Assert.True(stream.CanRead && stream.CanSeek);     // stream still usable
+            Assert.Equal(0, stream.Position);                  // original position restored
+            Assert.Equal(BinaryPayload, stream.ToArray());     // payload intact (MemoryStream shortcut)
         }
 
         [Fact]

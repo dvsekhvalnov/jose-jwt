@@ -316,21 +316,24 @@ namespace Jose
                 byte[] signature = jwsAlgorithm.Sign(signingInput, key);
 
                 // Rewind for serialization (if seekable)
-                if (payload.CanSeek) payload.Position = 0;
+                payload.Position = 0;
 
                 // Detached payload: empty stream placeholder; otherwise reuse payload (wrapped to avoid disposal).
                 Stream payloadForToken = jwtOptions.DetachPayload
                     ? new MemoryStream()
                     : payload; // payload kept open via ConcatenatedStream keepOpen
 
+                string token;
                 using (var tokenStream = Compact.Serialize(headerBytes, payloadForToken, jwtOptions.EncodePayload, signature))
                 using (var reader = new StreamReader(tokenStream, Encoding.UTF8))
                 {
-                    // Restore caller payload position if it was seekable and we changed it.
-                    if (payload.CanSeek)
-                        payload.Position = originalPosition;
-                    return reader.ReadToEnd();
+                    token = reader.ReadToEnd();
                 }
+
+                // Restore caller payload position AFTER disposing concatenated/serialization streams,
+                // because disposal may advance underlying payload stream to its end.
+                payload.Position = originalPosition;
+                return token;
             }
         }
 

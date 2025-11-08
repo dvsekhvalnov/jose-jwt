@@ -46,7 +46,7 @@ JSON Web Key (RFC 7517):
     <NeutralLanguage>en-US</NeutralLanguage>
     <VersionPrefix>5.2</VersionPrefix>
     <Authors>Dmitry Vsekhvalnov</Authors>
-    <TargetFrameworks>net40;net461;net472;netstandard1.4;netstandard2.1;net6.0</TargetFrameworks>
+    <TargetFrameworks>net40;net461;net472;netstandard1.4;netstandard2.1;net6.0;net8.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <AssemblyName>jose-jwt</AssemblyName>
     <PackageId>jose-jwt</PackageId>
