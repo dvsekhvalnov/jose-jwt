@@ -274,8 +274,14 @@ namespace Jose
         /// <returns>JWT in compact serialization form, digitally signed.</returns>
         public static string EncodeStream(Stream payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null, JwtOptions options = null)
         {
-             if (payload == null)
+             if (payload == null || payload == Stream.Null)
                 throw new ArgumentNullException(nameof(payload));
+
+            // Ensure we have a seekable, rewindable payload stream for signing & serialization.
+            if (!payload.CanSeek)
+                throw new NotImplementedException("Non-seekable streams are not supported.");
+
+            long originalPosition = payload.Position;
 
             var jwtSettings = GetSettings(settings);
             var jwtOptions = options ?? JwtOptions.Default;
@@ -302,13 +308,6 @@ namespace Jose
             {
                 throw new JoseException(string.Format("Unsupported JWS algorithm requested: {0}", algorithm));
             }
-
-            // Ensure we have a seekable, rewindable payload stream for signing & serialization.
-            if (!payload.CanSeek)
-                throw new NotImplementedException("Non-seekable streams are not supported.");
-
-            long originalPosition = payload.Position;
-            if (payload.Position != 0) payload.Position = 0; // sign from start for deterministic output
 
             // Sign over secured input without disposing caller's stream.
             using (var signingInput = Compact.Serialize(headerBytes, payload, jwtOptions.EncodePayload))
