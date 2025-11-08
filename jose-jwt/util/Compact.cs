@@ -24,29 +24,29 @@ namespace Jose
         public static Stream Serialize(byte[] header, Stream payload, bool encodePayload, params byte[][] other)
         {
             var dotBytes = Encoding.UTF8.GetBytes(".");
-            var list = new List<Stream>();
+            var streams = new List<Stream>();
 
             // header
-            list.Add(new MemoryStream(Encoding.UTF8.GetBytes(Base64Url.Encode(header)), false));
-            list.Add(new MemoryStream(dotBytes, false));
+            streams.Add(new MemoryStream(Encoding.UTF8.GetBytes(Base64Url.Encode(header)), false));
+            streams.Add(new MemoryStream(dotBytes, false));
 
             // payload (possibly streaming encoded)
             if (payload.CanSeek) payload.Position = 0;
-            list.Add(encodePayload ? new Base64UrlEncodingStream(payload) : payload);
+            streams.Add(encodePayload ? new Base64UrlEncodingStream(payload) : payload);
 
             if (other.Length > 0)
             {
-                list.Add(new MemoryStream(dotBytes, false));
+                streams.Add(new MemoryStream(dotBytes, false));
                 for (int i = 0; i < other.Length; i++)
                 {
-                    list.Add(new MemoryStream(Encoding.UTF8.GetBytes(Base64Url.Encode(other[i])), false));
+                    streams.Add(new MemoryStream(Encoding.UTF8.GetBytes(Base64Url.Encode(other[i])), false));
                     if (i < other.Length - 1)
-                        list.Add(new MemoryStream(dotBytes, false));
+                        streams.Add(new MemoryStream(dotBytes, false));
                 }
             }
 
             // Keep original payload stream undisposed for caller reuse
-            return new ConcatenatedStream(list, payload);
+            return new ConcatenatedStream(streams, payload);
         }
 
         public static byte[][] Parse(string token)
