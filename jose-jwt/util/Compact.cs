@@ -30,8 +30,8 @@ namespace Jose
             streams.Add(new MemoryStream(Encoding.UTF8.GetBytes(Base64Url.Encode(header)), false));
             streams.Add(new MemoryStream(dotBytes, false));
 
-            // payload (possibly streaming encoded)
-            if (payload.CanSeek) payload.Position = 0;
+            // payload
+            payload.Position = 0;
             streams.Add(encodePayload ? new Base64UrlEncodingStream(payload) : payload);
 
             if (other.Length > 0)

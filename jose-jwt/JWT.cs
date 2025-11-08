@@ -274,7 +274,7 @@ namespace Jose
         /// <returns>JWT in compact serialization form, digitally signed.</returns>
         public static string EncodeStream(Stream payload, object key, JwsAlgorithm algorithm, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null, JwtOptions options = null)
         {
-             if (payload == null || payload == Stream.Null)
+            if (payload == null || payload == Stream.Null)
                 throw new ArgumentNullException(nameof(payload));
 
             // Ensure we have a seekable, rewindable payload stream for signing & serialization.
@@ -282,6 +282,8 @@ namespace Jose
                 throw new NotImplementedException("Non-seekable streams are not supported.");
 
             long originalPosition = payload.Position;
+
+            string token;
 
             var jwtSettings = GetSettings(settings);
             var jwtOptions = options ?? JwtOptions.Default;
@@ -314,26 +316,22 @@ namespace Jose
             {
                 byte[] signature = jwsAlgorithm.Sign(signingInput, key);
 
-                // Rewind for serialization (if seekable)
-                payload.Position = 0;
-
                 // Detached payload: empty stream placeholder; otherwise reuse payload (wrapped to avoid disposal).
                 Stream payloadForToken = jwtOptions.DetachPayload
                     ? new MemoryStream()
                     : payload; // payload kept open via ConcatenatedStream keepOpen
 
-                string token;
                 using (var tokenStream = Compact.Serialize(headerBytes, payloadForToken, jwtOptions.EncodePayload, signature))
                 using (var reader = new StreamReader(tokenStream, Encoding.UTF8))
                 {
                     token = reader.ReadToEnd();
                 }
-
-                // Restore caller payload position AFTER disposing concatenated/serialization streams,
-                // because disposal may advance underlying payload stream to its end.
-                payload.Position = originalPosition;
-                return token;
             }
+
+            // Restore caller payload position AFTER disposing concatenated/serialization streams,
+            // because disposal may advance underlying payload stream to its end.
+            payload.Position = originalPosition;
+            return token;
         }
 
         /// <summary>
