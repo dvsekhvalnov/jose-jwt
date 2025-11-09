@@ -7,8 +7,9 @@ namespace Jose
     public class Base64UrlEncodingStream : Stream
     {
         private readonly Stream source;
-        private readonly byte[] inBuf = new byte[3];
-        private readonly byte[] outBuf = new byte[4];
+        private const int BufferBlockSize = 3072; // 3 KB, divisible by 3 (3072 / 3 = 1024)
+        private readonly byte[] inBuf = new byte[BufferBlockSize];
+        private readonly byte[] outBuf = new byte[(BufferBlockSize / 3) * 4]; // 4096 bytes
         private int outPos, outLen;
         private bool finished;
 
@@ -28,6 +29,8 @@ namespace Jose
         public override int Read(byte[] buffer, int offset, int count)
         {
             int written = 0;
+            // Reusable char buffer for base64url encoding (max 4 chars per 3 bytes * chunk)
+            char[] charBuf = new char[(BufferBlockSize / 3) * 4];
             while (written < count && !finished)
             {
                 if (outPos < outLen)
@@ -36,22 +39,38 @@ namespace Jose
                     continue;
                 }
 
-                int read = source.Read(inBuf, 0, 3);
+                // Read as much as possible, up to buffer size
+                int read = source.Read(inBuf, 0, inBuf.Length);
                 if (read == 0)
                 {
                     finished = true;
                     break;
                 }
 
-                string b64 = Convert.ToBase64String(inBuf, 0, read)
-                    .TrimEnd('=')
-                    .Replace('+', '-')
-                    .Replace('/', '_');
+                // Convert to base64 chars directly
+                int b64Len = Convert.ToBase64CharArray(inBuf, 0, read, charBuf, 0);
 
-                outLen = b64.Length;
-                for (int i = 0; i < outLen; i++)
-                    outBuf[i] = (byte)b64[i];
+                // Remove padding and apply base64url replacements in-place
+                int urlLen = b64Len;
 
+                // Remove any trailing '=' padding
+                while (urlLen > 0 && charBuf[urlLen - 1] == '=')
+                {
+                    urlLen--;
+                }
+
+                // Convert to Base64Url: replace '+' with '-', '/' with '_'
+                for (int i = 0; i < urlLen; i++)
+                {
+                    char c = charBuf[i];
+                    if (c == '+')
+                        c = '-';
+                    else if (c == '/')
+                        c = '_';
+                    outBuf[i] = (byte)c;
+                }
+
+                outLen = urlLen;
                 outPos = 0;
             }
             return written;
