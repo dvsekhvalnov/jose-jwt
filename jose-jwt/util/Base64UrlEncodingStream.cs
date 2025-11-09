@@ -10,6 +10,7 @@ namespace Jose
         private const int BufferBlockSize = 3072; // 3 KB, divisible by 3 (3072 / 3 = 1024)
         private readonly byte[] inBuf = new byte[BufferBlockSize];
         private readonly byte[] outBuf = new byte[(BufferBlockSize / 3) * 4]; // 4096 bytes
+        private readonly char[] charBuf = new char[(BufferBlockSize / 3) * 4]; // 4096 bytes
         private int outPos, outLen;
         private bool finished;
 
@@ -29,13 +30,14 @@ namespace Jose
         public override int Read(byte[] buffer, int offset, int count)
         {
             int written = 0;
-            // Reusable char buffer for base64url encoding (max 4 chars per 3 bytes * chunk)
-            char[] charBuf = new char[(BufferBlockSize / 3) * 4];
             while (written < count && !finished)
             {
                 if (outPos < outLen)
                 {
-                    buffer[offset + written++] = outBuf[outPos++];
+                    int toCopy = Math.Min(outLen - outPos, count - written);
+                    Buffer.BlockCopy(outBuf, outPos, buffer, offset + written, toCopy);
+                    outPos += toCopy;
+                    written += toCopy;
                     continue;
                 }
 
