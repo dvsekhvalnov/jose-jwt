@@ -7,17 +7,29 @@ namespace Jose
     public class Base64UrlEncodingStream : Stream
     {
         private readonly Stream source;
-        private const int BufferBlockSize = 3072; // 3 KB, divisible by 3 (3072 / 3 = 1024)
-        private readonly byte[] inBuf = new byte[BufferBlockSize];
-        private readonly byte[] outBuf = new byte[(BufferBlockSize / 3) * 4]; // 4096 bytes
-        private readonly char[] charBuf = new char[(BufferBlockSize / 3) * 4]; // 4096 bytes
+        private readonly byte[] inBuf;
+        private readonly byte[] outBuf;
+        private static readonly byte[] Base64UrlAlphabet = System.Text.Encoding.ASCII.GetBytes("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_");
+        private const int DefaultBufferSize = 12 * 1024; // 12 KB, covers most JSON/XML payloads
         private int outPos, outLen;
         private bool finished;
 
         public Base64UrlEncodingStream(Stream source)
+            : this(source, DefaultBufferSize)
+        {
+        }
+
+        public Base64UrlEncodingStream(Stream source, int bufferSize)
         {
             this.source = source;
             if (source.CanSeek) source.Position = 0;
+
+            if (bufferSize <= 0)
+                throw new ArgumentOutOfRangeException(nameof(bufferSize), "Buffer size must be positive.");
+
+            int alignedSize = bufferSize % 3 == 0 ? bufferSize : bufferSize + (3 - bufferSize % 3);
+            inBuf = new byte[alignedSize];
+            outBuf = new byte[(alignedSize / 3) * 4];
         }
 
         public override bool CanRead => true;
@@ -49,30 +61,40 @@ namespace Jose
                     break;
                 }
 
-                // Convert to base64 chars directly
-                int b64Len = Convert.ToBase64CharArray(inBuf, 0, read, charBuf, 0);
+                // Manually encode to Base64Url directly into the byte buffer
+                int fullGroups = read / 3;
+                int remainder = read % 3;
+                int inputIndex = 0;
+                int outputIndex = 0;
 
-                // Remove padding and apply base64url replacements in-place
-                int urlLen = b64Len;
-
-                // Remove any trailing '=' padding
-                while (urlLen > 0 && charBuf[urlLen - 1] == '=')
+                for (int i = 0; i < fullGroups; i++)
                 {
-                    urlLen--;
+                    int b0 = inBuf[inputIndex++];
+                    int b1 = inBuf[inputIndex++];
+                    int b2 = inBuf[inputIndex++];
+
+                    outBuf[outputIndex++] = Base64UrlAlphabet[b0 >> 2];
+                    outBuf[outputIndex++] = Base64UrlAlphabet[((b0 & 0x03) << 4) | (b1 >> 4)];
+                    outBuf[outputIndex++] = Base64UrlAlphabet[((b1 & 0x0F) << 2) | (b2 >> 6)];
+                    outBuf[outputIndex++] = Base64UrlAlphabet[b2 & 0x3F];
                 }
 
-                // Convert to Base64Url: replace '+' with '-', '/' with '_'
-                for (int i = 0; i < urlLen; i++)
+                if (remainder == 1)
                 {
-                    char c = charBuf[i];
-                    if (c == '+')
-                        c = '-';
-                    else if (c == '/')
-                        c = '_';
-                    outBuf[i] = (byte)c;
+                    int b0 = inBuf[inputIndex++];
+                    outBuf[outputIndex++] = Base64UrlAlphabet[b0 >> 2];
+                    outBuf[outputIndex++] = Base64UrlAlphabet[(b0 & 0x03) << 4];
+                }
+                else if (remainder == 2)
+                {
+                    int b0 = inBuf[inputIndex++];
+                    int b1 = inBuf[inputIndex++];
+                    outBuf[outputIndex++] = Base64UrlAlphabet[b0 >> 2];
+                    outBuf[outputIndex++] = Base64UrlAlphabet[((b0 & 0x03) << 4) | (b1 >> 4)];
+                    outBuf[outputIndex++] = Base64UrlAlphabet[(b1 & 0x0F) << 2];
                 }
 
-                outLen = urlLen;
+                outLen = outputIndex;
                 outPos = 0;
             }
             return written;

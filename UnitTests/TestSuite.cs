@@ -10,6 +10,7 @@ using Jose.keys;
 using Xunit;
 using Xunit.Abstractions;
 using System.IO;
+using System.Diagnostics;
 
 #if NETCOREAPP
 using Newtonsoft.Json.Linq;
@@ -107,6 +108,48 @@ namespace UnitTests
             Assert.True(stream.CanRead && stream.CanSeek);     // stream still usable
             Assert.Equal(0, stream.Position);                  // original position restored
             Assert.Equal(BinaryPayload, stream.ToArray());     // payload intact (MemoryStream shortcut)
+        }
+
+        [Fact]
+        public void Base64UrlEncodingStream_BenchmarkBufferSizes()
+        {
+            // Benchmark the streaming encoder across various buffer sizes and ensure correctness
+            int[] bufferSizes = { 3 * 1024, 6 * 1024, 12 * 1024, 24 * 1024, 36 * 1024 };
+            const int iterations = 5;
+            // 256 KB payload with repeating pattern to simulate larger JSON/XML bodies
+            byte[] payload = Enumerable.Range(0, 256 * 1024).Select(i => (byte)(i % 251)).ToArray();
+            string baseline = Base64Url.Encode(payload);
+            byte[] tempBuffer = new byte[4 * 1024];
+
+            foreach (int size in bufferSizes)
+            {
+                double totalMs = 0;
+                string streamed = null;
+
+                for (int i = 0; i < iterations; i++)
+                {
+                    // Run the stream encoder with the current buffer size
+                    using var source = new MemoryStream(payload, writable: false);
+                    using var encoder = new Base64UrlEncodingStream(source, size);
+                    using var encodedBytes = new MemoryStream(capacity: ((payload.Length + 2) / 3) * 4);
+
+                    var sw = Stopwatch.StartNew();
+                    int read;
+                    while ((read = encoder.Read(tempBuffer, 0, tempBuffer.Length)) > 0)
+                    {
+                        encodedBytes.Write(tempBuffer, 0, read);
+                    }
+                    sw.Stop();
+
+                    totalMs += sw.Elapsed.TotalMilliseconds;
+                    streamed = Encoding.ASCII.GetString(encodedBytes.ToArray());
+                }
+
+                // Verify output correctness and record average runtime
+                Assert.Equal(baseline, streamed);
+                double averageMs = totalMs / iterations;
+                Console.Out.WriteLine($"Base64UrlEncodingStream buffer={size / 1024} KB avg={averageMs:F2} ms over {iterations} iterations");
+            }
         }
 
         [Fact]
