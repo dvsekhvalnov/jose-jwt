@@ -111,6 +111,31 @@ namespace UnitTests
         }
 
         [Fact]
+        public void EncodeStreamHS512_GigabyteDetachedPayload()
+        {
+            Skip.IfNot(Environment.Is64BitProcess, "1 GB payload test only runs on 64-bit processes to avoid address space exhaustion.");
+
+            const long payloadSize = 1L << 30; // 1 GiB
+            using var stream = new DeterministicLargeStream(payloadSize);
+
+            var options = new JwtOptions { DetachPayload = true };
+            string token = Jose.JWT.EncodeStream(stream, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS512, options: options);
+
+            Assert.Equal(0, stream.Position);
+            Assert.Equal(payloadSize, stream.BytesServed);
+
+            string[] parts = token.Split('.');
+            Assert.Equal(3, parts.Length);
+            Assert.Equal(string.Empty, parts[1]);
+            Assert.Equal(86, parts[2].Length);
+            Assert.True(token.Length < 256, $"Detached token should remain small, but was {token.Length} characters.");
+
+            var headers = Jose.JWT.Headers(token);
+            Assert.Equal("HS512", headers["alg"]);
+            Assert.Equal("JWT", headers["typ"]);
+        }
+
+        [Fact]
         public void Base64UrlEncodingStream_BenchmarkBufferSizes()
         {
             // Benchmark the streaming encoder across various buffer sizes and ensure correctness
