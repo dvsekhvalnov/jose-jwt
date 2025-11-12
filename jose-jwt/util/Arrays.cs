@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -213,6 +214,28 @@ namespace Jose
             Buffer.BlockCopy(data, 0, result, 0, byteCount);
 
             return result;
+        }
+
+        public static byte[] ReadAllBytes(this Stream inStream)
+        {
+            if (inStream is MemoryStream inMemoryStream)
+                return inMemoryStream.ToArray();
+
+            using (var outStream = new MemoryStream())
+            {
+                inStream.CopyTo(outStream);
+                return outStream.ToArray();
+            }
+        }
+
+        public static Stream AsPayloadStream(this byte[] payload)
+        {
+            return payload != null ? new MemoryStream(payload) : null;
+        }
+        
+        public static Stream AsPayloadStream(this string payload)
+        {
+            return payload != null ? new MemoryStream(Encoding.UTF8.GetBytes(payload)) : null;
         }
     }
 }

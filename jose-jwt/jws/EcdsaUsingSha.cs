@@ -1,5 +1,6 @@
 #if NET40
 using System;
+using System.IO;
 using System.Security.Cryptography;
 
 namespace Jose
@@ -13,7 +14,7 @@ namespace Jose
             this.keySize = keySize;
         }
 
-        public byte[] Sign(byte[] securedInput, object key)
+        public byte[] Sign(Stream securedInput, object key)
         {
             var privateKey = Ensure.Type<CngKey>(key, "EcdsaUsingSha alg expects key to be of CngKey type.");
 
@@ -34,7 +35,7 @@ namespace Jose
             }
         }
 
-        public bool Verify(byte[] signature, byte[] securedInput, object key)
+        public bool Verify(byte[] signature, Stream securedInput, object key)
         {
             var publicKey = Ensure.Type<CngKey>(key, "EcdsaUsingSha alg expects key to be of CngKey type.");
 

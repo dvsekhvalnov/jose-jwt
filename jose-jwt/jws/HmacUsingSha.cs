@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Security.Cryptography;
 
 namespace Jose
@@ -12,7 +13,7 @@ namespace Jose
             this.hashMethod = hashMethod;
         }
 
-        public byte[] Sign(byte[] securedInput, object key)
+        public byte[] Sign(Stream securedInput, object key)
         {
             if (key is byte[] keyBytes)
             {
@@ -35,7 +36,7 @@ namespace Jose
             throw new ArgumentException("HmacUsingSha alg expects key to be byte[] array or Jwk with kty='oct'");
         }
 
-        public bool Verify(byte[] signature, byte[] securedInput, object key)
+        public bool Verify(byte[] signature, Stream securedInput, object key)
         {
             byte[] expected = Sign(securedInput, key);
 

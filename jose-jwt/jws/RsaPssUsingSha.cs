@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Security.Cryptography;
 using Jose.keys;
 
@@ -13,7 +14,7 @@ namespace Jose
             this.saltSize = saltSize;
         }
 
-        public byte[] Sign(byte[] securedInput, object key)
+        public byte[] Sign(Stream securedInput, object key)
         {
 #if NET40
             if (key is CngKey cngKey)
@@ -103,7 +104,7 @@ namespace Jose
 #endif
         }
 
-        public bool Verify(byte[] signature, byte[] securedInput, object key)
+        public bool Verify(byte[] signature, Stream securedInput, object key)
         {
 #if NET40
             if (key is CngKey cngKey)

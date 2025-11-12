@@ -15,6 +15,5 @@ _ReSharper*/
 package/
 artifacts/
 .vs
-.vscode
 packages
 *.lock.json
