@@ -615,7 +615,7 @@ namespace Jose
                 byte[] contentPayload = parts.Next(b64);
                 byte[] signature = parts.Next();
 
-                var effectivePayload = payload ?? new MemoryStream(contentPayload);
+                var effectivePayload = payload ?? contentPayload.AsPayloadStream();
 
                 var algorithm = (string)headerData["alg"];
                 var jwsAlgorithm = jwtSettings.JwsAlgorithmFromHeader(algorithm);
