@@ -367,7 +367,7 @@ namespace Jose
         /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
         public static byte[] DecodeBytes(string token, object key, JweAlgorithm alg, JweEncryption enc, JwtSettings settings = null)
         {
-            return DecodeBytes(Compact.Iterate(token), key, null, alg, enc, settings);
+            return DecodeBytes(Compact.Iterate(token), key, null, alg, enc, settings).ReadAllBytes();
         }
 
         /// <summary>
@@ -403,7 +403,7 @@ namespace Jose
         /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
         public static byte[] DecodeBytes(string token, object key, JwsAlgorithm alg, JwtSettings settings = null, byte[] payload = null)
         {
-            return DecodeBytes(Compact.Iterate(token), key, alg, null, null, settings, payload);
+            return DecodeBytes(Compact.Iterate(token), key, alg, null, null, settings, payload.AsPayloadStream()).ReadAllBytes();
         }
 
         /// <summary>
@@ -437,7 +437,7 @@ namespace Jose
         /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
         public static byte[] DecodeBytes(string token, object key = null, JwtSettings settings = null, byte[] payload = null)
         {
-            return DecodeBytes(Compact.Iterate(token), key, null, null, null, settings, payload);
+            return DecodeBytes(Compact.Iterate(token), key, null, null, null, settings, payload.AsPayloadStream()).ReadAllBytes();
         }
 
         /// <summary>
@@ -510,6 +510,18 @@ namespace Jose
                 throw new JoseException("Unexpected number of parts in signed token: " + parts.Count);
             }
 
+            return DecodeBytes(parts, key, alg, null, null, settings, payload.AsPayloadStream()).ReadAllBytes();
+        }
+
+        public static Stream VerifyStream(string token, object key, JwsAlgorithm? alg = null, JwtSettings settings = null, Stream payload = null)
+        {
+            var parts = Compact.Iterate(token);
+
+            if (parts.Count != 3)
+            {
+                throw new JoseException("Unexpected number of parts in signed token: " + parts.Count);
+            }
+
             return DecodeBytes(parts, key, alg, null, null, settings, payload);
         }
 
@@ -527,11 +539,11 @@ namespace Jose
                 throw new JoseException("Unexpected number of parts in encrypted token: " + parts.Count);
             }
 
-            return DecodeBytes(parts, key, null, alg, enc, settings);
+            return DecodeBytes(parts, key, null, alg, enc, settings).ReadAllBytes();
         }
 
 
-        private static byte[] DecodeBytes(Compact.Iterator parts, object key = null, JwsAlgorithm? expectedJwsAlg = null, JweAlgorithm? expectedJweAlg = null, JweEncryption? expectedJweEnc = null, JwtSettings settings = null, byte[] payload = null)
+        private static Stream DecodeBytes(Compact.Iterator parts, object key = null, JwsAlgorithm? expectedJwsAlg = null, JweAlgorithm? expectedJweAlg = null, JweEncryption? expectedJweEnc = null, JwtSettings settings = null, Stream payload = null)
         {
             Ensure.IsNotEmpty(parts.Token, "Incoming token expected to be in compact serialization form, not empty, whitespace or null.");
 
@@ -542,7 +554,7 @@ namespace Jose
                     throw new InvalidAlgorithmException("Encrypted tokens can't assert signing algorithm type.");
                 }
 
-                return JWE.Decrypt(parts.Token, key, expectedJweAlg, expectedJweEnc, settings).PlaintextBytes;
+                return new MemoryStream(JWE.Decrypt(parts.Token, key, expectedJweAlg, expectedJweEnc, settings).PlaintextBytes);
             }
             else if (parts.Count == 3) // signed JWT
             {
@@ -569,7 +581,7 @@ namespace Jose
                 byte[] contentPayload = parts.Next(b64);
                 byte[] signature = parts.Next();
 
-                var effectivePayload = payload ?? contentPayload;
+                var effectivePayload = payload ?? new MemoryStream(contentPayload);
 
                 var algorithm = (string)headerData["alg"];
                 var jwsAlgorithm = jwtSettings.JwsAlgorithmFromHeader(algorithm);
@@ -586,7 +598,7 @@ namespace Jose
                     throw new JoseException(string.Format("Unsupported JWS algorithm requested: {0}", algorithm));
                 }
 
-                if (!jwsAlgorithmImpl.Verify(signature, Compact.Serialize(header, new MemoryStream(effectivePayload), b64), key))
+                if (!jwsAlgorithmImpl.Verify(signature, Compact.Serialize(header,effectivePayload, b64), key))
                 {
                     throw new IntegrityException("Invalid signature.");
                 }
@@ -599,11 +611,9 @@ namespace Jose
 
         private static string Decode(string token, object key = null, JwsAlgorithm? jwsAlg = null, JweAlgorithm? jweAlg = null, JweEncryption? jweEnc = null, JwtSettings settings = null, string payload = null)
         {
-            var detached = payload != null ? Encoding.UTF8.GetBytes(payload) : null;
+            var payloadBytes = DecodeBytes(Compact.Iterate(token), key, jwsAlg, jweAlg, jweEnc, settings, payload.AsPayloadStream());
 
-            var payloadBytes = DecodeBytes(Compact.Iterate(token), key, jwsAlg, jweAlg, jweEnc, settings, detached);
-
-            return Encoding.UTF8.GetString(payloadBytes);
+            return Encoding.UTF8.GetString(payloadBytes.ReadAllBytes());
         }
 
         private static JwtSettings GetSettings(JwtSettings settings)
