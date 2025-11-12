@@ -581,66 +581,89 @@ namespace Jose
         {
             Ensure.IsNotEmpty(parts.Token, "Incoming token expected to be in compact serialization form, not empty, whitespace or null.");
 
-            if (parts.Count == 5) //encrypted JWT
+            switch (parts.Count)
             {
-                if (expectedJwsAlg != null)
-                {
-                    throw new InvalidAlgorithmException("Encrypted tokens can't assert signing algorithm type.");
-                }
-
-                return new MemoryStream(JWE.Decrypt(parts.Token, key, expectedJweAlg, expectedJweEnc, settings).PlaintextBytes);
+                case 5:
+                    return DecodeEncryptedToken(parts, key, expectedJwsAlg, expectedJweAlg, expectedJweEnc, settings);
+                case 3:
+                    return DecodeSignedToken(parts, key, expectedJwsAlg, expectedJweAlg, expectedJweEnc, settings, payload);
+                default:
+                    throw new JoseException("Expected compact serialized token with 3 or 5 parts, but got: " + parts.Count);
             }
-            else if (parts.Count == 3) // signed JWT
+        }
+
+        private static Stream DecodeEncryptedToken(Compact.Iterator parts, object key, JwsAlgorithm? expectedJwsAlg, JweAlgorithm? expectedJweAlg, JweEncryption? expectedJweEnc, JwtSettings settings)
+        {
+            if (expectedJwsAlg != null)
             {
-                if (expectedJweAlg != null || expectedJweEnc != null)
-                {
-                    throw new InvalidAlgorithmException("Signed tokens can't assert encryption type.");
-                }
+                throw new InvalidAlgorithmException("Encrypted tokens can't assert signing algorithm type.");
+            }
 
-                //signed or plain JWT
-                var jwtSettings = GetSettings(settings);
+            var decryptResult = JWE.Decrypt(parts.Token, key, expectedJweAlg, expectedJweEnc, settings);
 
-                byte[] header = parts.Next();
+            return new MemoryStream(decryptResult.PlaintextBytes);
+        }
 
-                var headerData = jwtSettings.JsonMapper.Parse<IDictionary<string, object>>(Encoding.UTF8.GetString(header));
+        private static Stream DecodeSignedToken(Compact.Iterator parts, object key, JwsAlgorithm? expectedJwsAlg, JweAlgorithm? expectedJweAlg, JweEncryption? expectedJweEnc, JwtSettings settings, Stream detachedPayload)
+        {
+            if (expectedJweAlg != null || expectedJweEnc != null)
+            {
+                throw new InvalidAlgorithmException("Signed tokens can't assert encryption type.");
+            }
 
-                bool b64 = true;
+            var jwtSettings = GetSettings(settings);
 
-                object value;
-                if (headerData.TryGetValue("b64", out value))
-                {
-                    b64 = (bool)value;
-                }
+            byte[] headerBytes = parts.Next();
+            var headerData = jwtSettings.JsonMapper.Parse<IDictionary<string, object>>(Encoding.UTF8.GetString(headerBytes));
 
-                byte[] contentPayload = parts.Next(b64);
-                byte[] signature = parts.Next();
+            bool encodePayload = true;
+            object value;
+            if (headerData.TryGetValue("b64", out value))
+            {
+                encodePayload = (bool)value;
+            }
 
-                var effectivePayload = payload ?? contentPayload.AsPayloadStream();
+            byte[] payloadFromToken = parts.Next(encodePayload);
+            byte[] signature = parts.Next();
 
-                var algorithm = (string)headerData["alg"];
-                var jwsAlgorithm = jwtSettings.JwsAlgorithmFromHeader(algorithm);
-                if (expectedJwsAlg != null && expectedJwsAlg != jwsAlgorithm)
-                {
-                    throw new InvalidAlgorithmException(
-                        "The algorithm type passed to the Decode method did not match the algorithm type in the header.");
-                }
+            Stream effectivePayload = detachedPayload ?? payloadFromToken.AsPayloadStream();
+            if (effectivePayload == null)
+            {
+                throw new JoseException("Signed token did not contain a payload.");
+            }
 
-                var jwsAlgorithmImpl = jwtSettings.Jws(jwsAlgorithm);
+            var algorithmHeaderValue = (string)headerData["alg"];
+            var jwsAlgorithm = jwtSettings.JwsAlgorithmFromHeader(algorithmHeaderValue);
 
-                if (jwsAlgorithmImpl == null)
-                {
-                    throw new JoseException(string.Format("Unsupported JWS algorithm requested: {0}", algorithm));
-                }
+            if (expectedJwsAlg != null && expectedJwsAlg != jwsAlgorithm)
+            {
+                throw new InvalidAlgorithmException(
+                    "The algorithm type passed to the Decode method did not match the algorithm type in the header.");
+            }
 
-                if (!jwsAlgorithmImpl.Verify(signature, Compact.Serialize(header, effectivePayload, b64), key))
+            var jwsImplementation = jwtSettings.Jws(jwsAlgorithm);
+
+            if (jwsImplementation == null)
+            {
+                throw new JoseException(string.Format("Unsupported JWS algorithm requested: {0}", algorithmHeaderValue));
+            }
+
+            long? originalPosition = effectivePayload.CanSeek ? effectivePayload.Position : (long?)null;
+
+            using (var securedInput = Compact.Serialize(headerBytes, effectivePayload, encodePayload))
+            {
+                if (!jwsImplementation.Verify(signature, securedInput, key))
                 {
                     throw new IntegrityException("Invalid signature.");
                 }
-
-                return effectivePayload;
             }
 
-            throw new JoseException("Expected compact serialized token with 3 or 5 parts, but got: " + parts.Count);
+            if (originalPosition.HasValue)
+            {
+                effectivePayload.Position = originalPosition.Value;
+            }
+
+            return effectivePayload;
         }
 
         private static string Decode(string token, object key = null, JwsAlgorithm? jwsAlg = null, JweAlgorithm? jweAlg = null, JweEncryption? jweEnc = null, JwtSettings settings = null, string payload = null)
