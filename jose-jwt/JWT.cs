@@ -627,10 +627,6 @@ namespace Jose
             byte[] signature = parts.Next();
 
             Stream effectivePayload = detachedPayload ?? payloadFromToken.AsPayloadStream();
-            if (effectivePayload == null)
-            {
-                throw new JoseException("Signed token did not contain a payload.");
-            }
 
             var algorithmHeaderValue = (string)headerData["alg"];
             var jwsAlgorithm = jwtSettings.JwsAlgorithmFromHeader(algorithmHeaderValue);
@@ -648,7 +644,11 @@ namespace Jose
                 throw new JoseException(string.Format("Unsupported JWS algorithm requested: {0}", algorithmHeaderValue));
             }
 
-            long? originalPosition = effectivePayload.CanSeek ? effectivePayload.Position : (long?)null;
+            long? originalPosition = null;
+            if (effectivePayload.CanSeek)
+            {
+                originalPosition = effectivePayload.Position;
+            }
 
             using (var securedInput = Compact.Serialize(headerBytes, effectivePayload, encodePayload))
             {
