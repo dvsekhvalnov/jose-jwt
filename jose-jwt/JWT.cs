@@ -442,6 +442,41 @@ namespace Jose
 
         /// <summary>
         /// Decodes JWT token by performing necessary decompression/decryption and signature verification as defined in JWT token header.
+        /// Resulting stream payload is returned untouched (e.g. no parsing or mapping)
+        /// </summary>
+        /// <param name="token">JWT token in compact serialization form.</param>
+        /// <param name="key">key for decoding suitable for JWT algorithm used, can be null.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
+        /// <param name="payload">optional detached payload</param>
+        /// <returns>The payload as stream</returns>
+        /// <exception cref="IntegrityException">if signature validation failed</exception>
+        /// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
+        /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
+        public static Stream DecodeStream(string token, object key = null, JwtSettings settings = null, Stream payload = null)
+        {
+            return DecodeBytes(Compact.Iterate(token), key, null, null, null, settings, payload);
+        }
+
+        /// <summary>
+        /// Decodes JWT token by performing necessary decompression/decryption and signature verification as defined in JWT token header.
+        /// Resulting stream of the payload are returned untouched (e.g. no parsing or mapping)
+        /// </summary>
+        /// <param name="token">JWT token in compact serialization form.</param>
+        /// <param name="key">key for decoding suitable for JWT algorithm used.</param>
+        /// <param name="alg">The algorithm type that we expect to receive in the header.</param>
+        /// <param name="settings">optional settings to override global DefaultSettings</param>
+        /// <param name="payload">optional detached payload</param>
+        /// <returns>The payload as stream data</returns>
+        /// <exception cref="IntegrityException">if signature validation failed</exception>
+        /// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
+        /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
+        public static Stream DecodeStream(string token, object key, JwsAlgorithm alg, JwtSettings settings = null, Stream payload = null)
+        {
+            return DecodeBytes(Compact.Iterate(token), key, alg, null, null, settings, payload);
+        }
+
+        /// <summary>
+        /// Decodes JWT token by performing necessary decompression/decryption and signature verification as defined in JWT token header.
         /// Resulting json string will be parsed and mapped to desired type via configured IJsonMapper implementation.
         /// </summary>
         /// <typeparam name="T">Deserid object type after json mapping</typeparam>
@@ -598,7 +633,7 @@ namespace Jose
                     throw new JoseException(string.Format("Unsupported JWS algorithm requested: {0}", algorithm));
                 }
 
-                if (!jwsAlgorithmImpl.Verify(signature, Compact.Serialize(header,effectivePayload, b64), key))
+                if (!jwsAlgorithmImpl.Verify(signature, Compact.Serialize(header, effectivePayload, b64), key))
                 {
                     throw new IntegrityException("Invalid signature.");
                 }

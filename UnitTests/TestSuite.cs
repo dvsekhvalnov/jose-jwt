@@ -4540,6 +4540,20 @@ namespace UnitTests
         }
 
         [Fact]
+        public void DecodeStreamUnencodedDetached()
+        {
+            //given
+            string token = "eyJiNjQiOmZhbHNlLCJjcml0IjpbImI2NCJdLCJhbGciOiJSUzI1NiJ9..ToCewDcERVLuqImwDkOd9iSxvTC8vzh-HrhuohOIjWMrGpTZi2FdzVN4Ll3fb2Iz3s_hj-Lno_c6m_7VcmOHfRLC9sPjSu2q9dbNkKo8Zc2FQmsCBdQi06XGAEJZW2M9380pxoYKiJ51a4EbGl4Ag7lX3hXeTPYRMVifacgdlpg2SYZzDPZQbWvibgtXFsBsIqPd-8i6ucE2eMdaNeWMLsHv-b5s7uWn8hN2nMKHj000Qce5rSbpK58l2LNeWw4IR6wNOqSZfbeerMxq1u0p-ZKIQxP24MltaPjZtqMdD4AzjrP4UCEf7VaLSkSuNVSf6ZmLmE_OYgQuQe7adFdoPg";
+
+            //when
+            using var stream = new MemoryStream(BinaryPayload);
+            Stream test = Jose.JWT.DecodeStream(token, testSuiteUtils.PubKey(), payload: stream);
+
+            //then
+            Assert.Equal(BinaryPayload, (test as MemoryStream).ToArray());
+        }
+
+        [Fact]
         public void DecodeSignedTokenValidationSuccess()
         {
             // given
@@ -4667,6 +4681,19 @@ namespace UnitTests
             string json = Jose.JWT.Verify(token, testSuiteUtils.PubKey());
 
             Assert.Equal(@"{""hello"": ""world""}", json);
+        }
+
+        [Fact]
+        public void VerifyStream()
+        {
+            //given
+            const string token = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w.3_-H4HJiNi8--Ss-VAMM1Dg0JtTGEXNvMo1LAHEnQ7bZpQiblqAu5tt-G9p8KFnSlSYOG6l64pIqmqu5p5RvuQ";
+
+            // when
+            var payload = Jose.JWT.VerifyStream(token, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS512);
+
+            // then
+            Assert.Equal(BinaryPayload, (payload as MemoryStream).ToArray());
         }
 
         [Fact]
