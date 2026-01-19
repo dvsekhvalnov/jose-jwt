@@ -59,8 +59,19 @@ namespace Jose
         /// Convert the concatenation of R and S into DER encoding
         /// </summary>
         /// <remarks>
-        /// <see href="https://github.com/ere-health/jose4j/blob/f6655ef41cff1737b52c8ba9285e819843a94b37/src/main/java/org/jose4j/jws/EcdsaUsingShaAlgorithm.java#L93">
-        /// Modified and used ere-health/jose4j under Apache License Version 2.0, relicensed under MIT License (jose-jwt/LICENSE)
+        /// The result of an ECDSA signature is the EC point (R, S), where R and S are unsigned (very large) integers.
+        /// The JCA ECDSA signature implementation (sun.security.ec.ECDSASignature) produces and expects a DER encoding
+        /// of R and S while JOSE/JWS wants R and S as a concatenated byte array. XML signatures (best I can tell) treats
+        /// ECDSA similarly to JOSE and the code for the two methods that convert to and from DER and concatenated
+        /// R and S was originally taken from org.apache.xml.security.algorithms.implementations.SignatureECDSA in the
+        /// (Apache 2 licensed) Apache Santuario XML Security library. Some minor changes have been made to ensure the
+        /// concatenated output left zero pads R & S to consistent length - i.e. the "octet sequence representations
+        /// MUST NOT be shortened to omit any leading zero octets" per <see href="http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-25#section-3.4" />
+        /// 
+        /// Which seemed like a better idea than trying to write it myself or using sun.security.util.Der[Input/Output]Stream
+        /// as sun.security.ec.ECDSASignature does or some other half-arsed approach.
+        /// <see href="https://bitbucket.org/b_c/jose4j/src/f7c6da83b7f8097be7d3391b4eca9a7dec4e765f/src/main/java/org/jose4j/jws/EcdsaUsingShaAlgorithm.java#lines-119">
+        /// Modified and used b_c/jose4j under Apache License Version 2.0, relicensed under MIT License (jose-jwt/LICENSE)
         /// </see>
         /// </remarks>
         public static byte[] ConvertConcatenatedToDer(byte[] concatenatedSignatureBytes)
@@ -129,8 +140,8 @@ namespace Jose
         /// Convert the DER encoding of R and S into a concatenation of R and S
         /// </summary>
         /// <remarks>
-        /// <see href="https://github.com/ere-health/jose4j/blob/f6655ef41cff1737b52c8ba9285e819843a94b37/src/main/java/org/jose4j/jws/EcdsaUsingShaAlgorithm.java#L156">
-        /// Modified and used ere-health/jose4j under Apache License Version 2.0, relicensed under MIT License (jose-jwt/LICENSE)
+        /// <see href="https://bitbucket.org/b_c/jose4j/src/f7c6da83b7f8097be7d3391b4eca9a7dec4e765f/src/main/java/org/jose4j/jws/EcdsaUsingShaAlgorithm.java#lines-119">
+        /// Modified and used b_c/jose4j under Apache License Version 2.0, relicensed under MIT License (jose-jwt/LICENSE)
         /// </see>
         /// </remarks>
         public static byte[] ConvertDerToConcatenated(byte[] derEncodedBytes, int outputLength)
