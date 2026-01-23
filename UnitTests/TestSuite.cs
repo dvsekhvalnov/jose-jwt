@@ -4312,6 +4312,19 @@ namespace UnitTests
         }
 
         [Fact]
+        public void Signature()
+        {
+            //given
+            string token = "eyJhbGciOiJIUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.chIoYWrQMA8XL5nFz6oLDJyvgHk2KA4BrFGrKymjC8E";
+
+            //when
+            var test = Jose.JWT.Signature(token);
+
+            //then
+            Assert.Equal(new byte[] { 114, 18, 40, 97, 106, 208, 48, 15, 23, 47, 153, 197, 207, 170, 11, 12, 156, 175, 128, 121, 54, 40, 14, 1, 172, 81, 171, 43, 41, 163, 11, 193 }, test);
+        }
+
+        [Fact]
         public void EncodeWithDetachedContent()
         {
             //given
