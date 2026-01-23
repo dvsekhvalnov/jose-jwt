@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace Jose
 {
@@ -25,26 +26,27 @@ namespace Jose
         /// </remarks>
         public static byte[] ToASN1(byte[] concatenatedSignatureBytes)
         {
-            int rawLen = concatenatedSignatureBytes.Length/2;
+            var concatenatedSignatureSignedBytes = concatenatedSignatureBytes.Select(b => unchecked((sbyte)b)).ToArray();
+            int rawLen = concatenatedSignatureSignedBytes.Length/2;
 
             int i;
 
-            for (i = rawLen; (i > 0) && (concatenatedSignatureBytes[rawLen - i] == 0); i--);
+            for (i = rawLen; (i > 0) && (concatenatedSignatureSignedBytes[rawLen - i] == 0); i--);
 
             int j = i;
 
-            if (concatenatedSignatureBytes[rawLen - i] < 0)
+            if (concatenatedSignatureSignedBytes[rawLen - i] < 0)
             {
                 j += 1;
             }
 
             int k;
 
-            for (k = rawLen; (k > 0) && (concatenatedSignatureBytes[2*rawLen - k] == 0); k--);
+            for (k = rawLen; (k > 0) && (concatenatedSignatureSignedBytes[2*rawLen - k] == 0); k--);
 
             int l = k;
 
-            if (concatenatedSignatureBytes[2*rawLen - k] < 0)
+            if (concatenatedSignatureSignedBytes[2*rawLen - k] < 0)
             {
                 l += 1;
             }
@@ -73,14 +75,14 @@ namespace Jose
             derEncodedSignatureBytes[offset++] = 2;
             derEncodedSignatureBytes[offset++] = (byte) j;
 
-            Array.Copy(concatenatedSignatureBytes, rawLen - i, derEncodedSignatureBytes, (offset + j) - i, i);
+            Array.Copy(concatenatedSignatureSignedBytes, rawLen - i, derEncodedSignatureBytes, (offset + j) - i, i);
 
             offset += j;
 
             derEncodedSignatureBytes[offset++] = 2;
             derEncodedSignatureBytes[offset++] = (byte) l;
 
-            Array.Copy(concatenatedSignatureBytes, 2*rawLen - k, derEncodedSignatureBytes, (offset + l) - k, k);
+            Array.Copy(concatenatedSignatureSignedBytes, 2*rawLen - k, derEncodedSignatureBytes, (offset + l) - k, k);
 
             return derEncodedSignatureBytes;
         }
@@ -96,17 +98,18 @@ namespace Jose
         public static byte[] ToP1363(byte[] derEncodedBytes)
         {
             const int OUTPUT_LENGTH = 64;
-            if (derEncodedBytes.Length < 8 || derEncodedBytes[0] != 48)
+            var derEncodedUnsignedBytes = derEncodedBytes.Select(b => unchecked((sbyte)b)).ToArray();
+            if (derEncodedUnsignedBytes.Length < 8 || derEncodedUnsignedBytes[0] != 48)
             {
                 throw new Exception("Invalid format of ECDSA signature");
             }
 
             int offset;
-            if (derEncodedBytes[1] > 0)
+            if (derEncodedUnsignedBytes[1] > 0)
             {
                 offset = 2;
             }
-            else if (derEncodedBytes[1] == (byte) 0x81)
+            else if (derEncodedUnsignedBytes[1] == (byte) 0x81)
             {
                 offset = 3;
             }
@@ -115,31 +118,31 @@ namespace Jose
                 throw new Exception("Invalid format of ECDSA signature");
             }
 
-            byte rLength = derEncodedBytes[offset + 1];
+            var rLength = derEncodedUnsignedBytes[offset + 1];
 
             int i;
-            for (i = rLength; (i > 0) && (derEncodedBytes[(offset + 2 + rLength) - i] == 0); i--);
+            for (i = rLength; (i > 0) && (derEncodedUnsignedBytes[(offset + 2 + rLength) - i] == 0); i--);
 
-            byte sLength = derEncodedBytes[offset + 2 + rLength + 1];
+            var sLength = derEncodedUnsignedBytes[offset + 2 + rLength + 1];
 
             int j;
-            for (j = sLength; (j > 0) && (derEncodedBytes[(offset + 2 + rLength + 2 + sLength) - j] == 0); j--);
+            for (j = sLength; (j > 0) && (derEncodedUnsignedBytes[(offset + 2 + rLength + 2 + sLength) - j] == 0); j--);
 
             int rawLen = Math.Max(i, j);
             rawLen = Math.Max(rawLen, OUTPUT_LENGTH/2);
 
-            if ((derEncodedBytes[offset - 1] & 0xff) != derEncodedBytes.Length - offset
-                || (derEncodedBytes[offset - 1] & 0xff) != 2 + rLength + 2 + sLength
-                || derEncodedBytes[offset] != 2
-                || derEncodedBytes[offset + 2 + rLength] != 2)
+            if ((derEncodedUnsignedBytes[offset - 1] & 0xff) != derEncodedUnsignedBytes.Length - offset
+                || (derEncodedUnsignedBytes[offset - 1] & 0xff) != 2 + rLength + 2 + sLength
+                || derEncodedUnsignedBytes[offset] != 2
+                || derEncodedUnsignedBytes[offset + 2 + rLength] != 2)
             {
                 throw new Exception("Invalid format of ECDSA signature");
             }
             
             byte[] concatenatedSignatureBytes = new byte[2*rawLen];
 
-            Array.Copy(derEncodedBytes, (offset + 2 + rLength) - i, concatenatedSignatureBytes, rawLen - i, i);
-            Array.Copy(derEncodedBytes, (offset + 2 + rLength + 2 + sLength) - j, concatenatedSignatureBytes, 2*rawLen - j, j);
+            Array.Copy(derEncodedUnsignedBytes, (offset + 2 + rLength) - i, concatenatedSignatureBytes, rawLen - i, i);
+            Array.Copy(derEncodedUnsignedBytes, (offset + 2 + rLength + 2 + sLength) - j, concatenatedSignatureBytes, 2*rawLen - j, j);
 
             return concatenatedSignatureBytes;
         }
