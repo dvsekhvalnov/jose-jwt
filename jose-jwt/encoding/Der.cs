@@ -109,7 +109,7 @@ namespace Jose
             {
                 offset = 2;
             }
-            else if (derEncodedUnsignedBytes[1] == (byte) 0x81)
+            else if (derEncodedUnsignedBytes[1] == unchecked((sbyte) 0x81))
             {
                 offset = 3;
             }
