@@ -1652,6 +1652,24 @@ Then take a look at: http://www.donaldsbaconbytes.com/2016/08/create-jwt-with-a-
 
 Usually people have success with https://github.com/brutaldev/StrongNameSigner
 
+## Conversion of DER-encoded signatures
+When an ECDSA signature is performed, you usually receive a `byte[]` containing the signature in ASN.1 DER format. To use the signature as the signature of a JWT conversion to the P1363/concatenated format is needed:
+```csharp
+byte[] derSignature = signSomething();
+byte[] jwtSignature = Der.ToP1363(asn1Signature);
+string jwt = Compact.Serialize(headerBytes, payloadBytes, jwtSignature)
+```
+
+The reverse conversion can be done like this:
+```csharp
+string jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30"
+byte[] jwtSignature = JWT.Signature(jwt)
+byte[] derSignature = Der.ToASN1(jwtSignature);
+```
+
+One real life example that makes `Der.ToP1363()` conversion necessary is the German "E-Rezept". During authentication with ECC certificates a ASN.1 DER
+signature is issued which [needs to be converted](https://wiki.gematik.de/spaces/RUAAS/pages/650419634/E-Rezept+-+RSA2ECC+Umstellungsleitfaden+f%C3%BCr+Entwickler#ERezeptRSA2ECCUmstellungsleitfadenf%C3%BCrEntwickler-ZusammenstellungdessigniertenJWTmitECCSignatur) to P1363/concatenated format.
+
 ## ASP.NET Core MVC JWT Authentication
 
 ### Securing Controllers Using AuthorizeAttribute
