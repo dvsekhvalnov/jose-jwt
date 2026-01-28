@@ -164,6 +164,40 @@ namespace Jose
             return GetSettings(settings).JsonMapper.Parse<T>(Payload(token));
         }
 
+        public static byte[] Signature(string token, bool b64 = true)
+        {
+            return SignatureBytes(token, b64);
+        }
+
+        /// <summary>
+        /// Parses signed JWT token, extracts and returns signature part as binary data.
+        /// This method is NOT supported for encrypted JWT tokens.
+        /// This method is NOT performing integrity checking.
+        /// </summary>
+        /// <param name="token">signed JWT token</param>
+        /// <returns>unmarshalled signature</returns>
+        /// <exception cref="JoseException">if encrypted JWT token is provided</exception>
+        public static byte[] SignatureBytes(string token, bool b64 = true)
+        {
+            var parts = Compact.Iterate(token);
+
+            if (parts.Count < 3)
+            {
+                throw new JoseException(
+                    "The given token doesn't follow JWT format and must contains at least three parts.");
+            }
+
+            if (parts.Count > 3)
+            {
+                throw new JoseException(
+                    "Getting payload for encrypted tokens is not supported. Please use Jose.JWT.Decode() method instead.");
+            }
+
+            parts.Next(false); //skip header
+            parts.Next(false); //skip payload
+            return parts.Next(b64);
+        }
+
         /// <summary>
         /// Serialize and encodes object to JWT token and applies requested encryption/compression algorithms.
         /// </summary>
