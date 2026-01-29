@@ -4769,6 +4769,77 @@ namespace UnitTests
         }
 
         [Fact]
+        public void Signature()
+        {
+            //given
+            string token = "eyJhbGciOiJIUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.chIoYWrQMA8XL5nFz6oLDJyvgHk2KA4BrFGrKymjC8E";
+
+            //when
+            var test = Jose.JWT.Signature(token);
+
+            //then
+            Assert.Equal("chIoYWrQMA8XL5nFz6oLDJyvgHk2KA4BrFGrKymjC8E", test);
+        }
+
+
+        [Fact]
+        public void SignatureBytes()
+        {
+            //given
+            string token = "eyJhbGciOiJIUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.chIoYWrQMA8XL5nFz6oLDJyvgHk2KA4BrFGrKymjC8E";
+
+            //when
+            var test = Jose.JWT.SignatureBytes(token);
+
+            //then
+            Assert.Equal(new byte[] { 99, 104, 73, 111, 89, 87, 114, 81, 77, 65, 56, 88, 76, 53, 110, 70, 122, 54, 111, 76, 68, 74, 121, 118, 103, 72, 107, 50, 75, 65, 52, 66, 114, 70, 71, 114, 75, 121, 109, 106, 67, 56, 69 }, test);
+        }
+
+        [Fact]
+        public void SignatureBytesDecoded()
+        {
+            //given
+            string token = "eyJhbGciOiJIUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.chIoYWrQMA8XL5nFz6oLDJyvgHk2KA4BrFGrKymjC8E";
+
+            //when
+            var test = Jose.JWT.SignatureBytes(token, true);
+
+            //then
+            Assert.Equal(new byte[] { 114, 18, 40, 97, 106, 208, 48, 15, 23, 47, 153, 197, 207, 170, 11, 12, 156, 175, 128, 121, 54, 40, 14, 1, 172, 81, 171, 43, 41, 163, 11, 193 }, test);
+        }
+
+        [Fact]
+        public void SignatureMalformedToken()
+        {
+            //given
+            string token = "not-a-token";
+
+            //when
+            var exception = Assert.Throws<JoseException>(() => Jose.JWT.Signature(token));
+
+            //then
+            Assert.Equal("The given token doesn't follow JWT format and must contains at least three parts.", exception.Message);
+        }
+
+        [Fact]
+        public void SignatureOfEncryptedToken()
+        {
+            //given
+            string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIn0..ZD93XtD7TOa2WMbqSuaY9g.1J5BAuxNRMWaw43s7hR82gqLiaZOHBmfD3_B9k4I2VIDKzS9oEF_NS2o7UIBa6t_fWHU7vDm9lNAN4rqq7OvtCBHJpFk31dcruQHxwYKn5xNefG7YP-o6QtpyNioNWJpaSD5VRcRO5ufRrw2bu4_nOth00yJU5jjN3O3n9f-0ewrN2UXDJIbZM-NiSuEDEgOVHImQXoOtOQd0BuaDx6xTJydw_rW5-_wtiOH2k-3YGlibfOWNu51kApGarRsAhhqKIPetYf5Mgmpv1bkUo6HJw.nVpOmg3Sxri0rh6nQXaIx5X0fBtCt7Kscg6c66NugHY";
+
+            //when
+            try
+            {
+                var test = JWT.Signature(token);
+                Assert.True(false, string.Format("JoseException was expected, but got:{0}", test));
+            }
+            catch (JoseException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+        }
+
+        [Fact]
         public void EncodeWithDetachedContent()
         {
             //given

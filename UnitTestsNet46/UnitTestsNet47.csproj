@@ -77,6 +77,7 @@
     <Compile Include="CompactTest.cs" />
     <Compile Include="ConcatKDFTest.cs" />
     <Compile Include="DictionariesTest.cs" />
+    <Compile Include="encoding\DerTest.cs" />
     <Compile Include="jwe\JweTest.cs" />
     <Compile Include="jwe\JweTokenTest.cs" />
     <Compile Include="jwk\JwkSetTest.cs" />

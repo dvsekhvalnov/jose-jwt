@@ -6,23 +6,11 @@ namespace Jose
     public static class Der
     {
         /// <summary>
-        /// Convert the concatenation of R and S into DER encoding
+        /// Convert the concatenation of ECDSA signature point (R,S), also known as IEEE P1363, into DER ASN.1 encoding.
         /// </summary>
-        /// <remarks>
-        /// The result of an ECDSA signature is the EC point (R, S), where R and S are unsigned (very large) integers.
-        /// The JCA ECDSA signature implementation (sun.security.ec.ECDSASignature) produces and expects a DER encoding
-        /// of R and S while JOSE/JWS wants R and S as a concatenated byte array. XML signatures (best I can tell) treats
-        /// ECDSA similarly to JOSE and the code for the two methods that convert to and from DER and concatenated
-        /// R and S was originally taken from org.apache.xml.security.algorithms.implementations.SignatureECDSA in the
-        /// (Apache 2 licensed) Apache Santuario XML Security library. Some minor changes have been made to ensure the
-        /// concatenated output left zero pads R & S to consistent length - i.e. the "octet sequence representations
-        /// MUST NOT be shortened to omit any leading zero octets" per <see href="http://tools.ietf.org/html/draft-ietf-jose-json-web-algorithms-25#section-3.4" />
-        /// 
-        /// Which seemed like a better idea than trying to write it myself or using sun.security.util.Der[Input/Output]Stream
-        /// as sun.security.ec.ECDSASignature does or some other half-arsed approach.
-        /// <see href="https://bitbucket.org/b_c/jose4j/src/f7c6da83b7f8097be7d3391b4eca9a7dec4e765f/src/main/java/org/jose4j/jws/EcdsaUsingShaAlgorithm.java#lines-119">
-        /// Modified and used b_c/jose4j under Apache License Version 2.0, relicensed under MIT License (jose-jwt/LICENSE)
-        /// </see>
+        /// <remarks>      
+        /// Original code ported from jose4j project <see href="https://bitbucket.org/b_c/jose4j/src/f7c6da83b7f8097be7d3391b4eca9a7dec4e765f/src/main/java/org/jose4j/jws/EcdsaUsingShaAlgorithm.java#lines-119" />
+        /// Which is derived from the Apache Santuario XML Security library's SignatureECDS implementation <see href=".http://santuario.apache.org/""/>        
         /// </remarks>
         public static byte[] ToASN1(byte[] concatenatedSignatureBytes)
         {
@@ -75,26 +63,26 @@ namespace Jose
             derEncodedSignatureBytes[offset++] = 2;
             derEncodedSignatureBytes[offset++] = (byte) j;
 
-            Array.Copy(concatenatedSignatureSignedBytes, rawLen - i, derEncodedSignatureBytes, (offset + j) - i, i);
+            Buffer.BlockCopy(concatenatedSignatureSignedBytes, rawLen - i, derEncodedSignatureBytes, (offset + j) - i, i);
 
             offset += j;
 
             derEncodedSignatureBytes[offset++] = 2;
             derEncodedSignatureBytes[offset++] = (byte) l;
 
-            Array.Copy(concatenatedSignatureSignedBytes, 2*rawLen - k, derEncodedSignatureBytes, (offset + l) - k, k);
+            Buffer.BlockCopy(concatenatedSignatureSignedBytes, 2*rawLen - k, derEncodedSignatureBytes, (offset + l) - k, k);
 
             return derEncodedSignatureBytes;
         }
-        
+
         /// <summary>
-        /// Convert the DER encoding of R and S into a concatenation of R and S
+        /// Convert the DER ASN.1 encoded ECDSA signature point (R,S) into a concatenation of R and S, also known as IEEE P1363.
         /// </summary>
-        /// <remarks>
-        /// <see href="https://bitbucket.org/b_c/jose4j/src/f7c6da83b7f8097be7d3391b4eca9a7dec4e765f/src/main/java/org/jose4j/jws/EcdsaUsingShaAlgorithm.java#lines-119">
-        /// Modified and used b_c/jose4j under Apache License Version 2.0, relicensed under MIT License (jose-jwt/LICENSE)
-        /// </see>
+        /// <remarks>      
+        /// Original code ported from jose4j project <see href="https://bitbucket.org/b_c/jose4j/src/f7c6da83b7f8097be7d3391b4eca9a7dec4e765f/src/main/java/org/jose4j/jws/EcdsaUsingShaAlgorithm.java#lines-119" />
+        /// Which is derived from the Apache Santuario XML Security library's SignatureECDS implementation <see href=".http://santuario.apache.org/""/>        
         /// </remarks>
+
         public static byte[] ToP1363(byte[] derEncodedBytes)
         {
             const int OUTPUT_LENGTH = 64;
@@ -141,8 +129,8 @@ namespace Jose
             
             byte[] concatenatedSignatureBytes = new byte[2*rawLen];
 
-            Array.Copy(derEncodedUnsignedBytes, (offset + 2 + rLength) - i, concatenatedSignatureBytes, rawLen - i, i);
-            Array.Copy(derEncodedUnsignedBytes, (offset + 2 + rLength + 2 + sLength) - j, concatenatedSignatureBytes, 2*rawLen - j, j);
+            Buffer.BlockCopy(derEncodedUnsignedBytes, (offset + 2 + rLength) - i, concatenatedSignatureBytes, rawLen - i, i);
+            Buffer.BlockCopy(derEncodedUnsignedBytes, (offset + 2 + rLength + 2 + sLength) - j, concatenatedSignatureBytes, 2*rawLen - j, j);
 
             return concatenatedSignatureBytes;
         }

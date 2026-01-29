@@ -56,6 +56,7 @@
     <Compile Include="crypto\PBKDF2.cs" />
     <Compile Include="crypto\RsaOaep.cs" />
     <Compile Include="crypto\RsaPss.cs" />
+    <Compile Include="encoding\Der.cs" />
     <Compile Include="json\IJsonMapper.cs" />
     <Compile Include="json\JsonMapper.cs" />
     <Compile Include="json\JSSerializerMapper.cs" />

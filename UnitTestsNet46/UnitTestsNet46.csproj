@@ -86,6 +86,7 @@
     <Compile Include="PBKDF2Test.cs" />
     <Compile Include="Pbse2HmacShaKeyManagementWithAesKeyWrapTest.cs" />
     <Compile Include="SecurityVulnerabilitiesTest.cs" />
+    <Compile Include="encoding\DerTest.cs" />
     <Compile Include="SettingsTest.cs" />
     <Compile Include="TestConsole.cs" />
     <Compile Include="TestSuite.cs" />
