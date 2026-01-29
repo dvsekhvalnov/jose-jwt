@@ -1204,9 +1204,10 @@ jose-jwt provides helper methods to examine token content without performing act
 `IDictionary<string, object> Jose.JWT.Headers(String token)` to return header information as dictionary and `T Jose.JWT.Headers<T>(string token)` to return headers information as
 unmarshalled type.
 
-`string Jose.JWT.Payload(string token)` to return unparsed payload and `T Jose.JWT.Payload<T>(string token)` to return unmarshalled payload type. Those 2 methods works only with
+`string Jose.JWT.Payload(string token)` and `Jose.JWT.PayloadBytes(string token)` to return unparsed payload and `T Jose.JWT.Payload<T>(string token)` to return unmarshalled payload type. Those 2 methods works only with
 signed tokens and will throw `JoseException` when applied on encrypted token.
 
+`string Jose.JWT.Signature(string token)` and `byte[] Jose.JWT.SignatureBytes(string token)` to return signature part of token.
 With JWE JSON (RFC 7516) serialized tokens `JweToken JWE.Headers()` method can be used for same purpose.
 It will parse JSON structure into `JweToken` object and pre-populate effective headers (`JweRecipient.JoseHeader` property, see [JWE](#decoding-json-serialized-encrypted-content)) per every recipient in token. But will not perform actual decryption or integrity verification.
 
@@ -1663,7 +1664,7 @@ string jwt = Compact.Serialize(headerBytes, payloadBytes, jwtSignature)
 The reverse conversion can be done like this:
 ```csharp
 string jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30"
-byte[] jwtSignature = JWT.Signature(jwt)
+byte[] jwtSignature = JWT.SignatureBytes(jwt)
 byte[] derSignature = Der.ToASN1(jwtSignature);
 ```
 
