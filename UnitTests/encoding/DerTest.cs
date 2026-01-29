@@ -1,10 +1,22 @@
 using Jose;
+using System.Reflection.PortableExecutable;
+using System.Runtime.InteropServices;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace UnitTests.encoding
 {
     public class DerTest
     {
+        private readonly TestConsole Console;
+        private ITestSuiteUtils testSuiteUtils;
+
+        public DerTest(ITestOutputHelper output)
+        {
+            this.Console = new TestConsole(output);
+            testSuiteUtils = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? (ITestSuiteUtils)new TestSuiteCngKeyUtils() : new TestSuiteEcdhUtils();
+        }
+
         [Fact]
         public void ToP1363()
         {
@@ -31,6 +43,41 @@ namespace UnitTests.encoding
 
             //then
             Assert.Equal(asn1Signature, test);
+        }
+
+        [Fact]
+        public void ToASN1CrossTest()
+        {
+            //given
+            var sig = Base64Url.Decode("Lkq9xKmN9c5Pvfr07t4BpE3Xty6HMl7GQ5zAU1WMjnY6hOtAQ0TK_gEX4Kunm0erHtz8jjIdLXV-pJbwkAy6RQ");
+
+            //when
+            var test = Base64Url.Encode(Der.ToASN1(sig));
+            Console.Out.WriteLine("DER ASN1 = {0}", test);
+
+            //then
+            //matches jose4j encoded ASN1
+            Assert.Equal("MEQCIC5KvcSpjfXOT7369O7eAaRN17cuhzJexkOcwFNVjI52AiA6hOtAQ0TK_gEX4Kunm0erHtz8jjIdLXV-pJbwkAy6RQ", test);
+        }
+
+        [Fact]
+        public void ToP1361CrossTest()
+        {
+            //given
+            // jose4j generated token            
+            var asn1Sig = Base64Url.Decode("MEQCIC5KvcSpjfXOT7369O7eAaRN17cuhzJexkOcwFNVjI52AiA6hOtAQ0TK_gEX4Kunm0erHtz8jjIdLXV-pJbwkAy6RQ");
+            var pubKey = new Jwk(crv: "P-256", x: "BHId3zoDv6pDgOUh8rKdloUZ0YumRTcaVDCppUPoYgk", y: "g3QIDhaWEksYtZ9OWjNHn9a6-i_P9o5_NrdISP0VWDU");
+
+            //when
+            var test = Base64Url.Encode(Der.ToP1363(asn1Sig));
+            Console.Out.WriteLine("P1363 = {0}", test);
+
+            var token = "eyJjdHkiOiJ0ZXh0L3BsYWluIiwiYWxnIjoiRVMyNTYifQ.eyJoZWxsbyI6ICJ3b3JsZCJ9." + test; // reconstruct full token           
+            string json = Jose.JWT.Decode(token, pubKey); // and make sure verification pass
+
+            //then
+            Assert.Equal("Lkq9xKmN9c5Pvfr07t4BpE3Xty6HMl7GQ5zAU1WMjnY6hOtAQ0TK_gEX4Kunm0erHtz8jjIdLXV-pJbwkAy6RQ", test);
+            Assert.Equal(@"{""hello"": ""world""}", json);
         }
     }
 }

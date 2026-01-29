@@ -164,9 +164,10 @@ namespace Jose
             return GetSettings(settings).JsonMapper.Parse<T>(Payload(token));
         }
 
-        public static byte[] Signature(string token, bool b64 = true)
+        public static string Signature(string token, bool b64 = false)
         {
-            return SignatureBytes(token, b64);
+            return Encoding.UTF8.GetString(
+                    SignatureBytes(token, b64));
         }
 
         /// <summary>
@@ -177,7 +178,7 @@ namespace Jose
         /// <param name="token">signed JWT token</param>
         /// <returns>unmarshalled signature</returns>
         /// <exception cref="JoseException">if encrypted JWT token is provided</exception>
-        public static byte[] SignatureBytes(string token, bool b64 = true)
+        public static byte[] SignatureBytes(string token, bool b64 = false)
         {
             var parts = Compact.Iterate(token);
 
@@ -190,7 +191,7 @@ namespace Jose
             if (parts.Count > 3)
             {
                 throw new JoseException(
-                    "Getting payload for encrypted tokens is not supported. Please use Jose.JWT.Decode() method instead.");
+                    "Getting signature for encrypted tokens is not supported. Please use Jose.JWT.Decode() method instead.");
             }
 
             parts.Next(false); //skip header
