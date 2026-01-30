@@ -177,8 +177,19 @@ namespace Jose
         private IJsonMapper jsMapper = new JsonMapper();
 #endif
 
-        //Builder-style methods
+        /// <summary>
+        /// Register Jwa implementation, will override existing one if any
+        /// </summary>
         public JwtSettings RegisterJwa(JweAlgorithm alg, IKeyManagement impl)
+        {
+            keyAlgorithms[alg] = impl;
+            return this;
+        }
+
+        /// <summary>
+        /// Register Jwa implementation, will override existing one if any
+        /// </summary>
+        public JwtSettings RegisterJwa(String alg, IKeyManagement impl)
         {
             keyAlgorithms[alg] = impl;
             return this;
@@ -194,9 +205,18 @@ namespace Jose
         }
 
         /// <summary>
-        /// Register an alias for the "enc" header that should point to a standard JWE encryption algorithm
+        /// Register Jwe implementation, will override existing one if any
         /// </summary>
         public JwtSettings RegisterJwe(JweEncryption alg, IJweAlgorithm impl)
+        {
+            encAlgorithms[alg] = impl;
+            return this;
+        }
+
+        /// <summary>
+        /// Register Jwe implementation, will override existing one if any
+        /// </summary>
+        public JwtSettings RegisterJwe(String alg, IJweAlgorithm impl)
         {
             encAlgorithms[alg] = impl;
             return this;
@@ -211,7 +231,14 @@ namespace Jose
             return this;
         }
 
+        /// Register Compression implementation, will override existing one if any
         public JwtSettings RegisterCompression(JweCompression alg, ICompression impl)
+        {
+            compressionAlgorithms[alg] = impl;
+            return this;
+        }
+
+        public JwtSettings RegisterCompression(String alg, ICompression impl)
         {
             compressionAlgorithms[alg] = impl;
             return this;
@@ -229,10 +256,17 @@ namespace Jose
         /// <summary>
         /// Register Jws implementation, will override existing one if any
         /// </summary>
-        /// <param name="alg"></param>
-        /// <param name="impl"></param>
-        /// <returns></returns>
         public JwtSettings RegisterJws(JwsAlgorithm alg, IJwsAlgorithm impl)
+        {
+            jwsAlgorithms[alg] = impl;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Register Jws implementation, will override existing one if any
+        /// </summary>
+        public JwtSettings RegisterJws(String alg, IJwsAlgorithm impl)
         {
             jwsAlgorithms[alg] = impl;
 
@@ -260,10 +294,32 @@ namespace Jose
         }
 
         /// <summary>
+        /// Deregister Jws implementation. Subsequent calls to Decode/Encode for given alg will throw 'InvalidAlgorithmException'.
+        /// Note: this method is not updating alg aliases. One should take care of it manually.
+        /// </summary>
+        public JwtSettings DeregisterJws(String alg)
+        {
+            jwsAlgorithms.Remove(alg);
+
+            return this;
+        }
+
+        /// <summary>
         /// Deregister Jwa implementation. Subsequent calls to Decode/Encode for given alg will throw 'InvalidAlgorithmException'.
         /// Note: this method is not updating alg aliases. One should take care of it manually.
         /// </summary>
         public JwtSettings DeregisterJwa(JweAlgorithm alg)
+        {
+            keyAlgorithms.Remove(alg);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Deregister Jwa implementation. Subsequent calls to Decode/Encode for given alg will throw 'InvalidAlgorithmException'.
+        /// Note: this method is not updating alg aliases. One should take care of it manually.
+        /// </summary>
+        public JwtSettings DeregisterJwa(String alg)
         {
             keyAlgorithms.Remove(alg);
 
@@ -282,10 +338,32 @@ namespace Jose
         }
 
         /// <summary>
+        /// Deregister Jwe implementation. Subsequent calls to Decode/Encode for given alg will throw 'InvalidAlgorithmException'.
+        /// Note: this method is not updating alg aliases. One should take care of it manually.
+        /// </summary>
+        public JwtSettings DeregisterJwe(String alg)
+        {
+            encAlgorithms.Remove(alg);
+
+            return this;
+        }
+
+        /// <summary>
         /// Deregister compression implementation. Subsequent calls to Decode/Encode for given alg will throw 'InvalidAlgorithmException'.
         /// Note: this method is not updating alg aliases. One should take care of it manually.
         /// </summary>
         public JwtSettings DeregisterCompression(JweCompression alg)
+        {
+            compressionAlgorithms.Remove(alg);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Deregister compression implementation. Subsequent calls to Decode/Encode for given alg will throw 'InvalidAlgorithmException'.
+        /// Note: this method is not updating alg aliases. One should take care of it manually.
+        /// </summary>
+        public JwtSettings DeregisterCompression(String alg)
         {
             compressionAlgorithms.Remove(alg);
 
