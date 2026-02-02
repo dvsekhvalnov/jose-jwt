@@ -1,17 +1,25 @@
-﻿using System;
+﻿using Jose;
+using Jose.keys;
+using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
-using Jose.keys;
-using Jose;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace UnitTests
 {
     public class SettingsTest
     {
-        private static readonly byte[] aes128Key = { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };        
-       
+        private readonly TestConsole Console;
+
+        private static readonly byte[] aes128Key = { 194, 164, 235, 6, 138, 248, 171, 239, 24, 216, 11, 22, 137, 199, 215, 133 };
+
+        public SettingsTest(ITestOutputHelper output)
+        {
+            this.Console = new TestConsole(output);
+        }
+
         [Fact]
         public void Encode_IJsonMapper_Override()
         {
@@ -151,6 +159,51 @@ namespace UnitTests
         }
 
         [Fact]
+        public void Encode_IKeyManagement_OverrideByHeaderValue()
+        {
+            //given
+            MockKeyManagement keyMgmt = new MockKeyManagement();
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            JwtSettings settings = new JwtSettings().RegisterJwa("dir", keyMgmt);
+
+            //when
+            string token = Jose.JWT.Encode(json, aes128Key, JweAlgorithm.DIR, JweEncryption.A128GCM, settings: settings);
+
+            //then
+            Console.Out.WriteLine("DIR_A128GCM = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(json, Jose.JWT.Decode(token, aes128Key, settings));
+
+            Assert.True(keyMgmt.WrapCalled);
+        }
+
+        [Fact]
+        public void Encode_IKeyManagement_CustomAlg()
+        {
+            //given
+            MockKeyManagement keyMgmt = new MockKeyManagement();
+            string json = @"{""hello"":""world""}";
+
+            JwtSettings settings = new JwtSettings().RegisterJwa("mock-alg", keyMgmt);
+
+            //when
+            string token = Jose.JWT.Encode(json, aes128Key, "mock-alg", "A128GCM", settings: settings);
+            
+            //then
+            Console.Out.WriteLine("mock-alg_A128GCM = {0}", token);
+            Assert.True(keyMgmt.WrapCalled);
+
+            IDictionary<string, object> headers = Jose.JWT.Headers(token);
+            Assert.Equal(2, headers.Count);
+            Assert.Equal("mock-alg", headers["alg"]);
+            Assert.Equal("A128GCM", headers["enc"]);
+        }
+
+        [Fact]
         public void Decode_IKeyManagement_Override()
         {
             //given
@@ -164,6 +217,40 @@ namespace UnitTests
             Console.Out.WriteLine("json = {0}", json);
 
             Assert.Equal(@"{""exp"":1392548520,""sub"":""alice"",""nbf"":1392547920,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0e659a67-1cd3-438b-8888-217e72951ec9"",""iat"":1392547920}", json);
+            Assert.True(keyMgmt.UnwrapCalled);
+        }
+
+        [Fact]
+        public void Decode_IKeyManagement_OverrideByHeaderValue()
+        {
+            //given
+            MockKeyManagement keyMgmt = new MockKeyManagement();
+            string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..yVi-LdQQngN0C5WS.1McwSmhZzAtmmLp9y-OdnJwaJFo1nj_4ashmzl2LhubGf0Jl1OTEVJzsHZb7bkup7cGTkuxh6Vfv10ljHsjWf_URXoxP3stQqQeViVcuPV0y2Q_WHYzTNGZpmHGe-hM6gjDhyZyvu3yeXGFSvfPQmp9pWVOgDjI4RC0MQ83rzzn-rRdnZkznWjbmOPxwPrR72Qng0BISsEwbkPn4oO8-vlHkVmPpuDTaYzCT2ZR5K9JnIU8d8QdxEAGb7-s8GEJ1yqtd_w._umbK59DAKA3O89h15VoKQ";
+
+            //when
+            string json = Jose.JWT.Decode(token, aes128Key, settings: new JwtSettings().RegisterJwa("dir", keyMgmt));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""exp"":1392548520,""sub"":""alice"",""nbf"":1392547920,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0e659a67-1cd3-438b-8888-217e72951ec9"",""iat"":1392547920}", json);
+            Assert.True(keyMgmt.UnwrapCalled);
+        }
+
+        [Fact]
+        public void Decode_IKeyManagement_CustomAlg()
+        {
+            //given
+            MockKeyManagement keyMgmt = new MockKeyManagement();
+            string token = "eyJhbGciOiJtb2NrLWFsZyIsImVuYyI6IkExMjhHQ00ifQ..ex70XgEnTsFo09ob.wuM5b4h0wp6HeXjnEBbWMpo.3w7FIqWqXnESGRd1fNi-MA";
+
+            //when
+            string json = Jose.JWT.Decode(token, aes128Key, settings: new JwtSettings().RegisterJwa("mock-alg", keyMgmt));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""hello"":""world""}", json);
             Assert.True(keyMgmt.UnwrapCalled);
         }
 
@@ -305,6 +392,24 @@ namespace UnitTests
                 Console.Out.WriteLine(e.ToString());
             }
         }
+
+        [Fact]
+        public void DeregisterJwaByHeaderValue()
+        {
+            try
+            {
+                JwtSettings settings = new JwtSettings();
+                settings.DeregisterJwa("RSA-OAEP-256");
+                Jose.JWT.Encode("should fail, no RSA-OAEP-256", PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM, settings: settings);
+                Assert.True(false, string.Format("JoseException was expected"));
+            }
+            catch (JoseException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+        }
+
+
 
         [Fact]
         public void DeregisterCompression()

@@ -35,6 +35,12 @@ namespace Jose
             return EncryptBytes(Encoding.UTF8.GetBytes(plaintext), recipients, enc, aad, mode, compression, extraProtectedHeaders, unprotectedHeaders, settings);
         }
 
+        // TODO: unit tests
+        public static string Encrypt(string plaintext, IEnumerable<JweRecipient> recipients, string enc, byte[] aad = null, SerializationMode mode = SerializationMode.Json, string compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
+        {
+            return EncryptBytes(Encoding.UTF8.GetBytes(plaintext), recipients, enc, aad, mode, compression, extraProtectedHeaders, unprotectedHeaders, settings);
+        }
+
         /// <summary>
         /// Encrypts given binary plaintext using JWE and applies requested encryption/compression algorithms.
         /// </summary>
@@ -50,6 +56,13 @@ namespace Jose
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
         public static string EncryptBytes(byte[] plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Json, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
         {
+            var compressionAlg = compression != null ? JwtSettings.CompressionHeader(compression.Value) : null;
+            return EncryptBytes(plaintext, recipients, JwtSettings.JweHeaderValue(enc), aad, mode, compressionAlg, extraProtectedHeaders, unprotectedHeaders, settings);
+        }
+
+        // TODO: unit tests
+        public static string EncryptBytes(byte[] plaintext, IEnumerable<JweRecipient> recipients, string enc, byte[] aad = null, SerializationMode mode = SerializationMode.Json, string compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
+        {
             if (plaintext == null)
             {
                 throw new ArgumentNullException(nameof(plaintext));
@@ -64,7 +77,7 @@ namespace Jose
             }
 
             IDictionary<string, object> joseProtectedHeader = Dictionaries.MergeHeaders(
-                new Dictionary<string, object> { { "enc", settings.JweHeaderValue(enc) } },
+                new Dictionary<string, object> { { "enc", enc } },
                 extraProtectedHeaders);
 
             byte[] cek = null;
@@ -84,7 +97,7 @@ namespace Jose
                 // - key management will write to (e.g. iv, tag - AesGcmKW)
                 IDictionary<string, object> joseHeader = Dictionaries.MergeHeaders(
                     joseProtectedHeader,
-                    new Dictionary<string, object> { { "alg", settings.JwaHeaderValue(recipient.Alg) } },
+                    new Dictionary<string, object> { { "alg", recipient.Alg } },
                     recipient.Header,
                     unprotectedHeaders
                     );
@@ -113,16 +126,16 @@ namespace Jose
                 recipientsOut.Add(new JweRecipient(encryptedCek, recipientHeader));
             }
 
-            if (compression.HasValue)
+            if (compression!=null)
             {
-                var compressionAlg = settings.Compression(compression.Value);
+                var compressionAlg = settings.Compression(compression);
 
                 if (compressionAlg == null)
                 {
-                    throw new JoseException(string.Format("Unsupported compression alg requested: {0}", compression.Value));
+                    throw new JoseException(string.Format("Unsupported compression alg requested: {0}", compression));
                 }
 
-                joseProtectedHeader["zip"] = settings.CompressionHeader(compression.Value);
+                joseProtectedHeader["zip"] = compression;
                                 
                 plaintext = compressionAlg.Compress(plaintext);
             }
@@ -196,6 +209,23 @@ namespace Jose
         /// <exception cref="InvalidAlgorithmException">if encryption or compression algorithm is not supported</exception>
         public static JweToken Decrypt(string jwe, object key, JweAlgorithm? expectedJweAlg = null, JweEncryption? expectedJweEnc = null, JwtSettings settings = null)
         {
+            var keyAlg = expectedJweAlg != null ? JwtSettings.JwaHeaderValue(expectedJweAlg.Value) : null;
+            var encAlg = expectedJweEnc != null ? JwtSettings.JweHeaderValue(expectedJweEnc.Value) : null;
+
+            return Decrypt(jwe, key, keyAlg, encAlg, settings);
+        }
+
+        /// <summary>
+        /// Type hint alias for backward SDK compatibility
+        /// </summary>
+        public static JweToken Decrypt(string jwe, object key)
+        {
+            return Decrypt(jwe, key, expectedJweAlg: (string)null, expectedJweEnc: (string)null, settings: null);
+        }
+
+        //TODO: unit tests
+        public static JweToken Decrypt(string jwe, object key, string expectedJweAlg = null, string expectedJweEnc = null, JwtSettings settings = null)
+        {
             Ensure.IsNotEmpty(jwe, "Incoming jwe expected to be in a valid serialization form, not empty, whitespace or null.");
 
             settings = GetSettings(settings);
@@ -211,7 +241,7 @@ namespace Jose
 
             foreach (var recipient in token.Recipients)
             {
-                var headerAlg = settings.JwaAlgorithmFromHeader((string)recipient.JoseHeader["alg"]);
+                var headerAlg = (string)recipient.JoseHeader["alg"];
                 var encryptedCek = recipient.EncryptedCek;
 
                 // skip recipient if asked to do strict validation
@@ -220,7 +250,7 @@ namespace Jose
                     continue;
                 }
 
-                IKeyManagement keys = settings.Jwa(headerAlg);
+                IKeyManagement keys = settings.JwaAlgorithmFromHeader(headerAlg);
 
                 if (keys == null)
                 {
@@ -229,8 +259,8 @@ namespace Jose
 
                 try
                 {
-                    JweEncryption headerEnc = settings.JweAlgorithmFromHeader((string)recipient.JoseHeader["enc"]);
-                    IJweAlgorithm enc = settings.Jwe(headerEnc);
+                    var headerEnc = (string)recipient.JoseHeader["enc"];
+                    IJweAlgorithm enc = settings.JweAlgorithmFromHeader(headerEnc);
 
                     if (enc == null)
                     {

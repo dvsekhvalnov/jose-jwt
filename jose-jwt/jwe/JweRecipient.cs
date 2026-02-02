@@ -26,6 +26,13 @@ namespace Jose
         /// <param name="key">key for encrypting CEK (Content Encryption Key). Cannot be null.</param>
         public JweRecipient(JweAlgorithm alg, object key, IDictionary<string, object> header = null)
         {
+            this.Alg = JwtSettings.JwaHeaderValue(alg);
+            this.Key = key ?? throw new ArgumentNullException(nameof(key));
+            this.Header = header;
+        }
+
+        public JweRecipient(string alg, object key, IDictionary<string, object> header = null)
+        {
             this.Alg = alg;
             this.Key = key ?? throw new ArgumentNullException(nameof(key));
             this.Header = header;
@@ -34,7 +41,7 @@ namespace Jose
         /// <summary>
         /// Content key encryption algorithm
         /// </summary>
-        public JweAlgorithm Alg { get; }
+        public string Alg { get; }
 
         /// <summary>
         /// Key to encrypt content key (KEK)

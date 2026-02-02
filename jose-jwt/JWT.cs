@@ -215,6 +215,11 @@ namespace Jose
             return Encode(GetSettings(settings).JsonMapper.Serialize(payload), key, alg, enc, compression, extraHeaders, settings);
         }
 
+        //public static string Encode(object payload, object key, string alg, string enc, string compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
+        //{
+        //    return Encode(GetSettings(settings).JsonMapper.Serialize(payload), key, alg, enc, compression, extraHeaders, settings);
+        //}
+
         /// <summary>
         /// Encodes given json string to JWT token and applies requested encryption/compression algorithms.
         /// Json string to encode will be obtained via configured IJsonMapper implementation.
@@ -233,6 +238,13 @@ namespace Jose
 
             return EncodeBytes(plainText, key, alg, enc, compression, extraHeaders, settings);
         }
+        // TODO: unit tests
+        public static string Encode(string payload, object key, string alg, string enc, string compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
+        {
+            byte[] plainText = Encoding.UTF8.GetBytes(payload);
+
+            return EncodeBytes(plainText, key, alg, enc, compression, extraHeaders, settings);
+        }
 
         /// <summary>
         /// Encodes given binary data to JWT token and applies requested encryption/compression algorithms.
@@ -246,6 +258,12 @@ namespace Jose
         /// <param name="settings">optional settings to override global DefaultSettings</param>
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
         public static string EncodeBytes(byte[] payload, object key, JweAlgorithm alg, JweEncryption enc, JweCompression? compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
+        {
+            return JWE.EncryptBytes(payload, new JweRecipient[] { new JweRecipient(alg, key) }, enc, aad: null, SerializationMode.Compact, compression, extraHeaders, null, settings);
+        }
+
+        // TODO: unit tests
+        public static string EncodeBytes(byte[] payload, object key, string alg, string enc, string compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
         {
             return JWE.EncryptBytes(payload, new JweRecipient[] { new JweRecipient(alg, key) }, enc, aad: null, SerializationMode.Compact, compression, extraHeaders, null, settings);
         }
