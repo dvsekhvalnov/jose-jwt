@@ -5,7 +5,6 @@ namespace UnitTests
 {
     public class HeaderTests
     {
-
         [Fact]
         public void JweHeaderFromAlg()
         {
@@ -23,5 +22,24 @@ namespace UnitTests
         {
             Assert.Null(Headers.Jwe("A512CBC-HS1024"));
         }
+
+        [Fact]
+        public void JwsHeaderFromAlg()
+        {
+            Assert.Equal("RS256", Headers.Jws(JwsAlgorithm.RS256));
+        }
+
+        [Fact]
+        public void JwsAlgFromHeader()
+        {
+            Assert.Equal(JwsAlgorithm.ES512, Headers.Jws("ES512"));
+        }
+
+        [Fact]
+        public void JwsAlgFromUnknownHeader()
+        {
+            Assert.Null(Headers.Jws("ES1024"));
+        }
+
     }
 }

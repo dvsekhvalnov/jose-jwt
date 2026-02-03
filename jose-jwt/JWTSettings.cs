@@ -81,6 +81,7 @@ namespace Jose
             { JwsAlgorithm.PS512, "PS512" },
         };
 
+        // alias header -> key alg header
         private readonly Dictionary<string, JwsAlgorithm> jwsAlgorithmsAliases = new Dictionary<string, JwsAlgorithm>();
 
         private readonly Dictionary<string, IJweAlgorithm> encAlgorithms = new Dictionary<string, IJweAlgorithm>

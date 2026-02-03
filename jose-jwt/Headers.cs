@@ -28,6 +28,40 @@ namespace Jose
             { "A256GCM", JweEncryption.A256GCM },
         };
 
+        private readonly static Dictionary<JwsAlgorithm, string> sigToHeader = new Dictionary<JwsAlgorithm, string>
+        {
+            { JwsAlgorithm.none, "none" },
+            { JwsAlgorithm.HS256, "HS256" },
+            { JwsAlgorithm.HS384, "HS384" },
+            { JwsAlgorithm.HS512, "HS512" },
+            { JwsAlgorithm.RS256, "RS256" },
+            { JwsAlgorithm.RS384, "RS384" },
+            { JwsAlgorithm.RS512, "RS512" },
+            { JwsAlgorithm.ES256, "ES256" },
+            { JwsAlgorithm.ES384, "ES384" },
+            { JwsAlgorithm.ES512, "ES512" },
+            { JwsAlgorithm.PS256, "PS256" },
+            { JwsAlgorithm.PS384, "PS384" },
+            { JwsAlgorithm.PS512, "PS512" },
+        };
+
+        private readonly static Dictionary<string, JwsAlgorithm> headerToSig = new Dictionary<string, JwsAlgorithm>
+        {
+            { "none", JwsAlgorithm.none },
+            { "HS256", JwsAlgorithm.HS256 },
+            { "HS384", JwsAlgorithm.HS384 },
+            { "HS512", JwsAlgorithm.HS512 },
+            { "RS256", JwsAlgorithm.RS256 },
+            { "RS384", JwsAlgorithm.RS384 },
+            { "RS512", JwsAlgorithm.RS512 },
+            { "ES256", JwsAlgorithm.ES256 },
+            { "ES384", JwsAlgorithm.ES384 },
+            { "ES512", JwsAlgorithm.ES512 },
+            { "PS256", JwsAlgorithm.PS256 },
+            { "PS384", JwsAlgorithm.PS384 },
+            { "PS512", JwsAlgorithm.PS512 },
+        };
+
         public static JweEncryption? Jwe(string header)
         {
             JweEncryption alg;
@@ -44,5 +78,20 @@ namespace Jose
             return encToHeader[alg];
         }
 
+        public static JwsAlgorithm? Jws(string header)
+        {
+            JwsAlgorithm alg;
+
+            if (headerToSig.TryGetValue(header, out alg))
+            {
+                return alg;
+            }
+
+            return null;
+        }
+        public static string Jws(JwsAlgorithm alg)
+        {
+            return sigToHeader[alg];
+        }
     }
 }
