@@ -57,7 +57,7 @@ namespace Jose
         public static string EncryptBytes(byte[] plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Json, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
         {
             var compressionAlg = compression != null ? JwtSettings.CompressionHeader(compression.Value) : null;
-            return EncryptBytes(plaintext, recipients, JwtSettings.JweHeaderValue(enc), aad, mode, compressionAlg, extraProtectedHeaders, unprotectedHeaders, settings);
+            return EncryptBytes(plaintext, recipients, Jose.Headers.Jwe(enc), aad, mode, compressionAlg, extraProtectedHeaders, unprotectedHeaders, settings);
         }
 
         // TODO: unit tests
@@ -210,7 +210,7 @@ namespace Jose
         public static JweToken Decrypt(string jwe, object key, JweAlgorithm? expectedJweAlg = null, JweEncryption? expectedJweEnc = null, JwtSettings settings = null)
         {
             var keyAlg = expectedJweAlg != null ? JwtSettings.JwaHeaderValue(expectedJweAlg.Value) : null;
-            var encAlg = expectedJweEnc != null ? JwtSettings.JweHeaderValue(expectedJweEnc.Value) : null;
+            var encAlg = expectedJweEnc != null ? Jose.Headers.Jwe(expectedJweEnc.Value) : null;
 
             return Decrypt(jwe, key, keyAlg, encAlg, settings);
         }

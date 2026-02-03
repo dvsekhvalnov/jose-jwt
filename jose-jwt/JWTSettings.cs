@@ -1,5 +1,4 @@
-﻿using Jose;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
@@ -86,26 +85,17 @@ namespace Jose
 
         private readonly Dictionary<string, IJweAlgorithm> encAlgorithms = new Dictionary<string, IJweAlgorithm>
         {
-            { encAlgorithmsHeaderValue[JweEncryption.A128CBC_HS256], new AesCbcHmacEncryption(new HmacUsingSha("SHA256"), 256) },
-            { encAlgorithmsHeaderValue[JweEncryption.A192CBC_HS384], new AesCbcHmacEncryption(new HmacUsingSha("SHA384"), 384) },
-            { encAlgorithmsHeaderValue[JweEncryption.A256CBC_HS512], new AesCbcHmacEncryption(new HmacUsingSha("SHA512"), 512) },
+            { Headers.Jwe(JweEncryption.A128CBC_HS256), new AesCbcHmacEncryption(new HmacUsingSha("SHA256"), 256) },
+            { Headers.Jwe(JweEncryption.A192CBC_HS384), new AesCbcHmacEncryption(new HmacUsingSha("SHA384"), 384) },
+            { Headers.Jwe(JweEncryption.A256CBC_HS512), new AesCbcHmacEncryption(new HmacUsingSha("SHA512"), 512) },
 
-            { encAlgorithmsHeaderValue[JweEncryption.A128GCM], new AesGcmEncryption(128) },
-            { encAlgorithmsHeaderValue[JweEncryption.A192GCM], new AesGcmEncryption(192) },
-            { encAlgorithmsHeaderValue[JweEncryption.A256GCM], new AesGcmEncryption(256) }
+            { Headers.Jwe(JweEncryption.A128GCM), new AesGcmEncryption(128) },
+            { Headers.Jwe(JweEncryption.A192GCM), new AesGcmEncryption(192) },
+            { Headers.Jwe(JweEncryption.A256GCM), new AesGcmEncryption(256) }
         };
 
-        private readonly static Dictionary<JweEncryption, string> encAlgorithmsHeaderValue = new Dictionary<JweEncryption, string>
-        {
-            { JweEncryption.A128CBC_HS256, "A128CBC-HS256" },
-            { JweEncryption.A192CBC_HS384, "A192CBC-HS384" },
-            { JweEncryption.A256CBC_HS512, "A256CBC-HS512" },
-            { JweEncryption.A128GCM, "A128GCM" },
-            { JweEncryption.A192GCM, "A192GCM" },
-            { JweEncryption.A256GCM, "A256GCM" },
-        };
-
-        private readonly Dictionary<string, JweEncryption> encAlgorithmsAliases = new Dictionary<string, JweEncryption>();
+        // alias header -> enc alg header
+        private readonly Dictionary<string, string> encAlgorithmsAliases = new Dictionary<string, string>();
 
         private readonly Dictionary<string, IKeyManagement> keyAlgorithms = new Dictionary<string, IKeyManagement>
         {
@@ -209,7 +199,7 @@ namespace Jose
         /// </summary>
         public JwtSettings RegisterJwe(JweEncryption alg, IJweAlgorithm impl)
         {
-            encAlgorithms[encAlgorithmsHeaderValue[alg]] = impl;
+            encAlgorithms[Headers.Jwe(alg)] = impl;
             return this;
         }
 
@@ -228,7 +218,7 @@ namespace Jose
         /// </summary>
         public JwtSettings RegisterJweAlias(string alias, JweEncryption alg)
         {
-            encAlgorithmsAliases[alias] = alg;
+            encAlgorithmsAliases[alias] = Headers.Jwe(alg);
             return this;
         }
 
@@ -337,7 +327,7 @@ namespace Jose
         /// </summary>
         public JwtSettings DeregisterJwe(JweEncryption alg)
         {
-            encAlgorithms.Remove(encAlgorithmsHeaderValue[alg]);
+            encAlgorithms.Remove(Headers.Jwe(alg));
 
             return this;
         }
@@ -428,29 +418,21 @@ namespace Jose
             return encAlgorithms.TryGetValue(alg, out impl) ? impl : null;
         }
 
-        public static string JweHeaderValue(JweEncryption algorithm)
-        {
-            return encAlgorithmsHeaderValue[algorithm];
-        }
-
         public IJweAlgorithm JweAlgorithmFromHeader(string headerValue)
         {
-            foreach (var pair in encAlgorithmsHeaderValue)
+            if (encAlgorithms.ContainsKey(headerValue))
             {
-                if (pair.Value.Equals(headerValue))
-                {
-                    return Jwe(headerValue);
-                }
+                return Jwe(headerValue);
             }
 
             //try alias
-            JweEncryption aliasMatch;
+            string aliasMatch;
 
             if (encAlgorithmsAliases.TryGetValue(headerValue, out aliasMatch))
             {
-                // TODO: simplify with string -> string alias mapping
-                return Jwe(JwtSettings.JweHeaderValue(aliasMatch));
+                return Jwe(aliasMatch);
             }
+
             throw new InvalidAlgorithmException(string.Format("JWE algorithm is not supported: {0}", headerValue));
         }
 
@@ -463,7 +445,7 @@ namespace Jose
 
         /// <summary>
         /// TODO: Instead of JWTSettings.JwaHeaderValue(...), should go to:
-        /// JWT.Headers.Jwe(JweAlgorithm) and JWT.Headers.Enc(string)
+        /// Jose.Headers.Jwe(JweAlgorithm) and JWT.Headers.Enc(string)
         /// JWT.Headers.Jwa(JwaAlgorithm) and JWT.Headers.Alg(string)
         /// JWT.Headers.Jws(JwaAlgorithm) and JWT.Headers.Alg(string)
         /// JWT.Headers.Zip(JwaAlgorithm) and JWT.Headers.Zip(string)
