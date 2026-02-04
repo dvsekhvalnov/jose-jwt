@@ -118,6 +118,53 @@ namespace UnitTests
         }
 
         [Fact]
+        public void Encode_IJweAlgorithm_OverrideByHeaderValue()
+        {
+            //given
+            MockJweAlgorithm encAlg = new MockJweAlgorithm(128);
+
+            JwtSettings settings = new JwtSettings().RegisterJwe("A128GCM", encAlg);
+
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, aes128Key, "dir", "A128GCM", settings: settings);
+
+            //then
+            Console.Out.WriteLine("DIR_A128GCM = {0}", token);
+
+            Assert.Equal(json, Jose.JWT.Decode(token, aes128Key, settings));
+            Assert.True(encAlg.EncryptCalled);
+        }
+
+        [Fact]
+        public void Encode_IJweAlgorithm_CustomAlg()
+        {
+            //given
+            MockJweAlgorithm encAlg = new MockJweAlgorithm(128);
+
+            JwtSettings settings = new JwtSettings().RegisterJwe("mock-enc", encAlg);
+
+            string json =
+                @"{""hello"":""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, aes128Key, "dir", "mock-enc", settings: settings);
+
+            //then
+            Console.Out.WriteLine("DIR_mock-enc = {0}", token);
+
+            Assert.Equal(json, Jose.JWT.Decode(token, aes128Key, settings));
+            Assert.True(encAlg.EncryptCalled);
+
+            IDictionary<string, object> headers = Jose.JWT.Headers(token);
+            Assert.Equal(2, headers.Count);
+            Assert.Equal("mock-enc", headers["enc"]);
+            Assert.Equal("dir", headers["alg"]);
+        }
+
+        [Fact]
         public void Decode_IJweAlgorithm_Override()
         {
             //given
@@ -132,6 +179,42 @@ namespace UnitTests
             Console.Out.WriteLine("json = {0}", json);
 
             Assert.Equal(@"{""exp"":1392548520,""sub"":""alice"",""nbf"":1392547920,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0e659a67-1cd3-438b-8888-217e72951ec9"",""iat"":1392547920}", json);
+            Assert.True(encAlg.DecryptCalled);
+        }
+
+        [Fact]
+        public void Decode_IJweAlgorithm_OverrideByHeaderValue()
+        {
+            //given
+            MockJweAlgorithm encAlg = new MockJweAlgorithm(128);
+
+            string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..yVi-LdQQngN0C5WS.1McwSmhZzAtmmLp9y-OdnJwaJFo1nj_4ashmzl2LhubGf0Jl1OTEVJzsHZb7bkup7cGTkuxh6Vfv10ljHsjWf_URXoxP3stQqQeViVcuPV0y2Q_WHYzTNGZpmHGe-hM6gjDhyZyvu3yeXGFSvfPQmp9pWVOgDjI4RC0MQ83rzzn-rRdnZkznWjbmOPxwPrR72Qng0BISsEwbkPn4oO8-vlHkVmPpuDTaYzCT2ZR5K9JnIU8d8QdxEAGb7-s8GEJ1yqtd_w._umbK59DAKA3O89h15VoKQ";
+
+            //when
+            string json = Jose.JWT.Decode(token, aes128Key, settings: new JwtSettings().RegisterJwe("A128GCM", encAlg));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""exp"":1392548520,""sub"":""alice"",""nbf"":1392547920,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0e659a67-1cd3-438b-8888-217e72951ec9"",""iat"":1392547920}", json);
+            Assert.True(encAlg.DecryptCalled);
+        }
+
+        [Fact]
+        public void Decode_IJweAlgorithm_CustomAlg()
+        {
+            //given
+            MockJweAlgorithm encAlg = new MockJweAlgorithm(128);
+
+            string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJtb2NrLWVuYyJ9..2LJzx8qk4Sb28wVf.dyAhoceMpgnTeAZFE6vaeXw.a7prOQ2bYaTYMNpH7UbzgA";
+
+            //when
+            string json = Jose.JWT.Decode(token, aes128Key, settings: new JwtSettings().RegisterJwe("mock-enc", encAlg));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""hello"":""world""}", json);
             Assert.True(encAlg.DecryptCalled);
         }
 
