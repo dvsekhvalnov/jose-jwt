@@ -41,5 +41,40 @@ namespace UnitTests
             Assert.Null(Headers.Jws("ES1024"));
         }
 
+        [Fact]
+        public void JwaHeaderFromAlg()
+        {
+            Assert.Equal("PBES2-HS256+A128KW", Headers.Jwa(JweAlgorithm.PBES2_HS256_A128KW));
+        }
+
+        [Fact]
+        public void JwaAlgFromHeader()
+        {
+            Assert.Equal(JweAlgorithm.RSA_OAEP_512, Headers.Jwa("RSA-OAEP-512"));
+        }
+
+        [Fact]
+        public void JwaAlgFromUnknownHeader()
+        {
+            Assert.Null(Headers.Jwa("ECDHES"));
+        }
+
+        [Fact]
+        public void CompressionHeaderFromAlg()
+        {
+            Assert.Equal("DEF", Headers.Zip(JweCompression.DEF));
+        }
+
+        [Fact]
+        public void CompressionAlgFromHeader()
+        {
+            Assert.Equal(JweCompression.DEF, Headers.Zip("DEF"));
+        }
+
+        [Fact]
+        public void CompressionAlgFromUnknownHeader()
+        {
+            Assert.Null(Headers.Zip("GZ"));
+        }
     }
 }
