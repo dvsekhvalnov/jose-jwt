@@ -26,7 +26,7 @@ namespace Jose
         /// <param name="key">key for encrypting CEK (Content Encryption Key). Cannot be null.</param>
         public JweRecipient(JweAlgorithm alg, object key, IDictionary<string, object> header = null)
         {
-            this.Alg = JwtSettings.JwaHeaderValue(alg);
+            this.Alg = Jose.Headers.Jwa(alg);
             this.Key = key ?? throw new ArgumentNullException(nameof(key));
             this.Header = header;
         }

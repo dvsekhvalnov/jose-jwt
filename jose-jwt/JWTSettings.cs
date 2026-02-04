@@ -13,29 +13,29 @@ namespace Jose
         public JwtSettings()
         {
 #if NET472 || NETSTANDARD2_1 || NET
-	    // By giving the Unix ECDHKeyManagement implementation to windows, we enable windows version of it to work with not only CngKey but also ECDiffieHellman.
+	        // By giving the Unix ECDHKeyManagement implementation to windows, we enable windows version of it to work with not only CngKey but also ECDiffieHellman.
             // Initially this was implemented separately, but unit tests were failing on windows due to the lack of ECDiffieHellman support. 
             // Since we don't know what the keys will be provided until runtime, and the registration happens before runtime, we need to make sure 
             // on windows it will also supports ECDiffieHellman. 
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                keyAlgorithms.Add(keyAlgorithmsHeaderValue[JweAlgorithm.ECDH_ES], new EcdhKeyManagementWin(true, new EcdhKeyManagementUnix(true)));
-                keyAlgorithms.Add(keyAlgorithmsHeaderValue[JweAlgorithm.ECDH_ES_A128KW], new EcdhKeyManagementWinWithAesKeyWrap(128, new AesKeyWrapManagement(128), new EcdhKeyManagementUnixWithAesKeyWrap(128, new AesKeyWrapManagement(128))));
-                keyAlgorithms.Add(keyAlgorithmsHeaderValue[JweAlgorithm.ECDH_ES_A192KW], new EcdhKeyManagementWinWithAesKeyWrap(192, new AesKeyWrapManagement(192), new EcdhKeyManagementUnixWithAesKeyWrap(192, new AesKeyWrapManagement(192))));
-                keyAlgorithms.Add(keyAlgorithmsHeaderValue[JweAlgorithm.ECDH_ES_A256KW], new EcdhKeyManagementWinWithAesKeyWrap(256, new AesKeyWrapManagement(256), new EcdhKeyManagementUnixWithAesKeyWrap(256, new AesKeyWrapManagement(256))));
+                keyAlgorithms.Add(Headers.Jwa(JweAlgorithm.ECDH_ES), new EcdhKeyManagementWin(true, new EcdhKeyManagementUnix(true)));
+                keyAlgorithms.Add(Headers.Jwa(JweAlgorithm.ECDH_ES_A128KW), new EcdhKeyManagementWinWithAesKeyWrap(128, new AesKeyWrapManagement(128), new EcdhKeyManagementUnixWithAesKeyWrap(128, new AesKeyWrapManagement(128))));
+                keyAlgorithms.Add(Headers.Jwa(JweAlgorithm.ECDH_ES_A192KW), new EcdhKeyManagementWinWithAesKeyWrap(192, new AesKeyWrapManagement(192), new EcdhKeyManagementUnixWithAesKeyWrap(192, new AesKeyWrapManagement(192))));
+                keyAlgorithms.Add(Headers.Jwa(JweAlgorithm.ECDH_ES_A256KW), new EcdhKeyManagementWinWithAesKeyWrap(256, new AesKeyWrapManagement(256), new EcdhKeyManagementUnixWithAesKeyWrap(256, new AesKeyWrapManagement(256))));
             }
             else
             {
-                keyAlgorithms.Add(keyAlgorithmsHeaderValue[JweAlgorithm.ECDH_ES], new EcdhKeyManagementUnix(true));
-                keyAlgorithms.Add(keyAlgorithmsHeaderValue[JweAlgorithm.ECDH_ES_A128KW], new EcdhKeyManagementUnixWithAesKeyWrap(128, new AesKeyWrapManagement(128)));
-                keyAlgorithms.Add(keyAlgorithmsHeaderValue[JweAlgorithm.ECDH_ES_A192KW], new EcdhKeyManagementUnixWithAesKeyWrap(192, new AesKeyWrapManagement(192)));
-                keyAlgorithms.Add(keyAlgorithmsHeaderValue[JweAlgorithm.ECDH_ES_A256KW], new EcdhKeyManagementUnixWithAesKeyWrap(256, new AesKeyWrapManagement(256)));
+                keyAlgorithms.Add(Headers.Jwa(JweAlgorithm.ECDH_ES), new EcdhKeyManagementUnix(true));
+                keyAlgorithms.Add(Headers.Jwa(JweAlgorithm.ECDH_ES_A128KW), new EcdhKeyManagementUnixWithAesKeyWrap(128, new AesKeyWrapManagement(128)));
+                keyAlgorithms.Add(Headers.Jwa(JweAlgorithm.ECDH_ES_A192KW), new EcdhKeyManagementUnixWithAesKeyWrap(192, new AesKeyWrapManagement(192)));
+                keyAlgorithms.Add(Headers.Jwa(JweAlgorithm.ECDH_ES_A256KW), new EcdhKeyManagementUnixWithAesKeyWrap(256, new AesKeyWrapManagement(256)));
             }
 #else
-                keyAlgorithms.Add(keyAlgorithmsHeaderValue[JweAlgorithm.ECDH_ES], new EcdhKeyManagementWin(true, new EcdhKeyManagementUnix(true)));
-                keyAlgorithms.Add(keyAlgorithmsHeaderValue[JweAlgorithm.ECDH_ES_A128KW], new EcdhKeyManagementWinWithAesKeyWrap(128, new AesKeyWrapManagement(128), new EcdhKeyManagementUnixWithAesKeyWrap(128, new AesKeyWrapManagement(128))));
-                keyAlgorithms.Add(keyAlgorithmsHeaderValue[JweAlgorithm.ECDH_ES_A192KW], new EcdhKeyManagementWinWithAesKeyWrap(192, new AesKeyWrapManagement(192), new EcdhKeyManagementUnixWithAesKeyWrap(192, new AesKeyWrapManagement(192))));
-                keyAlgorithms.Add(keyAlgorithmsHeaderValue[JweAlgorithm.ECDH_ES_A256KW], new EcdhKeyManagementWinWithAesKeyWrap(256, new AesKeyWrapManagement(256), new EcdhKeyManagementUnixWithAesKeyWrap(256, new AesKeyWrapManagement(256))));
+            keyAlgorithms.Add(Headers.Jwa(JweAlgorithm.ECDH_ES), new EcdhKeyManagementWin(true, new EcdhKeyManagementUnix(true)));
+            keyAlgorithms.Add(Headers.Jwa(JweAlgorithm.ECDH_ES_A128KW), new EcdhKeyManagementWinWithAesKeyWrap(128, new AesKeyWrapManagement(128), new EcdhKeyManagementUnixWithAesKeyWrap(128, new AesKeyWrapManagement(128))));
+            keyAlgorithms.Add(Headers.Jwa(JweAlgorithm.ECDH_ES_A192KW), new EcdhKeyManagementWinWithAesKeyWrap(192, new AesKeyWrapManagement(192), new EcdhKeyManagementUnixWithAesKeyWrap(192, new AesKeyWrapManagement(192))));
+            keyAlgorithms.Add(Headers.Jwa(JweAlgorithm.ECDH_ES_A256KW), new EcdhKeyManagementWinWithAesKeyWrap(256, new AesKeyWrapManagement(256), new EcdhKeyManagementUnixWithAesKeyWrap(256, new AesKeyWrapManagement(256))));
 #endif
         }
         
@@ -100,50 +100,28 @@ namespace Jose
 
         private readonly Dictionary<string, IKeyManagement> keyAlgorithms = new Dictionary<string, IKeyManagement>
         {
-            { keyAlgorithmsHeaderValue[JweAlgorithm.RSA_OAEP], new RsaKeyManagement(true) },
-            { keyAlgorithmsHeaderValue[JweAlgorithm.RSA_OAEP_256], new RsaOaepKeyManagement(256) },
-            { keyAlgorithmsHeaderValue[JweAlgorithm.RSA_OAEP_384], new RsaOaepKeyManagement(384) },
-            { keyAlgorithmsHeaderValue[JweAlgorithm.RSA_OAEP_512], new RsaOaepKeyManagement(512) },
-            { keyAlgorithmsHeaderValue[JweAlgorithm.RSA1_5], new RsaKeyManagement(false) },
-            { keyAlgorithmsHeaderValue[JweAlgorithm.DIR], new DirectKeyManagement() },
-            { keyAlgorithmsHeaderValue[JweAlgorithm.A128KW], new AesKeyWrapManagement(128) },
-            { keyAlgorithmsHeaderValue[JweAlgorithm.A192KW], new AesKeyWrapManagement(192) },
-            { keyAlgorithmsHeaderValue[JweAlgorithm.A256KW], new AesKeyWrapManagement(256) },
+            { Headers.Jwa(JweAlgorithm.RSA_OAEP), new RsaKeyManagement(true) },
+            { Headers.Jwa(JweAlgorithm.RSA_OAEP_256), new RsaOaepKeyManagement(256) },
+            { Headers.Jwa(JweAlgorithm.RSA_OAEP_384), new RsaOaepKeyManagement(384) },
+            { Headers.Jwa(JweAlgorithm.RSA_OAEP_512), new RsaOaepKeyManagement(512) },
+            { Headers.Jwa(JweAlgorithm.RSA1_5), new RsaKeyManagement(false) },
+            { Headers.Jwa(JweAlgorithm.DIR), new DirectKeyManagement() },
+            { Headers.Jwa(JweAlgorithm.A128KW), new AesKeyWrapManagement(128) },
+            { Headers.Jwa(JweAlgorithm.A192KW), new AesKeyWrapManagement(192) },
+            { Headers.Jwa(JweAlgorithm.A256KW), new AesKeyWrapManagement(256) },
             
             // PBKDF2 iterations limited per OWASP reccomendation: https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html#pbkdf2
-            { keyAlgorithmsHeaderValue[JweAlgorithm.PBES2_HS256_A128KW], new Pbse2HmacShaKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128), 310000) },
-            { keyAlgorithmsHeaderValue[JweAlgorithm.PBES2_HS384_A192KW], new Pbse2HmacShaKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192), 250000) },
-            { keyAlgorithmsHeaderValue[JweAlgorithm.PBES2_HS512_A256KW], new Pbse2HmacShaKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256), 120000) },
+            { Headers.Jwa(JweAlgorithm.PBES2_HS256_A128KW), new Pbse2HmacShaKeyManagementWithAesKeyWrap(128, new AesKeyWrapManagement(128), 310000) },
+            { Headers.Jwa(JweAlgorithm.PBES2_HS384_A192KW), new Pbse2HmacShaKeyManagementWithAesKeyWrap(192, new AesKeyWrapManagement(192), 250000) },
+            { Headers.Jwa(JweAlgorithm.PBES2_HS512_A256KW), new Pbse2HmacShaKeyManagementWithAesKeyWrap(256, new AesKeyWrapManagement(256), 120000) },
 
-            { keyAlgorithmsHeaderValue[JweAlgorithm.A128GCMKW], new AesGcmKeyWrapManagement(128) },
-            { keyAlgorithmsHeaderValue[JweAlgorithm.A192GCMKW], new AesGcmKeyWrapManagement(192) },
-            { keyAlgorithmsHeaderValue[JweAlgorithm.A256GCMKW], new AesGcmKeyWrapManagement(256) }
+            { Headers.Jwa(JweAlgorithm.A128GCMKW), new AesGcmKeyWrapManagement(128) },
+            { Headers.Jwa(JweAlgorithm.A192GCMKW), new AesGcmKeyWrapManagement(192) },
+            { Headers.Jwa(JweAlgorithm.A256GCMKW), new AesGcmKeyWrapManagement(256) }
         };
 
-        private static readonly Dictionary<JweAlgorithm, string> keyAlgorithmsHeaderValue = new Dictionary<JweAlgorithm, string>
-        {
-            { JweAlgorithm.RSA1_5, "RSA1_5" },
-            { JweAlgorithm.RSA_OAEP, "RSA-OAEP" },
-            { JweAlgorithm.RSA_OAEP_256, "RSA-OAEP-256" },
-            { JweAlgorithm.RSA_OAEP_384, "RSA-OAEP-384" },
-            { JweAlgorithm.RSA_OAEP_512, "RSA-OAEP-512" },
-            { JweAlgorithm.DIR, "dir" },
-            { JweAlgorithm.A128KW, "A128KW" },
-            { JweAlgorithm.A256KW, "A256KW" },
-            { JweAlgorithm.A192KW, "A192KW" },
-            { JweAlgorithm.ECDH_ES, "ECDH-ES" },
-            { JweAlgorithm.ECDH_ES_A128KW, "ECDH-ES+A128KW" },
-            { JweAlgorithm.ECDH_ES_A192KW, "ECDH-ES+A192KW" },
-            { JweAlgorithm.ECDH_ES_A256KW, "ECDH-ES+A256KW" },
-            { JweAlgorithm.PBES2_HS256_A128KW, "PBES2-HS256+A128KW" },
-            { JweAlgorithm.PBES2_HS384_A192KW, "PBES2-HS384+A192KW" },
-            { JweAlgorithm.PBES2_HS512_A256KW, "PBES2-HS512+A256KW" },
-            { JweAlgorithm.A128GCMKW, "A128GCMKW" },
-            { JweAlgorithm.A192GCMKW, "A192GCMKW" },
-            { JweAlgorithm.A256GCMKW, "A256GCMKW" },
-        };
-
-        private readonly Dictionary<string, JweAlgorithm> keyAlgorithmsAliases = new Dictionary<string, JweAlgorithm>();
+        // alias header -> key alg header
+        private readonly Dictionary<string, string> keyAlgorithmsAliases = new Dictionary<string, string>();
 
         private readonly Dictionary<JweCompression, ICompression> compressionAlgorithms = new Dictionary<JweCompression, ICompression>
         {
@@ -173,8 +151,7 @@ namespace Jose
         /// </summary>
         public JwtSettings RegisterJwa(JweAlgorithm alg, IKeyManagement impl)
         {
-            keyAlgorithms[keyAlgorithmsHeaderValue[alg]] = impl;
-            return this;
+            return RegisterJwa(Headers.Jwa(alg), impl);
         }
 
         /// <summary>
@@ -191,7 +168,7 @@ namespace Jose
         /// </summary>
         public JwtSettings RegisterJwaAlias(string alias, JweAlgorithm alg)
         {
-            keyAlgorithmsAliases[alias] = alg;
+            keyAlgorithmsAliases[alias] = Headers.Jwa(alg);
             return this;
         }
 
@@ -200,8 +177,7 @@ namespace Jose
         /// </summary>
         public JwtSettings RegisterJwe(JweEncryption alg, IJweAlgorithm impl)
         {
-            encAlgorithms[Headers.Jwe(alg)] = impl;
-            return this;
+            return RegisterJwe(Headers.Jwe(alg), impl);            
         }
 
         /// <summary>
@@ -306,7 +282,7 @@ namespace Jose
         /// </summary>
         public JwtSettings DeregisterJwa(JweAlgorithm alg)
         {
-            keyAlgorithms.Remove(keyAlgorithmsHeaderValue[alg]);
+            keyAlgorithms.Remove(Headers.Jwa(alg));
 
             return this;           
         }
@@ -443,41 +419,19 @@ namespace Jose
             IKeyManagement impl;
             return keyAlgorithms.TryGetValue(alg, out impl) ? impl : null;
         }
-
-        /// <summary>
-        /// TODO: Instead of JWTSettings.JwaHeaderValue(...), should go to:
-        /// Jose.Headers.Jwe(JweAlgorithm) and JWT.Headers.Enc(string)
-        /// JWT.Headers.Jwa(JwaAlgorithm) and JWT.Headers.Alg(string)
-        /// JWT.Headers.Jws(JwaAlgorithm) and JWT.Headers.Alg(string)
-        /// JWT.Headers.Zip(JwaAlgorithm) and JWT.Headers.Zip(string)
-        /// </summary>
-        /// <param name="alg"></param>
-        /// <returns></returns>
-        public static string JwaHeaderValue(JweAlgorithm alg)
-        {
-            return keyAlgorithmsHeaderValue[alg];
-        }
-
+   
         public IKeyManagement JwaAlgorithmFromHeader(string headerValue)
         {
-            foreach (var pair in keyAlgorithmsHeaderValue)
-            {
-                if (pair.Value.Equals(headerValue))
-                {
-                    return Jwa(headerValue);
-                }
-            }
-
             if (keyAlgorithms.ContainsKey(headerValue))
             {
                 return Jwa(headerValue);
             }
 
             //try alias
-            JweAlgorithm aliasMatch;
+            string aliasMatch;
             if (keyAlgorithmsAliases.TryGetValue(headerValue, out aliasMatch))
             {
-                return Jwa(JwtSettings.JwaHeaderValue(aliasMatch));
+                return Jwa(aliasMatch);
             }
             
             throw new InvalidAlgorithmException(string.Format("JWA algorithm is not supported: {0}.", headerValue));

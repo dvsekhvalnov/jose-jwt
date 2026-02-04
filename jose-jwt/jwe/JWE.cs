@@ -209,7 +209,7 @@ namespace Jose
         /// <exception cref="InvalidAlgorithmException">if encryption or compression algorithm is not supported</exception>
         public static JweToken Decrypt(string jwe, object key, JweAlgorithm? expectedJweAlg = null, JweEncryption? expectedJweEnc = null, JwtSettings settings = null)
         {
-            var keyAlg = expectedJweAlg != null ? JwtSettings.JwaHeaderValue(expectedJweAlg.Value) : null;
+            var keyAlg = expectedJweAlg != null ? Jose.Headers.Jwa(expectedJweAlg.Value) : null;
             var encAlg = expectedJweEnc != null ? Jose.Headers.Jwe(expectedJweEnc.Value) : null;
 
             return Decrypt(jwe, key, keyAlg, encAlg, settings);
