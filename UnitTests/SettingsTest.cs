@@ -5,6 +5,7 @@ using System.Security.Cryptography.X509Certificates;
 using Jose.keys;
 using Jose;
 using Xunit;
+using System.IO;
 
 namespace UnitTests
 {
@@ -376,10 +377,17 @@ namespace UnitTests
             public new byte[] Sign(byte[] securedInput, object key)
             {
                 SignCalled = true;
+                using var stream = new MemoryStream(securedInput);
+                return base.Sign(stream, key);
+            }
+
+            public new byte[] Sign(Stream securedInput, object key)
+            {
+                SignCalled = true;
                 return base.Sign(securedInput, key);
             }
 
-            public new bool Verify(byte[] signature, byte[] securedInput, object key)
+            public new bool Verify(byte[] signature, Stream securedInput, object key)
             {
                 VerifyCalled = true;
                 return base.Verify(signature, securedInput, key);

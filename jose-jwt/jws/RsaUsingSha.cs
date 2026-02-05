@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Security.Cryptography;
 
 namespace Jose
@@ -12,7 +13,7 @@ namespace Jose
             this.hashMethod = hashMethod;
         }
 
-        public byte[] Sign(byte[] securedInput, object key)
+        public byte[] Sign(Stream securedInput, object key)
         {
 #if NET40
             var privateKey = Ensure.Type<RSA>(key, "RsaUsingSha alg expects key to be of AsymmetricAlgorithm type.");
@@ -42,7 +43,7 @@ namespace Jose
 #endif
         }
 
-        public bool Verify(byte[] signature, byte[] securedInput, object key)
+        public bool Verify(byte[] signature, Stream securedInput, object key)
         {
 #if NET40
             using (var sha = HashAlgorithm)

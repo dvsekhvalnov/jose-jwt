@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography;
 using System.Security.Cryptography.X509Certificates;
 using Jose;
@@ -367,13 +368,13 @@ namespace UnitTests
             public bool SignCalled { get; set; }
             public bool VerifyCalled { get; set; }
 
-            public new byte[] Sign(byte[] securedInput, object key)
+            public new byte[] Sign(Stream securedInput, object key)
             {
                 SignCalled = true;
                 return base.Sign(securedInput, key);
             }
 
-            public new bool Verify(byte[] signature, byte[] securedInput, object key)
+            public new bool Verify(byte[] signature, Stream securedInput, object key)
             {
                 VerifyCalled = true;
                 return base.Verify(signature, securedInput, key);

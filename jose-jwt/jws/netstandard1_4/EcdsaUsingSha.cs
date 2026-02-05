@@ -1,6 +1,7 @@
 ﻿#if NET461_OR_GREATER || NETSTANDARD || NET
 
 using System;
+using System.IO;
 using System.Security.Cryptography;
 
 namespace Jose.netstandard1_4
@@ -14,7 +15,7 @@ namespace Jose.netstandard1_4
             this.keySize = keySize;
         }
 
-        public byte[] Sign(byte[] securedInput, object key)
+        public byte[] Sign(Stream securedInput, object key)
         {
             try
             {
@@ -47,7 +48,7 @@ namespace Jose.netstandard1_4
             }
         }
 
-        public bool Verify(byte[] signature, byte[] securedInput, object key)
+        public bool Verify(byte[] signature, Stream securedInput, object key)
         {
             try
             {
@@ -97,7 +98,7 @@ namespace Jose.netstandard1_4
             }
         }
 
-        private byte[] Sign(CngKey privateKey, byte[] securedInput)
+        private byte[] Sign(CngKey privateKey, Stream securedInput)
         {
             Ensure.BitSize(privateKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, privateKey.KeySize));
 
@@ -107,14 +108,14 @@ namespace Jose.netstandard1_4
             }
         }
 
-        private byte[] Sign(ECDsa privateKey, byte[] securedInput)
+        private byte[] Sign(ECDsa privateKey, Stream securedInput)
         {
             Ensure.BitSize(privateKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, privateKey.KeySize));
 
             return privateKey.SignData(securedInput, Hash);
         }
 
-        private bool Verify(CngKey publicKey, byte[] signature, byte[] securedInput)
+        private bool Verify(CngKey publicKey, byte[] signature, Stream securedInput)
         {
             Ensure.BitSize(publicKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, publicKey.KeySize));
 
@@ -124,7 +125,7 @@ namespace Jose.netstandard1_4
             }
         }
 
-        private bool Verify(ECDsa publicKey, byte[] signature, byte[] securedInput)
+        private bool Verify(ECDsa publicKey, byte[] signature, Stream securedInput)
         {
             Ensure.BitSize(publicKey.KeySize, keySize, string.Format("EcdsaUsingSha algorithm expected key of size {0} bits, but was given {1} bits", keySize, publicKey.KeySize));
 
