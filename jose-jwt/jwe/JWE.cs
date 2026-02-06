@@ -56,7 +56,7 @@ namespace Jose
         /// <returns>JWT in compact serialization form, encrypted and/or compressed.</returns>
         public static string EncryptBytes(byte[] plaintext, IEnumerable<JweRecipient> recipients, JweEncryption enc, byte[] aad = null, SerializationMode mode = SerializationMode.Json, JweCompression? compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
         {
-            var compressionAlg = compression != null ? JwtSettings.CompressionHeader(compression.Value) : null;
+            var compressionAlg = compression != null ? Jose.Headers.Zip(compression.Value) : null;
             return EncryptBytes(plaintext, recipients, Jose.Headers.Jwe(enc), aad, mode, compressionAlg, extraProtectedHeaders, unprotectedHeaders, settings);
         }
 
@@ -128,7 +128,7 @@ namespace Jose
 
             if (compression!=null)
             {
-                var compressionAlg = settings.Compression(compression);
+                var compressionAlg = settings.CompressionAlgFromHeader(compression);
 
                 if (compressionAlg == null)
                 {
@@ -277,7 +277,7 @@ namespace Jose
 
                     if (recipient.JoseHeader.TryGetValue("zip", out var compressionAlg))
                     {
-                        var compression = settings.Compression((string)compressionAlg);
+                        var compression = settings.CompressionAlgFromHeader((string)compressionAlg);
 
                         plaintext = compression.Decompress(plaintext);
                     }

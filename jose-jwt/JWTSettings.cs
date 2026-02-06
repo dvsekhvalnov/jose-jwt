@@ -123,20 +123,16 @@ namespace Jose
         // alias header -> key alg header
         private readonly Dictionary<string, string> keyAlgorithmsAliases = new Dictionary<string, string>();
 
-        private readonly Dictionary<JweCompression, ICompression> compressionAlgorithms = new Dictionary<JweCompression, ICompression>
+        private readonly Dictionary<string, ICompression> compressionAlgorithms = new Dictionary<string, ICompression>
         {
             { 
                 // 250Kb limited decompression buffer
-                JweCompression.DEF, new DeflateCompression(250 * 1024) 
+                Headers.Zip(JweCompression.DEF), new DeflateCompression(250 * 1024) 
             }
         };
 
-        private readonly static Dictionary<JweCompression, string> jweCompressionHeaderValue = new Dictionary<JweCompression, string>
-        {
-            { JweCompression.DEF, "DEF" }
-        };
-
-        private readonly Dictionary<string, JweCompression> compressionAlgorithmsAliases = new Dictionary<string, JweCompression>();
+        // alias header -> key alg header
+        private readonly Dictionary<string, string> compressionAlgorithmsAliases = new Dictionary<string, string>();
 
 #if NETFRAMEWORK
         private IJsonMapper jsMapper = new JSSerializerMapper();
@@ -202,15 +198,13 @@ namespace Jose
         /// Register Compression implementation, will override existing one if any
         public JwtSettings RegisterCompression(JweCompression alg, ICompression impl)
         {
-            compressionAlgorithms[alg] = impl;
-            return this;
+            return RegisterCompression(Headers.Zip(alg), impl);
         }
 
         public JwtSettings RegisterCompression(string alg, ICompression impl)
         {
-            //compressionAlgorithms[alg] = impl;
-            //return this;
-            throw new NotImplementedException("TODO");
+            compressionAlgorithms[alg] = impl;
+            return this;            
         }
 
         /// <summary>
@@ -218,7 +212,7 @@ namespace Jose
         /// </summary>
         public JwtSettings RegisterCompressionAlias(string alias, JweCompression alg)
         {
-            compressionAlgorithmsAliases[alias] = alg;
+            compressionAlgorithmsAliases[alias] = Headers.Zip(alg);
             return this;
         }
 
@@ -328,9 +322,7 @@ namespace Jose
         /// </summary>
         public JwtSettings DeregisterCompression(JweCompression alg)
         {
-            compressionAlgorithms.Remove(alg);
-
-            return this;
+            return DeregisterCompression(Headers.Zip(alg));
         }
 
         /// <summary>
@@ -339,10 +331,8 @@ namespace Jose
         /// </summary>
         public JwtSettings DeregisterCompression(string alg)
         {
-            //compressionAlgorithms.Remove(alg);
-
-            //return this;
-            throw new NotImplementedException("TODO");
+            compressionAlgorithms.Remove(alg);
+            return this;            
         }
 
         public JwtSettings RegisterMapper(IJsonMapper mapper)
@@ -438,35 +428,24 @@ namespace Jose
         }
 
         //Compression
-        public ICompression Compression(JweCompression alg)
-        {
-            ICompression impl;
-            return compressionAlgorithms.TryGetValue(alg, out impl) ? impl : null;
-        }
-
         public ICompression Compression(string alg)
         {
-            return Compression(CompressionAlgFromHeader(alg));
+            return compressionAlgorithms[alg];
         }
 
-        public static string CompressionHeader(JweCompression value)
+        public ICompression CompressionAlgFromHeader(string header)
         {
-            return jweCompressionHeaderValue[value];
-        }
-
-        public JweCompression CompressionAlgFromHeader(string header)
-        {
-            foreach (var pair in jweCompressionHeaderValue)
+            if (compressionAlgorithms.ContainsKey(header))
             {
-                if (pair.Value.Equals(header)) return pair.Key;
+                return Compression(header);
             }
 
             //try alias
-            JweCompression aliasMatch;
+            string aliasMatch;
 
             if (compressionAlgorithmsAliases.TryGetValue(header, out aliasMatch))
             {
-                return aliasMatch;
+                return Compression(aliasMatch);
             }
 
             throw new InvalidAlgorithmException(string.Format("Compression algorithm is not supported: {0}.", header));
