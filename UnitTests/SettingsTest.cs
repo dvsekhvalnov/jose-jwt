@@ -361,6 +361,52 @@ namespace UnitTests
         }
 
         [Fact]
+        public void Encode_ICompression_OverrideByHeaderValue()
+        {
+            //given
+            MockCompression compress = new MockCompression();
+            JwtSettings settings = new JwtSettings().RegisterCompression("DEF", compress);
+
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, PubKey(), "RSA-OAEP", "A256GCM", "DEF", settings: settings);
+
+            //then
+            Console.Out.WriteLine("RSA-OAEP_A256GCM-DEFLATE = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey(), settings));
+
+            Assert.True(compress.CompressCalled);
+        }
+
+        [Fact]
+        public void Encode_ICompression_CustomAlg()
+        {
+            //given
+            MockCompression compress = new MockCompression();
+            JwtSettings settings = new JwtSettings().RegisterCompression("BZIP", compress);
+
+            string json =
+                @"{""hello"":""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, PubKey(), "RSA-OAEP", "A256GCM", "BZIP", settings: settings);
+
+            //then
+            Console.Out.WriteLine("RSA-OAEP_A256GCM-BZIP = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(json, Jose.JWT.Decode(token, PrivKey(), settings));
+
+            Assert.True(compress.CompressCalled);
+        }
+
+        [Fact]
         public void Decode_ICompression_Override()
         {
             //given
@@ -375,6 +421,42 @@ namespace UnitTests
             Console.Out.WriteLine("json = {0}", json);
 
             Assert.Equal(@"{""exp"":1392963710,""sub"":""alice"",""nbf"":1392963110,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""9fa7a38a-28fd-421c-825c-8fab3bbf3fb4"",""iat"":1392963110}", json);
+            Assert.True(compress.DecompressCalled);
+        }
+
+        [Fact]
+        public void Decode_ICompression_OverrideByHeaderValue()
+        {
+            //given
+            MockCompression compress = new MockCompression();
+
+            string token = "eyJhbGciOiJSU0EtT0FFUCIsInppcCI6IkRFRiIsImVuYyI6IkExMjhDQkMtSFMyNTYifQ.nXSS9jDwE0dXkcGI7UquZBhn2nsB2P8u-YSWEuTAgEeuV54qNU4SlE76bToI1z4LUuABHmZOv9S24xkF45b7Mrap_Fu4JXH8euXrQgKQb9o_HL5FvE8m4zk5Ow13MKGPvHvWKOaNEBFriwYIfPi6QBYrpuqn0BaANc_aMyInV0Fn7e8EAgVmvoagmy7Hxic2sPUeLEIlRCDSGa82mpiGusjo7VMJxymkhnMdKufpGPh4wod7pvgb-jDWasUHpsUkHqSKZxlrDQxcy1-Pu1G37TAnImlWPa9NU7500IXc-W07IJccXhR3qhA5QaIyBbmHY0j1Dn3808oSFOYSF85A9w.uwbZhK-8iNzcjvKRb1a2Ig.jxj1GfH9Ndu1y0b7NRz_yfmjrvX2rXQczyK9ZJGWTWfeNPGR_PZdJmddiam15Qtz7R-pzIeyR4_qQoMzOISkq6fDEvEWVZdHnnTUHQzCoGX1dZoG9jXEwfAk2G1vXYT2vynEQZ72xk0V_OBtKhpIAUEFsXwCUeLAAgjFNY4OGWZl_Kmv9RTGhnePZfVbrbwg.WuV64jlV03OZm99qHMP9wQ";
+
+            //when
+            string json = Jose.JWT.Decode(token, PrivKey(), settings: new JwtSettings().RegisterCompression("DEF", compress));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""exp"":1392963710,""sub"":""alice"",""nbf"":1392963110,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""9fa7a38a-28fd-421c-825c-8fab3bbf3fb4"",""iat"":1392963110}", json);
+            Assert.True(compress.DecompressCalled);
+        }
+
+        [Fact]
+        public void Decode_ICompression_CustomAlg()
+        {
+            //given
+            MockCompression compress = new MockCompression();
+
+            string token = "eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZHQ00iLCJ6aXAiOiJCWklQIn0.Gegg1f1Vh_AkkYMT6XdzyC1fAjMnv2BRLHJ0L7w-v988eD1viwxtPGQLWQSVxdP0jHwAvnIwKo5TiC8uBzpg7BWPNdTalXSfNSJzb9JlDIOumsgCvvHQ5veS20aIvZybiVUB0p8okxs7BkB2BL0zYdu6vnYAcOxHVTXObZ-DF5ctY093oc9qdX22SE5g3JXfBRsaqmks7vHgcDHNlFpOOJOE1O1R_gJ4Rs-a2ccT60gE6N_4r8hl_n7CPdIUC2-M2J98TKfQouh1dc8etOEU62-suDcgin2-USVjFY9K5QgZmszwlX6Rn_2PoN0zuKrYKviTJ85zIVq8gJxLB_0hLw.RSvtdevK_5Xek9eS.eOpwpyak2ks9Xyu9H_mFD_wVwg.Tm8ekM0CUQB1zPUIbcTV_w";
+
+            //when
+            string json = Jose.JWT.Decode(token, PrivKey(), settings: new JwtSettings().RegisterCompression("BZIP", compress));
+
+            //then
+            Console.Out.WriteLine("json = {0}", json);
+
+            Assert.Equal(@"{""hello"":""world""}", json);
             Assert.True(compress.DecompressCalled);
         }
 
