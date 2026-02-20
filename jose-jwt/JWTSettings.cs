@@ -39,50 +39,33 @@ namespace Jose
 #endif
         }
         
-        private readonly Dictionary<JwsAlgorithm, IJwsAlgorithm> jwsAlgorithms = new Dictionary<JwsAlgorithm, IJwsAlgorithm>
+        private readonly Dictionary<string, IJwsAlgorithm> jwsAlgorithms = new Dictionary<string, IJwsAlgorithm>
         {
-            { JwsAlgorithm.none, new Plaintext()},
-            { JwsAlgorithm.HS256, new HmacUsingSha("SHA256") },
-            { JwsAlgorithm.HS384, new HmacUsingSha("SHA384") },
-            { JwsAlgorithm.HS512, new HmacUsingSha("SHA512") },
+            { Headers.Jws(JwsAlgorithm.none), new Plaintext()},
+            { Headers.Jws(JwsAlgorithm.HS256), new HmacUsingSha("SHA256") },
+            { Headers.Jws(JwsAlgorithm.HS384), new HmacUsingSha("SHA384") },
+            { Headers.Jws(JwsAlgorithm.HS512), new HmacUsingSha("SHA512") },
 
-            { JwsAlgorithm.RS256, new RsaUsingSha("SHA256") },
-            { JwsAlgorithm.RS384, new RsaUsingSha("SHA384") },
-            { JwsAlgorithm.RS512, new RsaUsingSha("SHA512") },
+            { Headers.Jws(JwsAlgorithm.RS256), new RsaUsingSha("SHA256") },
+            { Headers.Jws(JwsAlgorithm.RS384), new RsaUsingSha("SHA384") },
+            { Headers.Jws(JwsAlgorithm.RS512), new RsaUsingSha("SHA512") },
 
-            { JwsAlgorithm.PS256, new RsaPssUsingSha(32) },
-            { JwsAlgorithm.PS384, new RsaPssUsingSha(48) },
-            { JwsAlgorithm.PS512, new RsaPssUsingSha(64) },
+            { Headers.Jws(JwsAlgorithm.PS256), new RsaPssUsingSha(32) },
+            { Headers.Jws(JwsAlgorithm.PS384), new RsaPssUsingSha(48) },
+            { Headers.Jws(JwsAlgorithm.PS512), new RsaPssUsingSha(64) },
 #if NET40
-            { JwsAlgorithm.ES256, new EcdsaUsingSha(256) },
-            { JwsAlgorithm.ES384, new EcdsaUsingSha(384) },
-            { JwsAlgorithm.ES512, new EcdsaUsingSha(521) }
+            { Headers.Jws(JwsAlgorithm.ES256), new EcdsaUsingSha(256) },
+            { Headers.Jws(JwsAlgorithm.ES384), new EcdsaUsingSha(384) },
+            { Headers.Jws(JwsAlgorithm.ES512), new EcdsaUsingSha(521) }
 #elif NET461_OR_GREATER || NETSTANDARD || NET
-            { JwsAlgorithm.ES256, new Jose.netstandard1_4.EcdsaUsingSha(256) },
-            { JwsAlgorithm.ES384, new Jose.netstandard1_4.EcdsaUsingSha(384) },
-            { JwsAlgorithm.ES512, new Jose.netstandard1_4.EcdsaUsingSha(521) }
+            { Headers.Jws(JwsAlgorithm.ES256), new Jose.netstandard1_4.EcdsaUsingSha(256) },
+            { Headers.Jws(JwsAlgorithm.ES384), new Jose.netstandard1_4.EcdsaUsingSha(384) },
+            { Headers.Jws(JwsAlgorithm.ES512), new Jose.netstandard1_4.EcdsaUsingSha(521) }
 #endif
-        };
-
-        private readonly Dictionary<JwsAlgorithm, string> jwsAlgorithmsHeaderValue = new Dictionary<JwsAlgorithm, string>
-        {
-            { JwsAlgorithm.none, "none" },
-            { JwsAlgorithm.HS256, "HS256" },
-            { JwsAlgorithm.HS384, "HS384" },
-            { JwsAlgorithm.HS512, "HS512" },
-            { JwsAlgorithm.RS256, "RS256" },
-            { JwsAlgorithm.RS384, "RS384" },
-            { JwsAlgorithm.RS512, "RS512" },
-            { JwsAlgorithm.ES256, "ES256" },
-            { JwsAlgorithm.ES384, "ES384" },
-            { JwsAlgorithm.ES512, "ES512" },
-            { JwsAlgorithm.PS256, "PS256" },
-            { JwsAlgorithm.PS384, "PS384" },
-            { JwsAlgorithm.PS512, "PS512" },
-        };
+        };      
 
         // alias header -> key alg header
-        private readonly Dictionary<string, JwsAlgorithm> jwsAlgorithmsAliases = new Dictionary<string, JwsAlgorithm>();
+        private readonly Dictionary<string, string> jwsAlgorithmsAliases = new Dictionary<string, string>();
 
         private readonly Dictionary<string, IJweAlgorithm> encAlgorithms = new Dictionary<string, IJweAlgorithm>
         {
@@ -221,9 +204,7 @@ namespace Jose
         /// </summary>
         public JwtSettings RegisterJws(JwsAlgorithm alg, IJwsAlgorithm impl)
         {
-            jwsAlgorithms[alg] = impl;
-
-            return this;
+            return RegisterJws(Headers.Jws(alg), impl);
         }
 
         /// <summary>
@@ -231,16 +212,20 @@ namespace Jose
         /// </summary>
         public JwtSettings RegisterJws(string alg, IJwsAlgorithm impl)
         {
-            //jwsAlgorithms[alg] = impl;
+            jwsAlgorithms[alg] = impl;
 
-            //return this;
-            throw new NotImplementedException("TODO");
+            return this;           
         }
 
         /// <summary>
         /// Register an alias for the "alg" header that should point to a standard JWS signing algorithm
         /// </summary>
         public JwtSettings RegisterJwsAlias(string alias, JwsAlgorithm alg)
+        {
+            return RegisterJwsAlias(alias, Headers.Jws(alg));
+        }
+
+        public JwtSettings RegisterJwsAlias(string alias, string alg)
         {
             jwsAlgorithmsAliases[alias] = alg;
             return this;
@@ -252,9 +237,7 @@ namespace Jose
         /// </summary>
         public JwtSettings DeregisterJws(JwsAlgorithm alg)
         {
-            jwsAlgorithms.Remove(alg);
-
-            return this;
+            return DeregisterJws(Headers.Jws(alg));
         }
 
         /// <summary>
@@ -263,11 +246,9 @@ namespace Jose
         /// </summary>
         public JwtSettings DeregisterJws(string alg)
         {
-            //jwsAlgorithms.Remove(alg);
+            jwsAlgorithms.Remove(alg);
 
-            //return this;
-            throw new NotImplementedException("TODO");
-
+            return this;           
         }
 
         /// <summary>
@@ -350,29 +331,22 @@ namespace Jose
         }
 
         //JWS signing algorithm
-        public IJwsAlgorithm Jws(JwsAlgorithm alg)
+        public IJwsAlgorithm Jws(string alg)
         {
             IJwsAlgorithm impl;
             return jwsAlgorithms.TryGetValue(alg, out impl) ? impl : null;
         }
-
-        public string JwsHeaderValue(JwsAlgorithm algorithm)
-        {
-            return jwsAlgorithmsHeaderValue[algorithm];
-        }
-
-        public JwsAlgorithm JwsAlgorithmFromHeader(string headerValue)
-        {
-            foreach (var pair in jwsAlgorithmsHeaderValue)
-            {
-                if (pair.Value.Equals(headerValue)) return pair.Key;
+        public IJwsAlgorithm JwsAlgorithmFromHeader(string headerValue)
+        {            
+            if (jwsAlgorithms.ContainsKey(headerValue)) {
+                return Jws(headerValue);
             }
 
             //try alias
-            JwsAlgorithm aliasMatch;
+            string aliasMatch;
             if (jwsAlgorithmsAliases.TryGetValue(headerValue, out aliasMatch))
             {
-                return aliasMatch;
+                return Jws(aliasMatch);
             }
 
             throw new InvalidAlgorithmException(string.Format("JWS algorithm is not supported: {0}", headerValue));
