@@ -81,6 +81,48 @@ namespace UnitTests
         }
 
         [Fact]
+        public void Encode_IJwsAlgorithm_Override_ByHeaderValue()
+        {
+            //given
+            MockJwsAlgorithm jwsAlg = new MockJwsAlgorithm();
+
+            var payload = new
+            {
+                hello = "world"
+            };
+
+            //when
+            string token = Jose.JWT.Encode(payload, null, "none", settings: new JwtSettings().RegisterJws("none", jwsAlg));
+
+            Console.Out.WriteLine("Plaintext:" + token);
+
+            //then
+            Assert.Equal("eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.", token);
+            Assert.True(jwsAlg.SignCalled);
+        }
+
+        [Fact]
+        public void Encode_IJwsAlgorithm_CustomAlg()
+        {
+            //given
+            MockJwsAlgorithm jwsAlg = new MockJwsAlgorithm();
+
+            var payload = new
+            {
+                hello = "world"
+            };
+
+            //when
+            string token = Jose.JWT.Encode(payload, null, "mock", settings: new JwtSettings().RegisterJws("mock", jwsAlg));
+
+            Console.Out.WriteLine("Mock:" + token);
+
+            //then
+            Assert.Equal("eyJhbGciOiJtb2NrIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.", token);
+            Assert.True(jwsAlg.SignCalled);
+        }
+
+        [Fact]
         public void Decode_IJwsAlgorithm_Override()
         {
             //given
@@ -95,6 +137,39 @@ namespace UnitTests
             Assert.Equal(new Dictionary<string, object> { { "hello", "world" } }, test);
             Assert.True(jwsAlg.VerifyCalled);
         }
+
+        [Fact]
+        public void Decode_IJwsAlgorithm_Override_ByHeaderValue()
+        {
+            //given
+            MockJwsAlgorithm jwsAlg = new MockJwsAlgorithm();
+
+            string token = "eyJhbGciOiJub25lIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.";
+
+            //when
+            var test = Jose.JWT.Decode<IDictionary<string, object>>(token, settings: new JwtSettings().RegisterJws("none", jwsAlg));
+
+            //then
+            Assert.Equal(new Dictionary<string, object> { { "hello", "world" } }, test);
+            Assert.True(jwsAlg.VerifyCalled);
+        }
+
+        [Fact]
+        public void Decode_IJwsAlgorithm_CustomAlg()
+        {
+            //given
+            MockJwsAlgorithm jwsAlg = new MockJwsAlgorithm();
+
+            string token = "eyJhbGciOiJtb2NrIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.";
+
+            //when
+            var test = Jose.JWT.Decode<IDictionary<string, object>>(token, settings: new JwtSettings().RegisterJws("mock", jwsAlg));
+
+            //then
+            Assert.Equal(new Dictionary<string, object> { { "hello", "world" } }, test);
+            Assert.True(jwsAlg.VerifyCalled);
+        }
+
 
         [Fact]
         public void Encode_IJweAlgorithm_Override()
