@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime;
 using System.Text;
 
 namespace Jose
@@ -216,10 +215,10 @@ namespace Jose
             return Encode(GetSettings(settings).JsonMapper.Serialize(payload), key, alg, enc, compression, extraHeaders, settings);
         }
 
-        //public static string Encode(object payload, object key, string alg, string enc, string compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
-        //{
-        //    return Encode(GetSettings(settings).JsonMapper.Serialize(payload), key, alg, enc, compression, extraHeaders, settings);
-        //}
+        public static string Encode(object payload, object key, string alg, string enc, string compression = null, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null)
+        {
+            return Encode(GetSettings(settings).JsonMapper.Serialize(payload), key, alg, enc, compression, extraHeaders, settings);
+        }
 
         /// <summary>
         /// Encodes given json string to JWT token and applies requested encryption/compression algorithms.
@@ -284,9 +283,9 @@ namespace Jose
             return Encode(GetSettings(settings).JsonMapper.Serialize(payload), key, algorithm, extraHeaders, settings, options);
         }
 
-        public static string Encode(object payload, object key, string algorithm, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null, JwtOptions options = null)
+        public static string Encode(object payload, object key, string jwsAlg, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null, JwtOptions options = null)
         {
-            return Encode(GetSettings(settings).JsonMapper.Serialize(payload), key, algorithm, extraHeaders, settings, options);
+            return Encode(GetSettings(settings).JsonMapper.Serialize(payload), key, jwsAlg, extraHeaders, settings, options);
         }
 
         /// <summary>
@@ -306,11 +305,11 @@ namespace Jose
             return EncodeBytes(payloadBytes, key, algorithm, extraHeaders, settings, options);
         }
 
-        public static string Encode(string payload, object key, string algorithm, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null, JwtOptions options = null)
+        public static string Encode(string payload, object key, string jwsAlg, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null, JwtOptions options = null)
         {
             byte[] payloadBytes = Encoding.UTF8.GetBytes(payload);
 
-            return EncodeBytes(payloadBytes, key, algorithm, extraHeaders, settings, options);
+            return EncodeBytes(payloadBytes, key, jwsAlg, extraHeaders, settings, options);
         }
 
         /// <summary>
@@ -328,7 +327,7 @@ namespace Jose
             return EncodeBytes(payload, key, Jose.Headers.Jws(algorithm), extraHeaders, settings, options);
         }
 
-        public static string EncodeBytes(byte[] payload, object key, string algorithm, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null, JwtOptions options = null)
+        public static string EncodeBytes(byte[] payload, object key, string jwsAlg, IDictionary<string, object> extraHeaders = null, JwtSettings settings = null, JwtOptions options = null)
         {
             if (payload == null)
                 throw new ArgumentNullException(nameof(payload));
@@ -336,7 +335,7 @@ namespace Jose
             var jwtSettings = GetSettings(settings);
             var jwtOptions = options ?? JwtOptions.Default;
 
-            var jwtHeader = new Dictionary<string, object> { { "alg", algorithm } };
+            var jwtHeader = new Dictionary<string, object> { { "alg", jwsAlg } };
 
             if (extraHeaders == null) //allow overload, but keep backward compatible defaults
             {
@@ -352,11 +351,11 @@ namespace Jose
             Dictionaries.Append(jwtHeader, extraHeaders);
             byte[] headerBytes = Encoding.UTF8.GetBytes(jwtSettings.JsonMapper.Serialize(jwtHeader));
 
-            var jwsAlgorithm = jwtSettings.Jws(algorithm);
+            var jwsAlgorithm = jwtSettings.Jws(jwsAlg);
 
             if (jwsAlgorithm == null)
             {
-                throw new JoseException(string.Format("Unsupported JWS algorithm requested: {0}", algorithm));
+                throw new JoseException(string.Format("Unsupported JWS algorithm requested: {0}", jwsAlg));
             }
 
             byte[] signature = jwsAlgorithm.Sign(securedInput(headerBytes, payload, jwtOptions.EncodePayload), key);
@@ -383,6 +382,11 @@ namespace Jose
         /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
         public static string Decode(string token, object key, JweAlgorithm alg, JweEncryption enc, JwtSettings settings = null)
         {
+            return Decode(token, key, null, Jose.Headers.Jwa(alg), Jose.Headers.Jwe(enc), settings);
+        }
+
+        public static string Decode(string token, object key, string alg, string enc, JwtSettings settings = null)
+        {
             return Decode(token, key, null, alg, enc, settings);
         }
 
@@ -400,6 +404,11 @@ namespace Jose
         /// <exception cref="EncryptionException">if JWT token can't be decrypted</exception>
         /// <exception cref="InvalidAlgorithmException">if JWT signature, encryption or compression algorithm is not supported</exception>
         public static byte[] DecodeBytes(string token, object key, JweAlgorithm alg, JweEncryption enc, JwtSettings settings = null)
+        {
+            return DecodeBytes(Compact.Iterate(token), key, null, Jose.Headers.Jwa(alg), Jose.Headers.Jwe(enc), settings);
+        }
+
+        public static byte[] DecodeBytes(string token, object key, string alg, string enc, JwtSettings settings = null)
         {
             return DecodeBytes(Compact.Iterate(token), key, null, alg, enc, settings);
         }
@@ -422,9 +431,9 @@ namespace Jose
             return Decode(token, key, Jose.Headers.Jws(alg), null, null, settings, payload);
         }
 
-        public static string Decode(string token, object key, string alg, JwtSettings settings = null, string payload = null)
+        public static string Decode(string token, object key, string jwsAlg, JwtSettings settings = null, string payload = null)
         {
-            return Decode(token, key, alg, null, null, settings, payload);
+            return Decode(token, key, jwsAlg, null, null, settings, payload);
         }
 
         /// <summary>
@@ -445,9 +454,9 @@ namespace Jose
             return DecodeBytes(Compact.Iterate(token), key, Jose.Headers.Jws(alg), null, null, settings, payload);
         }
 
-        public static byte[] DecodeBytes(string token, object key, string alg, JwtSettings settings = null, byte[] payload = null)
+        public static byte[] DecodeBytes(string token, object key, string jwsAlg, JwtSettings settings = null, byte[] payload = null)
         {
-            return DecodeBytes(Compact.Iterate(token), key, alg, null, null, settings, payload);
+            return DecodeBytes(Compact.Iterate(token), key, jwsAlg, null, null, settings, payload);
         }
 
         /// <summary>
@@ -503,6 +512,11 @@ namespace Jose
             return GetSettings(settings).JsonMapper.Parse<T>(Decode(token, key, alg, enc, settings));
         }
 
+        public static T Decode<T>(string token, object key, string alg, string enc, JwtSettings settings = null)
+        {
+            return GetSettings(settings).JsonMapper.Parse<T>(Decode(token, key, alg, enc, settings));
+        }
+
         /// <summary>
         /// Decodes JWT token by performing necessary decompression/decryption and signature verification as defined in JWT token header.
         /// Resulting json string will be parsed and mapped to desired type via configured IJsonMapper implementation.
@@ -521,9 +535,9 @@ namespace Jose
             return GetSettings(settings).JsonMapper.Parse<T>(Decode(token, key, alg, settings));
         }
 
-        public static T Decode<T>(string token, object key, string alg, JwtSettings settings = null)
+        public static T Decode<T>(string token, object key, string jwsAlg, JwtSettings settings = null)
         {
-            return GetSettings(settings).JsonMapper.Parse<T>(Decode(token, key, alg, settings));
+            return GetSettings(settings).JsonMapper.Parse<T>(Decode(token, key, jwsAlg, settings));
         }
 
         /// <summary>
@@ -558,11 +572,11 @@ namespace Jose
             return Encoding.UTF8.GetString(VerifyBytes(token, key, alg, settings, detached));
         }
 
-        public static string Verify(string token, object key, string alg = null, JwtSettings settings = null, string payload = null)
+        public static string Verify(string token, object key, string jwsAlg = null, JwtSettings settings = null, string payload = null)
         {
             var detached = payload != null ? Encoding.UTF8.GetBytes(payload) : null;
 
-            return Encoding.UTF8.GetString(VerifyBytes(token, key, alg, settings, detached));
+            return Encoding.UTF8.GetString(VerifyBytes(token, key, jwsAlg, settings, detached));
         }
 
         /// <summary>
@@ -580,7 +594,7 @@ namespace Jose
             return VerifyBytes(token, key, expectedAlg, settings, payload);
         }
 
-        public static byte[] VerifyBytes(string token, object key, string alg = null, JwtSettings settings = null, byte[] payload = null)
+        public static byte[] VerifyBytes(string token, object key, string jwsAlg = null, JwtSettings settings = null, byte[] payload = null)
         {
             var parts = Compact.Iterate(token);
 
@@ -589,15 +603,41 @@ namespace Jose
                 throw new JoseException("Unexpected number of parts in signed token: " + parts.Count);
             }
 
-            return DecodeBytes(parts, key, alg, null, null, settings, payload);
+            return DecodeBytes(parts, key, jwsAlg, null, null, settings, payload);
         }
 
+        /// <summary>
+        /// Type hint alias for backward SDK compatibility
+        /// </summary>
+        public static string Decrypt(string token, object key)
+        {
+            return Decrypt(token, key, (string)null);   
+        }
         public static string Decrypt(string token, object key, JweAlgorithm? alg = null, JweEncryption? enc = null, JwtSettings settings = null)
         {
             return Encoding.UTF8.GetString(DecryptBytes(token, key, alg, enc, settings));
         }
+        public static string Decrypt(string token, object key, string alg = null, string enc = null, JwtSettings settings = null)
+        {
+            return Encoding.UTF8.GetString(DecryptBytes(token, key, alg, enc, settings));
+        }
 
+        /// <summary>
+        /// Type hint alias for backward SDK compatibility
+        /// </summary>
+        public static byte[] DecryptBytes(string token, object key)
+        {
+            return DecryptBytes(token, key, (string)null);
+        }
         public static byte[] DecryptBytes(string token, object key, JweAlgorithm? alg = null, JweEncryption? enc = null, JwtSettings settings = null)
+        {            
+
+            var keyAlg = alg != null ? Jose.Headers.Jwa(alg.Value) : null;
+            var encAlg = enc != null ? Jose.Headers.Jwe(enc.Value) : null;
+
+            return DecryptBytes(token, key, keyAlg, encAlg, settings);
+        }
+        public static byte[] DecryptBytes(string token, object key, string alg = null, string enc = null, JwtSettings settings = null)
         {
             var parts = Compact.Iterate(token);
 
@@ -609,8 +649,7 @@ namespace Jose
             return DecodeBytes(parts, key, null, alg, enc, settings);
         }
 
-
-        private static byte[] DecodeBytes(Compact.Iterator parts, object key = null, string expectedJwsAlg = null, JweAlgorithm? expectedJweAlg = null, JweEncryption? expectedJweEnc = null, JwtSettings settings = null, byte[] payload = null)
+        private static byte[] DecodeBytes(Compact.Iterator parts, object key = null, string expectedJwsAlg = null, string expectedJweAlg = null, string expectedJweEnc = null, JwtSettings settings = null, byte[] payload = null)
         {
             Ensure.IsNotEmpty(parts.Token, "Incoming token expected to be in compact serialization form, not empty, whitespace or null.");
 
@@ -675,7 +714,7 @@ namespace Jose
             throw new JoseException("Expected compact serialized token with 3 or 5 parts, but got: " + parts.Count);
         }
 
-        private static string Decode(string token, object key = null, string jwsAlg = null, JweAlgorithm? jweAlg = null, JweEncryption? jweEnc = null, JwtSettings settings = null, string payload = null)
+        private static string Decode(string token, object key = null, string jwsAlg = null, string jweAlg = null, string jweEnc = null, JwtSettings settings = null, string payload = null)
         {
             var detached = payload != null ? Encoding.UTF8.GetBytes(payload) : null;
             
