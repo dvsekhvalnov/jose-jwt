@@ -86,6 +86,20 @@ namespace UnitTests
         }
 
         [Fact]
+        public void EncodeBytesHS512_StringSDK()
+        {
+            // This test encodes a payload consisting of arbitrary binary data. Only a single signature algorithm is tested
+            // in the binary data scenario, as the internal flow is the same as for the non-Bytes methods and the
+            // other tests also cover the primary JOSE functionality, with only the binary-payload-specific part tested here.
+
+            string token = Jose.JWT.EncodeBytes(BinaryPayload, Encoding.UTF8.GetBytes(key), "HS512");
+
+            Console.Out.WriteLine("EncodeBytesHS512: " + token);
+
+            Assert.Equal("eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w.3_-H4HJiNi8--Ss-VAMM1Dg0JtTGEXNvMo1LAHEnQ7bZpQiblqAu5tt-G9p8KFnSlSYOG6l64pIqmqu5p5RvuQ", token);
+        }
+
+        [Fact]
         public void DecodeBytesHS512()
         {
             // This test decodes a payload consisting of arbitrary binary data. Only a single signature algorithm is tested
@@ -653,6 +667,22 @@ namespace UnitTests
             Assert.Equal("eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.EkP4VYlDO9a0ycFt6e_vSFwfI5MICvDqLCNFI779lodbs92EwBtxgzoYdgqz8E8H1ZtWEnyULsc7TkwgV-1xj_wbWVLDvQxjZ4wQfGaQBjD5yO9RTxwReWab3mtfixh7pPKi7lpmuO65sWBVnco2p1RXGsM7KtHjToRIFxu9ncA7YYdQ7i-YL1HcUHjjOc95NJzDyfqkwnaD10Wq7GM4XAixZFYYNDaz2nP7Gt8DwvEvFhtP2iPxeK3_AqhQ4T3B2GgcIDnNCjhETtx4oal-gZzujMEbrMx7ea_jdS5QpKv0EEiA2Ppv0-_4dDKELCwhmBuYzHZIGbSJUFMC_fKVqw", token);
             Assert.Equal(json, Jose.JWT.Decode(token, testSuiteUtils.PubKey()));
         }
+        
+        [Fact]
+        public void EncodeRS512_StringSDK()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, testSuiteUtils.PrivKey(), "RS512");
+
+            //then
+            Console.Out.WriteLine("RS512 = {0}", token);
+
+            Assert.Equal("eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.EkP4VYlDO9a0ycFt6e_vSFwfI5MICvDqLCNFI779lodbs92EwBtxgzoYdgqz8E8H1ZtWEnyULsc7TkwgV-1xj_wbWVLDvQxjZ4wQfGaQBjD5yO9RTxwReWab3mtfixh7pPKi7lpmuO65sWBVnco2p1RXGsM7KtHjToRIFxu9ncA7YYdQ7i-YL1HcUHjjOc95NJzDyfqkwnaD10Wq7GM4XAixZFYYNDaz2nP7Gt8DwvEvFhtP2iPxeK3_AqhQ4T3B2GgcIDnNCjhETtx4oal-gZzujMEbrMx7ea_jdS5QpKv0EEiA2Ppv0-_4dDKELCwhmBuYzHZIGbSJUFMC_fKVqw", token);
+            Assert.Equal(json, Jose.JWT.Decode(token, testSuiteUtils.PubKey()));
+        }
 
         [Fact]
         public void EncodeRS512_ExtraHeaders()
@@ -668,6 +698,28 @@ namespace UnitTests
 
             //when
             string token = Jose.JWT.Encode(json, testSuiteUtils.PrivKey(), JwsAlgorithm.RS512, extraHeaders: headers);
+
+            //then
+            Console.Out.WriteLine("RS512 (extra headers) = {0}", token);
+
+            Assert.Equal("eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCIsImtleWlkIjoiMTExLTIyMi0zMzMifQ.eyJoZWxsbyI6ICJ3b3JsZCJ9.Ca6ESMOSM2O45xJtwmZqMACihVTKk0GJQA4tCP3GUIu3r7kZzhZzqwPQ369-e8N0QKfvrjJ5ZpIlHGoeut44FMYFGVNtv4M7CbzPWyIdCeubwH2vkJwBaPs-ztA9aVng4kH3BjdckBtMGRmNKkk9IWjlEMi0RboPOuCpUHcTZ8Z99jocQ6GSKii-vT0YT0wa3U6weSqIojq_h0saMb2XzzTRnXzN2YmsJiiuNksRgaL8BKva2Qxk6fbYqdXXBeTsFZUtdZ30-wYciAbUvT29Z21RZSDCiDzCJtYTOv08zAqyAN3v6ZwpJ53VM4e_ANZtjyeog4xtoUXTg9FGhbuy_g", token);
+            Assert.Equal(json, Jose.JWT.Decode(token, testSuiteUtils.PubKey()));
+        }
+
+        [Fact]
+        public void EncodeRS512_ExtraHeaders_StringSDK()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            var headers = new Dictionary<string, object>
+            {
+                {"typ", "JWT"},
+                {"keyid", "111-222-333"}
+            };
+
+            //when
+            string token = Jose.JWT.Encode(json, testSuiteUtils.PrivKey(), "RS512", extraHeaders: headers);
 
             //then
             Console.Out.WriteLine("RS512 (extra headers) = {0}", token);
@@ -4407,6 +4459,22 @@ namespace UnitTests
 
             //when
             string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS256, options: new JwtOptions { EncodePayload = false });
+
+            //then
+            Console.Out.WriteLine("HS256 Unencoded = {0}", token);
+
+            Assert.Equal("eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il0sInR5cCI6IkpXVCJ9.{\"hello\": \"world\"}.ueGnzTJermvKhFYga7Pc7W_6fXhBKHklIIJeTnMrp9M", token);
+            Assert.Equal(json, Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)));
+        }
+
+        [Fact]
+        public void EncodeWithUnencodedPayload_StringSDK()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), "HS256", options: new JwtOptions { EncodePayload = false });
 
             //then
             Console.Out.WriteLine("HS256 Unencoded = {0}", token);
