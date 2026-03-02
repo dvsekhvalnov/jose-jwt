@@ -72,6 +72,23 @@ namespace UnitTests
         }
 
         [Fact]
+        public void EncodePlaintext_StringSDK()
+        {
+            //given
+            var payload = new
+            {
+                hello = "world"
+            };
+            //when
+            string token = Jose.JWT.Encode(payload, null, "none");
+
+            Console.Out.WriteLine("Plaintext:" + token);
+
+            //then
+            Assert.Equal("eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.", token);
+        }
+
+        [Fact]
         public void EncodeBytesHS512()
         {
             // This test encodes a payload consisting of arbitrary binary data. Only a single signature algorithm is tested
@@ -1319,6 +1336,38 @@ namespace UnitTests
 
             //when
             string token = Jose.JWT.Encode(payload, testSuiteUtils.PubKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A256CBC_HS512);
+
+            //then
+
+            Console.Out.WriteLine("RSA_OAEP_A256CBC_HS512 = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZDQkMtSFM1MTIifQ", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(43, parts[4].Length); //auth tag size
+        }
+
+        [Fact]
+        public void Encrypt_RSA_OAEP_A256CBC_HS512_StringSDK()
+        {
+            //given
+            var payload = new
+            {
+                exp = 1389189552,
+                sub = "alice",
+                nbf = 1389188952,
+                aud = new[] { @"https:\/\/app-one.com", @"https:\/\/app-two.com" },
+                iss = @"https:\/\/openid.net",
+                jti = "e543edf6-edf0-4348-8940-c4e28614d463",
+                iat = 1389188952
+            };
+
+            //when
+            string token = Jose.JWT.Encode(payload, testSuiteUtils.PubKey(), "RSA-OAEP", "A256CBC-HS512");
 
             //then
 
@@ -2791,6 +2840,31 @@ namespace UnitTests
 
             //when
             string token = Jose.JWT.Encode(json, "top secret", JweAlgorithm.PBES2_HS512_A256KW, JweEncryption.A256CBC_HS512);
+
+            //then
+            Console.Out.WriteLine("PBES2-HS512+256KW A256CBC_HS512 = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(115, parts[0].Length); //Header size
+            Assert.Equal(96, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(43, parts[4].Length); //auth tag size
+
+            Assert.Equal(json, Jose.JWT.Decode(token, "top secret"));
+        }
+
+        [Fact]
+        public void Encrypt_PBES2_HS512_A256KW_A256CBC_HS512_StringSDK()
+        {
+            //given
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, "top secret", "PBES2-HS512+A256KW", "A256CBC-HS512");
 
             //then
             Console.Out.WriteLine("PBES2-HS512+256KW A256CBC_HS512 = {0}", token);
@@ -4919,6 +4993,27 @@ namespace UnitTests
         {
             //when
             string token = Jose.JWT.EncodeBytes(new byte[0], aes128Key, JweAlgorithm.A128KW, JweEncryption.A128CBC_HS256);
+
+            //then
+            Console.Out.WriteLine("Empty bytes A128KW_A128CBC_HS256 = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(54, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(22, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
+
+            Assert.Equal("", Jose.JWT.Decode(token, aes128Key));
+        }        
+
+        [Fact]
+        public void EncryptEmptyBytes_A128KW_A128CBC_HS256_StringSDK()
+        {
+            //when
+            string token = Jose.JWT.EncodeBytes(new byte[0], aes128Key, "A128KW", "A128CBC-HS256");
 
             //then
             Console.Out.WriteLine("Empty bytes A128KW_A128CBC_HS256 = {0}", token);
