@@ -35,7 +35,6 @@ namespace Jose
             return EncryptBytes(Encoding.UTF8.GetBytes(plaintext), recipients, enc, aad, mode, compression, extraProtectedHeaders, unprotectedHeaders, settings);
         }
 
-        // TODO: unit tests
         public static string Encrypt(string plaintext, IEnumerable<JweRecipient> recipients, string enc, byte[] aad = null, SerializationMode mode = SerializationMode.Json, string compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
         {
             return EncryptBytes(Encoding.UTF8.GetBytes(plaintext), recipients, enc, aad, mode, compression, extraProtectedHeaders, unprotectedHeaders, settings);
@@ -60,7 +59,6 @@ namespace Jose
             return EncryptBytes(plaintext, recipients, Jose.Headers.Jwe(enc), aad, mode, compressionAlg, extraProtectedHeaders, unprotectedHeaders, settings);
         }
 
-        // TODO: unit tests
         public static string EncryptBytes(byte[] plaintext, IEnumerable<JweRecipient> recipients, string enc, byte[] aad = null, SerializationMode mode = SerializationMode.Json, string compression = null, IDictionary<string, object> extraProtectedHeaders = null, IDictionary<string, object> unprotectedHeaders = null, JwtSettings settings = null)
         {
             if (plaintext == null)
