@@ -220,8 +220,7 @@ namespace Jose
         {
             return Decrypt(jwe, key, expectedJweAlg: (string)null, expectedJweEnc: (string)null, settings: null);
         }
-
-        //TODO: unit tests
+        
         public static JweToken Decrypt(string jwe, object key, string expectedJweAlg = null, string expectedJweEnc = null, JwtSettings settings = null)
         {
             Ensure.IsNotEmpty(jwe, "Incoming jwe expected to be in a valid serialization form, not empty, whitespace or null.");

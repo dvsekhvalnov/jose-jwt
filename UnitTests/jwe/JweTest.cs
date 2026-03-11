@@ -129,6 +129,38 @@ namespace UnitTests
             Assert.Equal(expectedMessage, exception.Message);
         }
 
+        [Theory]
+        [InlineData("A256GCM", "ECDH-ES+A256KW", "The algorithm type passed to the Decrypt method did not match the algorithm type in the header.")]
+        [InlineData("A192GCM", "A256KW", "The encryption type passed to the Decrypt method did not match the encryption type in the header.")]
+        public void Decrypt_MultipleRecipients_MismatchEncOrAlgThrows_StringSDK(string expectedJweEnc, string expectedJweAlg, string expectedMessage)
+        {
+            //given
+            byte[] payload = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+            var recipients = new JweRecipient[]
+            {
+                recipientAes256KW1,
+                recipientAes256KW2,
+                recipientRsa1,
+            };
+            var sharedProtectedHeaders = new Dictionary<string, object>
+            {
+                { "cty", "application/octet-string"},
+            };
+            var jwe = JWE.EncryptBytes(
+                plaintext: payload,
+                recipients: recipients,
+                JweEncryption.A256GCM,
+                extraProtectedHeaders: sharedProtectedHeaders
+            );
+
+            //when
+            var exception = Record.Exception(() => JWE.Decrypt(jwe, aes256KWKey2, expectedJweAlg, expectedJweEnc));
+
+            //then
+            Assert.IsType<InvalidAlgorithmException>(exception);
+            Assert.Equal(expectedMessage, exception.Message);
+        }
+
         /// <summary>
         /// Attempting to decrypt with a private key not matching any of the recipients.
         /// </summary>
