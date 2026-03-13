@@ -649,7 +649,53 @@ namespace UnitTests
             }
         }
 
+        [Fact]
+        public void DeregisterCompressionByHeaderValue()
+        {
+            try
+            {
+                JwtSettings settings = new JwtSettings();
+                settings.DeregisterCompression("DEF");
+                Jose.JWT.Encode("should fail, no RSA-OAEP-256", PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM, JweCompression.DEF, settings: settings);
+                Assert.True(false, string.Format("JoseException was expected"));
+            }
+            catch (JoseException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+        }
 
+        [Fact]
+        public void DeregisterJwsByHeaderValue()
+        {
+            try
+            {
+                JwtSettings settings = new JwtSettings();
+                settings.DeregisterJws("RS256");
+                Jose.JWT.Encode("should fail, no RS-256", PrivKey(), JwsAlgorithm.RS256, settings: settings);
+                Assert.True(false, string.Format("JoseException was expected"));
+            }
+            catch (JoseException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+        }
+
+        [Fact]
+        public void DeregisterJweByHeaderValue()
+        {
+            try
+            {
+                JwtSettings settings = new JwtSettings();
+                settings.DeregisterJwe("A128GCM");
+                Jose.JWT.Encode("should fail, no A128GCM", PubKey(), JweAlgorithm.RSA_OAEP_256, JweEncryption.A128GCM, settings: settings);
+                Assert.True(false, string.Format("JoseException was expected"));
+            }
+            catch (JoseException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+        }
 
         [Fact]
         public void DeregisterCompression()

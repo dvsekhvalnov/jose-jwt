@@ -284,11 +284,9 @@ namespace Jose
         /// </summary>
         public JwtSettings DeregisterJwe(string alg)
         {
-            //encAlgorithms.Remove(alg);
+            encAlgorithms.Remove(alg);
 
-            //return this;
-
-            throw new NotImplementedException("TODO");
+            return this;
         }
 
         /// <summary>
