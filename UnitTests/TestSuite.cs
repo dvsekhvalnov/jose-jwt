@@ -5039,7 +5039,7 @@ namespace UnitTests
         }
 
         [Fact]
-        public void DecryptBytesExplicitAlg_StringSDk()
+        public void DecryptBytesExplicitAlg_StringSDK()
         {
             //given
             string token = Jose.JWT.EncodeBytes(BinaryPayload, testSuiteUtils.PubKey(), "RSA1_5", "A256GCM");
@@ -5152,6 +5152,7 @@ namespace UnitTests
             //then            
             Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decrypt(token, aes128Key, JweAlgorithm.DIR, JweEncryption.A192GCM));
         }
+
         [Fact]
         public void DecryptWrongEnc_StringSDK()
         {
