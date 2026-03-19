@@ -62,6 +62,23 @@ namespace UnitTests
         }
 
         [Fact]
+        public void EncodePlaintext_StringSDK()
+        {
+            //given
+            var payload = new
+            {
+                hello = "world"
+            };
+            //when
+            string token = Jose.JWT.Encode(payload, null, "none");
+
+            Console.Out.WriteLine("Plaintext:" + token);
+
+            //then
+            Assert.Equal("eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0.eyJoZWxsbyI6IndvcmxkIn0.", token);
+        }
+
+        [Fact]
         public void EncodeBytesHS512()
         {
             // This test encodes a payload consisting of arbitrary binary data. Only a single signature algorithm is tested
@@ -69,6 +86,20 @@ namespace UnitTests
             // other tests also cover the primary JOSE functionality, with only the binary-payload-specific part tested here.
 
             string token = Jose.JWT.EncodeBytes(BinaryPayload, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS512);
+
+            Console.Out.WriteLine("EncodeBytesHS512: " + token);
+
+            Assert.Equal("eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w.3_-H4HJiNi8--Ss-VAMM1Dg0JtTGEXNvMo1LAHEnQ7bZpQiblqAu5tt-G9p8KFnSlSYOG6l64pIqmqu5p5RvuQ", token);
+        }
+
+        [Fact]
+        public void EncodeBytesHS512_StringSDK()
+        {
+            // This test encodes a payload consisting of arbitrary binary data. Only a single signature algorithm is tested
+            // in the binary data scenario, as the internal flow is the same as for the non-Bytes methods and the
+            // other tests also cover the primary JOSE functionality, with only the binary-payload-specific part tested here.
+
+            string token = Jose.JWT.EncodeBytes(BinaryPayload, Encoding.UTF8.GetBytes(key), "HS512");
 
             Console.Out.WriteLine("EncodeBytesHS512: " + token);
 
@@ -92,6 +123,22 @@ namespace UnitTests
         }
 
         [Fact]
+        public void DecodeBytesHS512_StringSDK()
+        {
+            // This test decodes a payload consisting of arbitrary binary data. Only a single signature algorithm is tested
+            // in the binary data scenario, as the internal flow is the same as for the non-Bytes methods and the
+            // other tests also cover the primary JOSE functionality, with only the binary-payload-specific part tested here.
+
+            string token = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w.3_-H4HJiNi8--Ss-VAMM1Dg0JtTGEXNvMo1LAHEnQ7bZpQiblqAu5tt-G9p8KFnSlSYOG6l64pIqmqu5p5RvuQ";
+
+            var payload = Jose.JWT.DecodeBytes(token, Encoding.UTF8.GetBytes(key), "HS512");
+
+            Console.Out.WriteLine("DecodeBytesHS512: " + BitConverter.ToString(payload));
+
+            Assert.Equal(BinaryPayload, payload);
+        }
+
+        [Fact]
         public void EncryptAndDecryptBytes_RSA1_5_A256GCM()
         {
             // This test encodes a payload consisting of arbitrary binary data. Only a single encryption algorithm is tested
@@ -106,6 +153,23 @@ namespace UnitTests
 
             Assert.Equal(BinaryPayload, payload);
         }
+
+        [Fact]
+        public void EncryptAndDecryptBytes_RSA1_5_A256GCM_StringSDK()
+        {
+            // This test encodes a payload consisting of arbitrary binary data. Only a single encryption algorithm is tested
+            // in the binary data scenario, as the internal flow is the same as for the non-Bytes methods and the
+            // other tests also cover the primary JOSE functionality, with only the binary-payload-specific part tested here.
+
+            string token = Jose.JWT.EncodeBytes(BinaryPayload, PubKey(), JweAlgorithm.RSA1_5, JweEncryption.A256GCM);
+
+            Console.Out.WriteLine("EncryptAndDecryptBytes_RSA1_5_A256GCM: " + token);
+
+            var payload = Jose.JWT.DecodeBytes(token, PrivKey(), "RSA1_5", "A256GCM");
+
+            Assert.Equal(BinaryPayload, payload);
+        }
+
 
         [Fact]
         public void DecodeHS256()
@@ -726,6 +790,22 @@ namespace UnitTests
         }
 
         [Fact]
+        public void EncodeRS512_StringSDK()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, PrivKey(), "RS512");
+
+            //then
+            Console.Out.WriteLine("RS512 = {0}", token);
+
+            Assert.Equal("eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCJ9.eyJoZWxsbyI6ICJ3b3JsZCJ9.EkP4VYlDO9a0ycFt6e_vSFwfI5MICvDqLCNFI779lodbs92EwBtxgzoYdgqz8E8H1ZtWEnyULsc7TkwgV-1xj_wbWVLDvQxjZ4wQfGaQBjD5yO9RTxwReWab3mtfixh7pPKi7lpmuO65sWBVnco2p1RXGsM7KtHjToRIFxu9ncA7YYdQ7i-YL1HcUHjjOc95NJzDyfqkwnaD10Wq7GM4XAixZFYYNDaz2nP7Gt8DwvEvFhtP2iPxeK3_AqhQ4T3B2GgcIDnNCjhETtx4oal-gZzujMEbrMx7ea_jdS5QpKv0EEiA2Ppv0-_4dDKELCwhmBuYzHZIGbSJUFMC_fKVqw", token);
+            Assert.Equal(json, Jose.JWT.Decode(token, PubKey()));
+        }
+
+        [Fact]
         public void EncodeRS512_ExtraHeaders()
         {
             //given
@@ -739,6 +819,28 @@ namespace UnitTests
 
             //when
             string token = Jose.JWT.Encode(json, PrivKey(), JwsAlgorithm.RS512, extraHeaders: headers);
+
+            //then
+            Console.Out.WriteLine("RS512 (extra headers) = {0}", token);
+
+            Assert.Equal("eyJhbGciOiJSUzUxMiIsInR5cCI6IkpXVCIsImtleWlkIjoiMTExLTIyMi0zMzMifQ.eyJoZWxsbyI6ICJ3b3JsZCJ9.Ca6ESMOSM2O45xJtwmZqMACihVTKk0GJQA4tCP3GUIu3r7kZzhZzqwPQ369-e8N0QKfvrjJ5ZpIlHGoeut44FMYFGVNtv4M7CbzPWyIdCeubwH2vkJwBaPs-ztA9aVng4kH3BjdckBtMGRmNKkk9IWjlEMi0RboPOuCpUHcTZ8Z99jocQ6GSKii-vT0YT0wa3U6weSqIojq_h0saMb2XzzTRnXzN2YmsJiiuNksRgaL8BKva2Qxk6fbYqdXXBeTsFZUtdZ30-wYciAbUvT29Z21RZSDCiDzCJtYTOv08zAqyAN3v6ZwpJ53VM4e_ANZtjyeog4xtoUXTg9FGhbuy_g", token);
+            Assert.Equal(json, Jose.JWT.Decode(token, PubKey()));
+        }
+
+        [Fact]
+        public void EncodeRS512_ExtraHeaders_StringSDK()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            var headers = new Dictionary<string, object>
+            {
+                {"typ", "JWT"},
+                {"keyid", "111-222-333"}
+            };
+
+            //when
+            string token = Jose.JWT.Encode(json, PrivKey(), "RS512", extraHeaders: headers);
 
             //then
             Console.Out.WriteLine("RS512 (extra headers) = {0}", token);
@@ -1383,6 +1485,38 @@ namespace UnitTests
             string token = Jose.JWT.Encode(payload, PubKey(), JweAlgorithm.RSA_OAEP, JweEncryption.A256CBC_HS512);
 
             //then
+            Console.Out.WriteLine("RSA_OAEP_A256CBC_HS512 = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJSU0EtT0FFUCIsImVuYyI6IkEyNTZDQkMtSFM1MTIifQ", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(342, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(43, parts[4].Length); //auth tag size
+        }
+
+        [Fact]
+        public void Encrypt_RSA_OAEP_A256CBC_HS512_StringSDK()
+        {
+            //given
+            var payload = new
+            {
+                exp = 1389189552,
+                sub = "alice",
+                nbf = 1389188952,
+                aud = new[] { @"https:\/\/app-one.com", @"https:\/\/app-two.com" },
+                iss = @"https:\/\/openid.net",
+                jti = "e543edf6-edf0-4348-8940-c4e28614d463",
+                iat = 1389188952
+            };
+
+            //when
+            string token = Jose.JWT.Encode(payload, PubKey(), "RSA-OAEP", "A256CBC-HS512");
+
+            //then
+
             Console.Out.WriteLine("RSA_OAEP_A256CBC_HS512 = {0}", token);
 
             string[] parts = token.Split('.');
@@ -3058,6 +3192,31 @@ namespace UnitTests
 
             //when
             string token = Jose.JWT.Encode(json, "top secret", JweAlgorithm.PBES2_HS512_A256KW, JweEncryption.A256CBC_HS512);
+
+            //then
+            Console.Out.WriteLine("PBES2-HS512+256KW A256CBC_HS512 = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal(115, parts[0].Length); //Header size
+            Assert.Equal(96, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(278, parts[3].Length); //cipher text size
+            Assert.Equal(43, parts[4].Length); //auth tag size
+
+            Assert.Equal(json, Jose.JWT.Decode(token, "top secret"));
+        }
+
+        [Fact]
+        public void Encrypt_PBES2_HS512_A256KW_A256CBC_HS512_StringSDK()
+        {
+            //given
+            string json =
+                @"{""exp"":1389189552,""sub"":""alice"",""nbf"":1389188952,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""e543edf6-edf0-4348-8940-c4e28614d463"",""iat"":1389188952}";
+
+            //when
+            string token = Jose.JWT.Encode(json, "top secret", "PBES2-HS512+A256KW", "A256CBC-HS512");
 
             //then
             Console.Out.WriteLine("PBES2-HS512+256KW A256CBC_HS512 = {0}", token);
@@ -4872,6 +5031,22 @@ namespace UnitTests
         }
 
         [Fact]
+        public void EncodeWithUnencodedPayload_StringSDK()
+        {
+            //given
+            string json = @"{""hello"": ""world""}";
+
+            //when
+            string token = Jose.JWT.Encode(json, Encoding.UTF8.GetBytes(key), "HS256", options: new JwtOptions { EncodePayload = false });
+
+            //then
+            Console.Out.WriteLine("HS256 Unencoded = {0}", token);
+
+            Assert.Equal("eyJhbGciOiJIUzI1NiIsImI2NCI6ZmFsc2UsImNyaXQiOlsiYjY0Il0sInR5cCI6IkpXVCJ9.{\"hello\": \"world\"}.ueGnzTJermvKhFYga7Pc7W_6fXhBKHklIIJeTnMrp9M", token);
+            Assert.Equal(json, Jose.JWT.Decode(token, Encoding.UTF8.GetBytes(key)));
+        }
+
+        [Fact]
         public void EncodeWithUnencodedAndDetachedContent()
         {
             //given
@@ -4980,6 +5155,19 @@ namespace UnitTests
         }
 
         [Fact]
+        public void DecodeSignedTokenValidationSuccess_StringSDK()
+        {
+            // given
+            string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
+
+            // when
+            string json = Jose.JWT.Decode(token, PubKey(), "RS256");
+
+            // then
+            Assert.Equal(@"{""hello"": ""world""}", json);
+        }
+
+        [Fact]
         public void DecodeSignedTokenValidationFailure()
         {
             // given
@@ -4991,6 +5179,17 @@ namespace UnitTests
         }
 
         [Fact]
+        public void DecodeSignedTokenValidationFailure_StringSDK()
+        {
+            // given
+            string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
+
+            // then
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, PubKey(), "RS512"));
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, PubKey(), "RSA-OAEP-256", "A192GCM"));
+        }
+
+        [Fact]
         public void DecodeEncryptedTokenValidationSuccess()
         {
             // given
@@ -4999,6 +5198,20 @@ namespace UnitTests
 
             // when
             string decodedToken = Jose.JWT.Decode(token, RsaKey.New(PrivKey().ExportParameters(true)), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+
+            // then
+            Assert.Equal(json, decodedToken);
+        }
+
+        [Fact]
+        public void DecodeEncryptedTokenValidationSuccess_StringSDK()
+        {
+            // given
+            string json = @"{""hello"": ""world""}";
+            string token = Jose.JWT.Encode(json, PubKey(), "RSA-OAEP-256", "A192GCM");
+
+            // when
+            string decodedToken = Jose.JWT.Decode(token, PrivKey(), "RSA-OAEP-256", "A192GCM");
 
             // then
             Assert.Equal(json, decodedToken);
@@ -5018,6 +5231,19 @@ namespace UnitTests
         }
 
         [Fact]
+        public void DecodeEncryptedTokenValidationFailure_StringSDK()
+        {
+            // given
+            string json = @"{""hello"": ""world""}";
+            string token = Jose.JWT.Encode(json, PubKey(), "RSA-OAEP-256", "A192GCM");
+
+            // then
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, PrivKey(), "RSA-OAEP", "A192GCM"));
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, PrivKey(), "RSA-OAEP-256", "A128CBC-HS256"));
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decode(token, PrivKey(), "RS256"));
+        }
+
+        [Fact]
         public void DecodeAndMapSignedTokenValidationSuccess()
         {
             // given
@@ -5025,6 +5251,19 @@ namespace UnitTests
 
             // when
             var test = Jose.JWT.Decode<IDictionary<string, object>>(token, PubKey(), JwsAlgorithm.RS256);
+
+            // then
+            Assert.Equal(new Dictionary<string, object> { { "hello", "world" } }, test);
+        }
+
+        [Fact]
+        public void DecodeAndMapSignedTokenValidationSuccess_StringSDK()
+        {
+            // given
+            string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
+
+            // when
+            var test = Jose.JWT.Decode<IDictionary<string, object>>(token, PubKey(), "RS256");
 
             // then
             Assert.Equal(new Dictionary<string, object> { { "hello", "world" } }, test);
@@ -5039,6 +5278,20 @@ namespace UnitTests
 
             // when
             var test = Jose.JWT.Decode<IDictionary<string, object>>(token, RsaKey.New(PrivKey().ExportParameters(true)), JweAlgorithm.RSA_OAEP_256, JweEncryption.A192GCM);
+
+            // then
+            Assert.Equal(new Dictionary<string, object> { { "hello", "world" } }, test);
+        }
+
+        [Fact]
+        public void DecodeAndMapEncryptedTokenValidationSuccess_StringSDK()
+        {
+            // given
+            string json = @"{""hello"": ""world""}";
+            string token = Jose.JWT.Encode(json, PrivKey(), "RSA-OAEP-256", "A192GCM");
+
+            // when
+            var test = Jose.JWT.Decode<IDictionary<string, object>>(token, PrivKey(), "RSA-OAEP-256", "A192GCM");
 
             // then
             Assert.Equal(new Dictionary<string, object> { { "hello", "world" } }, test);
@@ -5097,6 +5350,30 @@ namespace UnitTests
         }
 
         [Fact]
+        public void VerifyExplicitAlg()
+        {
+            //given
+            const string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
+
+            //then
+            string json = Jose.JWT.Verify(token, PubKey(), JwsAlgorithm.RS256);
+
+            Assert.Equal(@"{""hello"": ""world""}", json);
+        }
+
+        [Fact]
+        public void VerifyExplicitAlg_StringSDK()
+        {
+            //given
+            const string token = "eyJhbGciOiJSUzI1NiIsImN0eSI6InRleHRcL3BsYWluIn0.eyJoZWxsbyI6ICJ3b3JsZCJ9.NL_dfVpZkhNn4bZpCyMq5TmnXbT4yiyecuB6Kax_lV8Yq2dG8wLfea-T4UKnrjLOwxlbwLwuKzffWcnWv3LVAWfeBxhGTa0c4_0TX_wzLnsgLuU6s9M2GBkAIuSMHY6UTFumJlEeRBeiqZNrlqvmAzQ9ppJHfWWkW4stcgLCLMAZbTqvRSppC1SMxnvPXnZSWn_Fk_q3oGKWw6Nf0-j-aOhK0S0Lcr0PV69ZE4xBYM9PUS1MpMe2zF5J3Tqlc1VBcJ94fjDj1F7y8twmMT3H1PI9RozO-21R0SiXZ_a93fxhE_l_dj5drgOek7jUN9uBDjkXUwJPAyp9YPehrjyLdw";
+
+            //then
+            string json = Jose.JWT.Verify(token, PubKey(), "RS256");
+
+            Assert.Equal(@"{""hello"": ""world""}", json);
+        }
+
+        [Fact]
         public void VerifyBytes()
         {
             //given
@@ -5104,6 +5381,32 @@ namespace UnitTests
 
             // when
             var payload = Jose.JWT.DecodeBytes(token, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS512);
+
+            // then
+            Assert.Equal(BinaryPayload, payload);
+        }
+
+        [Fact]
+        public void VerifyBytesExplicitAlg()
+        {
+            //given
+            const string token = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w.3_-H4HJiNi8--Ss-VAMM1Dg0JtTGEXNvMo1LAHEnQ7bZpQiblqAu5tt-G9p8KFnSlSYOG6l64pIqmqu5p5RvuQ";
+
+            // when
+            var payload = Jose.JWT.VerifyBytes(token, Encoding.UTF8.GetBytes(key), JwsAlgorithm.HS512);
+
+            // then
+            Assert.Equal(BinaryPayload, payload);
+        }
+
+        [Fact]
+        public void VerifyBytesExplicitAlg_StringSDK()
+        {
+            //given
+            const string token = "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0-P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn-AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq-wsbKztLW2t7i5uru8vb6_wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t_g4eLj5OXm5-jp6uvs7e7v8PHy8_T19vf4-fr7_P3-_w.3_-H4HJiNi8--Ss-VAMM1Dg0JtTGEXNvMo1LAHEnQ7bZpQiblqAu5tt-G9p8KFnSlSYOG6l64pIqmqu5p5RvuQ";
+
+            // when
+            var payload = Jose.JWT.VerifyBytes(token, Encoding.UTF8.GetBytes(key), "HS512");
 
             // then
             Assert.Equal(BinaryPayload, payload);
@@ -5178,6 +5481,58 @@ namespace UnitTests
         }
 
         [Fact]
+        public void DecryptBytesExplicitAlg()
+        {
+            //given
+            string token = Jose.JWT.EncodeBytes(BinaryPayload, PubKey(), JweAlgorithm.RSA1_5, JweEncryption.A256GCM);
+
+            //when
+            var payload = Jose.JWT.DecryptBytes(token, PrivKey(), JweAlgorithm.RSA1_5);
+
+            //then
+            Assert.Equal(BinaryPayload, payload);
+        }
+
+        [Fact]
+        public void DecryptBytesExplicitAlg_StringSDK()
+        {
+            //given
+            string token = Jose.JWT.EncodeBytes(BinaryPayload, PubKey(), "RSA1_5", "A256GCM");
+
+            //when
+            var payload = Jose.JWT.DecryptBytes(token, PrivKey(), "RSA1_5");
+
+            //then
+            Assert.Equal(BinaryPayload, payload);
+        }
+
+        [Fact]
+        public void DecryptBytesExplicitEnc()
+        {
+            //given
+            string token = Jose.JWT.EncodeBytes(BinaryPayload, PubKey(), JweAlgorithm.RSA1_5, JweEncryption.A256GCM);
+
+            //when
+            var payload = Jose.JWT.DecryptBytes(token, PrivKey(), JweAlgorithm.RSA1_5, JweEncryption.A256GCM);
+
+            //then
+            Assert.Equal(BinaryPayload, payload);
+        }
+
+        [Fact]
+        public void DecryptBytesExplicitEnc_StringSDK()
+        {
+            //given
+            string token = Jose.JWT.EncodeBytes(BinaryPayload, PubKey(), "RSA1_5", "A256GCM");
+
+            //when
+            var payload = Jose.JWT.DecryptBytes(token, PrivKey(), "RSA1_5", "A256GCM");
+
+            //then
+            Assert.Equal(BinaryPayload, payload);
+        }
+
+        [Fact]
         public void DecryptCorrectAlgEnc()
         {
             //given
@@ -5185,6 +5540,19 @@ namespace UnitTests
 
             //when
             string json = Jose.JWT.Decode(token, aes128Key, JweAlgorithm.DIR, JweEncryption.A128GCM);
+
+            //then
+            Assert.Equal(@"{""exp"":1392548520,""sub"":""alice"",""nbf"":1392547920,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0e659a67-1cd3-438b-8888-217e72951ec9"",""iat"":1392547920}", json);
+        }
+
+        [Fact]
+        public void DecryptCorrectAlgEnc_StringSDK()
+        {
+            //given
+            const string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..yVi-LdQQngN0C5WS.1McwSmhZzAtmmLp9y-OdnJwaJFo1nj_4ashmzl2LhubGf0Jl1OTEVJzsHZb7bkup7cGTkuxh6Vfv10ljHsjWf_URXoxP3stQqQeViVcuPV0y2Q_WHYzTNGZpmHGe-hM6gjDhyZyvu3yeXGFSvfPQmp9pWVOgDjI4RC0MQ83rzzn-rRdnZkznWjbmOPxwPrR72Qng0BISsEwbkPn4oO8-vlHkVmPpuDTaYzCT2ZR5K9JnIU8d8QdxEAGb7-s8GEJ1yqtd_w._umbK59DAKA3O89h15VoKQ";
+
+            //when
+            string json = Jose.JWT.Decode(token, aes128Key, "dir", "A128GCM");
 
             //then
             Assert.Equal(@"{""exp"":1392548520,""sub"":""alice"",""nbf"":1392547920,""aud"":[""https:\/\/app-one.com"",""https:\/\/app-two.com""],""iss"":""https:\/\/openid.net"",""jti"":""0e659a67-1cd3-438b-8888-217e72951ec9"",""iat"":1392547920}", json);
@@ -5221,6 +5589,16 @@ namespace UnitTests
         }
 
         [Fact]
+        public void DecryptWrongAlg_StringSDK()
+        {
+            //given
+            const string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..yVi-LdQQngN0C5WS.1McwSmhZzAtmmLp9y-OdnJwaJFo1nj_4ashmzl2LhubGf0Jl1OTEVJzsHZb7bkup7cGTkuxh6Vfv10ljHsjWf_URXoxP3stQqQeViVcuPV0y2Q_WHYzTNGZpmHGe-hM6gjDhyZyvu3yeXGFSvfPQmp9pWVOgDjI4RC0MQ83rzzn-rRdnZkznWjbmOPxwPrR72Qng0BISsEwbkPn4oO8-vlHkVmPpuDTaYzCT2ZR5K9JnIU8d8QdxEAGb7-s8GEJ1yqtd_w._umbK59DAKA3O89h15VoKQ";
+
+            //then            
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decrypt(token, aes192Key, "RSA-OAEP"));
+        }
+
+        [Fact]
         public void DecryptWrongEnc()
         {
             //given
@@ -5228,6 +5606,16 @@ namespace UnitTests
 
             //then            
             Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decrypt(token, aes128Key, JweAlgorithm.DIR, JweEncryption.A192GCM));
+        }
+
+        [Fact]
+        public void DecryptWrongEnc_StringSDK()
+        {
+            //given
+            const string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMTI4R0NNIn0..yVi-LdQQngN0C5WS.1McwSmhZzAtmmLp9y-OdnJwaJFo1nj_4ashmzl2LhubGf0Jl1OTEVJzsHZb7bkup7cGTkuxh6Vfv10ljHsjWf_URXoxP3stQqQeViVcuPV0y2Q_WHYzTNGZpmHGe-hM6gjDhyZyvu3yeXGFSvfPQmp9pWVOgDjI4RC0MQ83rzzn-rRdnZkznWjbmOPxwPrR72Qng0BISsEwbkPn4oO8-vlHkVmPpuDTaYzCT2ZR5K9JnIU8d8QdxEAGb7-s8GEJ1yqtd_w._umbK59DAKA3O89h15VoKQ";
+
+            //then            
+            Assert.Throws<InvalidAlgorithmException>(() => Jose.JWT.Decrypt(token, aes128Key, "dir", "A192GCM"));
         }
 
         [Fact]
@@ -5292,6 +5680,27 @@ namespace UnitTests
         {
             //when
             string token = Jose.JWT.EncodeBytes(new byte[0], aes128Key, JweAlgorithm.A128KW, JweEncryption.A128CBC_HS256);
+
+            //then
+            Console.Out.WriteLine("Empty bytes A128KW_A128CBC_HS256 = {0}", token);
+
+            string[] parts = token.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(54, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(22, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
+
+            Assert.Equal("", Jose.JWT.Decode(token, aes128Key));
+        }
+
+        [Fact]
+        public void EncryptEmptyBytes_A128KW_A128CBC_HS256_StringSDK()
+        {
+            //when
+            string token = Jose.JWT.EncodeBytes(new byte[0], aes128Key, "A128KW", "A128CBC-HS256");
 
             //then
             Console.Out.WriteLine("Empty bytes A128KW_A128CBC_HS256 = {0}", token);

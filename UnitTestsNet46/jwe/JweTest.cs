@@ -125,6 +125,38 @@ namespace UnitTests
             Assert.Equal(expectedMessage, exception.Message);
         }
 
+        [Theory]
+        [InlineData("A256GCM", "ECDH-ES+A256KW", "The algorithm type passed to the Decrypt method did not match the algorithm type in the header.")]
+        [InlineData("A192GCM", "A256KW", "The encryption type passed to the Decrypt method did not match the encryption type in the header.")]
+        public void Decrypt_MultipleRecipients_MismatchEncOrAlgThrows_StringSDK(string expectedJweEnc, string expectedJweAlg, string expectedMessage)
+        {
+            //given
+            byte[] payload = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12 };
+            var recipients = new JweRecipient[]
+            {
+                recipientAes256KW1,
+                recipientAes256KW2,
+                recipientRsa1,
+            };
+            var sharedProtectedHeaders = new Dictionary<string, object>
+            {
+                { "cty", "application/octet-string"},
+            };
+            var jwe = JWE.EncryptBytes(
+                plaintext: payload,
+                recipients: recipients,
+                JweEncryption.A256GCM,
+                extraProtectedHeaders: sharedProtectedHeaders
+            );
+
+            //when
+            var exception = Record.Exception(() => JWE.Decrypt(jwe, aes256KWKey2, expectedJweAlg, expectedJweEnc));
+
+            //then
+            Assert.IsType<InvalidAlgorithmException>(exception);
+            Assert.Equal(expectedMessage, exception.Message);
+        }
+
         /// <summary>
         /// Attempting to decrypt with a private key not matching any of the recipients.
         /// </summary>
@@ -191,6 +223,37 @@ namespace UnitTests
                 plaintext: plaintext,
                 recipients: new JweRecipient[] { recipientAes128KW },
                 JweEncryption.A128CBC_HS256,
+                mode: SerializationMode.Compact
+            );
+
+            //then
+            Console.Out.WriteLine("Empty bytes A128KW_A128CBC_HS256 = {0}", jwe);
+
+            string[] parts = jwe.Split('.');
+
+            Assert.Equal(5, parts.Length); //Make sure 5 parts
+            Assert.Equal("{\"alg\":\"A128KW\",\"enc\":\"A128CBC-HS256\"}",
+                UTF8Encoding.UTF8.GetString(Base64Url.Decode(parts[0])));
+            Assert.Equal("eyJhbGciOiJBMTI4S1ciLCJlbmMiOiJBMTI4Q0JDLUhTMjU2In0", parts[0]); //Header is non-encrypted and static text
+            Assert.Equal(54, parts[1].Length); //CEK size
+            Assert.Equal(22, parts[2].Length); //IV size
+            Assert.Equal(22, parts[3].Length); //cipher text size
+            Assert.Equal(22, parts[4].Length); //auth tag size
+
+            Assert.Equal(new byte[0], JWE.Decrypt(jwe, aes128KWKey).PlaintextBytes);
+        }
+
+        [Fact]
+        public void Encrypt_ModeCompactWithEmptyBytesA128KW_A128CBC_HS256_StringSDK()
+        {
+            //given
+            byte[] plaintext = { };
+
+            //when
+            var jwe = JWE.EncryptBytes(
+                plaintext: plaintext,
+                recipients: new JweRecipient[] { new JweRecipient("A128KW", aes128KWKey) },
+                "A128CBC-HS256",
                 mode: SerializationMode.Compact
             );
 
@@ -980,6 +1043,33 @@ namespace UnitTests
             JweRecipient r = new JweRecipient(JweAlgorithm.A256KW, sharedKey);
 
             string token = JWE.Encrypt(payload, new[] { r }, JweEncryption.A256GCM);
+
+            Console.Out.WriteLine("[JSON][A256KW][A256GCM]: {0}", token);
+
+            JObject deserialized = JObject.Parse(token);
+
+            Assert.Equal("{\"enc\":\"A256GCM\"}",
+                             UTF8Encoding.UTF8.GetString(Base64Url.Decode((string)deserialized["protected"])));
+
+            Assert.True(deserialized["header"] is JObject);
+            Assert.Equal("{\"alg\":\"A256KW\"}", deserialized["header"].ToString(Newtonsoft.Json.Formatting.None));
+            Assert.Equal("A256KW", deserialized["header"]["alg"]);
+            Assert.Equal(54, ((string)deserialized["encrypted_key"]).Length); //CEK size
+            Assert.Equal(16, ((string)deserialized["iv"]).Length); //IV size
+            Assert.Equal(18, ((string)deserialized["ciphertext"]).Length); //cipher text size
+            Assert.Equal(22, ((string)deserialized["tag"]).Length); //auth tag size
+
+            var decoded = JWE.Decrypt(token, sharedKey);
+            Assert.Equal(payload, decoded.Plaintext);
+        }
+
+        [Fact]
+        public void EncodeSingleRecipient_StringSDK()
+        {
+            var payload = "Hello World !";
+            JweRecipient r = new JweRecipient("A256KW", sharedKey);
+
+            string token = JWE.Encrypt(payload, new[] { r }, "A256GCM");
 
             Console.Out.WriteLine("[JSON][A256KW][A256GCM]: {0}", token);
 
