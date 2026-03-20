@@ -41,17 +41,17 @@ JSON Web Key (RFC 7517):
   - RSA, EC, oct keys
   - X509 Chains, SHA1 &amp; SHA2 thumbprints
 </Description>
-    <Copyright>Copyright dvsekhvalnov 2014-2024</Copyright>
+    <Copyright>Copyright dvsekhvalnov 2014-2026</Copyright>
     <AssemblyTitle>Jose JWT</AssemblyTitle>
     <NeutralLanguage>en-US</NeutralLanguage>
-    <VersionPrefix>5.2</VersionPrefix>
+    <VersionPrefix>5.3.0</VersionPrefix>
     <Authors>Dmitry Vsekhvalnov</Authors>
     <TargetFrameworks>net40;net461;net472;netstandard1.4;netstandard2.1;net6.0</TargetFrameworks>
     <LangVersion>latest</LangVersion>
     <AssemblyName>jose-jwt</AssemblyName>
     <PackageId>jose-jwt</PackageId>
     <PackageTags>jose;jwt;json;jwa;jwe;jws;jwk;aes;cbc;gcm;rsa;hmac;sha;rsassa;pss;rsaes;oaep;pkcs1-v1_5;es;elliptic;curve;diffe;hellman;agreement;ecdsa;key wrap;kw;ecdh;pbes;pbes2;pbkdf;pbkdf2;password based encryption;javascript object signing;two phase validation;netcore;clr;coreclr;portable;fips;compliant;open;banking;detached content;unencoded payload;json web key;</PackageTags>
-    <PackageReleaseNotes>Maintenance release, removed dependencies on external packages for .net6 and above.</PackageReleaseNotes>
+    <PackageReleaseNotes>Exteded public SDK for custom algorithms. Key utils for P1363 and DER ASN.1 encodings.</PackageReleaseNotes>
     <PackageProjectUrl>https://github.com/dvsekhvalnov/jose-jwt</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
