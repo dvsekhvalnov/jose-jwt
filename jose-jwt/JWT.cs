@@ -674,6 +674,11 @@ namespace Jose
 
                 byte[] header = parts.Next();
 
+                if (header.Length == 0)
+                {
+                    throw new JoseException("JWT header can't be empty.");
+                }
+
                 var headerData = jwtSettings.JsonMapper.Parse<IDictionary<string, object>>(Encoding.UTF8.GetString(header));
 
                 bool b64 = true;
@@ -689,7 +694,14 @@ namespace Jose
 
                 var effectivePayload = payload ?? contentPayload;
 
-                var algorithm = (string)headerData["alg"];                
+                object algObj;
+                if (!headerData.TryGetValue("alg", out algObj) || !(algObj is string))
+                {
+                    throw new JoseException("JWT header 'alg' value must be a string.");
+                }
+
+                var algorithm = (string)algObj;
+
                 if (expectedJwsAlg != null && expectedJwsAlg != algorithm)
                 {
                     throw new InvalidAlgorithmException(

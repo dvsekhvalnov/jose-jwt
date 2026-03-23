@@ -238,7 +238,13 @@ namespace Jose
 
             foreach (var recipient in token.Recipients)
             {
-                var headerAlg = (string)recipient.JoseHeader["alg"];
+                object algObj;
+                if (!recipient.JoseHeader.TryGetValue("alg", out algObj) || !(algObj is string))
+                {
+                    throw new JoseException("JWE header 'alg' value must be a string.");
+                }
+                string headerAlg = (string)algObj;
+
                 var encryptedCek = recipient.EncryptedCek;
 
                 // skip recipient if asked to do strict validation
@@ -256,7 +262,13 @@ namespace Jose
 
                 try
                 {
-                    var headerEnc = (string)recipient.JoseHeader["enc"];
+                    object encObj;
+                    if (!recipient.JoseHeader.TryGetValue("enc", out encObj) || !(encObj is string))
+                    {
+                        throw new JoseException("JWE header 'enc' value must be a string.");
+                    }
+                    string headerEnc = (string)encObj;
+
                     IJweAlgorithm enc = settings.JweAlgorithmFromHeader(headerEnc);
 
                     if (enc == null)

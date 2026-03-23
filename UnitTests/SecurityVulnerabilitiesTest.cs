@@ -218,5 +218,24 @@ namespace UnitTests
                 Console.Out.WriteLine(e.ToString());
             }
         }
+
+        [SkippableTheory]
+        [InlineData("..")]
+        [InlineData("eyJhbGciOjJ9.eyKhbGciOiJGciOjJ9.eyKhbGciOiJ")]
+        [InlineData("eyJhbGciOjJ9..SH9typ9..")]
+        [InlineData("eyJhbGciOiJkaXIiLCJlbmMiOjJ9..SH9typ9..")]
+        public void MalformedTokenShouldThrowJoseException(string token)
+        {
+            try
+            {
+                // when decrypt a malformed token with non string alg, it should fail
+                Jose.JWT.Decode(token, JwsAlgorithm.none);
+                Assert.True(false, "Should fail with JoseException");
+            }
+            catch (JoseException e)
+            {
+                Console.Out.WriteLine(e.ToString());
+            }
+        }
     }
 }
