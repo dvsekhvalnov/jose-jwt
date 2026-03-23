@@ -156,6 +156,9 @@ var payload = new Dictionary<string, object>()
 };
 
 string token = Jose.JWT.Encode(payload, null, JwsAlgorithm.none);
+
+// or starting v5.3.0 can also:
+string token = Jose.JWT.Encode(payload, null, "none");
 ```
 
 **Warning:** When using a `class` as the data structure of the payload, always use nullable data types for its properties. [details](#potential-security-risk)
@@ -174,6 +177,9 @@ var payload = new Dictionary<string, object>()
 var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
 
 string token=Jose.JWT.Encode(payload, secretKey, JwsAlgorithm.HS256);
+
+// or starting v5.3.0 can also:
+string token=Jose.JWT.Encode(payload, secretKey, "HS256");
 ```
 
 ``` cs
@@ -204,6 +210,9 @@ var payload = new Dictionary<string, object>()
 var privateKey=new X509Certificate2("my-key.p12", "password", X509KeyStorageFlags.Exportable | X509KeyStorageFlags.MachineKeySet).PrivateKey as RSACryptoServiceProvider;
 
 string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.RS256);
+
+// or starting v5.3.0 can also:
+string token=Jose.JWT.Encode(payload, privateKey, "RS256");
 ```
 
 **NETCORE**:
@@ -265,6 +274,9 @@ byte[] d = { 42, 148, 231, 48, 225, 196, 166, 201, 23, 190, 229, 199, 20, 39, 22
 var privateKey=EccKey.New(x, y, d);
 
 string token=Jose.JWT.Encode(payload, privateKey, JwsAlgorithm.ES256);
+
+// or starting v5.3.0 can also:
+string token=Jose.JWT.Encode(payload, privateKey, "ES256");
 ```
 
 **NETCORE**:
@@ -320,6 +332,10 @@ var payload = new Dictionary<string, object>()
 var publicKey=new X509Certificate2("my-key.p12", "password").PublicKey.Key as RSACryptoServiceProvider;
 
 string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA_OAEP, JweEncryption.A256GCM);
+
+// or starting v5.3.0 can also:
+string token = Jose.JWT.Encode(payload, publicKey, "RSA-OAEP", "A256GCM");
+
 ```
 
 **NETCORE:**
@@ -377,6 +393,9 @@ var payload = new Dictionary<string, object>()
 var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
 
 string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.DIR, JweEncryption.A128CBC_HS256);
+
+// or starting v5.3.0 can also:
+string token = Jose.JWT.Encode(payload, secretKey, "DIR", "A128CBC-HS256");
 ```
 
 ``` cs
@@ -404,6 +423,10 @@ var payload = new Dictionary<string, object>()
 var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
 
 string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.A256KW, JweEncryption.A256CBC_HS512);
+
+
+// or starting v5.3.0 can also:
+string token = Jose.JWT.Encode(payload, secretKey, "A256KW", "A256CBC-HS512");
 ```
 
 ``` cs
@@ -431,6 +454,9 @@ var payload = new Dictionary<string, object>()
 var secretKey = new byte[]{164,60,194,0,161,189,41,38,130,89,141,164,45,170,159,209,69,137,243,216,191,131,47,250,32,107,231,117,37,158,225,234};
 
 string token = Jose.JWT.Encode(payload, secretKey, JweAlgorithm.A256GCMKW, JweEncryption.A256CBC_HS512);
+
+// or starting v5.3.0 can also:
+string token = Jose.JWT.Encode(payload, secretKey, "A256GCMKW", "A256CBC-HS512");
 ```
 
 ``` cs
@@ -467,6 +493,9 @@ byte[] y = { 131, 116, 8, 14, 22, 150, 18, 75, 24, 181, 159, 78, 90, 51, 71, 159
 var publicKey=EccKey.New(x, y, usage:CngKeyUsages.KeyAgreement);
 
 string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.ECDH_ES, JweEncryption.A256GCM);
+
+// or starting v5.3.0 can also:
+string token = Jose.JWT.Encode(payload, publicKey, "ECDH_ES", "A256GCM");
 ```
 
 ``` cs
@@ -533,6 +562,9 @@ var payload = new Dictionary<string, object>()
 };
 
 string token = Jose.JWT.Encode(payload, "top secret", JweAlgorithm.PBES2_HS256_A128KW, JweEncryption.A256CBC_HS512);
+
+// or starting v5.3.0 can also:
+string token = Jose.JWT.Encode(payload, "top secret", "PBES2-HS256+A128KW", "A256CBC-HS512");
 ```
 
 Iteration counts can be controlled by setting `p2c` header value:
@@ -561,6 +593,9 @@ var payload = new Dictionary<string, object>()
 var publicKey=new X509Certificate2("my-key.p12", "password").PublicKey.Key as RSACryptoServiceProvider;
 
 string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.RSA1_5, JweEncryption.A128CBC_HS256, JweCompression.DEF);
+
+// or starting v5.3.0 can also:
+string token = Jose.JWT.Encode(payload, publicKey, "RSA1_5", "A128CBC-HS256", "DEF");
 ```
 
 ### Verifying and Decoding Tokens
@@ -870,8 +905,15 @@ var preSharedKey = LoadKey();
 // generate JSON encoded token
 string token_1 = JWE.Encrypt(payload, new[] { new JweRecipient(JweAlgorithm.A256KW, preSharedKey) }, JweEncryption.A256GCM);
 
+
+// or starting v5.3.0 can also:
+string token_1 = JWE.Encrypt(payload, new[] { new JweRecipient("A256KW", preSharedKey) }, "A256GCM");
+
 // encrypt binary
 string token_2 = JWE.EncryptBytes(payload, new[] { new JweRecipient(JweAlgorithm.A256KW, preSharedKey) }, JweEncryption.A256GCM);
+
+// or starting v5.3.0 can also:
+string token_2 = JWE.EncryptBytes(payload, new[] { new JweRecipient("A256KW", preSharedKey) }, "A256GCM");
 
 // can opt-in for Compact encoded tokens with same interface
 string token_3 = JWE.Encrypt(payload, new[] { new JweRecipient(JweAlgorithm.A256KW, preSharedKey), mode: SerializationMode.Compact }, JweEncryption.A256GCM);
@@ -880,10 +922,14 @@ string token_3 = JWE.Encrypt(payload, new[] { new JweRecipient(JweAlgorithm.A256
 Encrypt for multiple recipients at once:
 ``` cs
 var payload = "Hello World !";
+
 JweRecipient r1 = new JweRecipient(JweAlgorithm.PBES2_HS256_A128KW, "secret");
-JweRecipient r2 = new JweRecipient(JweAlgorithm.ECDH_ES_A128KW, ECPublicKey());
+
+// can mix and match old new SDK starting from v5.3.0
+JweRecipient r2 = new JweRecipient("ECDH-ES+A128KW", ECPublicKey());
 JweRecipient r3 = new JweRecipient(JweAlgorithm.RSA_OAEP_256, RsaPublicKey());
 
+string token_1 = JWE.Encrypt(payload, new[] { new JweRecipient(JweAlgorithm.A256KW, preSharedKey) }, JweEncryption.A256GCM);
 string token = JWE.Encrypt(payload, new[] { r1, r2, r3 }, JweEncryption.A256GCM);
 ```
 
@@ -1297,6 +1343,11 @@ string json = Jose.JWT.Decode(token, secretKey, JweAlgorithm.DIR, JweEncryption.
 
 // starting v5 also applies to dedicated methods
 string json = Jose.JWT.Decrypt(token, secretKey, JweAlgorithm.DIR, JweEncryption.A256GCM);
+
+// starting v5.3.0 can also:
+
+string json = Jose.JWT.Decode(token, secretKey, "DIR", "A256GCM");
+string json = Jose.JWT.Decrypt(token, secretKey, "DIR", "A256GCM");
 ```
 
 Example of how to strictly validate a signed token:
@@ -1311,6 +1362,10 @@ var publicKey = EccKey.New(x, y);
 string json = Jose.JWT.Decode(token, publicKey, JwsAlgorithm.ES256);
 
 // starting v5 also applies to dedicated methods
+string json = Jose.JWT.Verify(token, secretKey, JwsAlgorithm.ES256);
+
+// or starting v5.3.0 use string SDK:
+string json = Jose.JWT.Decode(token, publicKey, JwsAlgorithm.ES256);
 string json = Jose.JWT.Verify(token, secretKey, JwsAlgorithm.ES256);
 ```
 
@@ -1376,18 +1431,25 @@ So developers should always use [nullable data types](https://docs.microsoft.com
 
 ## Settings
 As of v2.3.0 settings can be configured either globally or on a per-call basis using a `JwtSettings` object.  The `JWT.DefaultSettings` object can be modified to change global settings, or a `JwtSettings` instance can be passed to any public method on `JWT` to override the global settings for particular method call.
+
 It is possible to provide custom implementations of:
-- specific signing `JwtSettings.RegisterJws(alg, impl)`
-- encryption,      `JwtSettings.RegisterJwe(alg, impl)`
-- key management   `JwtSettings.RegisterJwa(alg, impl)`
-- or compression   `JwtSettings.RegisterCompression(alg, impl)`
+- specific signing `JwtSettings.RegisterJws(JwsAlgorithm alg, IJwsAlgorithm impl)`
+- encryption,      `JwtSettings.RegisterJwe(JweEncryption alg, IJweAlgorithm impl)`
+- key management   `JwtSettings.RegisterJwa(JweAlgorithm alg, IKeyManagement impl)`
+- or compression   `JwtSettings.RegisterCompression(JweCompression alg, ICompression impl)`
 - json mapper      `JwtSettings.RegisterMapper(mapper)`
 
 as well as specify aliases when decoding tokens from 3rd party libraries that do not comply exactly to spec:
-- signing `JwtSettings.RegisterJwsAlias(header, alg)`
+- signing   `JwtSettings.RegisterJwsAlias(header, alg)`
 - encryption `JwtSettings.RegisterJweAlias(header, alg)`
 - key management `JwtSettings.RegisterJwaAlias(header, alg)`
 - compression `JwtSettings.RegisterCompressionAlias(header, alg)`
+
+starting v5.3.0 library additionally provides `string` based SDK for better flexibility and ability to add custom algorithms not available in a library at the moment:
+- signing           `JwtSettings.RegisterJws(string alg, IJwsAlgorithm impl)`
+- encryption,       `JwtSettings.RegisterJwe(string alg, IJweAlgorithm impl)`
+- key management    `JwtSettings.RegisterJwa(string alg, IKeyManagement impl)`
+- compression       `JwtSettings.RegisterCompression(string alg, ICompression impl)`
 
 ### Example of JWTSettings
 
@@ -1487,6 +1549,9 @@ public class CustomKeyManagement : IKeyManagement
 
 // set default RSA-OAEP key management to use custom implementation
 Jose.JWT.DefaultSettings.RegisterJwa(JweAlgorithm.RSA_OAEP, new CustomKeyManagement());
+
+// or starting v5.3.0
+Jose.JWT.DefaultSettings.RegisterJwa("RSA-OAEP", new CustomKeyManagement());
 ```
 
 ### Providing aliases
@@ -1524,11 +1589,17 @@ One can use following methods to deregister any signing, encryption, key managem
  - `JwtSettings.DeregisterJwe(JweEncryption alg)` - to remove signing algorithm
  - `JwtSettings.DeregisterCompression(JweCompression alg)` - to remove signing algorithm
 
+Starting v5.3.0 library additionally provides string SDK:
+ - `JwtSettings.DeregisterJws(string alg)` - to remove signing algorithm
+ - `JwtSettings.DeregisterJwa(string alg))` - to remove key management algorithm
+ - `JwtSettings.DeregisterJwe(string alg)` - to remove signing algorithm
+ - `JwtSettings.DeregisterCompression(string alg)` - to remove signing algorithm
+
  ```c#
     JWT.DefaultSettings.DeregisterJws(JwsAlgorithm.none)
                        .DeregisterJwe(JweAlgorithm.RSA1_5)
                        .DeregisterJwe(JweAlgorithm.DIR)
-                       .DeregisterCompression(JweCompression.DEF);
+                       .DeregisterCompression("DEF");
  ```
 
 ### Customizing compression
