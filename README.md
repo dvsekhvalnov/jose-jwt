@@ -9,7 +9,7 @@ JWE JSON Serialization cross-tested with [JWCrypto](https://github.com/latchset/
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
-- v5.3.0 Extended public SDK to allow custom algorithms implementations. New Elliptic Curve key utils to simplify conversion between P1363 and DER ASN.1 encodings.
+- v5.3.0 Extended public [SDK](#settings) to allow custom algorithms implementations. New Elliptic Curve key utils to simplify conversion between P1363 and DER ASN.1 encodings.
 - v5.2.0 Maintenence release, added .net6 target to remove dependencies on external outdated packages
 - v5.1.1 Maintenence release, improved memory allocation for deflated tokens (see https://github.com/dvsekhvalnov/jose-jwt/issues/258, https://github.com/dvsekhvalnov/jose-jwt/issues/257)
 
@@ -495,7 +495,7 @@ var publicKey=EccKey.New(x, y, usage:CngKeyUsages.KeyAgreement);
 string token = Jose.JWT.Encode(payload, publicKey, JweAlgorithm.ECDH_ES, JweEncryption.A256GCM);
 
 // or starting v5.3.0 can also:
-string token = Jose.JWT.Encode(payload, publicKey, "ECDH_ES", "A256GCM");
+string token = Jose.JWT.Encode(payload, publicKey, "ECDH-ES", "A256GCM");
 ```
 
 ``` cs
@@ -1345,7 +1345,6 @@ string json = Jose.JWT.Decode(token, secretKey, JweAlgorithm.DIR, JweEncryption.
 string json = Jose.JWT.Decrypt(token, secretKey, JweAlgorithm.DIR, JweEncryption.A256GCM);
 
 // starting v5.3.0 can also:
-
 string json = Jose.JWT.Decode(token, secretKey, "DIR", "A256GCM");
 string json = Jose.JWT.Decrypt(token, secretKey, "DIR", "A256GCM");
 ```
