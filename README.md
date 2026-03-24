@@ -9,7 +9,7 @@ JWE JSON Serialization cross-tested with [JWCrypto](https://github.com/latchset/
 Library is fully FIPS compliant since v2.1
 
 ## Which version?
-- v5.3.0 Extended public [SDK](#settings) to allow custom algorithms implementations. New Elliptic Curve key utils to simplify conversion between P1363 and DER ASN.1 encodings.
+- v5.3.0 Extended public [SDK](#settings) to allow custom algorithms implementations. New [Elliptic Curve key utils](#conversion-of-der-encoded-signatures) to simplify conversion between P1363 and DER ASN.1 encodings.
 - v5.2.0 Maintenence release, added .net6 target to remove dependencies on external outdated packages
 - v5.1.1 Maintenence release, improved memory allocation for deflated tokens (see https://github.com/dvsekhvalnov/jose-jwt/issues/258, https://github.com/dvsekhvalnov/jose-jwt/issues/257)
 
