@@ -681,26 +681,13 @@ namespace Jose
 
                 var headerData = jwtSettings.JsonMapper.Parse<IDictionary<string, object>>(Encoding.UTF8.GetString(header));
 
-                bool b64 = true;
-
-                object value;
-                if (headerData.TryGetValue("b64", out value))
-                {
-                    b64 = (bool)value;
-                }
+                bool b64=Dictionaries.Get<bool>(headerData, "b64", missing: true, msg: "JWT header 'b64' value must be a bool.");                                  
 
                 byte[] contentPayload = parts.Next(b64);
                 byte[] signature = parts.Next();
 
-                var effectivePayload = payload ?? contentPayload;
-
-                object algObj;
-                if (!headerData.TryGetValue("alg", out algObj) || !(algObj is string))
-                {
-                    throw new JoseException("JWT header 'alg' value must be a string.");
-                }
-
-                var algorithm = (string)algObj;
+                var effectivePayload = payload ?? contentPayload;                
+                string algorithm = Dictionaries.Get<string>(headerData, "alg", msg: "JWT header 'alg' value must be a string.");
 
                 if (expectedJwsAlg != null && expectedJwsAlg != algorithm)
                 {

@@ -133,7 +133,7 @@ namespace Jose
                     throw new JoseException(string.Format("Unsupported compression alg requested: {0}", compression));
                 }
 
-                joseProtectedHeader["zip"] = compression;
+                joseProtectedHeader["zip"] = compression;               
                                 
                 plaintext = compressionAlg.Compress(plaintext);
             }
@@ -238,12 +238,7 @@ namespace Jose
 
             foreach (var recipient in token.Recipients)
             {
-                object algObj;
-                if (!recipient.JoseHeader.TryGetValue("alg", out algObj) || !(algObj is string))
-                {
-                    throw new JoseException("JWE header 'alg' value must be a string.");
-                }
-                string headerAlg = (string)algObj;
+                string headerAlg = Dictionaries.Get<string>(recipient.JoseHeader, "alg", msg: "JWE header 'alg' value must be a string.");
 
                 var encryptedCek = recipient.EncryptedCek;
 
@@ -262,12 +257,7 @@ namespace Jose
 
                 try
                 {
-                    object encObj;
-                    if (!recipient.JoseHeader.TryGetValue("enc", out encObj) || !(encObj is string))
-                    {
-                        throw new JoseException("JWE header 'enc' value must be a string.");
-                    }
-                    string headerEnc = (string)encObj;
+                    string headerEnc = Dictionaries.Get<string>(recipient.JoseHeader, "enc", msg: "JWE header 'enc' value must be a string.");
 
                     IJweAlgorithm enc = settings.JweAlgorithmFromHeader(headerEnc);
 
@@ -284,12 +274,13 @@ namespace Jose
                     byte[] cek = keys.Unwrap(recipient.EncryptedCek, key, enc.KeySize, recipient.JoseHeader);
                     byte[] plaintext = enc.Decrypt(Aad(token.ProtectedHeaderBytes, token.Aad), cek, token.Iv, token.Ciphertext, token.AuthTag);
 
-                    if (recipient.JoseHeader.TryGetValue("zip", out var compressionAlg))
-                    {
-                        var compression = settings.CompressionAlgFromHeader((string)compressionAlg);
+                    string compressionAlg = Dictionaries.Get<string>(recipient.JoseHeader, "zip", msg: "JWT header 'zip' value must be a string.");
 
+                    if(compressionAlg != null)
+                    {
+                        var compression = settings.CompressionAlgFromHeader(compressionAlg);
                         plaintext = compression.Decompress(plaintext);
-                    }
+                    }                   
 
                     token.PlaintextBytes = plaintext;
                     token.Recipient = recipient;

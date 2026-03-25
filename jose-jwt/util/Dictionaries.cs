@@ -24,7 +24,7 @@ namespace Jose
         /// <summary>
         /// Syntax sugar for IDictionary.TryGetValue() to lookup unknown keys.
         /// </summary>
-        public static V Get<V>(IDictionary<string, object> src, string key)
+        public static V Get<V>(IDictionary<string, object> src, string key, V missing=default, string msg=null)
         {
             if(src==null)
             {
@@ -33,7 +33,22 @@ namespace Jose
 
             object value;
 
-            return src.TryGetValue(key, out value) ? (V)value : default;
+            if (!src.TryGetValue(key, out value))
+            {
+                return missing;
+            }
+
+            if (!(value is V))
+            {
+                if (msg != null)
+                {
+                    throw new JoseException(msg);
+                }
+
+                throw new JoseException(string.Format("Expected value of type: {0}, but got: {1}", typeof(V), value.GetType()));
+            }
+
+            return (V)value;
         }
 
         public static List<V> GetList<V>(IDictionary<string, object> src, string key)

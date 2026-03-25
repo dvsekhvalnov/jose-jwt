@@ -49,7 +49,14 @@ namespace UnitTests
             Assert.Equal(2, Dictionaries.Get<int>(src, "two"));
             Assert.Equal(new double[] { 4.1, 4.2, 4.3 }, Dictionaries.Get<double[]>(src, "four"));
             Assert.Null(Dictionaries.Get<string>(src, "three"));
+            Assert.Equal("upps", Dictionaries.Get<string>(src, "three", missing: "upps"));
             Assert.Null(Dictionaries.Get<string>(null, "one"));
+
+            var defaultEx=Assert.Throws<JoseException>(() => Dictionaries.Get<string>(src, "two"));
+            Assert.Equal("Expected value of type: System.String, but got: System.Int32", defaultEx.Message);
+
+            var customEx = Assert.Throws<JoseException>(() => Dictionaries.Get<string>(src, "two", msg: "must be string"));
+            Assert.Equal("must be string", customEx.Message);
         }
 
         [Fact]

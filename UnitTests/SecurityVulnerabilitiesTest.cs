@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Jose;
+using Jose.keys;
+using System;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using Jose;
-using Jose.keys;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -236,6 +238,27 @@ namespace UnitTests
             {
                 Console.Out.WriteLine(e.ToString());
             }
+        }
+
+        [Fact]
+        public void MalformedB64Header()
+        {
+            var ex = Assert.Throws<JoseException>(() => Jose.JWT.Decode(
+                "eyJhbGciOiJIUzI1NiIsImI2NCI6ImZhbHNlIiwiY3JpdCI6WyJiNjQiLCJleHAiXSwiZXhwIjoxMzYzMjg0MDB9..9nZCB1H_OMmoTRBe2p5qeq38cyzcjJ6FzUZ9SkeZ4TU",
+                Encoding.UTF8.GetBytes("a0a2abd8-6162-41c3-83d6-1cf559b46afc")
+            ));
+
+            Console.Out.WriteLine(ex.Message);
+        }
+
+        [Fact]
+        public void MalformedZipHeader()
+        {            
+            byte[] aes512Key = new byte[] { 238, 71, 183, 66, 57, 207, 194, 93, 82, 80, 80, 152, 92, 242, 84, 206, 194, 46, 67, 43, 231, 118, 208, 168, 156, 212, 33, 105, 27, 45, 60, 160, 232, 63, 61, 235, 68, 171, 206, 35, 152, 11, 142, 121, 174, 165, 140, 11, 172, 212, 13, 101, 13, 190, 82, 244, 109, 113, 70, 150, 251, 82, 215, 226 };
+            string token = "eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2Q0JDLUhTNTEyIiwiemlwIjp0cnVlfQ..nST6RFdA0NSofxIT9vKm7g.fD5P9Fh03XaW4dWpIUJqryH9fRHDdLLeMgWPTAFy4lg.Endy7B3S_qUuv6jE-Z6VX-bbbBl7ODFFMndIDMjslmg";
+
+            var ex = Assert.Throws<JoseException>(() => Jose.JWT.Decode(token, aes512Key));
+            Console.Out.WriteLine(ex.Message);
         }
     }
 }
